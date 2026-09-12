@@ -18,7 +18,10 @@ INSERT INTO `categories` (`id`, `slug`, `label`, `description`, `image`, `is_pub
 ('immunity', 'immunity', 'Immunity', 'Daily immunity boosters built on trusted herbs and clinically studied actives.', 'https://images.unsplash.com/photo-1584362917165-526a968579e8?w=600&q=80', 1, 3),
 ('weight-management', 'weight-management', 'Weight Management', 'Clean-label formulas to support metabolism and healthy weight goals.', 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80', 1, 4),
 ('vitamins', 'vitamins', 'Vitamins & Supplements', 'Targeted vitamins, minerals and multivitamins for everyday nutritional gaps.', 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=600&q=80', 1, 5),
-('personal-care', 'personal-care', 'Personal Care', 'Natural, dermatologically-tested skin and hair care essentials.', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80', 1, 6);
+('personal-care', 'personal-care', 'Personal Care', 'Natural, dermatologically-tested skin and hair care essentials.', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80', 1, 6),
+('digestive-health', 'digestive-health', 'Digestive Health', 'Ayurvedic juices and formulations for gut health and everyday digestion.', 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&q=80', 1, 7),
+('meal-replacement', 'meal-replacement', 'Meal Replacement', 'Balanced nutrition shakes for on-the-go meals and weight management.', 'https://images.unsplash.com/photo-1622484212385-1a6b90344b52?w=600&q=80', 1, 8),
+('superfoods', 'superfoods', 'Superfoods', 'Nutrient-dense superfood powders and blends for daily wellness.', 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=600&q=80', 1, 9);
 
 -- ----------------------------------------------------------------------------
 -- products
@@ -29,7 +32,14 @@ INSERT INTO `products` (`id`, `title`, `sku`, `price`, `original_price`, `discou
 ('ws-immunity-001', 'Immunity Booster Juice', 'WS-IMM-001', 399.00, 549.00, 27, 'immunity', 4.6, 178, 'A daily shot of giloy, amla, and tulsi crafted to strengthen natural immunity without any added preservatives or artificial colour.', 80, '1L', 'liquid', 'Original', 1, 1, 1, '11523011000452', 0, 0, 1, 0, 1, 1, 1, 1, 1, '2026-02-01 10:00:00.000000', '2026-02-01 10:00:00.000000'),
 ('ws-multivitamin-001', 'Daily Multivitamin Gummies', 'WS-MVG-001', 549.00, 749.00, 27, 'vitamins', 4.5, 96, '13 essential vitamins and minerals packed into a tasty mixed-fruit gummy — no gelatin, no artificial sweeteners.', 150, '60 gummies', 'gummy', 'Mixed Fruit', 1, 1, 0, '11523011000453', 1, 8, 1, 0, 0, 1, 1, 1, 1, '2026-02-15 10:00:00.000000', '2026-02-15 10:00:00.000000'),
 ('ws-fatburner-001', 'Green Coffee Weight Management Capsules', 'WS-GCF-001', 799.00, 1099.00, 27, 'weight-management', 4.4, 62, 'Green coffee bean extract standardised for chlorogenic acid to support metabolism as part of a balanced diet and active lifestyle.', 45, '90 capsules', 'capsule', NULL, 1, 1, 0, '11523011000454', 0, 0, 0, 0, 0, 1, 1, 1, 1, '2026-03-01 10:00:00.000000', '2026-03-01 10:00:00.000000'),
-('ws-facewash-001', 'Neem & Tea Tree Face Wash', 'WS-NTT-001', 349.00, 449.00, 22, 'personal-care', 4.6, 124, 'A gentle, sulphate-free face wash with neem and tea tree oil that clears everyday impurities without stripping your skin.', 200, '150ml', 'liquid', NULL, 1, 1, 0, NULL, 0, 0, 1, 1, 0, 1, 1, 1, 1, '2026-03-10 10:00:00.000000', '2026-03-10 10:00:00.000000');
+('ws-facewash-001', 'Neem & Tea Tree Face Wash', 'WS-NTT-001', 349.00, 449.00, 22, 'personal-care', 4.6, 124, 'A gentle, sulphate-free face wash with neem and tea tree oil that clears everyday impurities without stripping your skin.', 200, '150ml', 'liquid', NULL, 1, 1, 0, NULL, 0, 0, 1, 1, 0, 1, 1, 1, 1, '2026-03-10 10:00:00.000000', '2026-03-10 10:00:00.000000'),
+('ws-hairoil-001', 'Onion Black Seed Hair Oil', 'WS-OBS-001', 449.00, 599.00, 25, 'personal-care', 4.5, 88, 'A cold-pressed onion and black seed hair oil blend that strengthens roots and reduces hair fall with regular use.', 90, '200ml', 'oil', NULL, 1, 1, 1, NULL, 0, 0, 0, 0, 0, 1, 1, 1, 1, '2026-03-15 10:00:00.000000', '2026-03-15 10:00:00.000000'),
+('ws-aloevera-juice-001', 'Aloe Vera Digestive Juice', 'WS-ALV-001', 349.00, 449.00, 22, 'digestive-health', 4.5, 156, 'Cold-extracted aloe vera juice traditionally used to support digestion, gut comfort, and healthy skin from within.', 100, '1L', 'liquid', 'Original', 1, 1, 1, '11523011000455', 0, 0, 0, 1, 0, 1, 1, 1, 1, '2026-01-20 10:00:00.000000', '2026-08-01 10:00:00.000000'),
+('ws-triphala-001', 'Triphala Digestive Tablets', 'WS-TRI-001', 299.00, 399.00, 25, 'digestive-health', 4.6, 203, 'A classic Ayurvedic blend of Amalaki, Bibhitaki and Haritaki to support regular digestion and gentle detoxification.', 140, '60 tablets', 'tablet', NULL, 1, 1, 1, '11523011000456', 1, 10, 0, 1, 0, 1, 1, 1, 1, '2026-01-25 10:00:00.000000', '2026-01-25 10:00:00.000000'),
+('ws-mealshake-001', 'Meal Replacement Shake', 'WS-MRS-001', 1699.00, 2199.00, 23, 'meal-replacement', 4.4, 79, 'A balanced 250-calorie meal shake with 18 vitamins & minerals, fibre, and protein to support healthy, convenient weight management.', 55, '750g (25 servings)', 'powder', 'Cafe Mocha', 1, 0, 0, '11523011000457', 1, 15, 1, 0, 1, 1, 1, 1, 1, '2026-02-05 10:00:00.000000', '2026-08-05 10:00:00.000000'),
+('ws-superfood-greens-001', 'Daily Greens Superfood Blend', 'WS-DGB-001', 999.00, 1299.00, 23, 'superfoods', 4.5, 67, 'A blend of spirulina, wheatgrass, moringa and 8 other greens to help fill everyday nutrition gaps in one daily scoop.', 70, '200g (40 servings)', 'powder', 'Unflavoured', 1, 1, 0, '11523011000458', 1, 10, 1, 0, 0, 1, 1, 1, 1, '2026-02-20 10:00:00.000000', '2026-02-20 10:00:00.000000'),
+('ws-biotin-001', 'Biotin Hair, Skin & Nails Gummies', 'WS-BIO-001', 599.00, 799.00, 25, 'vitamins', 4.6, 142, '5000mcg biotin gummies with zinc and vitamin E to support healthy hair, skin and nails from within.', 130, '60 gummies', 'gummy', 'Orange', 1, 1, 0, '11523011000459', 1, 8, 1, 1, 0, 1, 1, 1, 1, '2026-03-05 10:00:00.000000', '2026-08-10 10:00:00.000000'),
+('ws-whey-001', 'Whey Protein Concentrate', 'WS-WHY-001', 2199.00, 2799.00, 21, 'protein', 4.7, 268, 'A classic whey protein concentrate with 25g protein per serving to support muscle recovery and daily protein targets.', 65, '1kg (33 servings)', 'powder', 'Rich Chocolate', 1, 0, 0, '11523011000460', 1, 10, 0, 1, 1, 1, 1, 1, 1, '2026-01-08 10:00:00.000000', '2026-08-15 10:00:00.000000');
 
 -- ----------------------------------------------------------------------------
 -- product_images
@@ -42,7 +52,14 @@ INSERT INTO `product_images` (`product_id`, `url`, `sort_order`) VALUES
 ('ws-immunity-001', 'https://images.unsplash.com/photo-1584362917165-526a968579e8?w=800&q=80', 0),
 ('ws-multivitamin-001', 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=800&q=80', 0),
 ('ws-fatburner-001', 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80', 0),
-('ws-facewash-001', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80', 0);
+('ws-facewash-001', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&q=80', 0),
+('ws-hairoil-001', 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=800&q=80', 0),
+('ws-aloevera-juice-001', 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=800&q=80', 0),
+('ws-triphala-001', 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=800&q=80', 0),
+('ws-mealshake-001', 'https://images.unsplash.com/photo-1622484212385-1a6b90344b52?w=800&q=80', 0),
+('ws-superfood-greens-001', 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=800&q=80', 0),
+('ws-biotin-001', 'https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?w=800&q=80', 0),
+('ws-whey-001', 'https://images.unsplash.com/photo-1579722820258-996fdb4dc7de?w=800&q=80', 0);
 
 -- ----------------------------------------------------------------------------
 -- product_badges
@@ -61,7 +78,21 @@ INSERT INTO `product_badges` (`product_id`, `badge`, `sort_order`) VALUES
 ('ws-multivitamin-001', 'FSSAI Certified', 1),
 ('ws-fatburner-001', 'Lab Tested', 0),
 ('ws-facewash-001', 'Sulphate Free', 0),
-('ws-facewash-001', 'Dermatologically Tested', 1);
+('ws-facewash-001', 'Dermatologically Tested', 1),
+('ws-hairoil-001', 'Cold Pressed', 0),
+('ws-hairoil-001', 'No Mineral Oil', 1),
+('ws-aloevera-juice-001', 'FSSAI Certified', 0),
+('ws-aloevera-juice-001', 'No Added Sugar', 1),
+('ws-triphala-001', 'FSSAI Certified', 0),
+('ws-triphala-001', '100% Ayurvedic', 1),
+('ws-mealshake-001', 'FSSAI Certified', 0),
+('ws-mealshake-001', '18 Vitamins & Minerals', 1),
+('ws-superfood-greens-001', 'FSSAI Certified', 0),
+('ws-superfood-greens-001', '100% Vegan', 1),
+('ws-biotin-001', 'FSSAI Certified', 0),
+('ws-biotin-001', 'No Gelatin', 1),
+('ws-whey-001', 'FSSAI Certified', 0),
+('ws-whey-001', 'Lab Tested', 1);
 
 -- ----------------------------------------------------------------------------
 -- product_tags
@@ -73,7 +104,14 @@ INSERT INTO `product_tags` (`product_id`, `tag`, `sort_order`) VALUES
 ('ws-immunity-001', 'New', 0),
 ('ws-multivitamin-001', 'New', 0),
 ('ws-facewash-001', 'Best Seller', 0),
-('ws-facewash-001', 'New', 1);
+('ws-facewash-001', 'New', 1),
+('ws-aloevera-juice-001', 'Best Seller', 0),
+('ws-triphala-001', 'Best Seller', 0),
+('ws-mealshake-001', 'New', 0),
+('ws-superfood-greens-001', 'New', 0),
+('ws-biotin-001', 'New', 0),
+('ws-biotin-001', 'Best Seller', 1),
+('ws-whey-001', 'Best Seller', 0);
 
 -- ----------------------------------------------------------------------------
 -- product_features
@@ -87,7 +125,14 @@ INSERT INTO `product_features` (`product_id`, `feature`, `sort_order`) VALUES
 ('ws-ashwagandha-001', '5% Withanolides Standardised', 1),
 ('ws-ashwagandha-001', 'Supports Stress & Sleep', 2),
 ('ws-facewash-001', 'Sulphate-Free Cleansing', 0),
-('ws-facewash-001', 'Neem + Tea Tree Oil', 1);
+('ws-facewash-001', 'Neem + Tea Tree Oil', 1),
+('ws-mealshake-001', '18 Vitamins & Minerals', 0),
+('ws-mealshake-001', '250 Calories per Serving', 1),
+('ws-mealshake-001', '11g Fibre', 2),
+('ws-triphala-001', 'Amalaki, Bibhitaki & Haritaki Blend', 0),
+('ws-triphala-001', 'Supports Regular Digestion', 1),
+('ws-whey-001', '25g Protein per Serving', 0),
+('ws-whey-001', '5.5g BCAAs', 1);
 
 -- ----------------------------------------------------------------------------
 -- product_ingredients
