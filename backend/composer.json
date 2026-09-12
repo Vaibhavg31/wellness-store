@@ -1,6 +1,6 @@
 {
-  "name": "krivea/jewels-api",
-  "description": "Krivea Jewels PHP API",
+  "name": "wellness-store/api",
+  "description": "Wellness Store PHP API",
   "type": "project",
     "require": {
     "php": ">=8.1",

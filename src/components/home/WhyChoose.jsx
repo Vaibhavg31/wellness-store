@@ -75,7 +75,7 @@ export default function WhyChoose() {
                         </a>
                         )}
                         <a
-                            href={getWhatsAppUrl('Hi Krivea! I have a question about your jewellery.')}
+                            href={getWhatsAppUrl('Hi! I have a question about your products.')}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex"

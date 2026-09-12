@@ -163,7 +163,7 @@ export default function ShopPage() {
 
                 {/* Circular categories — hidden on phone; tabs below handle filtering */}
                 <section className="hidden sm:block">
-                    <ShopSectionHeading title="Everyday Krivea Collection" className="mb-4 sm:mb-7" />
+                    <ShopSectionHeading title="Everyday Wellness Collection" className="mb-4 sm:mb-7" />
                     <CategoryCircles
                         activeSlug={filters.category === 'all' ? null : filters.category}
                         onSelect={setCategory}
@@ -172,7 +172,7 @@ export default function ShopPage() {
 
                 {/* Filter tabs + products */}
                 <section>
-                    <ShopSectionHeading title="Krivea Top Styles" className="mb-3 sm:mb-6" />
+                    <ShopSectionHeading title="Trending Now" className="mb-3 sm:mb-6" />
                     <ProductSearchBar
                         value={filters.search}
                         onChange={(value) => updateFilter('search', value)}

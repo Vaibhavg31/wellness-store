@@ -166,7 +166,7 @@ export default function Footer() {
 
                         {subscribed ? (
                             <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-blush/80 font-light">
-                                ✦ Thank you for subscribing! Welcome to the Krivea family.
+                                ✦ Thank you for subscribing! Welcome to the family.
                             </motion.p>
                         ) : (
                             <form onSubmit={handleNewsletter} className="space-y-3">

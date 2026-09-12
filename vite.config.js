@@ -44,6 +44,10 @@ export default defineConfig({
     },
   },
   server: {
+    // Bind to all interfaces (not just localhost) so devices on the same
+    // Wi-Fi/LAN — e.g. a phone — can reach the dev server via this PC's
+    // local IP (see README "Testing on your phone").
+    host: true,
     // Backend JSON stores (orders, rate limits, etc.) must not trigger a dev reload.
     watch: {
       ignored: ['**/backend/data/**'],

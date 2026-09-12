@@ -100,6 +100,7 @@ final class ProductRoutes
                 'badges'        => is_array($body['badges'] ?? null) ? $body['badges'] : [],
                 'stock'         => (int) $body['stock'],
                 'images'        => $body['images'],
+                'variants'      => is_array($body['variants'] ?? null) ? $body['variants'] : [],
                 'isNew'         => (bool) ($body['isNew']        ?? false),
                 'isBestSeller'  => (bool) ($body['isBestSeller'] ?? false),
                 'isTrendingPinned' => (bool) ($body['isTrendingPinned'] ?? false),
@@ -136,9 +137,12 @@ final class ProductRoutes
             $allowed = ['title', 'price', 'originalPrice', 'discount', 'category', 'tags',
                         'rating', 'reviewCount', 'description', 'features', 'badges', 'stock', 'images',
                         'isNew', 'isBestSeller', 'isTrendingPinned', 'showTrustBadges', 'isPublished', 'enable3dPreview', 'cutoutImages',
-                        'codEnabled', 'onlinePaymentEnabled'];
+                        'codEnabled', 'onlinePaymentEnabled', 'variants'];
 
             $changes = array_intersect_key($body, array_flip($allowed));
+            if (isset($changes['variants']) && !is_array($changes['variants'])) {
+                unset($changes['variants']);
+            }
 
             $price         = (float) ($changes['price']         ?? $product['price']);
             $originalPrice = (float) ($changes['originalPrice'] ?? $product['originalPrice']);

@@ -2,6 +2,6 @@ User-agent: *
 Allow: /
 
 # Admin panel — not for indexing
-Disallow: /krivea-studio
+Disallow: /wellness-studio
 
-Sitemap: https://kriveajewels.com/sitemap.xml
+Sitemap: https://wellnessstore.example/sitemap.xml

@@ -41,7 +41,7 @@
     "VITE_ADMIN_PATH": "/wellness-studio",
     "ADMIN_USERNAME": "wellness_admin",
     "ADMIN_PASSWORD_HASH": "",
-    "ADMIN_DEV_PASSWORD": "ChangeMe@123",
+    "ADMIN_DEV_PASSWORD": "Vaibhav@123",
     "ADMIN_EMAILS": "gandhivaibhav60@gmail.com",
     "ADMIN_PANEL_LOGIN": "true",
     "JWT_SECRET": "wellness-dev-secret-change-in-production",

@@ -42,6 +42,20 @@ INSERT INTO `products` (`id`, `title`, `sku`, `price`, `original_price`, `discou
 ('ws-whey-001', 'Whey Protein Concentrate', 'WS-WHY-001', 2199.00, 2799.00, 21, 'protein', 4.7, 268, 'A classic whey protein concentrate with 25g protein per serving to support muscle recovery and daily protein targets.', 65, '1kg (33 servings)', 'powder', 'Rich Chocolate', 1, 0, 0, '11523011000460', 1, 10, 0, 1, 1, 1, 1, 1, 1, '2026-01-08 10:00:00.000000', '2026-08-15 10:00:00.000000');
 
 -- ----------------------------------------------------------------------------
+-- product_variants (pack-size / duration variants — e.g. 1 / 3 / 6 month supply)
+-- ----------------------------------------------------------------------------
+INSERT INTO `product_variants` (`id`, `product_id`, `label`, `net_quantity`, `price`, `original_price`, `discount`, `stock`, `sku`, `is_default`, `sort_order`, `created_at`, `updated_at`) VALUES
+('ws-ashwagandha-001-1m', 'ws-ashwagandha-001', '1 Month Supply', '60 capsules', 649.00, 899.00, 28, 60, 'WS-ASH-001-1M', 1, 1, '2026-01-10 10:00:00.000000', '2026-08-18 10:00:00.000000'),
+('ws-ashwagandha-001-3m', 'ws-ashwagandha-001', '3 Month Supply', '180 capsules (3x60)', 1799.00, 2697.00, 33, 40, 'WS-ASH-001-3M', 0, 2, '2026-01-10 10:00:00.000000', '2026-08-18 10:00:00.000000'),
+('ws-ashwagandha-001-6m', 'ws-ashwagandha-001', '6 Month Supply', '360 capsules (6x60)', 3299.00, 5394.00, 39, 20, 'WS-ASH-001-6M', 0, 3, '2026-01-10 10:00:00.000000', '2026-08-18 10:00:00.000000'),
+('ws-protein-001-1m', 'ws-protein-001', '1 Month Supply', '1kg (33 servings)', 1899.00, 2499.00, 24, 30, 'WS-PRO-001-1M', 1, 1, '2026-01-05 10:00:00.000000', '2026-08-20 10:00:00.000000'),
+('ws-protein-001-3m', 'ws-protein-001', '3 Month Supply', '3kg (3x1kg)', 5399.00, 7497.00, 28, 20, 'WS-PRO-001-3M', 0, 2, '2026-01-05 10:00:00.000000', '2026-08-20 10:00:00.000000'),
+('ws-protein-001-6m', 'ws-protein-001', '6 Month Supply', '6kg (6x1kg)', 9999.00, 14994.00, 33, 10, 'WS-PRO-001-6M', 0, 3, '2026-01-05 10:00:00.000000', '2026-08-20 10:00:00.000000'),
+('ws-whey-001-1m', 'ws-whey-001', '1 Month Supply', '1kg (33 servings)', 2199.00, 2799.00, 21, 35, 'WS-WHY-001-1M', 1, 1, '2026-01-08 10:00:00.000000', '2026-08-15 10:00:00.000000'),
+('ws-whey-001-3m', 'ws-whey-001', '3 Month Supply', '3kg (3x1kg)', 6199.00, 8397.00, 26, 20, 'WS-WHY-001-3M', 0, 2, '2026-01-08 10:00:00.000000', '2026-08-15 10:00:00.000000'),
+('ws-whey-001-6m', 'ws-whey-001', '6 Month Supply', '6kg (6x1kg)', 11499.00, 16794.00, 32, 10, 'WS-WHY-001-6M', 0, 3, '2026-01-08 10:00:00.000000', '2026-08-15 10:00:00.000000');
+
+-- ----------------------------------------------------------------------------
 -- product_images
 -- ----------------------------------------------------------------------------
 INSERT INTO `product_images` (`product_id`, `url`, `sort_order`) VALUES
@@ -178,6 +192,20 @@ INSERT INTO `product_faqs` (`product_id`, `question`, `answer`, `sort_order`) VA
 ('ws-ashwagandha-001', 'Is it safe for daily long-term use?', 'Yes, KSM-66 Ashwagandha is well studied for safety with continued daily use; consult your physician if you are on other medication.', 1);
 
 -- ----------------------------------------------------------------------------
+-- bundles
+-- ----------------------------------------------------------------------------
+INSERT INTO `bundles` (`id`, `title`, `subtitle`, `description`, `image`, `discount_type`, `discount_value`, `is_published`, `sort_order`, `created_at`, `updated_at`) VALUES
+('bundle-wellness-kit', 'Complete Wellness Kit', 'Frequently Bought Together', 'Everyday essentials for stress, immunity, and digestion — together in one routine.', NULL, 'percent', 15, 1, 1, '2026-04-01 10:00:00.000000', '2026-08-01 10:00:00.000000'),
+('bundle-fitness-pack', 'Fitness Starter Pack', 'Fuel Your Workouts', 'Protein and multivitamin support for anyone starting a new training routine.', NULL, 'flat', 300, 1, 2, '2026-04-10 10:00:00.000000', '2026-08-01 10:00:00.000000');
+
+INSERT INTO `bundle_items` (`bundle_id`, `product_id`, `quantity`, `sort_order`) VALUES
+('bundle-wellness-kit', 'ws-ashwagandha-001', 1, 0),
+('bundle-wellness-kit', 'ws-multivitamin-001', 1, 1),
+('bundle-wellness-kit', 'ws-triphala-001', 1, 2),
+('bundle-fitness-pack', 'ws-whey-001', 1, 0),
+('bundle-fitness-pack', 'ws-biotin-001', 1, 1);
+
+-- ----------------------------------------------------------------------------
 -- reviews
 -- ----------------------------------------------------------------------------
 INSERT INTO `reviews` (`id`, `product_id`, `name`, `email`, `rating`, `comment`, `avatar`, `is_approved`, `created_at`) VALUES
@@ -272,25 +300,29 @@ INSERT INTO `site_why_choose_benefits` (`icon`, `title`, `description`, `sort_or
 -- ----------------------------------------------------------------------------
 -- site_section_toggles
 -- ----------------------------------------------------------------------------
-INSERT INTO `site_section_toggles` (`section_key`, `is_enabled`) VALUES
-('hero', 1),
-('brandMarquee', 1),
-('categories', 1),
-('featured', 1),
-('trending', 1),
-('whyChoose', 1),
-('qualityBanner', 1),
-('banners', 1),
-('reviews', 1),
-('instagram', 0),
-('newsletter', 1),
-('promoBanner', 1);
+INSERT INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES
+('hero', 1, 1),
+('brandMarquee', 1, 2),
+('categories', 1, 3),
+('featured', 1, 4),
+('trending', 1, 5),
+('bundles', 1, 6),
+('whyChoose', 1, 7),
+('antiTarnishBanner', 1, 8),
+('banners', 1, 9),
+('reviews', 1, 10),
+('instagram', 0, 11),
+('newsletter', 1, 12),
+('promoBanner', 1, 13);
 
 -- ----------------------------------------------------------------------------
 -- site_settings  (single row)
 -- ----------------------------------------------------------------------------
 INSERT INTO `site_settings` (
-  `id`, `site_name`, `brand_name`, `brand_short`, `brand_tagline`, `brand_description`, `logo`,
+  `id`, `site_name`, `brand_name`, `brand_short`, `brand_tagline`, `brand_description`, `logo`, `favicon`,
+  `theme_primary_color`, `theme_primary_light`, `theme_primary_dark`,
+  `theme_accent_color`, `theme_accent_light`, `theme_blush_color`,
+  `theme_background_color`, `theme_text_color`, `theme_font_heading`, `theme_font_body`,
   `contact_email`, `contact_whatsapp_number`, `contact_whatsapp_display`, `contact_whatsapp_default_message`, `contact_business_hours`,
   `social_instagram_handle`, `social_instagram_url`, `social_instagram_tagline`,
   `delivery_fee`, `delivery_free_threshold`, `delivery_return_days`,
@@ -302,9 +334,20 @@ INSERT INTO `site_settings` (
   `hero_featured_product_id`, `hero_scroll_cue`, `hero_video_url`, `hero_video_poster`,
   `featured_collection_title`, `featured_styles_title`, `featured_view_all_label`, `featured_product_count`,
   `why_choose_subtitle`, `why_choose_title`, `why_choose_description`, `why_choose_cta_text`,
-  `quality_promise_badge`, `quality_promise_title`, `quality_promise_description`, `quality_promise_cta_label`, `quality_promise_cta_href`
+  `quality_promise_badge`, `quality_promise_title`, `quality_promise_description`, `quality_promise_cta_label`, `quality_promise_cta_href`, `quality_promise_image`,
+  `newsletter_badge`, `newsletter_title`, `newsletter_description`, `newsletter_button_label`, `newsletter_disclaimer`, `newsletter_success_message`,
+  `instagram_subtitle`, `instagram_title`, `instagram_description`, `instagram_strip_label`,
+  `about_hero_title`, `about_hero_description`, `about_story_badge`, `about_story_title`,
+  `about_story_image`, `about_mission_title`, `about_mission_text`,
+  `about_vision_title`, `about_vision_text`, `about_values_subtitle`, `about_values_title`,
+  `contact_page_subtitle`, `contact_page_title`, `contact_page_description`,
+  `footer_tagline`, `footer_description`, `footer_newsletter_title`, `footer_newsletter_description`, `footer_instagram_card_text`,
+  `seo_title`, `seo_description`
 ) VALUES (
-  1, 'Wellness Store', 'Wellness Store', 'WS', 'Everyday Wellness, Honestly Made', 'Wellness Store is a placeholder wellness/nutrition D2C brand template — swap in your real brand name, copy and imagery.', '',
+  1, 'Wellness Store', 'Wellness Store', 'WS', 'Everyday Wellness, Honestly Made', 'Wellness Store is a placeholder wellness/nutrition D2C brand template — swap in your real brand name, copy and imagery.', '', '',
+  '#0F5132', '#15803D', '#0A3D25',
+  '#D97706', '#F59E0B', '#FDE68A',
+  '#FBF9F4', '#1C1A16', '"Fraunces", Georgia, serif', '"Inter", system-ui, sans-serif',
   'hello@wellnessstore.example', '910000000000', '+91 00000 00000', 'Hi! I have a question about a product.', 'Mon-Sat, 10am-7pm IST',
   'wellnessstore', 'https://instagram.com/wellnessstore', 'Follow us for wellness tips and behind-the-scenes',
   49.00, 999.00, 7,
@@ -316,7 +359,15 @@ INSERT INTO `site_settings` (
   'ws-protein-001', 'Scroll to explore', '', '',
   'Featured Collection', 'Trending Now', 'View All', 8,
   'Why Choose Us', 'Wellness You Can Trust', 'From sourcing to lab testing, every step is built around transparency.', 'Learn more about our process',
-  'FSSAI & GMP Certified', 'Purity You Can Verify', 'Every product is manufactured in certified facilities and third-party lab tested before it reaches you.', 'See Our Certifications', '/about'
+  'FSSAI & GMP Certified', 'Purity You Can Verify', 'Every product is manufactured in certified facilities and third-party lab tested before it reaches you.', 'See Our Certifications', '/about', '',
+  'Exclusive Access', 'Join Our Wellness Circle', 'Be the first to hear about new products, offers, and wellness tips.', 'Subscribe', 'No spam. Unsubscribe anytime.', 'Thank you for subscribing!',
+  '@wellnessstore', 'Follow Our Journey', 'Wellness tips, product stories & customer love. Join us on Instagram.', 'Follow us on Instagram',
+  'Our Story', 'Wellness Store was founded on a simple belief: everyday wellness shouldn''t mean compromising on purity or transparency.', 'The Beginning', 'Wellness, Honestly Made',
+  '', 'Our Mission', 'To make clean-label, lab-tested wellness products accessible to every household.',
+  'Our Vision', 'To become India''s most trusted wellness brand, known for transparency and quality.', 'What Drives Us', 'Mission & Vision',
+  'Get in Touch', 'Contact Us', 'We''d love to hear from you. Our team is here to help.',
+  'Everyday Wellness, Honestly Made', 'Clean-label supplements and nutrition, honestly sourced and lab tested for purity.', 'Our Wellness Circle', 'Be the first to hear about new products, offers, and wellness tips.', 'Wellness tips, product stories & behind-the-scenes.',
+  'Wellness Store | Clean-Label Supplements & Nutrition', 'Clean-label supplements and nutrition, honestly sourced and lab tested for purity.'
 );
 
 COMMIT;

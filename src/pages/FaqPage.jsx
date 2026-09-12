@@ -16,7 +16,7 @@ export default function FaqPage() {
                 <SectionTitle
                     subtitle="FAQ"
                     title="Frequently Asked Questions"
-                    description="Everything you need to know about Krivea jewellery, care, and orders."
+                    description="Everything you need to know about our products, purity, and orders."
                 />
 
                 <div className="space-y-3">

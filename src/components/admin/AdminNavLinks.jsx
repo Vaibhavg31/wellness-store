@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, Package, FolderOpen, Star, MessageSquare, Settings, ShoppingBag, PenLine, Tag, UserPlus, Users, Images } from 'lucide-react';
+import { LayoutDashboard, Package, FolderOpen, Star, MessageSquare, Settings, ShoppingBag, PenLine, Tag, Gift, UserPlus, Users, Images } from 'lucide-react';
 import { ADMIN_PATH } from '@/contexts/AuthContext';
 
 // Banners used to be its own nav item — its upload/management UI now lives
@@ -13,6 +13,7 @@ export const adminNavItems = [
     { label: 'Orders', href: `${ADMIN_PATH}/orders`, icon: ShoppingBag },
     { label: 'Direct Orders', href: `${ADMIN_PATH}/direct-orders`, icon: UserPlus },
     { label: 'Coupons', href: `${ADMIN_PATH}/coupons`, icon: Tag },
+    { label: 'Bundles', href: `${ADMIN_PATH}/bundles`, icon: Gift },
     { label: 'Users', href: `${ADMIN_PATH}/users`, icon: Users },
     { label: 'Reviews', href: `${ADMIN_PATH}/reviews`, icon: Star },
     { label: 'Feedback', href: `${ADMIN_PATH}/feedback`, icon: MessageSquare },

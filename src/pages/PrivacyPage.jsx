@@ -33,7 +33,7 @@ export default function PrivacyPage() {
                         <h2 className="font-serif text-xl text-charcoal mb-3">Your Rights</h2>
                         <p>
                             You may request access to, correction of, or deletion of your personal data at any time by
-                            contacting us at hello@kriveajewels.com.
+                            contacting us at hello@wellnessstore.example.
                         </p>
                     </section>
                     <section>

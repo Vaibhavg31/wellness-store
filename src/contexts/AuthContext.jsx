@@ -18,7 +18,7 @@ const TOKEN_KEY       = 'krivea-auth-token';
 const USER_KEY        = 'krivea-auth-user';
 const ADMIN_TOKEN_KEY = 'krivea-admin-token';
 
-export const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || '/krivea-studio';
+export const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || '/wellness-studio';
 
 const AuthContext = createContext(null);
 

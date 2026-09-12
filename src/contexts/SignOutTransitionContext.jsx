@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut } from 'lucide-react';
+import { BRAND_NAME } from '@/constants';
 
 const SignOutTransitionContext = createContext(null);
 
@@ -81,7 +82,7 @@ function SignOutOverlay({ active }) {
                             transition={{ delay: 0.18, duration: 0.35 }}
                             className="text-sm text-soft-brown font-light"
                         >
-                            Thanks for visiting Krivea Jewels
+                            Thanks for visiting {BRAND_NAME}
                         </motion.p>
 
                         <motion.div

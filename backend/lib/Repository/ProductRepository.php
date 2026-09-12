@@ -16,11 +16,10 @@ final class ProductRepository extends MysqlRepository
 
     /** Child tables keyed by their PHP array key → [table, column]. */
     private const CHILD_TABLES = [
-        'images'       => ['product_images', 'url'],
-        'tags'         => ['product_tags', 'tag'],
-        'features'     => ['product_features', 'feature'],
-        'badges'       => ['product_badges', 'badge'],
-        'cutoutImages' => ['product_cutout_images', 'url'],
+        'images'   => ['product_images', 'url'],
+        'tags'     => ['product_tags', 'tag'],
+        'features' => ['product_features', 'feature'],
+        'badges'   => ['product_badges', 'badge'],
     ];
 
     protected function rowToArray(array $row): array
@@ -30,7 +29,8 @@ final class ProductRepository extends MysqlRepository
         foreach (self::CHILD_TABLES as $key => [$table, $col]) {
             $children[$key] = $this->fetchChildStrings($table, $id, $col);
         }
-        return array_merge($this->scalarFields($row), $children);
+        $children['variants'] = $this->fetchVariants($id);
+        return $this->applyVariantOverrides(array_merge($this->scalarFields($row), $children));
     }
 
     private function scalarFields(array $row): array
@@ -51,7 +51,6 @@ final class ProductRepository extends MysqlRepository
             'isTrendingPinned'     => $this->bool($row['is_trending_pinned']),
             'showTrustBadges'      => $this->bool($row['show_trust_badges']),
             'isPublished'          => $this->bool($row['is_published']),
-            'enable3dPreview'      => $this->bool($row['enable_3d_preview']),
             'codEnabled'           => $this->bool($row['cod_enabled']),
             'onlinePaymentEnabled' => $this->bool($row['online_payment_enabled']),
             'createdAt'            => $this->toIso($row['created_at']),
@@ -76,15 +75,46 @@ final class ProductRepository extends MysqlRepository
         foreach (self::CHILD_TABLES as $key => [$table, $col]) {
             $childrenByKey[$key] = $this->fetchChildStringsBatch($table, $col, $ids);
         }
+        $variantsById = $this->fetchVariantsBatch($ids);
 
-        return array_map(function (array $row) use ($childrenByKey) {
+        return array_map(function (array $row) use ($childrenByKey, $variantsById) {
             $id = $row['id'];
             $children = [];
             foreach (array_keys(self::CHILD_TABLES) as $key) {
                 $children[$key] = $childrenByKey[$key][$id] ?? [];
             }
-            return array_merge($this->scalarFields($row), $children);
+            $children['variants'] = $variantsById[$id] ?? [];
+            return $this->applyVariantOverrides(array_merge($this->scalarFields($row), $children));
         }, $rows);
+    }
+
+    /**
+     * When a product has variants, the catalog-wide price/stock (used by
+     * product cards, cart, search, etc. everywhere else in the app) should
+     * reflect the pre-selected ("default") variant instead of the product's
+     * own base row — so nothing outside the product detail page needs to
+     * know variants exist at all.
+     */
+    private function applyVariantOverrides(array $product): array
+    {
+        $variants = $product['variants'] ?? [];
+        if (!$variants) {
+            $product['hasVariants'] = false;
+            return $product;
+        }
+
+        $default = null;
+        foreach ($variants as $v) {
+            if (!empty($v['isDefault'])) { $default = $v; break; }
+        }
+        $default ??= $variants[0];
+
+        $product['hasVariants']   = true;
+        $product['price']         = $default['price'];
+        $product['originalPrice'] = $default['originalPrice'];
+        $product['discount']      = $default['discount'];
+        $product['stock']         = array_sum(array_column($variants, 'stock'));
+        return $product;
     }
 
     /** @return array<string, list<string>> child values grouped by product_id */
@@ -121,7 +151,6 @@ final class ProductRepository extends MysqlRepository
             'isTrendingPinned'     => ['col' => 'is_trending_pinned',      'type' => 'bool'],
             'showTrustBadges'      => ['col' => 'show_trust_badges',       'type' => 'bool'],
             'isPublished'          => ['col' => 'is_published',            'type' => 'bool'],
-            'enable3dPreview'      => ['col' => 'enable_3d_preview',       'type' => 'bool'],
             'codEnabled'           => ['col' => 'cod_enabled',             'type' => 'bool'],
             'onlinePaymentEnabled' => ['col' => 'online_payment_enabled',  'type' => 'bool'],
             'createdAt'            => ['col' => 'created_at',              'type' => 'datetime'],
@@ -142,6 +171,157 @@ final class ProductRepository extends MysqlRepository
             };
         }
         return $row;
+    }
+
+    // -------------------------------------------------------------------------
+    // Variants (product_variants) — structured child rows, not a simple
+    // one-column child table, so they get their own read/write methods.
+    // -------------------------------------------------------------------------
+
+    private function variantRowToArray(array $r): array
+    {
+        return [
+            'id'             => $r['id'],
+            'label'          => $r['label'],
+            'netQuantity'    => $r['net_quantity'],
+            // NULL (the common case) means "reuse the product's own photos" —
+            // only set when this specific option genuinely looks different
+            // (e.g. a different color/flavor).
+            'image'          => $r['image'] ?? null,
+            'price'          => (float) $r['price'],
+            'originalPrice'  => (float) $r['original_price'],
+            'discount'       => (int) $r['discount'],
+            'stock'          => (int) $r['stock'],
+            'sku'            => $r['sku'],
+            'isDefault'      => $this->bool($r['is_default']),
+        ];
+    }
+
+    /**
+     * True once we've confirmed `product_variants` exists on this database —
+     * checked at most once per request. Lets an install that hasn't run
+     * backend/migrations/001_add_product_variants.sql yet keep listing
+     * products normally (just without variants) instead of every single
+     * product request failing outright.
+     */
+    private static ?bool $variantsTableExists = null;
+
+    private function variantsTableExists(): bool
+    {
+        if (self::$variantsTableExists === null) {
+            try {
+                $this->pdo()->query('SELECT 1 FROM product_variants LIMIT 1');
+                self::$variantsTableExists = true;
+            } catch (\Throwable) {
+                self::$variantsTableExists = false;
+                error_log('[ProductRepository] `product_variants` table not found — run backend/migrations/001_add_product_variants.sql. Serving products without variants in the meantime.');
+            }
+        }
+        return self::$variantsTableExists;
+    }
+
+    private function fetchVariants(string $productId): array
+    {
+        if (!$this->variantsTableExists()) {
+            return [];
+        }
+        $stmt = $this->pdo()->prepare(
+            'SELECT * FROM product_variants WHERE product_id = ? ORDER BY sort_order ASC, created_at ASC'
+        );
+        $stmt->execute([$productId]);
+        return array_map([$this, 'variantRowToArray'], $stmt->fetchAll());
+    }
+
+    /** @return array<string, list<array>> variants grouped by product_id */
+    private function fetchVariantsBatch(array $productIds): array
+    {
+        if (!$productIds || !$this->variantsTableExists()) {
+            return [];
+        }
+        $placeholders = implode(', ', array_fill(0, count($productIds), '?'));
+        $stmt = $this->pdo()->prepare(
+            "SELECT * FROM product_variants WHERE product_id IN ({$placeholders}) ORDER BY product_id, sort_order ASC, created_at ASC"
+        );
+        $stmt->execute($productIds);
+
+        $grouped = [];
+        foreach ($stmt->fetchAll() as $r) {
+            $grouped[$r['product_id']][] = $this->variantRowToArray($r);
+        }
+        return $grouped;
+    }
+
+    private function replaceVariants(string $productId, array $variants): void
+    {
+        $this->pdo()->prepare('DELETE FROM product_variants WHERE product_id = ?')->execute([$productId]);
+        if (!$variants) {
+            return;
+        }
+        $insert = $this->pdo()->prepare(
+            'INSERT INTO product_variants
+                (id, product_id, label, net_quantity, image, price, original_price, discount, stock, sku, is_default, sort_order, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $now = gmdate('Y-m-d H:i:s');
+        foreach (array_values($variants) as $i => $v) {
+            $price    = (float) ($v['price'] ?? 0);
+            $original = (float) ($v['originalPrice'] ?? $price);
+            $insert->execute([
+                $v['id'] ?? Database::generateId('variant'),
+                $productId,
+                trim((string) ($v['label'] ?? '')) ?: 'Variant ' . ($i + 1),
+                ($v['netQuantity'] ?? '') !== '' ? $v['netQuantity'] : null,
+                ($v['image'] ?? '') !== '' ? $v['image'] : null,
+                $price,
+                $original,
+                self::calcDiscount($price, $original, isset($v['discount']) ? (float) $v['discount'] : null),
+                (int) ($v['stock'] ?? 0),
+                $v['sku'] ?? null,
+                !empty($v['isDefault']) ? 1 : 0,
+                $i,
+                $now,
+                $now,
+            ]);
+        }
+    }
+
+    /** Fetch a single variant, scoped to its product (defends against a
+     *  variantId from one product being used to buy/adjust another's). */
+    public function getVariant(string $productId, string $variantId): ?array
+    {
+        $stmt = $this->pdo()->prepare(
+            'SELECT * FROM product_variants WHERE id = ? AND product_id = ? LIMIT 1'
+        );
+        $stmt->execute([$variantId, $productId]);
+        $row = $stmt->fetch();
+        return $row ? $this->variantRowToArray($row) : null;
+    }
+
+    public function adjustVariantStock(string $variantId, int $delta): bool
+    {
+        $pdo  = $this->pdo();
+        $stmt = $pdo->prepare('SELECT stock FROM product_variants WHERE id = ? FOR UPDATE');
+        $pdo->beginTransaction();
+        try {
+            $stmt->execute([$variantId]);
+            $row = $stmt->fetch();
+            if (!$row) {
+                $pdo->rollBack();
+                return false;
+            }
+            $next = (int) $row['stock'] + $delta;
+            if ($next < 0) {
+                $pdo->rollBack();
+                return false;
+            }
+            $pdo->prepare('UPDATE product_variants SET stock = ?, updated_at = ? WHERE id = ?')
+                ->execute([$next, gmdate('Y-m-d H:i:s'), $variantId]);
+            $pdo->commit();
+            return true;
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
     }
 
     private function fetchChildStrings(string $table, string $productId, string $col): array
@@ -177,11 +357,13 @@ final class ProductRepository extends MysqlRepository
         $this->pdo()->prepare("INSERT INTO products ({$cols}) VALUES ({$places})")->execute(array_values($row));
 
         $id = $data['id'];
-        $this->replaceChildStrings('product_images',        $id, 'url',     $data['images']       ?? []);
-        $this->replaceChildStrings('product_tags',          $id, 'tag',     $data['tags']         ?? []);
-        $this->replaceChildStrings('product_features',      $id, 'feature', $data['features']     ?? []);
-        $this->replaceChildStrings('product_badges',        $id, 'badge',   $data['badges']       ?? []);
-        $this->replaceChildStrings('product_cutout_images', $id, 'url',     $data['cutoutImages'] ?? []);
+        $this->replaceChildStrings('product_images',   $id, 'url',     $data['images']   ?? []);
+        $this->replaceChildStrings('product_tags',     $id, 'tag',     $data['tags']     ?? []);
+        $this->replaceChildStrings('product_features', $id, 'feature', $data['features'] ?? []);
+        $this->replaceChildStrings('product_badges',   $id, 'badge',   $data['badges']   ?? []);
+        if (array_key_exists('variants', $data)) {
+            $this->replaceVariants($id, $data['variants'] ?? []);
+        }
 
         return $data;
     }
@@ -198,6 +380,9 @@ final class ProductRepository extends MysqlRepository
             if (array_key_exists($phpKey, $changes)) {
                 $this->replaceChildStrings($table, $id, $col, $changes[$phpKey]);
             }
+        }
+        if (array_key_exists('variants', $changes)) {
+            $this->replaceVariants($id, $changes['variants'] ?? []);
         }
 
         return $this->getById($id);

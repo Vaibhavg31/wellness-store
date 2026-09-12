@@ -14,6 +14,53 @@ function maxQtyFor(product, requested) {
     return Math.min(Math.max(0, requested), stock);
 }
 
+/**
+ * Products with pack-size/duration variants (e.g. "1/3/6 Month Supply") need
+ * a specific variant selected before they can be priced or stocked — callers
+ * that already picked one (ProductDetailPage) pass `product.variantId`;
+ * callers that don't (ProductCard's quick-add) fall back to the default.
+ * Returns `product` unchanged when it has no variants at all.
+ */
+function resolveCartProduct(product) {
+    if (!product?.hasVariants || !Array.isArray(product.variants) || product.variants.length === 0) {
+        return product;
+    }
+    const variant = (product.variantId && product.variants.find((v) => v.id === product.variantId))
+        || product.variants.find((v) => v.isDefault)
+        || product.variants[0];
+
+    return {
+        ...product,
+        variantId: variant.id,
+        variantLabel: variant.label,
+        title: `${product.title} — ${variant.label}`,
+        price: variant.price,
+        originalPrice: variant.originalPrice,
+        discount: variant.discount,
+        stock: variant.stock,
+        images: variant.image ? [variant.image, ...(product.images || [])] : product.images,
+    };
+}
+
+const sameLine = (a, b) =>
+    a.id === b.id
+    && (a.variantId || null) === (b.variantId || null)
+    && (a.bundleId || null) === (b.bundleId || null);
+
+/**
+ * A bundle's discount is spread across its items proportionally to each
+ * item's own price, so the sum of line prices always equals the bundle's
+ * total — mirrors BundleRepository::priceForProduct on the backend exactly,
+ * which is what actually gets charged; this is only for display/local state.
+ */
+function bundleItemUnitPrice(bundle, productId) {
+    const item = bundle.items?.find((i) => i.productId === productId);
+    if (!item) return 0;
+    const { subtotal, bundlePrice } = bundle.pricing || {};
+    if (!subtotal) return item.product.price;
+    return Math.round(item.product.price * (bundlePrice / subtotal) * 100) / 100;
+}
+
 export function CartProvider({ children }) {
     const [items, setItems] = useLocalStorage('krivea-cart', []);
     const [couponCode, setCouponCode] = useLocalStorage('krivea-coupon', '');
@@ -42,18 +89,19 @@ export function CartProvider({ children }) {
         sessionStorage.setItem(AUTO_SKIP_KEY, '1');
     }, []);
 
-    const addToCart = useCallback((product, quantity = 1) => {
+    const addToCart = useCallback((rawProduct, quantity = 1) => {
+        const product = resolveCartProduct(rawProduct);
         const qty = maxQtyFor(product, quantity);
         if (qty <= 0) return false;
 
         let added = false;
         setItems((prev) => {
-            const existing = prev.find((item) => item.product.id === product.id);
+            const existing = prev.find((item) => sameLine(item.product, product));
             if (existing) {
                 const next = maxQtyFor(product, existing.quantity + quantity);
                 added = next > existing.quantity;
                 return prev.map((item) => {
-                    if (item.product.id !== product.id) return item;
+                    if (!sameLine(item.product, product)) return item;
                     return { ...item, product: { ...item.product, ...product }, quantity: next };
                 }).filter((item) => item.quantity > 0);
             }
@@ -64,45 +112,111 @@ export function CartProvider({ children }) {
         return added;
     }, [setItems]);
 
+    /**
+     * Adds every product in a bundle as one atomic action, each line priced
+     * at its share of the bundle discount and tagged with bundleId so it's
+     * grouped and removed together in the cart UI — never merges with a
+     * plain (non-bundle) line of the same product. Bundle lines have a fixed
+     * quantity (no per-line +/- stepper) since a bundle is one unit; adding
+     * the same bundle twice is a no-op (use the stepper on the plain
+     * product instead if more units are wanted).
+     */
+    const addBundleToCart = useCallback((bundle) => {
+        if (!bundle?.items?.length) return false;
+        if (items.some((item) => item.product.bundleId === bundle.id)) return false;
+        if (bundle.items.some((bi) => (bi.product.stock ?? 0) < bi.quantity)) return false;
+
+        const newLines = bundle.items.map((bi) => ({
+            product: {
+                id: bi.productId,
+                title: bi.product.title,
+                images: [bi.product.image],
+                category: '',
+                price: bundleItemUnitPrice(bundle, bi.productId),
+                originalPrice: bi.product.price,
+                stock: bi.product.stock,
+                bundleId: bundle.id,
+                bundleTitle: bundle.title,
+            },
+            quantity: bi.quantity,
+        }));
+
+        setItems((prev) => [...prev, ...newLines]);
+        setCartPulse((n) => n + 1);
+        return true;
+    }, [items, setItems]);
+
+    const removeBundleFromCart = useCallback((bundleId) => {
+        setItems((prev) => prev.filter((item) => item.product.bundleId !== bundleId));
+    }, [setItems]);
+
+    const isBundleInCart = useCallback(
+        (bundleId) => items.some((item) => item.product.bundleId === bundleId),
+        [items],
+    );
+
     const syncPrices = useCallback(async () => {
         const current = items;
         if (current.length === 0) return;
 
+        // Bundle lines are priced as a share of the bundle's discount, not
+        // the plain product price — re-fetching /api/products/:id here would
+        // silently overwrite that discount with the full price. Checkout
+        // re-validates bundle pricing/stock authoritatively anyway, so it's
+        // safe to leave these as-is for a soft cart-display refresh.
+        const syncable = current.filter((item) => !item.product.bundleId);
+        if (syncable.length === 0) return;
+
         const results = await Promise.allSettled(
-            current.map((item) => api.get(`/api/products/${item.product.id}`))
+            syncable.map((item) => api.get(`/api/products/${item.product.id}`))
         );
+        const resultByLine = new Map(syncable.map((item, i) => [item, results[i]]));
 
         setItems((prev) => prev
-            .map((item, i) => {
-                const result = results[i];
+            .map((item) => {
+                if (item.product.bundleId) return item;
+                const result = resultByLine.get(item);
                 if (!result || result.status !== 'fulfilled' || !result.value) return item;
                 const fresh = result.value;
+                // A variant line must re-price off that specific variant, not
+                // the product's own (default-variant) price/stock — a fresh
+                // fetch otherwise silently swaps a "3 Month" line to "1 Month"
+                // pricing.
+                const freshVariant = item.product.variantId && Array.isArray(fresh.variants)
+                    ? fresh.variants.find((v) => v.id === item.product.variantId)
+                    : null;
+                if (item.product.variantId && !freshVariant) {
+                    // That variant no longer exists — drop the line rather
+                    // than silently re-price it against the wrong option.
+                    return { ...item, quantity: 0 };
+                }
+                const source = freshVariant || fresh;
                 return {
                     ...item,
                     product: {
                         ...item.product,
-                        price: fresh.price,
-                        originalPrice: fresh.originalPrice,
-                        discount: fresh.discount,
-                        stock: fresh.stock,
+                        price: source.price,
+                        originalPrice: source.originalPrice,
+                        discount: source.discount,
+                        stock: source.stock,
                     },
-                    quantity: maxQtyFor(fresh, item.quantity),
+                    quantity: maxQtyFor(source, item.quantity),
                 };
             })
             .filter((item) => item.quantity > 0));
     }, [items, setItems]);
 
-    const removeFromCart = useCallback((productId) => {
-        setItems((prev) => prev.filter((item) => item.product.id !== productId));
+    const removeFromCart = useCallback((productId, { variantId = null, bundleId = null } = {}) => {
+        setItems((prev) => prev.filter((item) => !sameLine(item.product, { id: productId, variantId, bundleId })));
     }, [setItems]);
 
-    const updateQuantity = useCallback((productId, quantity) => {
+    const updateQuantity = useCallback((productId, quantity, { variantId = null, bundleId = null } = {}) => {
         if (quantity <= 0) {
-            removeFromCart(productId);
+            removeFromCart(productId, { variantId, bundleId });
             return;
         }
         setItems((prev) => prev.map((item) => {
-            if (item.product.id !== productId) return item;
+            if (!sameLine(item.product, { id: productId, variantId, bundleId })) return item;
             return { ...item, quantity: maxQtyFor(item.product, quantity) };
         }).filter((item) => item.quantity > 0));
     }, [setItems, removeFromCart]);
@@ -234,7 +348,8 @@ export function CartProvider({ children }) {
         }
     }, [subtotal, items.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const isInCart = useCallback((productId) => items.some((item) => item.product.id === productId), [items]);
+    const isInCart = useCallback((productId, { variantId = null, bundleId = null } = {}) =>
+        items.some((item) => sameLine(item.product, { id: productId, variantId, bundleId })), [items]);
 
     const amountUntilFreeDelivery = Math.max(0, freeThreshold - subtotal);
     // Use the coupon-adjusted fee, not the pre-coupon base fee — otherwise a
@@ -248,6 +363,9 @@ export function CartProvider({ children }) {
     const value = useMemo(() => ({
         items,
         addToCart,
+        addBundleToCart,
+        removeBundleFromCart,
+        isBundleInCart,
         removeFromCart,
         updateQuantity,
         clearCart,
@@ -274,6 +392,9 @@ export function CartProvider({ children }) {
     }), [
         items,
         addToCart,
+        addBundleToCart,
+        removeBundleFromCart,
+        isBundleInCart,
         removeFromCart,
         updateQuantity,
         clearCart,

@@ -3,6 +3,7 @@ import BrandMarquee from '@/components/home/BrandMarquee';
 import HeroCinematic from '@/components/home/HeroCinematic';
 import QuickShop from '@/components/home/QuickShop';
 import Categories from '@/components/home/Categories';
+import BundleShowcase from '@/components/home/BundleShowcase';
 import WhyChoose from '@/components/home/WhyChoose';
 import AntiTarnishBanner from '@/components/home/AntiTarnishBanner';
 import CustomerReviews from '@/components/home/CustomerReviews';
@@ -80,6 +81,7 @@ function buildSectionRenderers({ displayProducts, loading, error }) {
         ),
         trending: () => <TrendingProducts key="trending" />,
         categories: () => <Categories key="categories" />,
+        bundles: () => <BundleShowcase key="bundles" />,
         whyChoose: () => <WhyChoose key="whyChoose" />,
         antiTarnishBanner: () => <AntiTarnishBanner key="antiTarnishBanner" />,
         reviews: () => <CustomerReviews key="reviews" />,

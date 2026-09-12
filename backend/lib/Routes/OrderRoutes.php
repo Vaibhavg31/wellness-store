@@ -13,6 +13,7 @@ use Krivea\ExportHelper;
 use Krivea\OrderRevenue;
 use Krivea\OtpConfig;
 use Krivea\RazorpayService;
+use Krivea\Repository\BundleRepository;
 use Krivea\Repository\CouponRepository;
 use Krivea\Repository\OrderRepository;
 use Krivea\Repository\ProductRepository;
@@ -60,6 +61,13 @@ final class OrderRoutes
     {
         static $repo = null;
         $repo ??= new CouponRepository();
+        return $repo;
+    }
+
+    private static function bundles(): BundleRepository
+    {
+        static $repo = null;
+        $repo ??= new BundleRepository();
         return $repo;
     }
 
@@ -983,6 +991,8 @@ final class OrderRoutes
             }
 
             $productId = (string) ($line['productId'] ?? '');
+            $variantId = trim((string) ($line['variantId'] ?? ''));
+            $bundleId  = trim((string) ($line['bundleId'] ?? ''));
             $qty       = (int) ($line['quantity'] ?? 0);
 
             if ($productId === '' || $qty < 1) {
@@ -1001,24 +1011,77 @@ final class OrderRoutes
                 throw new \InvalidArgumentException("Product unavailable: {$productId}");
             }
 
-            $stock = (int) ($product['stock'] ?? 0);
+            $title = (string) ($product['title'] ?? '');
+
+            // A bundle line ("Complete Wellness Kit") is priced and stocked
+            // entirely server-side from the bundle's own products/discount —
+            // never trust the client's price, and skip normal variant
+            // selection (a bundle always buys each product's default
+            // variant; see BundleRepository::priceForProduct).
+            if ($bundleId !== '') {
+                $bundleLine = self::bundles()->priceForProduct($bundleId, $productId);
+                if (!$bundleLine) {
+                    throw new \InvalidArgumentException("That bundle is no longer available for \"{$title}\"");
+                }
+                if ($qty !== $bundleLine['quantity']) {
+                    throw new \InvalidArgumentException("Please add the full bundle for \"{$bundleLine['bundleTitle']}\"");
+                }
+                $displayTitle = "{$title} — {$bundleLine['bundleTitle']}";
+                if ($bundleLine['stock'] < $qty) {
+                    throw new \InvalidArgumentException(
+                        $bundleLine['stock'] <= 0
+                            ? "\"{$title}\" is out of stock"
+                            : "Only {$bundleLine['stock']} left for \"{$title}\". Please update your bag"
+                    );
+                }
+                $built[] = [
+                    'productId'    => $productId,
+                    'variantId'    => $bundleLine['variantId'],
+                    'variantLabel' => null,
+                    'bundleId'     => $bundleId,
+                    'bundleTitle'  => $bundleLine['bundleTitle'],
+                    'title'        => $displayTitle,
+                    'price'        => $bundleLine['unitPrice'],
+                    'quantity'     => $qty,
+                    'image'        => is_array($product['images'] ?? null) && isset($product['images'][0])
+                        ? $product['images'][0]
+                        : ($line['image'] ?? ''),
+                ];
+                $subtotal += $bundleLine['unitPrice'] * $qty;
+                continue;
+            }
+
+            // Pack-size/duration variant (e.g. "3 Month Supply") — its own
+            // price and stock take over from the base product's when present.
+            if (!empty($product['hasVariants']) && $variantId === '') {
+                throw new \InvalidArgumentException("Please choose an option (pack size) for \"{$product['title']}\"");
+            }
+            $variant = $variantId !== '' ? $productRepo->getVariant($productId, $variantId) : null;
+            if ($variantId !== '' && !$variant) {
+                throw new \InvalidArgumentException("Selected option is no longer available for \"{$product['title']}\"");
+            }
+
+            $stock = $variant ? $variant['stock'] : (int) ($product['stock'] ?? 0);
+            $displayTitle = $variant ? "{$title} — {$variant['label']}" : $title;
+
             if ($stock < $qty) {
-                $title = (string) ($product['title'] ?? $productId);
                 if ($stock <= 0) {
-                    throw new \InvalidArgumentException("\"{$title}\" is out of stock");
+                    throw new \InvalidArgumentException("\"{$displayTitle}\" is out of stock");
                 }
                 throw new \InvalidArgumentException(
-                    "Only {$stock} left for \"{$title}\". Please update your bag"
+                    "Only {$stock} left for \"{$displayTitle}\". Please update your bag"
                 );
             }
 
-            $price = (float) ($product['price'] ?? 0);
+            $price = $variant ? $variant['price'] : (float) ($product['price'] ?? 0);
             $built[] = [
-                'productId' => $productId,
-                'title'     => (string) ($product['title'] ?? ''),
-                'price'     => $price,
-                'quantity'  => $qty,
-                'image'     => is_array($product['images'] ?? null) && isset($product['images'][0])
+                'productId'    => $productId,
+                'variantId'    => $variant['id'] ?? null,
+                'variantLabel' => $variant['label'] ?? null,
+                'title'        => $displayTitle,
+                'price'        => $price,
+                'quantity'     => $qty,
+                'image'        => is_array($product['images'] ?? null) && isset($product['images'][0])
                     ? $product['images'][0]
                     : ($line['image'] ?? ''),
             ];
@@ -1084,13 +1147,22 @@ final class OrderRoutes
                 $isCustom = true;
             }
 
+            $variantId = trim((string) ($line['variantId'] ?? ''));
+            $variantLabel = null;
+            if ($variantId !== '' && !$isCustom) {
+                $variant = $productRepo->getVariant($productId, $variantId);
+                $variantLabel = $variant['label'] ?? null;
+            }
+
             $built[] = [
-                'productId' => $productId,
-                'title'     => $title,
-                'price'     => round($price, 2),
-                'quantity'  => $qty,
-                'image'     => $image,
-                'isCustom'  => $isCustom,
+                'productId'    => $productId,
+                'variantId'    => $variantId !== '' ? $variantId : null,
+                'variantLabel' => $variantLabel,
+                'title'        => $title,
+                'price'        => round($price, 2),
+                'quantity'     => $qty,
+                'image'        => $image,
+                'isCustom'     => $isCustom,
             ];
             $subtotal += $price * $qty;
         }
@@ -1101,10 +1173,25 @@ final class OrderRoutes
         ];
     }
 
+    /**
+     * Adjust stock for one order line — routes to the variant's own stock
+     * (product_variants.stock) when the line has a variantId, otherwise the
+     * product's base stock, exactly mirroring how validateAndBuildItems()
+     * decided which stock to check against.
+     */
+    private static function adjustItemStock(array $item, int $delta): bool
+    {
+        $repo = self::products();
+        $variantId = (string) ($item['variantId'] ?? '');
+        if ($variantId !== '') {
+            return $repo->adjustVariantStock($variantId, $delta);
+        }
+        return $repo->adjustStock((string) ($item['productId'] ?? ''), $delta);
+    }
+
     /** @param array<int, array<string, mixed>> $items */
     private static function decrementStockForDirectItems(array $items): void
     {
-        $repo = self::products();
         $done = [];
         foreach ($items as $item) {
             if (!empty($item['isCustom']) || str_starts_with((string) ($item['productId'] ?? ''), 'custom-')) {
@@ -1114,7 +1201,7 @@ final class OrderRoutes
             if ($productId === '') {
                 continue;
             }
-            $ok = $repo->adjustStock($productId, -(int) $item['quantity']);
+            $ok = self::adjustItemStock($item, -(int) $item['quantity']);
             if (!$ok) {
                 self::restoreStockItems($done);
                 throw new \InvalidArgumentException(
@@ -1128,10 +1215,9 @@ final class OrderRoutes
     /** @param array<int, array<string, mixed>> $items */
     private static function decrementStock(array $items): void
     {
-        $repo = self::products();
         $done = [];
         foreach ($items as $item) {
-            $ok = $repo->adjustStock((string) $item['productId'], -(int) $item['quantity']);
+            $ok = self::adjustItemStock($item, -(int) $item['quantity']);
             if (!$ok) {
                 self::restoreStockItems($done);
                 throw new \InvalidArgumentException(
@@ -1145,9 +1231,8 @@ final class OrderRoutes
     /** @param array<int, array<string, mixed>> $items */
     private static function restoreStockItems(array $items): void
     {
-        $repo = self::products();
         foreach ($items as $item) {
-            $repo->adjustStock((string) $item['productId'], (int) $item['quantity']);
+            self::adjustItemStock($item, (int) $item['quantity']);
         }
     }
 

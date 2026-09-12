@@ -13,7 +13,7 @@ import {
 const STEP_META = {
     confirmed: { icon: Check, message: 'Payment confirmed. We\'re preparing your order' },
     out_for_delivery: { icon: Truck, message: 'On the way to you' },
-    delivered: { icon: MapPin, message: 'Delivered. Enjoy your Krivea' },
+    delivered: { icon: MapPin, message: 'Delivered. Enjoy your order' },
 };
 
 const TERMINAL_META = {

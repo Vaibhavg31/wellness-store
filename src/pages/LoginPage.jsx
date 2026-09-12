@@ -9,7 +9,7 @@ import Button from '@/components/ui/Button';
 import { useAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { useCustomerSession } from '@/hooks/useCustomerSession';
 import { useSiteContent } from '@/contexts/SiteContentContext';
-import { BRAND_TAGLINE } from '@/constants';
+import { BRAND_NAME, BRAND_TAGLINE } from '@/constants';
 import { ApiError } from '@/services/api';
 
 const GOOGLE_ENABLED = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -163,13 +163,13 @@ export default function LoginPage() {
                 <div className="relative z-10 max-w-md">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ivory/10 border border-blush/30 mb-6">
                         <Sparkles size={12} className="text-blush" />
-                        <span className="text-[10px] tracking-[0.25em] uppercase text-ivory/90">Krivea Jewels</span>
+                        <span className="text-[10px] tracking-[0.25em] uppercase text-ivory/90">{BRAND_NAME}</span>
                     </div>
                     <h2 className="font-serif text-4xl text-ivory leading-tight mb-4">
                         {isCheckoutLogin ? (
                             <>Complete your <span className="italic text-blush">order</span></>
                         ) : (
-                            <>Shop like <span className="italic text-blush">royalty</span></>
+                            <>Shop <span className="italic text-blush">wellness</span></>
                         )}
                     </h2>
                     <p className="text-ivory/60 font-light leading-relaxed">
@@ -179,7 +179,7 @@ export default function LoginPage() {
                     </p>
                 </div>
                 <p className="relative z-10 text-[10px] tracking-wider text-ivory/30 uppercase">
-                    Anti-Tarnish · Premium Quality · Free Delivery ₹1999+
+                    FSSAI Certified · Lab Tested · Free Delivery ₹1999+
                 </p>
             </div>
 
@@ -200,7 +200,7 @@ export default function LoginPage() {
                             </h1>
                             <p className="text-soft-brown text-sm font-light">
                                 {isAdminAccess
-                                    ? 'Sign in with your admin Google account to open Krivea Studio'
+                                    ? `Sign in with your admin Google account to open ${BRAND_NAME} Studio`
                                     : mode === 'signup'
                                         ? 'Enter your details — we will email you a secure link to verify and sign in'
                                         : 'Use email and password, or continue with Google'}

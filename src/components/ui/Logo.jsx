@@ -1,16 +1,15 @@
 import { Link } from 'react-router-dom';
 import { cn } from '@/utils/formatPrice';
-import logoTransparent from '@/assets/krivea-logo-transparent.png';
+import logoMark from '@/assets/wellness-logo.svg';
 
 /**
- * Krivea logo component.
+ * Wellness Store logo component.
  *
- * The transparent PNG (pink art on a transparent canvas) is used everywhere.
- * It is designed to sit on Wine Maroon backgrounds (navbar, footer, hero) where
- * it reads beautifully. On light backgrounds the `variant="light"` prop applies
- * a CSS filter to render it in a dark tone that stays legible.
+ * `logoMark` is a placeholder brand mark (swap the file to drop in real
+ * artwork) — it's a self-contained circular badge, so it reads fine on both
+ * dark (navbar, footer, hero) and light backgrounds without a filter.
  *
- * Size map is calibrated to the real artwork dimensions (341×299, ~1.14:1).
+ * Size map is calibrated to a square (1:1) mark.
  */
 const sizeMap = {
     xs: 'h-8',
@@ -37,8 +36,8 @@ export default function Logo({
                     className="absolute inset-0 -m-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-[600ms] ease-out pointer-events-none"
                     style={{
                         background: isLight
-                            ? 'radial-gradient(circle, rgba(90,0,9,0.10) 0%, transparent 70%)'
-                            : 'radial-gradient(circle, rgba(242,184,181,0.15) 0%, transparent 70%)',
+                            ? 'radial-gradient(circle, rgba(15, 81, 50,0.10) 0%, transparent 70%)'
+                            : 'radial-gradient(circle, rgba(253, 230, 138,0.15) 0%, transparent 70%)',
                     }}
                     aria-hidden="true"
                 />
@@ -46,11 +45,10 @@ export default function Logo({
 
             <div className={cn('relative transition-transform duration-[600ms] ease-out', showHover && 'group-hover:scale-[1.03]', sizeMap[size])}>
                 <img
-                    src={logoTransparent}
-                    alt="Krivea Jewels"
+                    src={logoMark}
+                    alt="Wellness Store"
                     className="h-full w-auto object-contain"
                     draggable={false}
-                    style={isLight ? { filter: 'brightness(0.15) sepia(0.3)' } : undefined}
                 />
                 {showHover && (
                     <div
@@ -66,7 +64,7 @@ export default function Logo({
 
     if (linkToHome) {
         return (
-            <Link to="/" className="inline-flex flex-shrink-0" aria-label="Krivea Jewels Home">
+            <Link to="/" className="inline-flex flex-shrink-0" aria-label="Wellness Store Home">
                 {content}
             </Link>
         );

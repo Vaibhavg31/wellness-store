@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Star, MessageSquare, FolderOpen, ShoppingBag, PenLine, Tag, IndianRupee, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
+import { Package, Star, MessageSquare, FolderOpen, ShoppingBag, PenLine, Tag, Gift, IndianRupee, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
 import { api } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { formatPrice } from '@/utils/formatPrice';
@@ -28,6 +28,7 @@ export default function AdminDashboardPage() {
         feedback: 0,
         orders: 0,
         coupons: 0,
+        bundles: 0,
         unread: 0,
         revenue: 0,
     });
@@ -44,7 +45,8 @@ export default function AdminDashboardPage() {
             api.get('/api/feedback', adminToken),
             api.get('/api/orders/admin/all', adminToken),
             api.get('/api/coupons/admin/all', adminToken),
-        ]).then(([productList, categories, reviews, feedback, orderData, coupons]) => {
+            api.get('/api/bundles/admin/all', adminToken),
+        ]).then(([productList, categories, reviews, feedback, orderData, coupons, bundles]) => {
             const orderList = Array.isArray(orderData) ? orderData : [];
             const productArr = Array.isArray(productList) ? productList : [];
             setProducts(productArr);
@@ -56,6 +58,7 @@ export default function AdminDashboardPage() {
                 feedback: feedback.length,
                 orders: orderList.length,
                 coupons: Array.isArray(coupons) ? coupons.filter((c) => c.isEnabled).length : 0,
+                bundles: Array.isArray(bundles) ? bundles.filter((b) => b.isPublished).length : 0,
                 unread: feedback.filter((f) => !f.isRead).length,
                 revenue: sumOrderRevenue(orderList),
             });
@@ -107,6 +110,7 @@ export default function AdminDashboardPage() {
         { label: 'Orders', value: stats.orders, icon: ShoppingBag, href: `${ADMIN_PATH}/orders` },
         { label: 'Low Stock', value: lowStockProducts.length, sub: outOfStockCount > 0 ? `${outOfStockCount} out of stock` : undefined, icon: AlertTriangle, href: `${ADMIN_PATH}/products` },
         { label: 'Coupons', value: stats.coupons, sub: 'active', icon: Tag, href: `${ADMIN_PATH}/coupons` },
+        { label: 'Bundles', value: stats.bundles, sub: 'published', icon: Gift, href: `${ADMIN_PATH}/bundles` },
         { label: 'Reviews', value: stats.reviews, icon: Star, href: `${ADMIN_PATH}/reviews` },
         { label: 'Feedback', value: stats.feedback, sub: stats.unread > 0 ? `${stats.unread} unread` : undefined, icon: MessageSquare, href: `${ADMIN_PATH}/feedback` },
     ];
@@ -115,7 +119,7 @@ export default function AdminDashboardPage() {
         <div>
             <AdminPageHeader
                 title="Dashboard"
-                subtitle="Overview of your Krivea Studio store"
+                subtitle="Overview of your Wellness Store"
             />
 
             <AdminPromoCard

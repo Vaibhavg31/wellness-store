@@ -129,7 +129,7 @@ export default function OrdersPage() {
                 <Package size={40} className="text-wine/30 mb-4" />
                 <h1 className="font-serif text-3xl mb-3">Your Orders</h1>
                 <p className="text-soft-brown mb-6 max-w-sm">
-                    Sign in to track your Krivea pieces from our studio to your doorstep.
+                    Sign in to track your orders from our warehouse to your doorstep.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
                     <Link to={loginUrl('/orders')}><Button variant="gold">Sign In</Button></Link>

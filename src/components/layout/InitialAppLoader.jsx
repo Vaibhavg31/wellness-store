@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import logoMaroon from '@/assets/krivea-logo-maroon.png';
+import logoMark from '@/assets/wellness-logo.svg';
+import { BRAND_NAME, BRAND_TAGLINE } from '@/constants';
 
 function Sparkle({ cx, cy, size, delay, duration }) {
     return (
@@ -16,7 +17,7 @@ function Sparkle({ cx, cy, size, delay, duration }) {
         >
             <path
                 d={`M${cx},${cy - size} Q${cx + size * 0.18},${cy - size * 0.18} ${cx + size},${cy} Q${cx + size * 0.18},${cy + size * 0.18} ${cx},${cy + size} Q${cx - size * 0.18},${cy + size * 0.18} ${cx - size},${cy} Q${cx - size * 0.18},${cy - size * 0.18} ${cx},${cy - size}Z`}
-                fill="rgba(242,184,181,0.9)"
+                fill="rgba(253, 230, 138,0.9)"
             />
         </motion.g>
     );
@@ -49,7 +50,7 @@ export default function InitialAppLoader({ children }) {
     const MIN_MS = 1400;
     const [visible, setVisible] = useState(() => {
         try {
-            return sessionStorage.getItem('krivea-loader-seen') !== '1';
+            return sessionStorage.getItem('wellness-loader-seen') !== '1';
         } catch {
             return true;
         }
@@ -76,7 +77,7 @@ export default function InitialAppLoader({ children }) {
 
         const hideTimer = setTimeout(() => {
             setVisible(false);
-            try { sessionStorage.setItem('krivea-loader-seen', '1'); } catch { /* ignore */ }
+            try { sessionStorage.setItem('wellness-loader-seen', '1'); } catch { /* ignore */ }
         }, remaining + 200);
 
         return () => {
@@ -95,12 +96,12 @@ export default function InitialAppLoader({ children }) {
                         initial={{ opacity: 1 }}
                         exit={{ opacity: 0, transition: { duration: 0.45, ease: 'easeOut' } }}
                         className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-wine pointer-events-none"
-                        aria-label="Loading Krivea Jewels"
+                        aria-label={`Loading ${BRAND_NAME}`}
                         role="status"
                     >
                         <div
                             className="absolute inset-0 pointer-events-none"
-                            style={{ background: 'radial-gradient(ellipse 55% 55% at 50% 50%, rgba(242,184,181,0.08) 0%, transparent 70%)' }}
+                            style={{ background: 'radial-gradient(ellipse 55% 55% at 50% 50%, rgba(253, 230, 138,0.08) 0%, transparent 70%)' }}
                             aria-hidden="true"
                         />
 
@@ -112,12 +113,12 @@ export default function InitialAppLoader({ children }) {
                                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                                 className="relative z-10 w-40 h-40 sm:w-52 sm:h-52 rounded-2xl overflow-hidden shadow-2xl"
                             >
-                                <img src={logoMaroon} alt="Krivea Jewels" className="w-full h-full object-cover" draggable={false} />
+                                <img src={logoMark} alt={BRAND_NAME} className="w-full h-full object-contain bg-ivory p-6" draggable={false} />
                                 {!prefersReduced && (
                                     <motion.div
                                         className="absolute inset-0 pointer-events-none"
                                         style={{
-                                            background: 'linear-gradient(105deg, transparent 30%, rgba(242,184,181,0.20) 50%, transparent 70%)',
+                                            background: 'linear-gradient(105deg, transparent 30%, rgba(253, 230, 138,0.20) 50%, transparent 70%)',
                                             backgroundSize: '200% 100%',
                                         }}
                                         animate={{ backgroundPosition: ['200% 0', '-200% 0'] }}
@@ -134,10 +135,10 @@ export default function InitialAppLoader({ children }) {
                             className="mt-6 text-center"
                         >
                             <p className="font-serif text-2xl sm:text-3xl font-light tracking-[0.06em] text-ivory">
-                                Krivea Jewels
+                                {BRAND_NAME}
                             </p>
                             <p className="mt-1.5 text-[10px] tracking-[0.35em] uppercase text-blush/60">
-                                Wear the Sparkle
+                                {BRAND_TAGLINE}
                             </p>
                         </motion.div>
 

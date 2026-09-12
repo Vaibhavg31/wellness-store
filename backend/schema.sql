@@ -85,6 +85,30 @@ CREATE TABLE `product_images` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Primary product gallery images';
 
 -- ----------------------------------------------------------------------------
+-- product_variants  (one product, multiple buyable options — sizes, pack
+-- counts, or durations, e.g. "Small/Medium/Large" or "1/3/6 Month Supply")
+-- ----------------------------------------------------------------------------
+CREATE TABLE `product_variants` (
+  `id` varchar(64) NOT NULL,
+  `product_id` varchar(64) NOT NULL,
+  `label` varchar(150) NOT NULL COMMENT 'e.g. "Large", "250ml", "3 Month Supply"',
+  `net_quantity` varchar(100) DEFAULT NULL COMMENT 'e.g. 200g, 60 capsules, 500ml — this variant''s size/pack label',
+  `image` varchar(2048) DEFAULT NULL COMMENT 'Optional override photo (e.g. a different color/flavor); NULL = reuse the product''s own photos',
+  `price` decimal(10,2) NOT NULL,
+  `original_price` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `discount` int(11) NOT NULL DEFAULT 0 COMMENT 'Percent discount; may be admin override',
+  `stock` int(11) NOT NULL DEFAULT 0,
+  `sku` varchar(100) DEFAULT NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Pre-selected variant on the product page',
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_product_variants_product_id` (`product_id`),
+  CONSTRAINT `fk_product_variants_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Optional pack-size/duration variants for a product (e.g. 1/3/6 month supply), each with its own price and stock';
+
+-- ----------------------------------------------------------------------------
 -- product_badges
 -- ----------------------------------------------------------------------------
 CREATE TABLE `product_badges` (
@@ -180,6 +204,40 @@ CREATE TABLE `product_faqs` (
   KEY `idx_product_faqs_product_id` (`product_id`),
   CONSTRAINT `fk_product_faqs_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Product-specific FAQ entries shown on the PDP';
+
+-- ----------------------------------------------------------------------------
+-- bundles  (e.g. "Complete Wellness Kit" — buy 3 products together and save)
+-- ----------------------------------------------------------------------------
+CREATE TABLE `bundles` (
+  `id` varchar(64) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `subtitle` varchar(255) DEFAULT NULL COMMENT 'e.g. "Frequently Bought Together", "Complete your routine"',
+  `description` text DEFAULT NULL,
+  `image` varchar(2048) DEFAULT NULL COMMENT 'Optional cover image; falls back to a collage of item images',
+  `discount_type` enum('percent','flat') NOT NULL DEFAULT 'percent',
+  `discount_value` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'Percent off (0-100) or a flat rupee amount off the combined item price',
+  `is_published` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_bundles_is_published` (`is_published`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Multi-product bundle offers — price is computed live from current item prices minus the discount, so it never drifts out of sync';
+
+-- ----------------------------------------------------------------------------
+-- bundle_items
+-- ----------------------------------------------------------------------------
+CREATE TABLE `bundle_items` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `bundle_id` varchar(64) NOT NULL,
+  `product_id` varchar(64) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `idx_bundle_items_bundle_id` (`bundle_id`),
+  KEY `idx_bundle_items_product_id` (`product_id`),
+  CONSTRAINT `fk_bundle_items_bundle` FOREIGN KEY (`bundle_id`) REFERENCES `bundles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Products (and quantities) that make up a bundle';
 
 -- ----------------------------------------------------------------------------
 -- coupons
@@ -295,6 +353,10 @@ CREATE TABLE `order_items` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` varchar(64) NOT NULL,
   `product_id` varchar(64) DEFAULT NULL COMMENT 'NULL or custom-* when not a catalog product',
+  `variant_id` varchar(64) DEFAULT NULL COMMENT 'product_variants.id at time of purchase; NULL when the product has no variants',
+  `variant_label` varchar(150) DEFAULT NULL COMMENT 'Snapshot of the variant label (e.g. "3 Month Supply") so it survives later edits/deletes',
+  `bundle_id` varchar(64) DEFAULT NULL COMMENT 'bundles.id when this line was purchased as part of a bundle offer',
+  `bundle_title` varchar(255) DEFAULT NULL COMMENT 'Snapshot of the bundle title so it survives later edits/deletes',
   `title` varchar(500) NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `quantity` int(10) UNSIGNED NOT NULL DEFAULT 1,
@@ -512,8 +574,9 @@ CREATE TABLE `site_nav_links` (
 CREATE TABLE `site_section_toggles` (
   `section_key` varchar(64) NOT NULL,
   `is_enabled` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`section_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Homepage section visibility flags';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Homepage section visibility flags, in admin-defined display order';
 
 CREATE TABLE `site_why_choose_benefits` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -532,6 +595,17 @@ CREATE TABLE `site_settings` (
   `brand_tagline` varchar(500) NOT NULL,
   `brand_description` text NOT NULL,
   `logo` text NOT NULL,
+  `favicon` text NOT NULL,
+  `theme_primary_color` varchar(20) NOT NULL DEFAULT '#0F5132',
+  `theme_primary_light` varchar(20) NOT NULL DEFAULT '#15803D',
+  `theme_primary_dark` varchar(20) NOT NULL DEFAULT '#0A3D25',
+  `theme_accent_color` varchar(20) NOT NULL DEFAULT '#D97706',
+  `theme_accent_light` varchar(20) NOT NULL DEFAULT '#F59E0B',
+  `theme_blush_color` varchar(20) NOT NULL DEFAULT '#FDE68A',
+  `theme_background_color` varchar(20) NOT NULL DEFAULT '#FBF9F4',
+  `theme_text_color` varchar(20) NOT NULL DEFAULT '#1C1A16',
+  `theme_font_heading` varchar(255) NOT NULL DEFAULT '"Fraunces", Georgia, serif',
+  `theme_font_body` varchar(255) NOT NULL DEFAULT '"Inter", system-ui, sans-serif',
   `contact_email` varchar(255) NOT NULL,
   `contact_whatsapp_number` varchar(20) NOT NULL,
   `contact_whatsapp_display` varchar(50) NOT NULL,
@@ -578,6 +652,38 @@ CREATE TABLE `site_settings` (
   `quality_promise_description` text NOT NULL,
   `quality_promise_cta_label` varchar(255) NOT NULL,
   `quality_promise_cta_href` text NOT NULL,
+  `quality_promise_image` text NOT NULL,
+  `newsletter_badge` varchar(255) NOT NULL,
+  `newsletter_title` varchar(255) NOT NULL,
+  `newsletter_description` text NOT NULL,
+  `newsletter_button_label` varchar(100) NOT NULL,
+  `newsletter_disclaimer` varchar(255) NOT NULL,
+  `newsletter_success_message` varchar(500) NOT NULL,
+  `instagram_subtitle` varchar(255) NOT NULL,
+  `instagram_title` varchar(255) NOT NULL,
+  `instagram_description` text NOT NULL,
+  `instagram_strip_label` varchar(255) NOT NULL,
+  `about_hero_title` varchar(255) NOT NULL,
+  `about_hero_description` text NOT NULL,
+  `about_story_badge` varchar(255) NOT NULL,
+  `about_story_title` varchar(255) NOT NULL,
+  `about_story_image` text NOT NULL,
+  `about_mission_title` varchar(255) NOT NULL,
+  `about_mission_text` text NOT NULL,
+  `about_vision_title` varchar(255) NOT NULL,
+  `about_vision_text` text NOT NULL,
+  `about_values_subtitle` varchar(255) NOT NULL,
+  `about_values_title` varchar(255) NOT NULL,
+  `contact_page_subtitle` varchar(255) NOT NULL,
+  `contact_page_title` varchar(255) NOT NULL,
+  `contact_page_description` text NOT NULL,
+  `footer_tagline` varchar(500) NOT NULL,
+  `footer_description` text NOT NULL,
+  `footer_newsletter_title` varchar(255) NOT NULL,
+  `footer_newsletter_description` text NOT NULL,
+  `footer_instagram_card_text` text NOT NULL,
+  `seo_title` varchar(255) NOT NULL,
+  `seo_description` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Single-row site-wide CMS settings';
 

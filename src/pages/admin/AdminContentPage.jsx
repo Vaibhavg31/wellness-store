@@ -59,7 +59,8 @@ const SECTION_LABELS = {
     featured: 'Featured Collection',
     trending: 'Trending Now',
     categories: 'Shop by Category',
-    whyChoose: 'Why Choose Krivea',
+    bundles: 'Bundle & Save Offers',
+    whyChoose: 'Why Choose Us',
     antiTarnishBanner: 'Anti-Tarnish Banner',
     reviews: 'Customer Reviews',
     instagram: 'Instagram Gallery',
@@ -420,6 +421,14 @@ export default function AdminContentPage() {
                     <p className="text-sm text-admin-muted pt-3">
                         Shows categories with at least one product, managed in{' '}
                         <Link to={`${ADMIN_PATH}/categories`} className="text-wine font-medium hover:underline">Categories</Link>. No extra content to configure here.
+                    </p>
+                );
+
+            case 'bundles':
+                return (
+                    <p className="text-sm text-admin-muted pt-3">
+                        Shows every published bundle offer, managed in{' '}
+                        <Link to={`${ADMIN_PATH}/bundles`} className="text-wine font-medium hover:underline">Bundles</Link>. Hidden automatically when there are no bundles to show.
                     </p>
                 );
 

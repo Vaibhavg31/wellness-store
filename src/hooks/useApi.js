@@ -113,6 +113,21 @@ export function useCategories() {
     return { categories, loading };
 }
 
+export function useBundles() {
+    const [bundles, setBundles] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        let cancelled = false;
+        api
+            .get('/api/bundles')
+            .then((data) => { if (!cancelled) setBundles(Array.isArray(data) ? data : []); })
+            .catch(() => { if (!cancelled) setBundles([]); })
+            .finally(() => { if (!cancelled) setLoading(false); });
+        return () => { cancelled = true; };
+    }, []);
+    return { bundles, loading };
+}
+
 export function useCategory(slug) {
     const [category, setCategory] = useState(null);
     const [loading, setLoading] = useState(true);

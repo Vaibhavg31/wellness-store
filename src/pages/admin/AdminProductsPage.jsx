@@ -14,6 +14,7 @@ import {
     AdminEmptyState,
     AdminIconButton,
     AdminStatusPill,
+    AdminErrorBanner,
 } from '@/components/admin/AdminUi';
 
 export default function AdminProductsPage() {
@@ -35,11 +36,21 @@ export default function AdminProductsPage() {
 
     const liveCount = products.filter((p) => p.isPublished).length;
 
+    const [loadError, setLoadError] = useState('');
+
     const fetchProducts = async () => {
         if (!adminToken) return;
-        const data = await api.get('/api/products/admin/all', adminToken);
-        setProducts(data);
-        setLoading(false);
+        setLoading(true);
+        try {
+            const data = await api.get('/api/products/admin/all', adminToken);
+            setProducts(Array.isArray(data) ? data : []);
+            setLoadError('');
+        } catch (err) {
+            setProducts([]);
+            setLoadError(err instanceof Error ? err.message : 'Failed to load products');
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -71,6 +82,8 @@ export default function AdminProductsPage() {
                     </Link>
                 )}
             />
+
+            {loadError && <AdminErrorBanner message={loadError} onDismiss={() => setLoadError('')} />}
 
             <AdminSummaryGrid
                 columns={3}
@@ -119,12 +132,19 @@ export default function AdminProductsPage() {
                                                 <img src={imageUrl(product.images?.[0] || '')} alt="" className="w-11 h-11 rounded-lg object-cover border border-admin-border-light" />
                                                 <div>
                                                     <p className="font-medium text-charcoal">{product.title}</p>
-                                                    <p className="text-xs text-admin-muted line-clamp-1">{product.tags?.join(', ')}</p>
+                                                    <p className="text-xs text-admin-muted line-clamp-1">
+                                                        {product.hasVariants
+                                                            ? `${product.variants.length} option${product.variants.length === 1 ? '' : 's'}${product.tags?.length ? ` · ${product.tags.join(', ')}` : ''}`
+                                                            : product.tags?.join(', ')}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="p-4 capitalize text-admin-muted">{product.category}</td>
-                                        <td className="p-4 font-medium tabular-nums">₹{product.price}</td>
+                                        <td className="p-4 font-medium tabular-nums">
+                                            {product.hasVariants && <span className="text-admin-muted font-normal">From </span>}
+                                            ₹{product.price}
+                                        </td>
                                         <td className="p-4 tabular-nums">{product.stock}</td>
                                         <td className="p-4">
                                             <button type="button" onClick={() => togglePublish(product)}>

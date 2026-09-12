@@ -91,7 +91,9 @@ final class OrderRepository extends MysqlRepository
         $stmt->execute($ids);
         foreach ($stmt->fetchAll() as $r) {
             $itemsById[$r['order_id']][] = [
-                'productId' => $r['product_id'], 'title' => $r['title'], 'price' => (float) $r['price'],
+                'productId' => $r['product_id'], 'variantId' => $r['variant_id'] ?? null, 'variantLabel' => $r['variant_label'] ?? null,
+                'bundleId' => $r['bundle_id'] ?? null, 'bundleTitle' => $r['bundle_title'] ?? null,
+                'title' => $r['title'], 'price' => (float) $r['price'],
                 'quantity' => (int) $r['quantity'], 'image' => $r['image'], 'isCustom' => $this->bool($r['is_custom']),
             ];
         }
@@ -195,12 +197,16 @@ final class OrderRepository extends MysqlRepository
         $stmt = $this->pdo()->prepare('SELECT * FROM order_items WHERE order_id = ? ORDER BY id ASC');
         $stmt->execute([$orderId]);
         return array_map(fn($r) => [
-            'productId' => $r['product_id'],
-            'title'     => $r['title'],
-            'price'     => (float) $r['price'],
-            'quantity'  => (int) $r['quantity'],
-            'image'     => $r['image'],
-            'isCustom'  => $this->bool($r['is_custom']),
+            'productId'    => $r['product_id'],
+            'variantId'    => $r['variant_id']    ?? null,
+            'variantLabel' => $r['variant_label'] ?? null,
+            'bundleId'     => $r['bundle_id']    ?? null,
+            'bundleTitle'  => $r['bundle_title'] ?? null,
+            'title'        => $r['title'],
+            'price'        => (float) $r['price'],
+            'quantity'     => (int) $r['quantity'],
+            'image'        => $r['image'],
+            'isCustom'     => $this->bool($r['is_custom']),
         ], $stmt->fetchAll());
     }
 
@@ -250,14 +256,18 @@ final class OrderRepository extends MysqlRepository
             return;
         }
         $stmt = $this->pdo()->prepare(
-            'INSERT INTO order_items (order_id, product_id, title, price, quantity, image, is_custom)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO order_items (order_id, product_id, variant_id, variant_label, bundle_id, bundle_title, title, price, quantity, image, is_custom)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         foreach ($items as $item) {
             $stmt->execute([
                 $orderId,
-                $item['productId'] ?? null,
-                $item['title']     ?? '',
+                $item['productId']    ?? null,
+                $item['variantId']    ?? null,
+                $item['variantLabel'] ?? null,
+                $item['bundleId']     ?? null,
+                $item['bundleTitle']  ?? null,
+                $item['title']        ?? '',
                 (float) ($item['price']    ?? 0),
                 (int)   ($item['quantity'] ?? 1),
                 $item['image']     ?? null,

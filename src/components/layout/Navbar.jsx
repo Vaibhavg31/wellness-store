@@ -339,7 +339,7 @@ export default function Navbar() {
                             </a>
                             )}
                             <p className="type-eyebrow text-ivory/35">
-                                Krivea Jewels. Wear the Sparkle.
+                                {content.brandTagline}
                             </p>
                         </div>
                     </motion.div>

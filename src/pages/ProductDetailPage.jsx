@@ -8,8 +8,9 @@ import { imageUrl } from '@/services/api';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast, showCartToast } from '@/contexts/ToastContext';
-import { useProduct, useProducts, useReviews } from '@/hooks/useApi';
+import { useBundles, useProduct, useProducts, useReviews } from '@/hooks/useApi';
 import ProductCard from '@/components/product/ProductCard';
+import BundleCard from '@/components/product/BundleCard';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SectionTitle from '@/components/ui/SectionTitle';
@@ -25,6 +26,7 @@ export default function ProductDetailPage() {
     const navigate     = useNavigate();
     const { product, loading } = useProduct(id);
     const { products } = useProducts();
+    const { bundles } = useBundles();
     const { reviews, refetch: refetchReviews } = useReviews(id);
     const { addToCart }                    = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
@@ -33,6 +35,7 @@ export default function ProductDetailPage() {
     const trustBadges                      = getProductTrustBadges(content, product);
 
     const [selectedImage, setSelectedImage]    = useState(0);
+    const [selectedVariantId, setSelectedVariantId] = useState(null);
     const [quantity, setQuantity]              = useState(1);
     const [activeTab, setActiveTab]            = useState('Description');
     const [reviewError, setReviewError]        = useState('');
@@ -51,7 +54,16 @@ export default function ProductDetailPage() {
     useEffect(() => {
         setSelectedImage(0);
         setQuantity(1);
-    }, [product?.id]);
+        const variants = product?.variants;
+        setSelectedVariantId(
+            variants?.length ? (variants.find((v) => v.isDefault) || variants[0]).id : null
+        );
+    }, [product?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        setQuantity(1);
+        setSelectedImage(0);
+    }, [selectedVariantId]);
 
     useEffect(() => {
         const el = buyBoxRef.current;
@@ -82,9 +94,47 @@ export default function ProductDetailPage() {
     }
 
     const related = getRelatedProducts(products, product.id, product.category);
+    const productBundles = bundles.filter((b) => b.items.some((i) => i.productId === product.id));
     const wished  = isInWishlist(product.id);
-    const outOfStock = product.stock <= 0;
-    const maxQty = Math.max(1, product.stock || 1);
+
+    // Pack-size/duration variants (e.g. "1/3/6 Month Supply") each carry
+    // their own price/stock — everything below reads from the selected one
+    // when the product has variants, and falls back to the product itself
+    // when it doesn't (so non-variant products are unaffected).
+    const variants = product.variants || [];
+    const hasVariants = product.hasVariants && variants.length > 0;
+    const activeVariant = hasVariants
+        ? (variants.find((v) => v.id === selectedVariantId) || variants.find((v) => v.isDefault) || variants[0])
+        : null;
+    // Most variants reuse the product's own photos as-is; a variant can
+    // optionally override with its own cover photo (e.g. a different
+    // color) — when set, it's shown first in the gallery and auto-selected.
+    const galleryImages = activeVariant?.image
+        ? [activeVariant.image, ...product.images.filter((img) => img !== activeVariant.image)]
+        : product.images;
+
+    const displayPrice = activeVariant ? activeVariant.price : product.price;
+    const displayOriginalPrice = activeVariant ? activeVariant.originalPrice : product.originalPrice;
+    const displayDiscount = activeVariant ? activeVariant.discount : product.discount;
+    const displayStock = activeVariant ? activeVariant.stock : product.stock;
+
+    const outOfStock = displayStock <= 0;
+    const maxQty = Math.max(1, displayStock || 1);
+
+    // What actually gets added to the cart / sent to checkout — merges the
+    // selected variant's price/stock/id onto the base product.
+    const cartProduct = activeVariant
+        ? {
+            ...product,
+            variantId: activeVariant.id,
+            variantLabel: activeVariant.label,
+            price: activeVariant.price,
+            originalPrice: activeVariant.originalPrice,
+            discount: activeVariant.discount,
+            stock: activeVariant.stock,
+            images: activeVariant.image ? [activeVariant.image, ...product.images] : product.images,
+        }
+        : product;
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
@@ -104,8 +154,8 @@ export default function ProductDetailPage() {
             showToast('This piece is out of stock', 'error');
             return;
         }
-        if (addToCart(product, quantity)) {
-            showCartToast(showToast, product);
+        if (addToCart(cartProduct, quantity)) {
+            showCartToast(showToast, cartProduct);
         } else {
             showToast('You already have the maximum available quantity in your bag', 'error');
         }
@@ -116,8 +166,8 @@ export default function ProductDetailPage() {
             showToast('This piece is out of stock', 'error');
             return;
         }
-        if (addToCart(product, quantity)) {
-            showCartToast(showToast, product, 'Added. Proceeding to checkout');
+        if (addToCart(cartProduct, quantity)) {
+            showCartToast(showToast, cartProduct, 'Added. Proceeding to checkout');
             navigate('/checkout');
         } else {
             showToast('You already have the maximum available quantity in your bag', 'error');
@@ -146,7 +196,7 @@ export default function ProductDetailPage() {
                             <AnimatePresence mode="wait">
                                 <motion.img
                                     key={`photo-${selectedImage}`}
-                                    src={imageUrl(product.images[selectedImage])}
+                                    src={imageUrl(galleryImages[selectedImage])}
                                     alt={product.title}
                                     className="w-full h-full object-cover"
                                     initial={{ opacity: 0, scale: 1.04 }}
@@ -163,7 +213,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
-                            {product.images.map((img, i) => (
+                            {galleryImages.map((img, i) => (
                                 <button
                                     key={i}
                                     type="button"
@@ -201,16 +251,70 @@ export default function ProductDetailPage() {
                         )}
 
                         <div className="flex flex-wrap items-baseline gap-3 sm:gap-4 mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-border/60">
-                            <span className="font-serif text-2xl sm:text-3xl text-charcoal">{formatPrice(product.price)}</span>
-                            {product.originalPrice > product.price && (
-                                <span className="text-base sm:text-lg text-soft-brown/50 line-through">{formatPrice(product.originalPrice)}</span>
+                            <span className="font-serif text-2xl sm:text-3xl text-charcoal">{formatPrice(displayPrice)}</span>
+                            {displayOriginalPrice > displayPrice && (
+                                <span className="text-base sm:text-lg text-soft-brown/50 line-through">{formatPrice(displayOriginalPrice)}</span>
                             )}
-                            {product.discount > 0 && (
+                            {displayDiscount > 0 && (
                                 <span className="px-2 py-0.5 rounded-full bg-wine/10 text-wine text-xs font-medium">
-                                    {product.discount}% off
+                                    {displayDiscount}% off
                                 </span>
                             )}
                         </div>
+
+                        {hasVariants && (
+                            <div className="mb-6 sm:mb-8">
+                                <p className="type-eyebrow text-soft-brown mb-3">Choose an Option</p>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                                    {variants.map((v) => {
+                                        const active = v.id === activeVariant?.id;
+                                        const sold = v.stock <= 0;
+                                        return (
+                                            <button
+                                                key={v.id}
+                                                type="button"
+                                                disabled={sold}
+                                                onClick={() => setSelectedVariantId(v.id)}
+                                                className={`relative text-left px-3.5 py-3 rounded-xl border transition-all duration-200 ${
+                                                    active
+                                                        ? 'border-wine bg-wine/5 ring-1 ring-wine'
+                                                        : 'border-border/70 hover:border-wine/40'
+                                                } ${sold ? 'opacity-45 cursor-not-allowed' : ''}`}
+                                                aria-pressed={active}
+                                            >
+                                                {v.discount > 0 && !sold && (
+                                                    <span className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-gold text-ivory text-[10px] font-medium shadow-sm">
+                                                        -{v.discount}%
+                                                    </span>
+                                                )}
+                                                <span className="flex items-center gap-2">
+                                                    {v.image && (
+                                                        <img
+                                                            src={imageUrl(v.image)}
+                                                            alt=""
+                                                            className="w-8 h-8 rounded-lg object-cover border border-border/50 flex-shrink-0"
+                                                        />
+                                                    )}
+                                                    <span className={`block text-sm font-medium ${active ? 'text-wine' : 'text-charcoal'}`}>
+                                                        {v.label}
+                                                    </span>
+                                                </span>
+                                                {v.netQuantity && (
+                                                    <span className="block text-xs text-soft-brown/70 mt-0.5">{v.netQuantity}</span>
+                                                )}
+                                                <span className="block text-sm font-serif text-charcoal mt-1.5">
+                                                    {formatPrice(v.price)}
+                                                    {v.originalPrice > v.price && (
+                                                        <span className="ml-1.5 text-xs text-soft-brown/50 line-through">{formatPrice(v.originalPrice)}</span>
+                                                    )}
+                                                </span>
+                                                {sold && <span className="block text-[11px] text-red-600 mt-1">Out of stock</span>}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                         <div className="mb-6 sm:mb-8">
                             <div className="flex gap-0 border-b border-border/40 mb-4 sm:mb-5 overflow-x-auto">
@@ -297,8 +401,8 @@ export default function ProductDetailPage() {
 
                         {outOfStock ? (
                             <p className="text-sm text-red-600 mb-5 font-medium">Out of stock</p>
-                        ) : product.stock <= 5 && (
-                            <p className="text-sm text-wine/80 mb-5 font-medium">Only {product.stock} left in stock</p>
+                        ) : displayStock <= 5 && (
+                            <p className="text-sm text-wine/80 mb-5 font-medium">Only {displayStock} left in stock</p>
                         )}
 
                         <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
@@ -382,6 +486,15 @@ export default function ProductDetailPage() {
                     </motion.div>
                 </div>
 
+                {productBundles.length > 0 && (
+                    <section className="mt-12 sm:mt-16">
+                        <SectionTitle subtitle="Better Together" title="Frequently Bought Together" className="mb-6 sm:mb-8" />
+                        <div className={`grid gap-4 sm:gap-6 ${productBundles.length > 1 ? 'sm:grid-cols-2' : 'max-w-xl'}`}>
+                            {productBundles.map((bundle) => <BundleCard key={bundle.id} bundle={bundle} />)}
+                        </div>
+                    </section>
+                )}
+
                 <section className="mt-12 sm:mt-16 bg-cream rounded-2xl p-5 sm:p-8 border border-border/40">
                     <h2 className="font-serif text-xl sm:text-2xl mb-6 text-charcoal">Write a Review</h2>
                     {reviewSubmitted ? (
@@ -445,8 +558,10 @@ export default function ProductDetailPage() {
                     >
                         <div className="max-w-7xl mx-auto flex items-center gap-3">
                             <div className="min-w-0 flex-1">
-                                <p className="text-xs text-soft-brown line-clamp-1">{product.title}</p>
-                                <p className="font-serif text-lg text-wine">{formatPrice(product.price)}</p>
+                                <p className="text-xs text-soft-brown line-clamp-1">
+                                    {product.title}{activeVariant ? ` — ${activeVariant.label}` : ''}
+                                </p>
+                                <p className="font-serif text-lg text-wine">{formatPrice(displayPrice)}</p>
                             </div>
                             <Button
                                 variant="gold"

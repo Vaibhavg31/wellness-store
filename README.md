@@ -39,6 +39,21 @@ and what needs a dev-server restart vs. what applies immediately.
 - PHP API: http://localhost:8000
 - Admin panel: http://localhost:5173/wellness-studio
 
+## Testing on Your Phone (same Wi-Fi)
+
+The dev server binds to all network interfaces (`vite.config.js` → `server.host: true`), so a phone on the **same Wi-Fi network** as this PC can load the site directly — no deploy needed.
+
+1. Start the app as usual: `npm run dev:all`
+2. Find this PC's local IP (Windows): `ipconfig` → look for "IPv4 Address" under your Wi-Fi adapter (e.g. `192.168.1.3`)
+3. On your phone's browser, go to: `http://<that-IP>:5173` (e.g. `http://192.168.1.3:5173`)
+4. **Windows Firewall**: the first time, Windows may prompt "Allow this app through the firewall?" for Node.js — click **Allow** (Private networks). If you don't see a prompt and the phone can't connect, open PowerShell **as Administrator** and run:
+   ```powershell
+   New-NetFirewallRule -DisplayName "Vite Dev Server (5173)" -Direction Inbound -Protocol TCP -LocalPort 5173 -Action Allow -Profile Private
+   ```
+5. The PHP API itself doesn't need to be exposed — the phone only talks to the Vite dev server (port 5173), which proxies `/api` and `/uploads` requests to the PHP backend on this same PC (`127.0.0.1:8000`).
+
+If it still doesn't load: confirm the phone is on the same Wi-Fi (not mobile data), and that the PC's Wi-Fi network profile is set to **Private**, not Public (Public profiles block inbound connections by default).
+
 ### Default Admin Login
 
 Set `ADMIN_USERNAME` and `ADMIN_PASSWORD_HASH` in `config.json`.  

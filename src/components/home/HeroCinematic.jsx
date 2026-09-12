@@ -7,7 +7,7 @@ import { imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { HERO_JEWELRY_IMAGES } from '@/data/fallbackProducts';
-import logoTransparent from '@/assets/krivea-logo-transparent.png';
+import logoMark from '@/assets/wellness-logo.svg';
 
 const fadeUp = (delay = 0) => ({
     initial:    { opacity: 0, y: 24 },
@@ -23,11 +23,11 @@ function isBrandAsset(path) {
 }
 
 function resolveBrandLogo(path) {
-    if (!path || path === '/krivea-logo-transparent.png') return logoTransparent;
+    if (!path) return logoMark;
     return imageUrl(path);
 }
 
-function JewelStage3D({ items, featuredProduct, centerImage, brandLogo }) {
+function JewelStage3D({ items, featuredProduct, centerImage, brandLogo, brandName }) {
     const stageRef = useRef(null);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -109,7 +109,7 @@ function JewelStage3D({ items, featuredProduct, centerImage, brandLogo }) {
         <div ref={stageRef} className="relative w-full max-w-[380px] sm:max-w-sm lg:max-w-lg mx-auto aspect-square" style={{ perspective: `${perspectivePx}px` }}>
             <div
                 className="absolute inset-[10%] rounded-full blur-3xl opacity-60 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(242,184,181,0.45) 0%, rgba(217,178,111,0.15) 45%, transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, rgba(253, 230, 138,0.45) 0%, rgba(217, 119, 6,0.15) 45%, transparent 70%)' }}
                 aria-hidden="true"
             />
 
@@ -173,7 +173,7 @@ function JewelStage3D({ items, featuredProduct, centerImage, brandLogo }) {
                         animate={{ y: [0, -14, 0], scale: [1, 1.03, 1] }}
                         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                     >
-                        <div className="relative w-full h-full rounded-full p-[3px] bg-gradient-to-br from-blush via-gold-light to-rose-gold shadow-[0_24px_64px_rgba(90,0,9,0.18)]">
+                        <div className="relative w-full h-full rounded-full p-[3px] bg-gradient-to-br from-blush via-gold-light to-rose-gold shadow-[0_24px_64px_rgba(15, 81, 50,0.18)]">
                             <div
                                 className={`w-full h-full rounded-full overflow-hidden border-4 border-white ${
                                     showAsBrand ? 'bg-wine flex items-center justify-center p-[14%]' : 'bg-white'
@@ -181,7 +181,7 @@ function JewelStage3D({ items, featuredProduct, centerImage, brandLogo }) {
                             >
                                 <img
                                     src={heroImg}
-                                    alt={showAsBrand ? 'Krivea Jewels' : (featuredProduct?.title || 'Featured jewellery')}
+                                    alt={showAsBrand ? brandName : (featuredProduct?.title || 'Featured product')}
                                     className={showAsBrand ? 'w-full h-full object-contain' : 'w-full h-full object-cover'}
                                     draggable={false}
                                 />
@@ -286,12 +286,12 @@ export default function HeroCinematic({ products = [] }) {
             <div className="absolute inset-0 bg-mesh-luxury pointer-events-none" aria-hidden="true" />
             <div
                 className="absolute top-0 right-0 w-[70%] h-[70%] opacity-40 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(242,184,181,0.35) 0%, transparent 55%)' }}
+                style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(253, 230, 138,0.35) 0%, transparent 55%)' }}
                 aria-hidden="true"
             />
             <div
                 className="absolute bottom-0 left-0 w-[50%] h-[50%] opacity-30 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 10% 90%, rgba(217,178,111,0.25) 0%, transparent 60%)' }}
+                style={{ background: 'radial-gradient(ellipse at 10% 90%, rgba(217, 119, 6,0.25) 0%, transparent 60%)' }}
                 aria-hidden="true"
             />
 
@@ -415,6 +415,7 @@ export default function HeroCinematic({ products = [] }) {
                             featuredProduct={centerProduct}
                             centerImage={hero.centerImage}
                             brandLogo={content.logo}
+                            brandName={content.brandName}
                         />
                     </motion.div>
                 </div>

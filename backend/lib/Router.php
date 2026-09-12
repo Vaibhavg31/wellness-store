@@ -6,6 +6,7 @@ namespace Krivea;
 
 use Krivea\Routes\AuthRoutes;
 use Krivea\Routes\BannerRoutes;
+use Krivea\Routes\BundleRoutes;
 use Krivea\Routes\CategoryRoutes;
 use Krivea\Routes\CouponRoutes;
 use Krivea\Routes\FeedbackRoutes;
@@ -250,6 +251,29 @@ final class Router
         }
         if ($method === 'DELETE' && preg_match('#^/api/coupons/([^/]+)$#', $path, $m)) {
             CouponRoutes::delete($m[1]);
+        }
+
+        // ── Bundles ───────────────────────────────────────
+        if ($method === 'GET' && $path === '/api/bundles') {
+            BundleRoutes::listPublic();
+        }
+        if ($method === 'GET' && $path === '/api/bundles/admin/all') {
+            BundleRoutes::listAdmin();
+        }
+        if ($method === 'GET' && preg_match('#^/api/bundles/admin/([^/]+)$#', $path, $m)) {
+            BundleRoutes::getAdmin($m[1]);
+        }
+        if ($method === 'POST' && $path === '/api/bundles') {
+            BundleRoutes::create();
+        }
+        if ($method === 'PUT' && preg_match('#^/api/bundles/([^/]+)/toggle$#', $path, $m)) {
+            BundleRoutes::toggle($m[1]);
+        }
+        if ($method === 'PUT' && preg_match('#^/api/bundles/([^/]+)$#', $path, $m)) {
+            BundleRoutes::update($m[1]);
+        }
+        if ($method === 'DELETE' && preg_match('#^/api/bundles/([^/]+)$#', $path, $m)) {
+            BundleRoutes::delete($m[1]);
         }
 
         // ── Orders ────────────────────────────────────────

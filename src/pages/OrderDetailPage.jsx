@@ -103,7 +103,7 @@ export default function OrderDetailPage() {
                     >
                         <Sparkles size={24} className="text-gold mx-auto mb-2" />
                         <p className="font-serif text-xl text-charcoal">Your pieces have arrived</p>
-                        <p className="text-sm text-soft-brown mt-1">Thank you for choosing Krivea. We hope they bring you joy.</p>
+                        <p className="text-sm text-soft-brown mt-1">Thank you for choosing us. We hope you feel the difference.</p>
                     </motion.div>
                 )}
 

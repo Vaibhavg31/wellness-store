@@ -53,6 +53,7 @@ const AdminSettingsPage = lazy(() => import('@/pages/admin/AdminSettingsPage'));
 const AdminContentPage = lazy(() => import('@/pages/admin/AdminContentPage'));
 const AdminMediaPage = lazy(() => import('@/pages/admin/AdminMediaPage'));
 const AdminCouponsPage = lazy(() => import('@/pages/admin/AdminCouponsPage'));
+const AdminBundlesPage = lazy(() => import('@/pages/admin/AdminBundlesPage'));
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -173,6 +174,7 @@ export default function App() {
                       <Route path="direct-orders" element={<SuspensePage message="Loading direct orders..."><AdminDirectOrdersPage /></SuspensePage>} />
                       <Route path="users" element={<SuspensePage message="Loading users..."><AdminUsersPage /></SuspensePage>} />
                       <Route path="coupons" element={<SuspensePage message="Loading coupons..."><AdminCouponsPage /></SuspensePage>} />
+                      <Route path="bundles" element={<SuspensePage message="Loading bundles..."><AdminBundlesPage /></SuspensePage>} />
                       <Route path="content" element={<SuspensePage message="Loading content..."><AdminContentPage /></SuspensePage>} />
                       <Route path="media" element={<SuspensePage message="Loading media..."><AdminMediaPage /></SuspensePage>} />
                       <Route path="settings" element={<SuspensePage message="Loading settings..."><AdminSettingsPage /></SuspensePage>} />

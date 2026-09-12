@@ -40,7 +40,7 @@ export default function CategoryCircles({ activeSlug, onSelect, linkMode = false
                                     className="absolute inset-0 opacity-30 sm:opacity-40 pointer-events-none hidden sm:block"
                                     aria-hidden="true"
                                     style={{
-                                        backgroundImage: 'radial-gradient(circle, rgba(217,178,111,0.5) 1px, transparent 1px), radial-gradient(circle, rgba(90,0,9,0.15) 1px, transparent 1px)',
+                                        backgroundImage: 'radial-gradient(circle, rgba(217, 119, 6,0.5) 1px, transparent 1px), radial-gradient(circle, rgba(15, 81, 50,0.15) 1px, transparent 1px)',
                                         backgroundSize: '18px 18px, 24px 24px',
                                         backgroundPosition: '0 0, 12px 12px',
                                     }}

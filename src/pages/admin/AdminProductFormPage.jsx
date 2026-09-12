@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
     AlertCircle,
+    Boxes,
     CreditCard,
     ImageIcon,
     Layers,
@@ -10,6 +11,7 @@ import {
     Plus,
     ShieldCheck,
     Sparkles,
+    Star,
     Tag,
     Trash2,
     Upload,
@@ -58,6 +60,7 @@ const DEFAULT_OPTIONAL = {
     badges: true,
     features: false,
     payment: true,
+    variants: false,
 };
 
 const emptyProduct = {
@@ -75,6 +78,7 @@ const emptyProduct = {
     features: [''],
     stock: '',
     images: [],
+    variants: [],
     isNew: false,
     isBestSeller: false,
     isTrendingPinned: false,
@@ -82,6 +86,28 @@ const emptyProduct = {
     codEnabled: true,
     onlinePaymentEnabled: true,
 };
+
+let variantSeq = 0;
+function makeVariant(patch = {}) {
+    variantSeq += 1;
+    return {
+        key: `new-${Date.now()}-${variantSeq}`, // stable React key only; not sent to the server unless it's a real id
+        id: null,
+        label: '',
+        netQuantity: '',
+        image: '', // '' = reuse the product's own photos
+        price: '',
+        originalPrice: '',
+        stock: '',
+        sku: '',
+        isDefault: false,
+        ...patch,
+    };
+}
+
+// Cycled through so a fresh row's placeholder isn't always the same example
+// — makes it obvious variants aren't only for "month supply" durations.
+const VARIANT_LABEL_PLACEHOLDERS = ['e.g. Small', 'e.g. Large', 'e.g. 3 Month Supply', 'e.g. 250ml'];
 
 export default function AdminProductFormPage() {
     const { id } = useParams();
@@ -122,6 +148,17 @@ export default function AdminProductFormPage() {
                     features: p.features.length ? p.features : [''],
                     stock: p.stock,
                     images: p.images,
+                    variants: (p.variants ?? []).map((v) => makeVariant({
+                        id: v.id,
+                        label: v.label,
+                        netQuantity: v.netQuantity ?? '',
+                        image: v.image ?? '',
+                        price: v.price,
+                        originalPrice: v.originalPrice,
+                        stock: v.stock,
+                        sku: v.sku ?? '',
+                        isDefault: v.isDefault,
+                    })),
                     isNew: p.isNew,
                     isBestSeller: p.isBestSeller,
                     isTrendingPinned: p.isTrendingPinned,
@@ -134,6 +171,7 @@ export default function AdminProductFormPage() {
                     badges: p.showTrustBadges !== false,
                     features: p.features?.some((f) => f.trim()),
                     payment: p.codEnabled === false || p.onlinePaymentEnabled === false,
+                    variants: (p.variants?.length ?? 0) > 0,
                 });
             });
         }
@@ -143,9 +181,19 @@ export default function AdminProductFormPage() {
         setForm((prev) => ({ ...prev, [key]: value }));
     };
 
-    const price = Number(form.price);
-    const originalPrice = Number(form.originalPrice);
-    const stock = Number(form.stock);
+    // Once pack-size variants are on, the base Price/Original Price/Stock
+    // fields are hidden and derived from the default variant instead — the
+    // rest of the app (product cards, search, cart) still just reads the
+    // product's own price/stock fields, so this is what keeps them accurate.
+    const defaultVariant = optional.variants
+        ? (form.variants.find((v) => v.isDefault) || form.variants[0])
+        : null;
+
+    const price = Number(defaultVariant ? defaultVariant.price : form.price);
+    const originalPrice = Number(defaultVariant ? (defaultVariant.originalPrice || defaultVariant.price) : form.originalPrice);
+    const stock = defaultVariant
+        ? form.variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0)
+        : Number(form.stock);
 
     const computedDiscount = useMemo(() => {
         if (!Number.isFinite(price) || !Number.isFinite(originalPrice) || originalPrice <= price) return 0;
@@ -239,6 +287,55 @@ export default function AdminProductFormPage() {
         setForm((prev) => ({ ...prev, showTrustBadges: v, badges: v ? prev.badges : [] }));
     };
 
+    // ---- Variants: one product, multiple buyable options — different
+    // sizes (Small/Medium/Large, 100ml/250ml/500ml), pack counts, or
+    // durations (1/3/6 Month Supply). All options share the same photos,
+    // description, and category as the product above — only label,
+    // quantity label, price, and stock differ per option. ----------------
+
+    const toggleVariantsSection = (v) => {
+        setOptionalSection('variants', v);
+        if (v && form.variants.length === 0) {
+            setForm((prev) => ({ ...prev, variants: [makeVariant({ isDefault: true }), makeVariant({})] }));
+        } else if (!v) {
+            setForm((prev) => ({ ...prev, variants: [] }));
+        }
+    };
+
+    const addVariant = () => {
+        setForm((prev) => ({
+            ...prev,
+            variants: [...prev.variants, makeVariant({ isDefault: prev.variants.length === 0 })],
+        }));
+    };
+
+    const updateVariant = (index, patch) => {
+        setForm((prev) => ({
+            ...prev,
+            variants: prev.variants.map((v, i) => (i === index ? { ...v, ...patch } : v)),
+        }));
+    };
+
+    const removeVariant = (index) => {
+        setForm((prev) => {
+            const next = prev.variants.filter((_, i) => i !== index);
+            // Keep exactly one default so the storefront always has a
+            // pre-selected option — promote the first remaining variant if
+            // the one just removed was it.
+            if (next.length > 0 && !next.some((v) => v.isDefault)) {
+                next[0] = { ...next[0], isDefault: true };
+            }
+            return { ...prev, variants: next };
+        });
+    };
+
+    const setDefaultVariant = (index) => {
+        setForm((prev) => ({
+            ...prev,
+            variants: prev.variants.map((v, i) => ({ ...v, isDefault: i === index })),
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!adminToken) return;
@@ -273,10 +370,44 @@ export default function AdminProductFormPage() {
             setError('Please enter a valid stock quantity (0 or more).');
             return;
         }
+        if (optional.variants) {
+            if (form.variants.length < 2) {
+                setError('Add at least 2 options (e.g. "Small" / "Large", or "100ml" / "250ml") — or turn Variants off if this product only comes one way.');
+                return;
+            }
+            for (const v of form.variants) {
+                if (!v.label.trim()) {
+                    setError('Every option needs a label (e.g. "Large", "250ml", or "3 Month Supply").');
+                    return;
+                }
+                if (!Number.isFinite(Number(v.price)) || Number(v.price) <= 0) {
+                    setError(`Enter a valid price for "${v.label}".`);
+                    return;
+                }
+                if (!Number.isFinite(Number(v.stock)) || Number(v.stock) < 0) {
+                    setError(`Enter a valid stock quantity for "${v.label}".`);
+                    return;
+                }
+            }
+        }
 
         setSaving(true);
 
         try {
+            const cleanVariants = optional.variants
+                ? form.variants.map((v) => ({
+                    id: v.id || undefined,
+                    label: v.label.trim(),
+                    netQuantity: v.netQuantity.trim() || null,
+                    image: v.image || null,
+                    price: Number(v.price),
+                    originalPrice: Number(v.originalPrice) || Number(v.price),
+                    stock: Number(v.stock) || 0,
+                    sku: v.sku.trim() || null,
+                    isDefault: v.isDefault,
+                }))
+                : [];
+
             const payload = {
                 ...form,
                 title: form.title.trim(),
@@ -288,6 +419,7 @@ export default function AdminProductFormPage() {
                 badges: form.badges.map((b) => normalizeTag(b)).filter(Boolean),
                 features: form.features.filter((f) => f.trim()),
                 discount: computedDiscount,
+                variants: cleanVariants,
                 // Deliberately NOT sending enable3dPreview/cutoutImages: this form has
                 // no UI for either, and previously sent enable3DPreview:false and
                 // cutoutImages:[] unconditionally on every save — silently wiping any
@@ -386,49 +518,55 @@ export default function AdminProductFormPage() {
                     <SectionHeader
                         icon={Tag}
                         title="Pricing & stock"
-                        description="Sale price, MRP, and inventory"
+                        description={optional.variants
+                            ? 'Managed per option below — this product has multiple variants'
+                            : 'Sale price, MRP, and inventory'}
                     />
-                    <div className="grid sm:grid-cols-3 gap-3">
-                        <div>
-                            <FormLabel required>Price (₹)</FormLabel>
-                            <input
-                                type="number"
-                                min="1"
-                                value={form.price}
-                                onChange={(e) => update('price', e.target.value)}
-                                className={fieldClass}
-                                placeholder="2499"
-                                required
-                            />
+                    {!optional.variants && (
+                        <div className="grid sm:grid-cols-3 gap-3">
+                            <div>
+                                <FormLabel required>Price (₹)</FormLabel>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={form.price}
+                                    onChange={(e) => update('price', e.target.value)}
+                                    className={fieldClass}
+                                    placeholder="2499"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <FormLabel required>Original price (₹)</FormLabel>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={form.originalPrice}
+                                    onChange={(e) => update('originalPrice', e.target.value)}
+                                    className={fieldClass}
+                                    placeholder="3499"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <FormLabel required>Stock</FormLabel>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={form.stock}
+                                    onChange={(e) => update('stock', e.target.value)}
+                                    className={fieldClass}
+                                    placeholder="10"
+                                    required
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <FormLabel required>Original price (₹)</FormLabel>
-                            <input
-                                type="number"
-                                min="1"
-                                value={form.originalPrice}
-                                onChange={(e) => update('originalPrice', e.target.value)}
-                                className={fieldClass}
-                                placeholder="3499"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <FormLabel required>Stock</FormLabel>
-                            <input
-                                type="number"
-                                min="0"
-                                value={form.stock}
-                                onChange={(e) => update('stock', e.target.value)}
-                                className={fieldClass}
-                                placeholder="10"
-                                required
-                            />
-                        </div>
-                    </div>
+                    )}
                     {Number.isFinite(price) && price > 0 && Number.isFinite(originalPrice) && originalPrice > 0 && (
                         <div className="rounded-xl border border-admin-border bg-admin-surface-alt p-3 flex flex-wrap items-center justify-between gap-2 text-sm">
-                            <span className="text-admin-muted">Customer sees</span>
+                            <span className="text-admin-muted">
+                                {optional.variants ? `Customer sees (default: "${defaultVariant?.label || '—'}")` : 'Customer sees'}
+                            </span>
                             <div className="flex items-center gap-3">
                                 <span className="font-semibold text-charcoal">{formatPrice(price)}</span>
                                 {originalPrice > price && (
@@ -442,6 +580,144 @@ export default function AdminProductFormPage() {
                             </div>
                         </div>
                     )}
+
+                    <OptionalSection
+                        icon={Boxes}
+                        title="Variants (sizes, packs, durations…)"
+                        description="One product, multiple buyable options — different sizes (Small/Medium/Large, 100ml/250ml/500ml), pack counts, or durations (1/3/6 Month Supply) — each with its own price and stock. The customer picks one on the product page; everything else about the product (photos, description, category) stays shared."
+                        enabled={optional.variants}
+                        onToggle={toggleVariantsSection}
+                    >
+                        <p className="text-xs text-admin-muted -mt-1">
+                            No need to upload separate photos per option — every variant shows the same photos you set above by default. Pick a different cover photo per option below only if it genuinely looks different (e.g. a different color).
+                        </p>
+                        <div className="space-y-3">
+                            {form.variants.map((v, i) => (
+                                <div key={v.key} className="rounded-xl border border-admin-border bg-admin-surface-alt p-3 sm:p-4 space-y-3">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setDefaultVariant(i)}
+                                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-colors ${
+                                                v.isDefault
+                                                    ? 'bg-wine text-ivory border-wine'
+                                                    : 'border-admin-border text-admin-muted hover:border-wine/40 bg-white'
+                                            }`}
+                                            title="Pre-selected option on the product page"
+                                        >
+                                            <Star size={11} fill={v.isDefault ? 'currentColor' : 'none'} />
+                                            {v.isDefault ? 'Default option' : 'Set as default'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeVariant(i)}
+                                            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 shrink-0"
+                                            aria-label="Remove option"
+                                        >
+                                            <Trash2 size={15} />
+                                        </button>
+                                    </div>
+
+                                    <div className="grid sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <FormLabel required>Label</FormLabel>
+                                            <input
+                                                value={v.label}
+                                                onChange={(e) => updateVariant(i, { label: e.target.value })}
+                                                className={fieldClass}
+                                                placeholder={VARIANT_LABEL_PLACEHOLDERS[i % VARIANT_LABEL_PLACEHOLDERS.length]}
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <FormLabel>Size / quantity label</FormLabel>
+                                            <input
+                                                value={v.netQuantity}
+                                                onChange={(e) => updateVariant(i, { netQuantity: e.target.value })}
+                                                className={fieldClass}
+                                                placeholder="e.g. 250ml, 60 capsules, 180g"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {form.images.length > 0 && (
+                                        <div>
+                                            <FormLabel>Cover photo for this option</FormLabel>
+                                            <div className="flex flex-wrap gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateVariant(i, { image: '' })}
+                                                    className={`px-3 py-2 rounded-lg border text-xs transition-colors ${
+                                                        !v.image ? 'border-wine bg-wine/5 text-wine' : 'border-admin-border text-admin-muted hover:border-wine/30'
+                                                    }`}
+                                                >
+                                                    Same as product
+                                                </button>
+                                                {form.images.map((img) => (
+                                                    <button
+                                                        key={img}
+                                                        type="button"
+                                                        onClick={() => updateVariant(i, { image: img })}
+                                                        className={`w-11 h-11 rounded-lg overflow-hidden border-2 transition-colors shrink-0 ${
+                                                            v.image === img ? 'border-wine' : 'border-transparent opacity-70 hover:opacity-100'
+                                                        }`}
+                                                        title="Use this photo for this option"
+                                                    >
+                                                        <img src={imageUrl(img)} alt="" className="w-full h-full object-cover" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="grid sm:grid-cols-3 gap-3">
+                                        <div>
+                                            <FormLabel required>Price (₹)</FormLabel>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={v.price}
+                                                onChange={(e) => updateVariant(i, { price: e.target.value })}
+                                                className={fieldClass}
+                                                placeholder="1799"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <FormLabel>Original price (₹)</FormLabel>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={v.originalPrice}
+                                                onChange={(e) => updateVariant(i, { originalPrice: e.target.value })}
+                                                className={fieldClass}
+                                                placeholder="2697"
+                                            />
+                                        </div>
+                                        <div>
+                                            <FormLabel required>Stock</FormLabel>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={v.stock}
+                                                onChange={(e) => updateVariant(i, { stock: e.target.value })}
+                                                className={fieldClass}
+                                                placeholder="40"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={addVariant}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-wine bg-wine/5 hover:bg-wine/10 border border-wine/20"
+                        >
+                            <Plus size={14} /> Add option
+                        </button>
+                    </OptionalSection>
                 </FormSection>
 
                 <FormSection>

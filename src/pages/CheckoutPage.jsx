@@ -299,6 +299,8 @@ export default function CheckoutPage() {
         const order = await api.post('/api/orders', {
             items: items.map((item) => ({
                 productId: item.product.id,
+                variantId: item.product.variantId || undefined,
+                bundleId: item.product.bundleId || undefined,
                 title: item.product.title,
                 price: item.product.price,
                 quantity: item.quantity,
@@ -342,7 +344,7 @@ export default function CheckoutPage() {
                     customerName: form.name,
                     email: form.email,
                     phone: normalizePhone(form.phone),
-                    description: `Krivea order ${order.id}`,
+                    description: `Order ${order.id}`,
                 });
 
                 const verified = await api.post('/api/orders/verify-payment', {

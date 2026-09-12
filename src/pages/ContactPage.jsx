@@ -109,7 +109,7 @@ export default function ContactPage() {
                         )}
 
                         <a
-                            href={getWhatsAppUrl('Hi Krivea! I would like to get in touch.')}
+                            href={getWhatsAppUrl('Hi! I would like to get in touch.')}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-4 p-5 rounded-2xl bg-[#25D366]/10 border border-[#25D366]/25 hover:bg-[#25D366]/15 transition-colors group"

@@ -1,49 +1,52 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Krivea Jewels Design Tokens ──────────────────────────────────────── */
+  /* ── Wellness Store Design Tokens ─────────────────────────────────────── */
 
-  /* Primary — wine maroon (hero, footer, loader, nav) */
-  --color-wine:        #5A0009;
-  --color-wine-light:  #7A000F;
-  --color-wine-deep:   #3E0007;
+  /* Primary — forest green (hero, footer, loader, nav). The "wine" token
+     name is legacy (this was originally a jewelry-brand template) but is
+     kept so every existing bg-wine / text-wine class across the app just
+     picks up the new brand color without a repo-wide rename. */
+  --color-wine:        #0F5132;
+  --color-wine-light:  #15803D;
+  --color-wine-deep:   #0A3D25;
 
   /* Legacy aliases mapped to wine so existing bg-emerald / text-emerald
      classes continue to work without touching every component */
-  --color-emerald:       #5A0009;
-  --color-emerald-light: #7A000F;
-  --color-emerald-dark:  #3E0007;
+  --color-emerald:       #0F5132;
+  --color-emerald-light: #15803D;
+  --color-emerald-dark:  #0A3D25;
 
-  /* Accent — blush pink (CTAs on dark bg, highlights) */
-  --color-blush:       #F2B8B5;
+  /* Accent — warm highlight (CTAs on dark bg, highlights) */
+  --color-blush:       #FDE68A;
 
-  /* Accent — rose gold family */
-  --color-rose-gold:   #C99383;   /* fills, dividers, borders */
-  --color-rose-ink:    #8F5340;   /* 5.64:1 on ivory — text/icons on light bg */
+  /* Accent — amber/gold family */
+  --color-rose-gold:   #D97706;   /* fills, dividers, borders */
+  --color-rose-ink:    #92400E;   /* text/icons on light bg */
 
   /* Accent — soft gold family */
-  --color-gold:        #D9B26F;   /* fills: badges, price highlights */
-  --color-gold-light:  #E8CC91;   /* hover fills */
-  --color-gold-ink:    #856226;   /* 5.20:1 on ivory — text on light bg */
+  --color-gold:        #D97706;   /* fills: badges, price highlights */
+  --color-gold-light:  #F59E0B;   /* hover fills */
+  --color-gold-ink:    #92400E;   /* text on light bg */
 
   /* Legacy aliases kept so existing text-gold / bg-gold-light classes work */
-  --color-champagne:   #F2B8B5;   /* repurposed → blush */
-  --color-muted-gold:  #856226;
+  --color-champagne:   #FDE68A;   /* repurposed → blush */
+  --color-muted-gold:  #92400E;
 
   /* Surfaces */
-  --color-ivory:         #FDF6F0;  /* page background */
-  --color-cream:         #FDF6F0;  /* alias */
-  --color-warm-beige:    #F5EBE5;  /* section tint bands */
+  --color-ivory:         #FBF9F4;  /* page background */
+  --color-cream:         #FBF9F4;  /* alias */
+  --color-warm-beige:    #F3EEE3;  /* section tint bands */
   --color-luxury-white:  #FFFFFF;
 
   /* Text */
-  --color-charcoal:      #231414;  /* espresso body text */
-  --color-dark-chocolate:#231414;  /* alias */
-  --color-soft-brown:    #8F5340;  /* rose-ink muted text */
-  --color-accent-brown:  #5A0009;  /* alias → wine */
+  --color-charcoal:      #1C1A16;  /* body text */
+  --color-dark-chocolate:#1C1A16;  /* alias */
+  --color-soft-brown:    #57534E;  /* muted text */
+  --color-accent-brown:  #0F5132;  /* alias → wine */
 
   /* Borders */
-  --color-border:        #E8D0C8;  /* blush-tinted hairlines */
+  --color-border:        #E5DDD0;  /* warm neutral hairlines */
 
   /* Admin panel — clean neutral chrome with wine accents */
   --color-admin-border:       #E5DDD6;
@@ -84,8 +87,8 @@
     line-height: 1.6;
     overflow-x: hidden;
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(90, 0, 9, 0.04), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(217, 178, 111, 0.04), transparent);
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(15, 81, 50, 0.04), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(217, 119, 6, 0.04), transparent);
   }
 
   ::selection {
@@ -140,14 +143,14 @@
 
   /* ── Text gradients ─────────────────────────────────────────────────── */
   .text-gradient-gold {
-    background: linear-gradient(135deg, #5A0009 0%, #D9B26F 60%, #E8CC91 100%);
+    background: linear-gradient(135deg, var(--color-wine) 0%, var(--color-gold) 60%, var(--color-gold-light) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .text-gradient-blush {
-    background: linear-gradient(135deg, #5A0009 0%, #C99383 50%, #F2B8B5 100%);
+    background: linear-gradient(135deg, var(--color-wine) 0%, var(--color-rose-gold) 50%, var(--color-blush) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -155,66 +158,66 @@
 
   /* ── Backgrounds ────────────────────────────────────────────────────── */
   .bg-luxury-gradient {
-    background: linear-gradient(180deg, #FDF6F0 0%, #F5EBE5 50%, #FDF6F0 100%);
+    background: linear-gradient(180deg, var(--color-ivory) 0%, var(--color-warm-beige) 50%, var(--color-ivory) 100%);
   }
 
   .bg-footer-gradient {
-    background: linear-gradient(180deg, #3E0007 0%, #5A0009 50%, #3E0007 100%);
+    background: linear-gradient(180deg, var(--color-wine-deep) 0%, var(--color-wine) 50%, var(--color-wine-deep) 100%);
   }
 
   .bg-emerald-gradient {
-    background: linear-gradient(135deg, #5A0009 0%, #7A000F 100%);
+    background: linear-gradient(135deg, var(--color-wine) 0%, var(--color-wine-light) 100%);
   }
 
   .bg-section-emerald {
-    background: linear-gradient(165deg, #3E0007 0%, #5A0009 40%, #3E0007 100%);
+    background: linear-gradient(165deg, var(--color-wine-deep) 0%, var(--color-wine) 40%, var(--color-wine-deep) 100%);
   }
 
   .bg-section-warm {
-    background: linear-gradient(180deg, #F5EBE5 0%, #FDF6F0 50%, #F5EBE5 100%);
+    background: linear-gradient(180deg, var(--color-warm-beige) 0%, var(--color-ivory) 50%, var(--color-warm-beige) 100%);
   }
 
   .bg-mesh-luxury {
-    background-color: #FDF6F0;
+    background-color: var(--color-ivory);
     background-image:
-      radial-gradient(at 20% 20%, rgba(90, 0, 9, 0.06) 0%, transparent 50%),
-      radial-gradient(at 80% 80%, rgba(217, 178, 111, 0.06) 0%, transparent 50%),
-      radial-gradient(at 50% 50%, rgba(242, 184, 181, 0.04) 0%, transparent 70%);
+      radial-gradient(at 20% 20%, rgba(15, 81, 50, 0.06) 0%, transparent 50%),
+      radial-gradient(at 80% 80%, rgba(217, 119, 6, 0.06) 0%, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(253, 230, 138, 0.04) 0%, transparent 70%);
   }
 
   /* ── Glass / frosted surfaces ───────────────────────────────────────── */
   .glass {
-    background: rgba(253, 246, 240, 0.95);
+    background: rgba(251, 249, 244, 0.95);
   }
 
   /* ── Shadows ────────────────────────────────────────────────────────── */
   .luxury-shadow {
-    box-shadow: 0 2px 24px rgba(90, 0, 9, 0.06), 0 1px 2px rgba(35, 20, 20, 0.04);
+    box-shadow: 0 2px 24px rgba(15, 81, 50, 0.06), 0 1px 2px rgba(35, 20, 20, 0.04);
   }
 
   .luxury-shadow-lg {
-    box-shadow: 0 12px 48px rgba(90, 0, 9, 0.10), 0 2px 8px rgba(35, 20, 20, 0.04);
+    box-shadow: 0 12px 48px rgba(15, 81, 50, 0.10), 0 2px 8px rgba(35, 20, 20, 0.04);
   }
 
   .luxury-shadow-hover {
-    box-shadow: 0 8px 32px rgba(90, 0, 9, 0.15), 0 2px 8px rgba(217, 178, 111, 0.08);
+    box-shadow: 0 8px 32px rgba(15, 81, 50, 0.15), 0 2px 8px rgba(217, 119, 6, 0.08);
   }
 
   .gold-glow {
-    box-shadow: 0 0 40px rgba(217, 178, 111, 0.20);
+    box-shadow: 0 0 40px rgba(217, 119, 6, 0.20);
   }
 
   .emerald-glow {
-    box-shadow: 0 0 40px rgba(90, 0, 9, 0.15);
+    box-shadow: 0 0 40px rgba(15, 81, 50, 0.15);
   }
 
   /* ── Cards ──────────────────────────────────────────────────────────── */
   .luxury-card {
     background-color: #FFFFFF;
-    background-image: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(253,246,240,0.95) 100%);
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(251,249,244,0.95) 100%);
     border-radius: 1rem;
     border: 1px solid rgba(232, 208, 200, 0.5);
-    box-shadow: 0 2px 24px rgba(90, 0, 9, 0.06), 0 1px 2px rgba(35, 20, 20, 0.03);
+    box-shadow: 0 2px 24px rgba(15, 81, 50, 0.06), 0 1px 2px rgba(35, 20, 20, 0.03);
   }
 
   /* ── Typography helpers ─────────────────────────────────────────────── */
@@ -251,7 +254,7 @@
   }
 
   .text-shadow-luxury {
-    text-shadow: 0 2px 24px rgba(90, 0, 9, 0.15);
+    text-shadow: 0 2px 24px rgba(15, 81, 50, 0.15);
   }
 
   /* ── Ornament corners ───────────────────────────────────────────────── */
@@ -265,7 +268,7 @@
     position: absolute;
     width: 48px;
     height: 48px;
-    border-color: rgba(217, 178, 111, 0.35);
+    border-color: rgba(217, 119, 6, 0.35);
     pointer-events: none;
   }
 
@@ -325,7 +328,7 @@
     background: linear-gradient(
       105deg,
       transparent 40%,
-      rgba(242, 184, 181, 0.30) 50%,
+      rgba(253, 230, 138, 0.30) 50%,
       transparent 60%
     );
     background-size: 200% 100%;
@@ -341,8 +344,8 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(217, 178, 111, 0.15); }
-    50%       { box-shadow: 0 0 40px rgba(217, 178, 111, 0.30); }
+    0%, 100% { box-shadow: 0 0 20px rgba(217, 119, 6, 0.15); }
+    50%       { box-shadow: 0 0 40px rgba(217, 119, 6, 0.30); }
   }
 
   .pulse-glow {
@@ -484,8 +487,8 @@
 
   .admin-control:focus {
     outline: none;
-    border-color: rgba(90, 0, 9, 0.35);
-    box-shadow: 0 0 0 3px rgba(90, 0, 9, 0.08);
+    border-color: rgba(15, 81, 50, 0.35);
+    box-shadow: 0 0 0 3px rgba(15, 81, 50, 0.08);
   }
 
   /* Date inputs */
@@ -576,8 +579,8 @@
   }
 
   .admin-quick-link-highlight {
-    background: linear-gradient(135deg, rgba(90, 0, 9, 0.04) 0%, rgba(217, 178, 111, 0.08) 100%);
-    border-color: rgba(217, 178, 111, 0.35);
+    background: linear-gradient(135deg, rgba(15, 81, 50, 0.04) 0%, rgba(217, 119, 6, 0.08) 100%);
+    border-color: rgba(217, 119, 6, 0.35);
   }
 
   .admin-promo-card {
@@ -590,7 +593,7 @@
   }
 
   .admin-promo-card:hover {
-    border-color: rgba(90, 0, 9, 0.2);
-    box-shadow: 0 4px 12px rgba(90, 0, 9, 0.06);
+    border-color: rgba(15, 81, 50, 0.2);
+    box-shadow: 0 4px 12px rgba(15, 81, 50, 0.06);
   }
 }
