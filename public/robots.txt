@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Admin panel — not for indexing
+Disallow: /krivea-studio
+
+Sitemap: https://kriveajewels.com/sitemap.xml
