@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Krivea;
 
+use Krivea\Repository\SettingsRepository;
+
 /**
  * All transactional email via Brevo REST API (auth, orders, password reset).
  * Single provider — no SMTP required.
@@ -59,7 +61,7 @@ final class EmailService
                                 Thanks for creating your account. Click the button below to verify your email address and complete sign-in.
                             </p>
                             <p style="margin:28px 0;text-align:center;">
-                                <a href="{$safeUrl}" style="display:inline-block;padding:14px 32px;background:#6b2d3e;color:#faf7f2;text-decoration:none;border-radius:999px;font-weight:600;">
+                                <a href="{$safeUrl}" style="display:inline-block;padding:14px 32px;background:#0F5132;color:#faf7f2;text-decoration:none;border-radius:999px;font-weight:600;">
                                     Verify email &amp; sign in
                                 </a>
                             </p>
@@ -106,7 +108,7 @@ final class EmailService
                                 We received a request to reset your password. Click the button below to choose a new one.
                             </p>
                             <p style="margin:28px 0;text-align:center;">
-                                <a href="{$safeUrl}" style="display:inline-block;padding:14px 32px;background:#6b2d3e;color:#faf7f2;text-decoration:none;border-radius:999px;font-weight:600;">
+                                <a href="{$safeUrl}" style="display:inline-block;padding:14px 32px;background:#0F5132;color:#faf7f2;text-decoration:none;border-radius:999px;font-weight:600;">
                                     Reset password
                                 </a>
                             </p>
@@ -138,6 +140,15 @@ final class EmailService
     private static function brandName(): string
     {
         $name = trim((string) ($_ENV['BREVO_SENDER_NAME'] ?? ''));
-        return $name !== '' ? $name : 'Krivea Jewels';
+        if ($name !== '') {
+            return $name;
+        }
+
+        try {
+            $settings = (new SettingsRepository())->get();
+            return (string) ($settings['brandName'] ?? 'Wellness Store');
+        } catch (\Throwable) {
+            return 'Wellness Store';
+        }
     }
 }

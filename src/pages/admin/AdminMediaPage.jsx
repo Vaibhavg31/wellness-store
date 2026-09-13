@@ -158,24 +158,24 @@ export default function AdminMediaPage() {
                                         loading="lazy"
                                     />
                                 )}
-                                <div className="absolute inset-0 bg-dark-chocolate/0 group-hover:bg-dark-chocolate/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                                <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                                     <AdminIconButton
                                         onClick={() => copyUrl(item)}
                                         icon={copiedId === item.id ? Check : Copy}
                                         title="Copy URL"
-                                        className="bg-ivory"
+                                        className="bg-cream"
                                     />
                                     <AdminIconButton
                                         onClick={() => remove(item)}
                                         icon={Trash2}
                                         variant="danger"
                                         title="Delete"
-                                        className="bg-ivory"
+                                        className="bg-cream"
                                     />
                                 </div>
                             </div>
                             <div className="p-2.5">
-                                <p className="text-xs text-charcoal truncate" title={item.filename}>{item.filename}</p>
+                                <p className="text-xs text-ink truncate" title={item.filename}>{item.filename}</p>
                                 <p className="text-[11px] text-admin-muted mt-0.5">{formatSize(item.sizeBytes)}</p>
                             </div>
                         </div>

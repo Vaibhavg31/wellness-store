@@ -95,20 +95,20 @@ function CustomerSummary({ order }) {
             <div className="grid sm:grid-cols-2 gap-3.5">
                 <div>
                     <dt className="text-[10px] uppercase tracking-wider text-admin-muted mb-0.5">Name</dt>
-                    <dd className="text-charcoal font-medium">{s.name || '—'}</dd>
+                    <dd className="text-ink font-medium">{s.name || '—'}</dd>
                 </div>
                 <div>
                     <dt className="text-[10px] uppercase tracking-wider text-admin-muted mb-0.5">Phone</dt>
-                    <dd className="text-charcoal">{s.phone || '—'}</dd>
+                    <dd className="text-ink">{s.phone || '—'}</dd>
                 </div>
             </div>
             <div>
                 <dt className="text-[10px] uppercase tracking-wider text-admin-muted mb-0.5">Email</dt>
-                <dd className="text-charcoal break-all">{order.email || '—'}</dd>
+                <dd className="text-ink break-all">{order.email || '—'}</dd>
             </div>
             <div>
                 <dt className="text-[10px] uppercase tracking-wider text-admin-muted mb-0.5">Address</dt>
-                <dd className="text-charcoal leading-relaxed">{addressLine || '—'}</dd>
+                <dd className="text-ink leading-relaxed">{addressLine || '—'}</dd>
             </div>
         </dl>
     );
@@ -131,7 +131,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
 
     return (
         <div className="space-y-5">
-            <div className="rounded-xl border border-admin-border bg-warm-beige/30 p-4">
+            <div className="rounded-xl border border-admin-border bg-sand/30 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-2">
                         <OrderStatusBadge status={order.status} />
@@ -147,7 +147,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                         )}
                     </div>
                     <div className="text-right">
-                        <p className="font-serif text-2xl text-charcoal leading-none">{formatPrice(order.total)}</p>
+                        <p className="font-display text-2xl text-ink leading-none">{formatPrice(order.total)}</p>
                         <p className="text-xs text-admin-muted mt-1">{paymentLabel(order)}</p>
                     </div>
                 </div>
@@ -160,7 +160,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                 <div className="grid grid-cols-2 gap-2.5">
                     {nextStatus ? (
                         <Button
-                            variant="gold"
+                            variant="turmeric"
                             size="sm"
                             disabled={updating}
                             onClick={() => updateStatus(nextStatus, `Moved to ${getStatusLabel(nextStatus)}`)}
@@ -208,7 +208,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                         <span>Delivery</span>
                         <span>{order.deliveryFee > 0 ? formatPrice(order.deliveryFee) : 'Free'}</span>
                     </div>
-                    <div className="flex justify-between font-semibold text-charcoal pt-1 border-t border-admin-border-light">
+                    <div className="flex justify-between font-semibold text-ink pt-1 border-t border-admin-border-light">
                         <span>Total</span>
                         <span>{formatPrice(order.total)}</span>
                     </div>
@@ -427,7 +427,7 @@ export default function AdminOrdersPage() {
             await api.download(
                 `/api/orders/admin/export${formatParam}`,
                 adminToken,
-                `krivea-orders-${from}-to-${to}.${ext}`,
+                `wellness-orders-${from}-to-${to}.${ext}`,
             );
             setExportModalOpen(false);
         } catch (err) {
@@ -445,7 +445,7 @@ export default function AdminOrdersPage() {
                 actions={(
                     <>
                         <Link to={`${ADMIN_PATH}/direct-orders`}>
-                            <Button variant="gold" size="sm" className="gap-2 normal-case tracking-normal">
+                            <Button variant="turmeric" size="sm" className="gap-2 normal-case tracking-normal">
                                 Direct order
                             </Button>
                         </Link>
@@ -464,7 +464,7 @@ export default function AdminOrdersPage() {
             <AdminStatStrip
                 columns={5}
                 stats={[
-                    { label: 'Revenue', value: formatPrice(stats.revenue), tone: 'gold' },
+                    { label: 'Revenue', value: formatPrice(stats.revenue), tone: 'turmeric' },
                     { label: 'New', value: stats.placed, tone: 'blue' },
                     { label: 'In progress', value: stats.active, tone: 'amber' },
                     { label: 'Delivered', value: stats.delivered, tone: 'emerald' },
@@ -486,18 +486,18 @@ export default function AdminOrdersPage() {
                 {hasActiveFilters && <AdminClearButton onClick={clearFilters} />}
                 {someSelected && (
                     <div className="w-full flex flex-wrap items-center gap-2 pt-2 mt-1 border-t border-admin-border-light">
-                        <span className="text-sm text-charcoal font-medium">{selected.size} selected</span>
+                        <span className="text-sm text-ink font-medium">{selected.size} selected</span>
                         <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)} disabled={bulkLoading} className={`${adminControlClass} min-w-[10rem] w-auto py-1.5`}>
                             <option value="">Change status…</option>
                             {ADMIN_STATUS_OPTIONS.map((s) => (
                                 <option key={s.value} value={s.value}>{s.adminLabel}</option>
                             ))}
                         </select>
-                        <button type="button" disabled={bulkLoading || !bulkStatus} onClick={() => bulkAction(bulkStatus)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-wine text-ivory hover:bg-wine-light disabled:opacity-50">
+                        <button type="button" disabled={bulkLoading || !bulkStatus} onClick={() => bulkAction(bulkStatus)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-forest text-cream hover:bg-forest-light disabled:opacity-50">
                             Apply
                         </button>
                         {BULK_ACTIONS.map(({ status, label, icon: Icon }) => (
-                            <button key={status} type="button" disabled={bulkLoading} onClick={() => bulkAction(status)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-admin-surface-alt border border-admin-border-light hover:bg-warm-beige/60 disabled:opacity-50">
+                            <button key={status} type="button" disabled={bulkLoading} onClick={() => bulkAction(status)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-admin-surface-alt border border-admin-border-light hover:bg-sand/60 disabled:opacity-50">
                                 <Icon size={12} />
                                 {label}
                             </button>
@@ -506,7 +506,7 @@ export default function AdminOrdersPage() {
                             <RotateCcw size={12} />
                             Refund
                         </button>
-                        <button type="button" onClick={() => printStickers()} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-charcoal text-ivory hover:bg-charcoal/90">
+                        <button type="button" onClick={() => printStickers()} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-ink text-cream hover:bg-ink/90">
                             <Printer size={12} />
                             Print {selected.size === 1 ? 'label' : 'labels'}
                         </button>
@@ -536,14 +536,14 @@ export default function AdminOrdersPage() {
                                     <th className="p-4 font-medium text-admin-muted">Customer</th>
                                     <th className="p-4 font-medium text-admin-muted">Items</th>
                                     <th className="p-4 font-medium text-admin-muted">
-                                        <button type="button" onClick={() => toggleSort('total')} className="inline-flex items-center gap-1 hover:text-charcoal">
+                                        <button type="button" onClick={() => toggleSort('total')} className="inline-flex items-center gap-1 hover:text-ink">
                                             Total <ArrowUpDown size={12} />
                                         </button>
                                     </th>
                                     <th className="p-4 font-medium text-admin-muted">Payment</th>
                                     <th className="p-4 font-medium text-admin-muted">Status</th>
                                     <th className="p-4 font-medium text-admin-muted">
-                                        <button type="button" onClick={() => toggleSort('createdAt')} className="inline-flex items-center gap-1 hover:text-charcoal">
+                                        <button type="button" onClick={() => toggleSort('createdAt')} className="inline-flex items-center gap-1 hover:text-ink">
                                             Date <ArrowUpDown size={12} />
                                         </button>
                                     </th>
@@ -557,7 +557,7 @@ export default function AdminOrdersPage() {
                                     return (
                                         <tr
                                             key={order.id}
-                                            className={`border-b border-admin-border-light hover:bg-admin-surface-alt cursor-pointer ${selected.has(order.id) ? 'bg-wine/5' : ''}`}
+                                            className={`border-b border-admin-border-light hover:bg-admin-surface-alt cursor-pointer ${selected.has(order.id) ? 'bg-forest/5' : ''}`}
                                             onClick={() => setDetailOrder(order)}
                                         >
                                             <td className="p-4" onClick={(e) => e.stopPropagation()}>
@@ -569,7 +569,7 @@ export default function AdminOrdersPage() {
                                                 />
                                             </td>
                                             <td className="p-4">
-                                                <p className="font-mono text-xs text-charcoal">{shortOrderId(order.id)}</p>
+                                                <p className="font-mono text-xs text-ink">{shortOrderId(order.id)}</p>
                                                 {isDirectOrder(order) && (
                                                     <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-800 border border-violet-200">
                                                         Direct
@@ -582,16 +582,16 @@ export default function AdminOrdersPage() {
                                                 )}
                                             </td>
                                             <td className="p-4">
-                                                <p className="font-medium text-charcoal truncate max-w-[10rem]">{order.shipping?.name || '—'}</p>
+                                                <p className="font-medium text-ink truncate max-w-[10rem]">{order.shipping?.name || '—'}</p>
                                                 <p className="text-xs text-admin-muted truncate max-w-[10rem]">{order.email}</p>
                                             </td>
                                             <td className="p-4">
-                                                <p className="text-charcoal line-clamp-1 max-w-[12rem]">{itemPreview?.title || '—'}</p>
+                                                <p className="text-ink line-clamp-1 max-w-[12rem]">{itemPreview?.title || '—'}</p>
                                                 <p className="text-xs text-admin-muted">
                                                     {itemCount} item{itemCount === 1 ? '' : 's'}
                                                 </p>
                                             </td>
-                                            <td className="p-4 font-medium text-charcoal whitespace-nowrap">{formatPrice(order.total)}</td>
+                                            <td className="p-4 font-medium text-ink whitespace-nowrap">{formatPrice(order.total)}</td>
                                             <td className="p-4 text-xs text-admin-muted whitespace-nowrap">{paymentLabel(order)}</td>
                                             <td className="p-4">
                                                 <OrderStatusBadge status={order.status} />
@@ -604,7 +604,7 @@ export default function AdminOrdersPage() {
                                                     <button
                                                         type="button"
                                                         onClick={(e) => { e.stopPropagation(); printStickers([order.id]); }}
-                                                        className="text-charcoal hover:text-wine p-1 rounded-md hover:bg-warm-beige/60"
+                                                        className="text-ink hover:text-forest p-1 rounded-md hover:bg-sand/60"
                                                         title="Print shipping label"
                                                         aria-label={`Print label for order ${shortOrderId(order.id)}`}
                                                     >
@@ -613,7 +613,7 @@ export default function AdminOrdersPage() {
                                                     <button
                                                         type="button"
                                                         onClick={(e) => { e.stopPropagation(); setDetailOrder(order); }}
-                                                        className="text-wine hover:text-wine-light text-xs font-medium inline-flex items-center gap-0.5"
+                                                        className="text-forest hover:text-forest-light text-xs font-medium inline-flex items-center gap-0.5"
                                                     >
                                                         View <ChevronRight size={14} />
                                                     </button>

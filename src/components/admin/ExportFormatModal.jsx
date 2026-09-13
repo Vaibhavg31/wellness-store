@@ -19,7 +19,7 @@ export default function ExportFormatModal({ isOpen, onClose, onSelect, exporting
                         <FileSpreadsheet size={20} className="text-emerald" />
                     </div>
                     <div>
-                        <p className="font-medium text-charcoal">CSV spreadsheet</p>
+                        <p className="font-medium text-ink">CSV spreadsheet</p>
                         <p className="text-xs text-admin-muted mt-0.5">Best for Excel, Google Sheets, and analysis</p>
                     </div>
                 </button>
@@ -29,11 +29,11 @@ export default function ExportFormatModal({ isOpen, onClose, onSelect, exporting
                     onClick={() => onSelect('pdf')}
                     className="flex items-center gap-4 p-4 rounded-xl border border-admin-border bg-admin-surface-alt hover:bg-admin-surface-alt transition-colors disabled:opacity-50 text-left"
                 >
-                    <div className="w-10 h-10 rounded-lg bg-wine/10 flex items-center justify-center flex-shrink-0">
-                        <FileText size={20} className="text-wine" />
+                    <div className="w-10 h-10 rounded-lg bg-forest/10 flex items-center justify-center flex-shrink-0">
+                        <FileText size={20} className="text-forest" />
                     </div>
                     <div>
-                        <p className="font-medium text-charcoal">PDF document</p>
+                        <p className="font-medium text-ink">PDF document</p>
                         <p className="text-xs text-admin-muted mt-0.5">Formatted report for sharing or printing</p>
                     </div>
                 </button>

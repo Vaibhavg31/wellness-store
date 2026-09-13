@@ -6,10 +6,10 @@ const STYLE_TAG_ID = 'dynamic-theme-vars';
 const FAVICON_LINK_ID = 'dynamic-favicon';
 const FONT_LINK_ID = 'dynamic-google-fonts';
 
-// Fonts already loaded statically in index.html (Cormorant Garamond, Inter)
+// Fonts already loaded statically in index.html (Manrope, Inter)
 // or system fonts that need no stylesheet at all.
 const NO_LOAD_NEEDED = new Set([
-    'Cormorant Garamond', 'Inter', 'Georgia', 'Times New Roman', 'system-ui',
+    'Manrope', 'Inter', 'Georgia', 'Times New Roman', 'system-ui',
 ]);
 
 /** Pull the first (quoted or bare) font family name out of a CSS font-family value. */
@@ -23,8 +23,8 @@ function primaryFamily(cssValue) {
  * Applies admin-configured branding (colors, fonts, favicon) at runtime by
  * overriding the CSS custom properties Tailwind's @theme directive generates
  * in :root (src/index.css). Every utility class built on those tokens
- * (bg-wine, text-gold, border-blush, font-serif, ...) picks up the new value
- * immediately — no rebuild needed.
+ * (bg-forest, text-turmeric, border-sage-light, font-display, ...) picks up
+ * the new value immediately — no rebuild needed.
  */
 export default function ThemeInjector() {
     const { content } = useSiteContent();
@@ -39,23 +39,19 @@ export default function ThemeInjector() {
             document.head.appendChild(style);
         }
         style.textContent = `:root {
-            --color-wine: ${theme.primaryColor};
-            --color-wine-light: ${theme.primaryLight};
-            --color-wine-deep: ${theme.primaryDark};
+            --color-forest: ${theme.primaryColor};
+            --color-forest-light: ${theme.primaryLight};
+            --color-forest-deep: ${theme.primaryDark};
             --color-emerald: ${theme.primaryColor};
             --color-emerald-light: ${theme.primaryLight};
             --color-emerald-dark: ${theme.primaryDark};
-            --color-accent-brown: ${theme.primaryColor};
-            --color-gold: ${theme.accentColor};
-            --color-gold-light: ${theme.accentLight};
-            --color-muted-gold: ${theme.accentColor};
-            --color-blush: ${theme.blushColor};
-            --color-champagne: ${theme.blushColor};
-            --color-ivory: ${theme.backgroundColor};
+            --color-turmeric: ${theme.accentColor};
+            --color-turmeric-light: ${theme.accentLight};
+            --color-turmeric-ink: ${theme.accentColor};
+            --color-sage-light: ${theme.tintColor};
             --color-cream: ${theme.backgroundColor};
-            --color-charcoal: ${theme.textColor};
-            --color-dark-chocolate: ${theme.textColor};
-            --font-serif: ${theme.fontHeading};
+            --color-ink: ${theme.textColor};
+            --font-display: ${theme.fontHeading};
             --font-sans: ${theme.fontBody};
         }`;
     }, [theme]);

@@ -23,12 +23,12 @@ const STATUS_FILTERS = [
 
 function StarRating({ rating }) {
     return (
-        <span className="inline-flex items-center gap-0.5 text-gold" aria-label={`${rating} out of 5 stars`}>
+        <span className="inline-flex items-center gap-0.5 text-turmeric" aria-label={`${rating} out of 5 stars`}>
             {Array.from({ length: 5 }, (_, i) => (
                 <Star
                     key={i}
                     size={12}
-                    className={i < rating ? 'fill-gold text-gold' : 'text-warm-beige'}
+                    className={i < rating ? 'fill-turmeric text-turmeric' : 'text-sand'}
                 />
             ))}
         </span>
@@ -135,9 +135,9 @@ export default function AdminReviewsPage() {
                 columns={4}
                 stats={[
                     { label: 'Total reviews', value: reviews.length },
-                    { label: 'Pending', value: pendingCount, color: 'text-gold-ink', sub: pendingCount > 0 ? 'Needs action' : undefined },
+                    { label: 'Pending', value: pendingCount, color: 'text-turmeric-ink', sub: pendingCount > 0 ? 'Needs action' : undefined },
                     { label: 'Approved', value: approvedCount, color: 'text-emerald' },
-                    { label: 'Average rating', value: avgRating, color: 'text-wine' },
+                    { label: 'Average rating', value: avgRating, color: 'text-forest' },
                 ]}
             />
 
@@ -178,7 +178,7 @@ export default function AdminReviewsPage() {
                             setStatusFilter('all');
                             setProductFilter('');
                         }}
-                        className="inline-flex items-center gap-1 text-sm text-admin-muted hover:text-charcoal px-2 py-2 shrink-0"
+                        className="inline-flex items-center gap-1 text-sm text-admin-muted hover:text-ink px-2 py-2 shrink-0"
                     >
                         <X size={14} /> Clear
                     </button>
@@ -212,7 +212,7 @@ export default function AdminReviewsPage() {
                                 {filteredReviews.map((review) => (
                                     <tr key={review.id} className="border-b border-admin-border-light hover:bg-admin-surface-alt/60">
                                         <td className="p-4 align-top">
-                                            <p className="font-medium text-charcoal">{review.name}</p>
+                                            <p className="font-medium text-ink">{review.name}</p>
                                             <p className="text-xs text-admin-muted mt-0.5 break-all">{review.email}</p>
                                         </td>
                                         <td className="p-4 align-top">
@@ -220,10 +220,10 @@ export default function AdminReviewsPage() {
                                             <p className="text-xs text-admin-muted mt-1">{review.rating}/5</p>
                                         </td>
                                         <td className="p-4 align-top">
-                                            <p className="text-charcoal leading-relaxed line-clamp-3">{review.comment}</p>
+                                            <p className="text-ink leading-relaxed line-clamp-3">{review.comment}</p>
                                         </td>
                                         <td className="p-4 align-top">
-                                            <p className="text-charcoal line-clamp-2">{getProductLabel(review.productId)}</p>
+                                            <p className="text-ink line-clamp-2">{getProductLabel(review.productId)}</p>
                                         </td>
                                         <td className="p-4 align-top text-admin-muted text-xs">
                                             {new Date(review.createdAt).toLocaleDateString('en-IN', {

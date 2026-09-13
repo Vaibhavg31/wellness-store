@@ -151,34 +151,34 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen grid lg:grid-cols-2 bg-charcoal">
+        <div className="min-h-screen grid lg:grid-cols-2 bg-ink">
             <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden">
                 <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=85" alt="" className="w-full h-full object-cover" aria-hidden="true" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-charcoal/95 via-wine-deep/80 to-charcoal/90" />
+                    <img src="https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=1400&q=85" alt="" className="w-full h-full object-cover" aria-hidden="true" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-ink/95 via-forest-deep/80 to-ink/90" />
                 </div>
                 <div className="relative z-10">
                     <Logo size="md" showHover />
                 </div>
                 <div className="relative z-10 max-w-md">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ivory/10 border border-blush/30 mb-6">
-                        <Sparkles size={12} className="text-blush" />
-                        <span className="text-[10px] tracking-[0.25em] uppercase text-ivory/90">{BRAND_NAME}</span>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cream/10 border border-turmeric-light/30 mb-6">
+                        <Sparkles size={12} className="text-turmeric-light" />
+                        <span className="text-[10px] tracking-[0.25em] uppercase text-cream/90">{BRAND_NAME}</span>
                     </div>
-                    <h2 className="font-serif text-4xl text-ivory leading-tight mb-4">
+                    <h2 className="font-display text-4xl text-cream leading-tight mb-4">
                         {isCheckoutLogin ? (
-                            <>Complete your <span className="italic text-blush">order</span></>
+                            <>Complete your <span className="italic text-turmeric-light">order</span></>
                         ) : (
-                            <>Shop <span className="italic text-blush">wellness</span></>
+                            <>Shop <span className="italic text-turmeric-light">wellness</span></>
                         )}
                     </h2>
-                    <p className="text-ivory/60 font-light leading-relaxed">
+                    <p className="text-cream/60 font-light leading-relaxed">
                         {isCheckoutLogin
                             ? 'Sign in to checkout. We verify your phone when you place the order.'
                             : BRAND_TAGLINE}
                     </p>
                 </div>
-                <p className="relative z-10 text-[10px] tracking-wider text-ivory/30 uppercase">
+                <p className="relative z-10 text-[10px] tracking-wider text-cream/30 uppercase">
                     FSSAI Certified · Lab Tested · Free Delivery ₹1999+
                 </p>
             </div>
@@ -190,15 +190,15 @@ export default function LoginPage() {
                     <div className="space-y-6">
                         <div className="text-center lg:text-left">
                             {isCheckoutLogin && (
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-wine/10 text-wine text-xs mb-4">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-forest/10 text-forest text-xs mb-4">
                                     <ShoppingBag size={14} />
                                     Checkout login
                                 </div>
                             )}
-                            <h1 className="font-serif text-3xl text-charcoal mb-2">
+                            <h1 className="font-display text-3xl text-ink mb-2">
                                 {isCheckoutLogin ? 'Sign in to buy' : isAdminAccess ? 'Studio access' : mode === 'signin' ? 'Sign in' : 'Create account'}
                             </h1>
-                            <p className="text-soft-brown text-sm font-light">
+                            <p className="text-slate text-sm font-light">
                                 {isAdminAccess
                                     ? `Sign in with your admin Google account to open ${BRAND_NAME} Studio`
                                     : mode === 'signup'
@@ -209,18 +209,18 @@ export default function LoginPage() {
 
                         {!isAdminAccess && (
                             <>
-                                <div className="flex rounded-full bg-ivory border border-border/50 p-1">
+                                <div className="flex rounded-full bg-cream border border-border/50 p-1">
                                     <button
                                         type="button"
                                         onClick={() => { setMode('signin'); setError(''); }}
-                                        className={`flex-1 py-2 text-sm rounded-full transition-colors ${mode === 'signin' ? 'bg-wine text-ivory' : 'text-soft-brown hover:text-charcoal'}`}
+                                        className={`flex-1 py-2 text-sm rounded-full transition-colors ${mode === 'signin' ? 'bg-forest text-cream' : 'text-slate hover:text-ink'}`}
                                     >
                                         Sign in
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => { setMode('signup'); setError(''); }}
-                                        className={`flex-1 py-2 text-sm rounded-full transition-colors ${mode === 'signup' ? 'bg-wine text-ivory' : 'text-soft-brown hover:text-charcoal'}`}
+                                        className={`flex-1 py-2 text-sm rounded-full transition-colors ${mode === 'signup' ? 'bg-forest text-cream' : 'text-slate hover:text-ink'}`}
                                     >
                                         Sign up
                                     </button>
@@ -259,19 +259,19 @@ export default function LoginPage() {
                                     )}
                                     {mode === 'signin' && (
                                         <div className="flex items-center justify-between text-sm">
-                                            <label className="flex items-center gap-2 text-soft-brown cursor-pointer">
+                                            <label className="flex items-center gap-2 text-slate cursor-pointer">
                                                 <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="rounded border-border" />
                                                 Remember me
                                             </label>
-                                            <Link to="/forgot-password" className="text-wine hover:text-wine-light">Forgot password?</Link>
+                                            <Link to="/forgot-password" className="text-forest hover:text-forest-light">Forgot password?</Link>
                                         </div>
                                     )}
                                     {mode === 'signup' && (
-                                        <p className="text-xs text-soft-brown text-center -mt-2">
+                                        <p className="text-xs text-slate text-center -mt-2">
                                             We&apos;ll send a magic link to verify your email. Click it to complete sign-in.
                                         </p>
                                     )}
-                                    <Button variant="gold" size="lg" className="w-full" type="submit" disabled={loading}>
+                                    <Button variant="turmeric" size="lg" className="w-full" type="submit" disabled={loading}>
                                         {loading ? 'Please wait…' : mode === 'signin' ? 'Sign in with email' : 'Create account'}
                                     </Button>
                                 </form>
@@ -279,7 +279,7 @@ export default function LoginPage() {
                                 {googleSignInEnabled && (
                                     <div className="flex items-center gap-3">
                                         <div className="flex-1 h-px bg-border/60" />
-                                        <span className="text-xs text-soft-brown uppercase tracking-wider">or</span>
+                                        <span className="text-xs text-slate uppercase tracking-wider">or</span>
                                         <div className="flex-1 h-px bg-border/60" />
                                     </div>
                                 )}
@@ -299,12 +299,12 @@ export default function LoginPage() {
                                 />
                             </div>
                         ) : GOOGLE_ENABLED ? (
-                            <div className="p-4 rounded-xl bg-gold/10 border border-gold/20 text-sm text-soft-brown text-center">
+                            <div className="p-4 rounded-xl bg-turmeric/10 border border-turmeric/20 text-sm text-slate text-center">
                                 Google sign-in is turned off in store settings.
                             </div>
                         ) : !isAdminAccess ? (
-                            <div className="p-4 rounded-xl bg-gold/10 border border-gold/20 text-sm text-soft-brown text-center">
-                                Add <code className="text-xs bg-ivory px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> to enable Google sign-in.
+                            <div className="p-4 rounded-xl bg-turmeric/10 border border-turmeric/20 text-sm text-slate text-center">
+                                Add <code className="text-xs bg-cream px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> to enable Google sign-in.
                             </div>
                         ) : null}
 
@@ -314,13 +314,13 @@ export default function LoginPage() {
                             </div>
                         )}
 
-                        <p className="text-center text-xs text-soft-brown">
+                        <p className="text-center text-xs text-slate">
                             By signing in you agree to our Terms &amp; Privacy Policy
                         </p>
 
                         <Link
                             to={isCheckoutLogin ? '/cart' : isAdminAccess ? '/' : '/shop'}
-                            className="block text-center text-sm text-soft-brown hover:text-wine transition-colors"
+                            className="block text-center text-sm text-slate hover:text-forest transition-colors"
                         >
                             {isCheckoutLogin ? '← Back to cart' : isAdminAccess ? '← Back to store' : 'Continue shopping without signing in →'}
                         </Link>
@@ -330,7 +330,7 @@ export default function LoginPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowStudioLogin(!showStudioLogin)}
-                                    className="text-xs text-soft-brown hover:text-charcoal w-full text-center"
+                                    className="text-xs text-slate hover:text-ink w-full text-center"
                                 >
                                     {showStudioLogin ? 'Hide studio credentials' : 'Use studio username & password'}
                                 </button>
@@ -338,7 +338,7 @@ export default function LoginPage() {
                                     <form onSubmit={handleAdminLogin} className="space-y-4 mt-4">
                                         <Input label="Username" value={adminUser} onChange={(e) => setAdminUser(e.target.value)} required />
                                         <Input label="Password" type="password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} required />
-                                        <Button variant="gold" size="lg" className="w-full" type="submit" disabled={loading}>
+                                        <Button variant="turmeric" size="lg" className="w-full" type="submit" disabled={loading}>
                                             {loading ? 'Signing in…' : 'Enter Studio'}
                                         </Button>
                                     </form>

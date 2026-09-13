@@ -10,7 +10,7 @@ const Input = forwardRef(({ className, label, error, id, type, ...props }, ref) 
     return (
         <div className="w-full">
             {label && (
-                <label htmlFor={inputId} className="block text-xs tracking-[0.15em] uppercase text-soft-brown mb-2 font-medium">
+                <label htmlFor={inputId} className="block text-xs tracking-[0.15em] uppercase text-slate mb-2 font-medium">
                     {label}
                 </label>
             )}
@@ -20,9 +20,9 @@ const Input = forwardRef(({ className, label, error, id, type, ...props }, ref) 
                     id={inputId}
                     type={isPassword && showPassword ? 'text' : type}
                     className={cn(
-                        'w-full px-5 py-3.5 bg-ivory/60 border border-border rounded-full',
-                        'text-dark-chocolate placeholder:text-soft-brown/45',
-                        'focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/20',
+                        'w-full px-5 py-3.5 bg-cream/60 border border-border rounded-full',
+                        'text-ink placeholder:text-slate/45',
+                        'focus:outline-none focus:border-turmeric focus:ring-1 focus:ring-turmeric/20',
                         'transition-all duration-500 font-light',
                         isPassword && 'pr-12',
                         error && 'border-red-400 focus:border-red-400',
@@ -34,7 +34,7 @@ const Input = forwardRef(({ className, label, error, id, type, ...props }, ref) 
                     <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-soft-brown hover:text-charcoal transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate hover:text-ink transition-colors"
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

@@ -31,7 +31,7 @@ export default function UserAvatar({ user, size = 'md', className = '', signedIn
                 src={user.avatar}
                 alt=""
                 referrerPolicy="no-referrer"
-                className={`${s.box} rounded-full object-cover ring-1 ring-blush/40 flex-shrink-0 ${className}`}
+                className={`${s.box} rounded-full object-cover ring-1 ring-turmeric-light/40 flex-shrink-0 ${className}`}
                 onError={() => setImgFailed(true)}
             />
         );
@@ -40,7 +40,7 @@ export default function UserAvatar({ user, size = 'md', className = '', signedIn
     if (signedIn && label) {
         return (
             <span
-                className={`${s.box} ${s.text} rounded-full bg-blush/25 text-wine font-semibold flex items-center justify-center ring-1 ring-blush/40 flex-shrink-0 ${className}`}
+                className={`${s.box} ${s.text} rounded-full bg-turmeric-light/25 text-forest font-semibold flex items-center justify-center ring-1 ring-turmeric-light/40 flex-shrink-0 ${className}`}
                 aria-hidden="true"
             >
                 {label}

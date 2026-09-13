@@ -11,9 +11,9 @@ import { getStatusLabel, formatOrderDate, shortOrderId, normalizeStatus } from '
 const LOW_STOCK_THRESHOLD = 5;
 
 const STATUS_TONE = {
-    placed: 'wine',
+    placed: 'forest',
     confirmed: 'warning',
-    out_for_delivery: 'wine',
+    out_for_delivery: 'forest',
     delivered: 'success',
     cancelled: 'danger',
     returned: 'danger',
@@ -163,8 +163,8 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
                 <div className="admin-table-shell p-4">
                     <div className="flex items-center gap-2 mb-3">
-                        <Clock size={16} className="text-wine" strokeWidth={1.75} />
-                        <h3 className="font-semibold text-charcoal text-sm">Recent Orders</h3>
+                        <Clock size={16} className="text-forest" strokeWidth={1.75} />
+                        <h3 className="font-semibold text-ink text-sm">Recent Orders</h3>
                     </div>
                     {recentOrders.length === 0 ? (
                         <AdminEmptyState icon={ShoppingBag} title="No orders yet" />
@@ -179,7 +179,7 @@ export default function AdminDashboardPage() {
                                             className="flex items-center justify-between gap-3 py-2.5 hover:bg-admin-surface-alt -mx-1 px-1 rounded-lg transition-colors"
                                         >
                                             <div className="min-w-0">
-                                                <p className="text-sm font-medium text-charcoal truncate">
+                                                <p className="text-sm font-medium text-ink truncate">
                                                     {order.shipping?.name || order.email || shortOrderId(order.id)}
                                                 </p>
                                                 <p className="text-xs text-admin-muted mt-0.5">
@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
                                                 </p>
                                             </div>
                                             <div className="text-right shrink-0">
-                                                <p className="text-sm font-semibold text-charcoal tabular-nums">{formatPrice(order.total)}</p>
+                                                <p className="text-sm font-semibold text-ink tabular-nums">{formatPrice(order.total)}</p>
                                                 <AdminStatusPill tone={STATUS_TONE[status] ?? 'default'}>
                                                     {getStatusLabel(status)}
                                                 </AdminStatusPill>
@@ -202,8 +202,8 @@ export default function AdminDashboardPage() {
 
                 <div className="admin-table-shell p-4">
                     <div className="flex items-center gap-2 mb-3">
-                        <AlertTriangle size={16} className="text-wine" strokeWidth={1.75} />
-                        <h3 className="font-semibold text-charcoal text-sm">Low Stock Alerts</h3>
+                        <AlertTriangle size={16} className="text-forest" strokeWidth={1.75} />
+                        <h3 className="font-semibold text-ink text-sm">Low Stock Alerts</h3>
                     </div>
                     {lowStockProducts.length === 0 ? (
                         <AdminEmptyState icon={Package} title="All products well stocked" />
@@ -217,7 +217,7 @@ export default function AdminDashboardPage() {
                                             to={`${ADMIN_PATH}/products/${product.id}`}
                                             className="flex items-center justify-between gap-3 py-2.5 hover:bg-admin-surface-alt -mx-1 px-1 rounded-lg transition-colors"
                                         >
-                                            <p className="text-sm font-medium text-charcoal truncate">{product.title}</p>
+                                            <p className="text-sm font-medium text-ink truncate">{product.title}</p>
                                             <AdminStatusPill tone={stock <= 0 ? 'danger' : 'warning'}>
                                                 {stock <= 0 ? 'Out of stock' : `${stock} left`}
                                             </AdminStatusPill>
@@ -232,8 +232,8 @@ export default function AdminDashboardPage() {
 
             <div className="admin-table-shell p-4 mt-4">
                 <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp size={16} className="text-wine" strokeWidth={1.75} />
-                    <h3 className="font-semibold text-charcoal text-sm">Best Selling Products</h3>
+                    <TrendingUp size={16} className="text-forest" strokeWidth={1.75} />
+                    <h3 className="font-semibold text-ink text-sm">Best Selling Products</h3>
                 </div>
                 {bestSellers.length === 0 ? (
                     <AdminEmptyState icon={TrendingUp} title="No sales data yet" />
@@ -242,13 +242,13 @@ export default function AdminDashboardPage() {
                         {bestSellers.map((item, idx) => (
                             <li key={item.title + idx} className="flex items-center justify-between gap-3 py-2.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <span className="w-6 h-6 rounded-md bg-wine/8 text-wine text-xs font-semibold flex items-center justify-center shrink-0">
+                                    <span className="w-6 h-6 rounded-md bg-forest/8 text-forest text-xs font-semibold flex items-center justify-center shrink-0">
                                         {idx + 1}
                                     </span>
-                                    <p className="text-sm font-medium text-charcoal truncate">{item.title}</p>
+                                    <p className="text-sm font-medium text-ink truncate">{item.title}</p>
                                 </div>
                                 <div className="text-right shrink-0">
-                                    <p className="text-sm font-semibold text-charcoal tabular-nums">{formatPrice(item.revenue)}</p>
+                                    <p className="text-sm font-semibold text-ink tabular-nums">{formatPrice(item.revenue)}</p>
                                     <p className="text-xs text-admin-muted mt-0.5">{item.quantity} sold</p>
                                 </div>
                             </li>

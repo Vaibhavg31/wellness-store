@@ -95,7 +95,7 @@ export default function InitialAppLoader({ children }) {
                         key="loader"
                         initial={{ opacity: 1 }}
                         exit={{ opacity: 0, transition: { duration: 0.45, ease: 'easeOut' } }}
-                        className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-wine pointer-events-none"
+                        className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-forest pointer-events-none"
                         aria-label={`Loading ${BRAND_NAME}`}
                         role="status"
                     >
@@ -113,7 +113,7 @@ export default function InitialAppLoader({ children }) {
                                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                                 className="relative z-10 w-40 h-40 sm:w-52 sm:h-52 rounded-2xl overflow-hidden shadow-2xl"
                             >
-                                <img src={logoMark} alt={BRAND_NAME} className="w-full h-full object-contain bg-ivory p-6" draggable={false} />
+                                <img src={logoMark} alt={BRAND_NAME} className="w-full h-full object-contain bg-cream p-6" draggable={false} />
                                 {!prefersReduced && (
                                     <motion.div
                                         className="absolute inset-0 pointer-events-none"
@@ -134,17 +134,17 @@ export default function InitialAppLoader({ children }) {
                             transition={{ delay: 0.3, duration: 0.55 }}
                             className="mt-6 text-center"
                         >
-                            <p className="font-serif text-2xl sm:text-3xl font-light tracking-[0.06em] text-ivory">
+                            <p className="font-display text-2xl sm:text-3xl font-light tracking-[0.06em] text-cream">
                                 {BRAND_NAME}
                             </p>
-                            <p className="mt-1.5 text-[10px] tracking-[0.35em] uppercase text-blush/60">
+                            <p className="mt-1.5 text-[10px] tracking-[0.35em] uppercase text-turmeric-light/60">
                                 {BRAND_TAGLINE}
                             </p>
                         </motion.div>
 
-                        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-32 h-px bg-ivory/10 overflow-hidden rounded-full">
+                        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-32 h-px bg-cream/10 overflow-hidden rounded-full">
                             <motion.div
-                                className="h-full bg-blush/60 rounded-full"
+                                className="h-full bg-turmeric-light/60 rounded-full"
                                 style={{ width: `${progress}%` }}
                                 transition={{ ease: 'easeOut', duration: 0.2 }}
                             />

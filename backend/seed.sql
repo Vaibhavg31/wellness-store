@@ -14,13 +14,13 @@ START TRANSACTION;
 -- ----------------------------------------------------------------------------
 INSERT INTO `categories` (`id`, `slug`, `label`, `description`, `image`, `is_published`, `sort_order`) VALUES
 ('protein', 'protein', 'Protein & Fitness', 'Whey, plant protein and fitness essentials to fuel recovery and muscle growth.', 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600&q=80', 1, 1),
-('ayurveda', 'ayurveda', 'Ayurveda', 'Traditional Ayurvedic formulations for everyday wellness, immunity and balance.', 'https://images.unsplash.com/photo-1611072172377-64f6764f5e77?w=600&q=80', 1, 2),
+('ayurveda', 'ayurveda', 'Ayurveda', 'Traditional Ayurvedic formulations for everyday wellness, immunity and balance.', 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&q=80', 1, 2),
 ('immunity', 'immunity', 'Immunity', 'Daily immunity boosters built on trusted herbs and clinically studied actives.', 'https://images.unsplash.com/photo-1584362917165-526a968579e8?w=600&q=80', 1, 3),
 ('weight-management', 'weight-management', 'Weight Management', 'Clean-label formulas to support metabolism and healthy weight goals.', 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80', 1, 4),
 ('vitamins', 'vitamins', 'Vitamins & Supplements', 'Targeted vitamins, minerals and multivitamins for everyday nutritional gaps.', 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=600&q=80', 1, 5),
 ('personal-care', 'personal-care', 'Personal Care', 'Natural, dermatologically-tested skin and hair care essentials.', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80', 1, 6),
 ('digestive-health', 'digestive-health', 'Digestive Health', 'Ayurvedic juices and formulations for gut health and everyday digestion.', 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&q=80', 1, 7),
-('meal-replacement', 'meal-replacement', 'Meal Replacement', 'Balanced nutrition shakes for on-the-go meals and weight management.', 'https://images.unsplash.com/photo-1622484212385-1a6b90344b52?w=600&q=80', 1, 8),
+('meal-replacement', 'meal-replacement', 'Meal Replacement', 'Balanced nutrition shakes for on-the-go meals and weight management.', 'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=600&q=80', 1, 8),
 ('superfoods', 'superfoods', 'Superfoods', 'Nutrient-dense superfood powders and blends for daily wellness.', 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=600&q=80', 1, 9);
 
 -- ----------------------------------------------------------------------------
@@ -60,8 +60,8 @@ INSERT INTO `product_variants` (`id`, `product_id`, `label`, `net_quantity`, `pr
 -- ----------------------------------------------------------------------------
 INSERT INTO `product_images` (`product_id`, `url`, `sort_order`) VALUES
 ('ws-protein-001', 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=800&q=80', 0),
-('ws-protein-001', 'https://images.unsplash.com/photo-1579722820258-996fdb4dc7de?w=800&q=80', 1),
-('ws-ashwagandha-001', 'https://images.unsplash.com/photo-1611072172377-64f6764f5e77?w=800&q=80', 0),
+('ws-protein-001', 'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=800&q=80', 1),
+('ws-ashwagandha-001', 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80', 0),
 ('ws-ashwagandha-001', 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&q=80', 1),
 ('ws-immunity-001', 'https://images.unsplash.com/photo-1584362917165-526a968579e8?w=800&q=80', 0),
 ('ws-multivitamin-001', 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=800&q=80', 0),
@@ -70,10 +70,10 @@ INSERT INTO `product_images` (`product_id`, `url`, `sort_order`) VALUES
 ('ws-hairoil-001', 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=800&q=80', 0),
 ('ws-aloevera-juice-001', 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=800&q=80', 0),
 ('ws-triphala-001', 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=800&q=80', 0),
-('ws-mealshake-001', 'https://images.unsplash.com/photo-1622484212385-1a6b90344b52?w=800&q=80', 0),
+('ws-mealshake-001', 'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=800&q=80', 0),
 ('ws-superfood-greens-001', 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=800&q=80', 0),
 ('ws-biotin-001', 'https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?w=800&q=80', 0),
-('ws-whey-001', 'https://images.unsplash.com/photo-1579722820258-996fdb4dc7de?w=800&q=80', 0);
+('ws-whey-001', 'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=800&q=80', 0);
 
 -- ----------------------------------------------------------------------------
 -- product_badges
@@ -154,7 +154,7 @@ INSERT INTO `product_features` (`product_id`, `feature`, `sort_order`) VALUES
 INSERT INTO `product_ingredients` (`product_id`, `name`, `benefit`, `image`, `sort_order`) VALUES
 ('ws-protein-001', 'Pea Protein Isolate', 'Rich in BCAAs, supports lean muscle recovery.', 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=300&q=80', 0),
 ('ws-protein-001', 'Brown Rice Protein', 'Complements pea protein for a complete amino acid profile.', NULL, 1),
-('ws-ashwagandha-001', 'Ashwagandha (KSM-66)', 'Adaptogen that helps the body manage everyday stress.', 'https://images.unsplash.com/photo-1611072172377-64f6764f5e77?w=300&q=80', 0),
+('ws-ashwagandha-001', 'Ashwagandha (KSM-66)', 'Adaptogen that helps the body manage everyday stress.', 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=300&q=80', 0),
 ('ws-immunity-001', 'Giloy', 'Traditionally used to support the body''s natural defence.', NULL, 0),
 ('ws-immunity-001', 'Amla', 'Rich source of natural Vitamin C.', NULL, 1),
 ('ws-immunity-001', 'Tulsi', 'Adaptogenic herb known for immune and respiratory support.', NULL, 2);
@@ -251,15 +251,15 @@ INSERT INTO `site_marquee_items` (`text`, `sort_order`) VALUES
 -- ----------------------------------------------------------------------------
 INSERT INTO `site_hero_trust_badges` (`icon`, `label`, `sort_order`) VALUES
 ('shield', 'FSSAI Certified', 0),
-('flask', 'Lab Tested', 1),
-('leaf', '100% Natural', 2);
+('star', '4.9★ Rated', 1),
+('sparkles', 'Lab Tested', 2);
 
 -- ----------------------------------------------------------------------------
 -- site_hero_orbit_images
 -- ----------------------------------------------------------------------------
 INSERT INTO `site_hero_orbit_images` (`url`, `sort_order`) VALUES
 ('https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=1200&q=90', 0),
-('https://images.unsplash.com/photo-1611072172377-64f6764f5e77?w=1200&q=90', 1),
+('https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=1200&q=90', 1),
 ('https://images.unsplash.com/photo-1584362917165-526a968579e8?w=1200&q=90', 2),
 ('https://images.unsplash.com/photo-1550572017-edd951b55104?w=1200&q=90', 3);
 
@@ -268,7 +268,7 @@ INSERT INTO `site_hero_orbit_images` (`url`, `sort_order`) VALUES
 -- ----------------------------------------------------------------------------
 INSERT INTO `site_instagram_images` (`url`, `sort_order`) VALUES
 ('https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80', 0),
-('https://images.unsplash.com/photo-1611072172377-64f6764f5e77?w=400&q=80', 1),
+('https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80', 1),
 ('https://images.unsplash.com/photo-1584362917165-526a968579e8?w=400&q=80', 2),
 ('https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&q=80', 3);
 
@@ -301,25 +301,24 @@ INSERT INTO `site_why_choose_benefits` (`icon`, `title`, `description`, `sort_or
 -- site_section_toggles
 -- ----------------------------------------------------------------------------
 INSERT INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES
-('openingIntro', 1, 1),
-('hero', 1, 2),
-('videoBanner', 1, 3),
-('brandMarquee', 1, 4),
-('categories', 1, 5),
-('featured', 1, 6),
-('trending', 1, 7),
-('bundles', 1, 8),
-('ritualBuilder', 1, 9),
-('wellnessJourney', 1, 10),
-('bodyMap', 1, 11),
-('sourceTrail', 1, 12),
-('whyChoose', 1, 13),
-('antiTarnishBanner', 1, 14),
-('banners', 1, 15),
-('reviews', 1, 16),
-('instagram', 0, 17),
-('newsletter', 1, 18),
-('promoBanner', 1, 19);
+('hero', 1, 1),
+('videoBanner', 1, 2),
+('brandMarquee', 1, 3),
+('categories', 1, 4),
+('featured', 1, 5),
+('trending', 1, 6),
+('bundles', 1, 7),
+('ritualBuilder', 1, 8),
+('wellnessJourney', 1, 9),
+('bodyMap', 1, 10),
+('sourceTrail', 1, 11),
+('whyChoose', 1, 12),
+('certifiedBanner', 1, 13),
+('banners', 1, 14),
+('reviews', 1, 15),
+('instagram', 0, 16),
+('newsletter', 1, 17),
+('promoBanner', 1, 18);
 
 -- ----------------------------------------------------------------------------
 -- site_settings  (single row)
@@ -358,8 +357,8 @@ INSERT INTO `site_settings` (
 ) VALUES (
   1, 'Wellness Store', 'Wellness Store', 'WS', 'Everyday Wellness, Honestly Made', 'Wellness Store is a placeholder wellness/nutrition D2C brand template — swap in your real brand name, copy and imagery.', '', '',
   '#0F5132', '#15803D', '#0A3D25',
-  '#D97706', '#F59E0B', '#FDE68A',
-  '#FBF9F4', '#1C1A16', '"Fraunces", Georgia, serif', '"Inter", system-ui, sans-serif',
+  '#D97706', '#F59E0B', '#DCEEE1',
+  '#FBF9F4', '#1C1A16', '"Manrope", system-ui, sans-serif', '"Inter", system-ui, sans-serif',
   'hello@wellnessstore.example', '910000000000', '+91 00000 00000', 'Hi! I have a question about a product.', 'Mon-Sat, 10am-7pm IST',
   'wellnessstore', 'https://instagram.com/wellnessstore', 'Follow us for wellness tips and behind-the-scenes',
   49.00, 999.00, 7,

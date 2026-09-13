@@ -32,7 +32,7 @@ export default function EmailVerificationBanner({ className = '', compact = fals
     if (compact) {
         return (
             <div className={`p-4 rounded-xl bg-amber-50 border border-amber-200/80 ${className}`}>
-                <p className="text-sm text-charcoal mb-2">
+                <p className="text-sm text-ink mb-2">
                     Verify <span className="font-medium">{email}</span> to place orders.
                 </p>
                 <Button variant="outline" size="sm" type="button" onClick={handleResend} disabled={loading}>
@@ -50,9 +50,9 @@ export default function EmailVerificationBanner({ className = '', compact = fals
                 <Mail size={18} className="text-amber-700" />
             </div>
             <div className="flex-1 min-w-0">
-                <h3 className="font-serif text-lg text-charcoal mb-1">Verify your email</h3>
-                <p className="text-sm text-soft-brown mb-3">
-                    We sent a magic link to <span className="font-medium text-charcoal">{email}</span>.
+                <h3 className="font-display text-lg text-ink mb-1">Verify your email</h3>
+                <p className="text-sm text-slate mb-3">
+                    We sent a magic link to <span className="font-medium text-ink">{email}</span>.
                     Click it to verify and sign in.
                 </p>
                 <Button variant="outline" size="sm" type="button" onClick={handleResend} disabled={loading}>

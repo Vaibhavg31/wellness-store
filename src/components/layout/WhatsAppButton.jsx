@@ -44,7 +44,7 @@ export default function WhatsAppButton() {
                 <WhatsAppIcon size={26} />
             </span>
 
-            <span className="hidden sm:flex absolute right-full mr-3 px-3 py-1.5 rounded-lg bg-charcoal text-ivory text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+            <span className="hidden sm:flex absolute right-full mr-3 px-3 py-1.5 rounded-lg bg-ink text-cream text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
                 Chat on WhatsApp
             </span>
         </motion.a>

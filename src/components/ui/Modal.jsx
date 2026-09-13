@@ -39,7 +39,7 @@ export default function Modal({ isOpen, onClose, children, title, size = 'md' })
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className="absolute inset-0 bg-dark-chocolate/50 backdrop-blur-[3px]"
+                        className="absolute inset-0 bg-ink/50 backdrop-blur-[3px]"
                         onClick={onClose}
                         aria-hidden="true"
                     />
@@ -51,11 +51,11 @@ export default function Modal({ isOpen, onClose, children, title, size = 'md' })
                         role="dialog"
                         aria-modal="true"
                         aria-label={title}
-                        className={`relative w-full ${sizeStyles[size]} bg-ivory luxury-shadow-lg max-h-[min(90dvh,90vh)] overflow-hidden flex flex-col`}
+                        className={`relative w-full ${sizeStyles[size]} bg-cream soft-shadow-lg max-h-[min(90dvh,90vh)] overflow-hidden flex flex-col`}
                     >
-                        <div className="flex items-center justify-between px-6 py-5 border-b border-warm-beige/30 flex-shrink-0">
+                        <div className="flex items-center justify-between px-6 py-5 border-b border-sand/30 flex-shrink-0">
                             {title && (
-                                <h3 className="font-serif text-2xl font-light text-dark-chocolate">
+                                <h3 className="font-display text-2xl font-light text-ink">
                                     {title}
                                 </h3>
                             )}
@@ -64,7 +64,7 @@ export default function Modal({ isOpen, onClose, children, title, size = 'md' })
                                 className="ml-auto p-2 hover:bg-cream rounded-full transition-colors"
                                 aria-label="Close modal"
                             >
-                                <X size={20} className="text-dark-chocolate" />
+                                <X size={20} className="text-ink" />
                             </button>
                         </div>
                         <div className="p-6 overflow-y-auto overscroll-contain">{children}</div>

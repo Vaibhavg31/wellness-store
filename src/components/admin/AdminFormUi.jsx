@@ -1,11 +1,11 @@
 export const fieldClass =
-    'admin-control w-full text-sm text-charcoal px-3 py-2.5';
+    'admin-control w-full text-sm text-ink px-3 py-2.5';
 
 export function FormLabel({ children, required }) {
     return (
-        <label className="text-xs font-semibold text-charcoal block mb-1.5">
+        <label className="text-xs font-semibold text-ink block mb-1.5">
             {children}
-            {required && <span className="text-wine ml-0.5">*</span>}
+            {required && <span className="text-forest ml-0.5">*</span>}
         </label>
     );
 }
@@ -22,9 +22,9 @@ export function ToggleSwitch({ enabled, onChange, ariaLabel }) {
                 group relative inline-flex shrink-0 items-center
                 w-[3.25rem] h-7 rounded-full p-0.5
                 border transition-all duration-200 ease-out
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine/25 focus-visible:ring-offset-2
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest/25 focus-visible:ring-offset-2
                 ${enabled
-                    ? 'bg-wine border-wine/80 shadow-inner'
+                    ? 'bg-forest border-forest/80 shadow-inner'
                     : 'bg-admin-surface border-admin-border shadow-sm'}
             `}
         >
@@ -46,7 +46,7 @@ export function OptionalSection({ icon: Icon, title, description, enabled, onTog
         <div
             className={`rounded-xl border overflow-hidden transition-colors duration-200 ${
                 enabled
-                    ? 'border-wine/25 bg-white shadow-sm'
+                    ? 'border-forest/25 bg-white shadow-sm'
                     : 'border-admin-border bg-admin-surface-alt'
             }`}
         >
@@ -54,10 +54,10 @@ export function OptionalSection({ icon: Icon, title, description, enabled, onTog
                 {Icon && (
                     <div
                         className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
-                            enabled ? 'bg-wine/12' : 'bg-charcoal/5'
+                            enabled ? 'bg-forest/12' : 'bg-ink/5'
                         }`}
                     >
-                        <Icon size={18} className={enabled ? 'text-wine' : 'text-admin-muted'} />
+                        <Icon size={18} className={enabled ? 'text-forest' : 'text-admin-muted'} />
                     </div>
                 )}
                 <button
@@ -65,13 +65,13 @@ export function OptionalSection({ icon: Icon, title, description, enabled, onTog
                     onClick={() => onToggle(!enabled)}
                     className="flex-1 min-w-0 text-left rounded-lg -my-1 py-1 hover:opacity-90 transition-opacity"
                 >
-                    <p className="text-sm font-semibold text-charcoal">{title}</p>
+                    <p className="text-sm font-semibold text-ink">{title}</p>
                     <p className="text-xs text-admin-muted mt-0.5 leading-relaxed">{description}</p>
                 </button>
                 <div className="flex items-center gap-2.5 shrink-0 pl-1">
                     <span
                         className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${
-                            enabled ? 'text-wine' : 'text-admin-muted/70'
+                            enabled ? 'text-forest' : 'text-admin-muted/70'
                         }`}
                     >
                         {enabled ? 'On' : 'Off'}
@@ -96,11 +96,11 @@ export function SectionHeader({ icon: Icon, title, description, action }) {
     return (
         <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-wine/10 flex items-center justify-center shrink-0">
-                    <Icon size={20} className="text-wine" />
+                <div className="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center shrink-0">
+                    <Icon size={20} className="text-forest" />
                 </div>
                 <div>
-                    <h2 className="font-serif text-xl text-charcoal">{title}</h2>
+                    <h2 className="font-display text-xl text-ink">{title}</h2>
                     {description && <p className="text-xs text-admin-muted">{description}</p>}
                 </div>
             </div>

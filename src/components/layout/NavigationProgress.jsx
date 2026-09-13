@@ -37,7 +37,7 @@ export default function NavigationProgress() {
           aria-hidden="true"
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-emerald via-gold to-emerald shadow-[0_0_12px_rgba(212,175,55,0.5)]"
+            className="h-full bg-gradient-to-r from-emerald via-turmeric to-emerald shadow-[0_0_12px_rgba(212,175,55,0.5)]"
             initial={{ width: '0%' }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.25, ease: 'easeOut' }}

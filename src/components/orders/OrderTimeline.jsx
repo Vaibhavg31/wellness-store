@@ -11,18 +11,18 @@ export default function OrderTimeline({ order }) {
                     {i < history.length - 1 && (
                         <div className="absolute left-[7px] top-4 w-px h-[calc(100%-4px)] bg-border/50" />
                     )}
-                    <div className="w-3.5 h-3.5 rounded-full bg-wine border-2 border-ivory flex-shrink-0 mt-0.5 z-10" />
+                    <div className="w-3.5 h-3.5 rounded-full bg-forest border-2 border-cream flex-shrink-0 mt-0.5 z-10" />
                     <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-0.5">
                             <OrderStatusBadge status={entry.status} />
                             {entry.by && entry.by !== 'system' && (
-                                <span className="text-[10px] uppercase tracking-wider text-soft-brown/60">by {entry.by}</span>
+                                <span className="text-[10px] uppercase tracking-wider text-slate/60">by {entry.by}</span>
                             )}
                         </div>
                         {entry.note && (
-                            <p className="text-sm text-charcoal/80">{entry.note}</p>
+                            <p className="text-sm text-ink/80">{entry.note}</p>
                         )}
-                        <p className="text-xs text-soft-brown/70 mt-1">
+                        <p className="text-xs text-slate/70 mt-1">
                             {entry.at
                                 ? new Date(entry.at).toLocaleString('en-IN', {
                                     day: 'numeric',

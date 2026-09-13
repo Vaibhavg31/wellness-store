@@ -64,9 +64,9 @@ function CouponRow({ code }) {
         <button
             type="button"
             onClick={copy}
-            className="w-full flex items-center justify-between gap-3 rounded-xl border border-dashed border-gold/50 bg-gold/10 px-4 py-3 text-left transition-colors hover:bg-gold/15"
+            className="w-full flex items-center justify-between gap-3 rounded-xl border border-dashed border-turmeric/50 bg-turmeric/10 px-4 py-3 text-left transition-colors hover:bg-turmeric/15"
         >
-            <span className="font-serif text-lg tracking-wide text-charcoal">{code}</span>
+            <span className="font-display text-lg tracking-wide text-ink">{code}</span>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald">
                 {copied ? <Check size={14} /> : <Copy size={14} />}
                 {copied ? 'Copied' : 'Copy code'}
@@ -121,7 +121,7 @@ export default function AnnouncementPopup() {
                     transition={{ duration: 0.25 }}
                 >
                     <div
-                        className="absolute inset-0 bg-charcoal/60 backdrop-blur-sm"
+                        className="absolute inset-0 bg-ink/60 backdrop-blur-sm"
                         onClick={dismiss}
                         aria-hidden="true"
                     />
@@ -129,7 +129,7 @@ export default function AnnouncementPopup() {
                         role="dialog"
                         aria-modal="true"
                         aria-label={popup.title}
-                        className="relative w-full max-w-sm rounded-2xl bg-ivory shadow-2xl overflow-hidden"
+                        className="relative w-full max-w-sm rounded-2xl bg-cream shadow-2xl overflow-hidden"
                         initial={{ opacity: 0, scale: 0.92, y: 16 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 8 }}
@@ -139,7 +139,7 @@ export default function AnnouncementPopup() {
                             type="button"
                             onClick={dismiss}
                             aria-label="Close"
-                            className="absolute top-3 right-3 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full bg-charcoal/5 text-charcoal/60 hover:bg-charcoal/10 hover:text-charcoal transition-colors"
+                            className="absolute top-3 right-3 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full bg-ink/5 text-ink/60 hover:bg-ink/10 hover:text-ink transition-colors"
                         >
                             <X size={16} />
                         </button>
@@ -148,13 +148,13 @@ export default function AnnouncementPopup() {
                             <img src={imageUrl(popup.image)} alt="" className="w-full h-40 object-cover" />
                         ) : (
                             <div className="w-full h-24 bg-gradient-to-br from-emerald to-[#0A3D25] flex items-center justify-center">
-                                <Icon size={32} className="text-gold-light" />
+                                <Icon size={32} className="text-turmeric-light" />
                             </div>
                         )}
 
                         <div className="p-6">
-                            <h3 className="font-serif text-2xl text-charcoal leading-tight mb-2">{popup.title}</h3>
-                            <p className="text-sm text-soft-brown font-light leading-relaxed mb-5">{popup.message}</p>
+                            <h3 className="font-display text-2xl text-ink leading-tight mb-2">{popup.title}</h3>
+                            <p className="text-sm text-slate font-light leading-relaxed mb-5">{popup.message}</p>
 
                             {popup.type === 'coupon' && popup.couponCode && (
                                 <div className="mb-5">
@@ -166,16 +166,16 @@ export default function AnnouncementPopup() {
                                 <Link
                                     to={`/product/${product.id}`}
                                     onClick={dismiss}
-                                    className="mb-5 flex items-center gap-3 rounded-xl border border-border/40 bg-white/60 p-3 hover:border-gold/50 transition-colors"
+                                    className="mb-5 flex items-center gap-3 rounded-xl border border-border/40 bg-white/60 p-3 hover:border-turmeric/50 transition-colors"
                                 >
                                     <img
                                         src={imageUrl(product.images?.[0])}
                                         alt=""
-                                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-warm-beige/50"
+                                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-sand/50"
                                     />
                                     <span className="min-w-0">
-                                        <span className="block text-sm text-charcoal font-medium truncate">{product.title}</span>
-                                        <span className="block text-sm text-gold-dark">{formatPrice(product.price)}</span>
+                                        <span className="block text-sm text-ink font-medium truncate">{product.title}</span>
+                                        <span className="block text-sm text-turmeric-dark">{formatPrice(product.price)}</span>
                                     </span>
                                 </Link>
                             )}
@@ -184,7 +184,7 @@ export default function AnnouncementPopup() {
                                 <Link
                                     to={popup.ctaHref}
                                     onClick={dismiss}
-                                    className="block w-full text-center rounded-xl bg-emerald text-ivory font-medium py-3 hover:bg-emerald/90 transition-colors"
+                                    className="block w-full text-center rounded-xl bg-emerald text-cream font-medium py-3 hover:bg-emerald/90 transition-colors"
                                 >
                                     {popup.ctaLabel}
                                 </Link>

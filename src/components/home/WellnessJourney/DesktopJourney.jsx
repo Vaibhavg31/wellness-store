@@ -8,7 +8,7 @@ import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl } from '@/services/api';
 import { useCart } from '@/contexts/CartContext';
 import { useToast, showCartToast } from '@/contexts/ToastContext';
-import { useLenisScroll } from '@/components/home/DayInHerSparkle/useLenisScroll';
+import { useLenisScroll } from '@/hooks/useLenisScroll';
 import journeyGlow from '@/assets/wellness-journey-glow.png';
 import { bestMatchForGoal } from '../wellnessRituals';
 import { STAGES, hourToAngle, lerpAngle } from './journeyStages';
@@ -133,7 +133,7 @@ export default function DesktopJourney({ products }) {
                         <span
                             key={s.id}
                             className={`h-1 rounded-full transition-all duration-500 ${
-                                i === activeIndex ? 'w-8 bg-gold' : 'w-4 bg-ivory/25'
+                                i === activeIndex ? 'w-8 bg-turmeric' : 'w-4 bg-cream/25'
                             }`}
                         />
                     ))}
@@ -149,12 +149,12 @@ export default function DesktopJourney({ products }) {
                                 exit={{ opacity: 0, y: -16 }}
                                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                             >
-                                <p className="type-eyebrow text-gold-light mb-3">{stage.time}</p>
-                                <h3 className="font-serif text-3xl sm:text-4xl text-ivory leading-tight mb-4">{stage.title}</h3>
-                                <p className="text-ivory/65 font-light leading-relaxed mb-6">{stage.copy}</p>
+                                <p className="type-eyebrow text-turmeric-light mb-3">{stage.time}</p>
+                                <h3 className="font-display text-3xl sm:text-4xl text-cream leading-tight mb-4">{stage.title}</h3>
+                                <p className="text-cream/65 font-light leading-relaxed mb-6">{stage.copy}</p>
 
                                 {product && (
-                                    <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.06] backdrop-blur-sm p-3 hover:border-gold/50 transition-colors">
+                                    <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.06] backdrop-blur-sm p-3 hover:border-turmeric/50 transition-colors">
                                         <Link to={`/product/${product.id}`} className="flex items-center gap-3 flex-1 min-w-0">
                                             <img
                                                 src={imageUrl(product.images?.[0])}
@@ -162,9 +162,9 @@ export default function DesktopJourney({ products }) {
                                                 className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-white/10"
                                             />
                                             <span className="text-left min-w-0">
-                                                <span className="block text-xs text-ivory/50">Fits this moment</span>
-                                                <span className="block text-sm text-ivory font-medium truncate">{product.title}</span>
-                                                <span className="block text-sm text-gold-light">{formatPrice(product.price)}</span>
+                                                <span className="block text-xs text-cream/50">Fits this moment</span>
+                                                <span className="block text-sm text-cream font-medium truncate">{product.title}</span>
+                                                <span className="block text-sm text-turmeric-light">{formatPrice(product.price)}</span>
                                             </span>
                                         </Link>
                                         <button
@@ -172,7 +172,7 @@ export default function DesktopJourney({ products }) {
                                             onClick={handleAdd}
                                             disabled={justAdded}
                                             className={`flex-shrink-0 inline-flex items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-colors disabled:opacity-90 ${
-                                                justAdded ? 'bg-emerald text-ivory' : 'bg-gold text-charcoal hover:bg-gold-light'
+                                                justAdded ? 'bg-emerald text-cream' : 'bg-turmeric text-ink hover:bg-turmeric-light'
                                             }`}
                                         >
                                             {justAdded ? <Check size={14} strokeWidth={2} /> : <ShoppingBag size={14} strokeWidth={1.5} />}
@@ -180,7 +180,7 @@ export default function DesktopJourney({ products }) {
                                         </button>
                                         <Link
                                             to={`/product/${product.id}`}
-                                            className="flex-shrink-0 text-ivory/40 hover:text-gold-light transition-colors"
+                                            className="flex-shrink-0 text-cream/40 hover:text-turmeric-light transition-colors"
                                             aria-label={`View ${product.title}`}
                                         >
                                             <ArrowRight size={15} />

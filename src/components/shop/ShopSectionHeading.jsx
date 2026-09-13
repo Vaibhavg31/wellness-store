@@ -9,7 +9,7 @@ export default function ShopSectionHeading({ title, className = '', align = 'cen
             viewport={{ once: true }}
             transition={{ duration: 0.45 }}
             className={cn(
-                'type-eyebrow font-semibold text-charcoal',
+                'type-eyebrow font-semibold text-ink',
                 align === 'center' ? 'text-center' : 'text-left',
                 className,
             )}

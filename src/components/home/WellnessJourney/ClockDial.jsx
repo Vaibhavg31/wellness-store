@@ -39,11 +39,11 @@ const ClockDial = forwardRef(function ClockDial({ stages, activeIndex }, markerR
             </svg>
             <div
                 ref={markerRef}
-                className="absolute w-3 h-3 rounded-full bg-ivory shadow-[0_0_12px_4px_rgba(245,158,11,0.55)]"
+                className="absolute w-3 h-3 rounded-full bg-cream shadow-[0_0_12px_4px_rgba(245,158,11,0.55)]"
                 style={{ left: CENTER, top: CENTER, marginLeft: -6, marginTop: -6, willChange: 'transform' }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[10px] uppercase tracking-[0.16em] text-ivory/40">24h</span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-cream/40">24h</span>
             </div>
         </div>
     );

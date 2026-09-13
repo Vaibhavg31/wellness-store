@@ -26,7 +26,7 @@ export default function MatchRing({ value }) {
     return (
         <div className="relative w-20 h-20 flex-shrink-0">
             <svg viewBox="0 0 72 72" className="w-full h-full -rotate-90">
-                <circle cx="36" cy="36" r={RADIUS} fill="none" stroke="currentColor" className="text-warm-beige" strokeWidth="5" />
+                <circle cx="36" cy="36" r={RADIUS} fill="none" stroke="currentColor" className="text-sand" strokeWidth="5" />
                 <motion.circle
                     cx="36"
                     cy="36"
@@ -40,7 +40,7 @@ export default function MatchRing({ value }) {
                     style={{ strokeDashoffset: dashoffset }}
                 />
             </svg>
-            <span ref={spanRef} className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-charcoal">
+            <span ref={spanRef} className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-ink">
                 0%
             </span>
         </div>

@@ -139,7 +139,7 @@ export default function AdminSettingsPage() {
             />
 
             <div>
-                <h2 className="text-sm font-semibold text-charcoal mb-1">Store Services</h2>
+                <h2 className="text-sm font-semibold text-ink mb-1">Store Services</h2>
                 <p className="text-xs text-admin-muted mb-3">
                     Turn features on or off site-wide. Credentials still come from config.json — toggles control whether each service is active.
                 </p>
@@ -150,10 +150,10 @@ export default function AdminSettingsPage() {
                             className={`flex items-start justify-between gap-4 px-4 py-3.5 ${i < arr.length - 1 ? 'border-b border-admin-border-light' : ''}`}
                         >
                             <div className="min-w-0">
-                                <span className="text-sm font-medium text-charcoal block">{item.label}</span>
+                                <span className="text-sm font-medium text-ink block">{item.label}</span>
                                 <span className="text-xs text-admin-muted block mt-0.5">{item.description}</span>
                                 {item.hint && (
-                                    <span className="text-[11px] text-soft-brown block mt-1">{item.hint}</span>
+                                    <span className="text-[11px] text-slate block mt-1">{item.hint}</span>
                                 )}
                             </div>
                             <ToggleSwitch
@@ -167,7 +167,7 @@ export default function AdminSettingsPage() {
             </div>
 
             <div>
-                <h2 className="text-sm font-semibold text-charcoal mb-1">Homepage Sections</h2>
+                <h2 className="text-sm font-semibold text-ink mb-1">Homepage Sections</h2>
                 <p className="text-xs text-admin-muted mb-3">
                     Managed in one place — show/hide and drag to reorder homepage sections there.
                 </p>

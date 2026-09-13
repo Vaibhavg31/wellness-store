@@ -124,8 +124,8 @@ export default function SavedAddresses() {
         <section className="mt-10">
             <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                    <MapPin size={20} className="text-wine" />
-                    <h2 className="font-serif text-xl text-charcoal">Saved Addresses</h2>
+                    <MapPin size={20} className="text-forest" />
+                    <h2 className="font-display text-xl text-ink">Saved Addresses</h2>
                 </div>
                 {!editing && !atLimit && (
                     <Button variant="outline" size="sm" onClick={openNew} className="gap-1.5">
@@ -133,7 +133,7 @@ export default function SavedAddresses() {
                     </Button>
                 )}
             </div>
-            <p className="text-xs text-soft-brown mb-6">
+            <p className="text-xs text-slate mb-6">
                 Save up to {MAX_ADDRESSES} delivery addresses for faster checkout. No phone verification needed.
                 {addresses.length > 0 && ` (${addresses.length}/${MAX_ADDRESSES} saved)`}
             </p>
@@ -141,7 +141,7 @@ export default function SavedAddresses() {
             {error && <p className="text-sm text-red-600 mb-4" role="alert">{error}</p>}
 
             {editing ? (
-                <div className="bg-ivory rounded-2xl p-6 border border-border/40 space-y-4">
+                <div className="bg-cream rounded-2xl p-6 border border-border/40 space-y-4">
                     <Input label="Label" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Home, Work…" />
                     <Input label="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} error={errors.name} required />
                     <Input
@@ -152,47 +152,47 @@ export default function SavedAddresses() {
                     />
                     <DeliveryAddressForm value={form} onChange={setForm} errors={errors} />
                     <div className="flex gap-3 pt-2">
-                        <Button variant="gold" onClick={save} disabled={loading}>{loading ? 'Saving…' : 'Save address'}</Button>
+                        <Button variant="turmeric" onClick={save} disabled={loading}>{loading ? 'Saving…' : 'Save address'}</Button>
                         <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
                     </div>
                 </div>
             ) : addresses.length === 0 ? (
-                <div className="bg-ivory rounded-2xl p-8 text-center border border-border/40">
-                    <p className="text-soft-brown text-sm mb-4">No saved addresses yet. Add one for faster checkout.</p>
-                    <Button variant="gold" size="sm" onClick={openNew}>Add your first address</Button>
+                <div className="bg-cream rounded-2xl p-8 text-center border border-border/40">
+                    <p className="text-slate text-sm mb-4">No saved addresses yet. Add one for faster checkout.</p>
+                    <Button variant="turmeric" size="sm" onClick={openNew}>Add your first address</Button>
                 </div>
             ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
                     {addresses.map((addr) => (
-                        <div key={addr.id} className={`bg-ivory rounded-2xl p-5 border ${addr.isDefault ? 'border-wine/30' : 'border-border/40'}`}>
+                        <div key={addr.id} className={`bg-cream rounded-2xl p-5 border ${addr.isDefault ? 'border-forest/30' : 'border-border/40'}`}>
                             <div className="flex items-start justify-between gap-2 mb-2">
                                 <div>
-                                    <p className="font-medium text-charcoal flex items-center gap-2">
+                                    <p className="font-medium text-ink flex items-center gap-2">
                                         {addr.label || 'Address'}
                                         {addr.isDefault && (
-                                            <span className="text-[10px] uppercase tracking-wider text-wine bg-wine/10 px-2 py-0.5 rounded-full">Default</span>
+                                            <span className="text-[10px] uppercase tracking-wider text-forest bg-forest/10 px-2 py-0.5 rounded-full">Default</span>
                                         )}
                                         {user?.lastUsedAddressId === addr.id && (
-                                            <span className="text-[10px] uppercase tracking-wider text-soft-brown bg-border/40 px-2 py-0.5 rounded-full">Last used</span>
+                                            <span className="text-[10px] uppercase tracking-wider text-slate bg-border/40 px-2 py-0.5 rounded-full">Last used</span>
                                         )}
                                     </p>
-                                    <p className="text-xs text-soft-brown">
+                                    <p className="text-xs text-slate">
                                         {addr.name}
                                         {addr.phone ? ` · ${addr.phone}` : ''}
                                     </p>
                                 </div>
                                 <div className="flex gap-1">
-                                    <button type="button" onClick={() => openEdit(addr)} className="p-2 text-soft-brown hover:text-wine" aria-label="Edit">
+                                    <button type="button" onClick={() => openEdit(addr)} className="p-2 text-slate hover:text-forest" aria-label="Edit">
                                         <Pencil size={14} />
                                     </button>
-                                    <button type="button" onClick={() => remove(addr.id)} className="p-2 text-soft-brown hover:text-red-600" aria-label="Delete">
+                                    <button type="button" onClick={() => remove(addr.id)} className="p-2 text-slate hover:text-red-600" aria-label="Delete">
                                         <Trash2 size={14} />
                                     </button>
                                 </div>
                             </div>
-                            <p className="text-sm text-charcoal leading-relaxed">{formatIndianAddress(addr)}</p>
+                            <p className="text-sm text-ink leading-relaxed">{formatIndianAddress(addr)}</p>
                             {!addr.isDefault && (
-                                <button type="button" onClick={() => setDefault(addr.id)} className="mt-3 text-xs text-wine hover:text-wine-light inline-flex items-center gap-1">
+                                <button type="button" onClick={() => setDefault(addr.id)} className="mt-3 text-xs text-forest hover:text-forest-light inline-flex items-center gap-1">
                                     <Star size={12} /> Set as default
                                 </button>
                             )}
@@ -202,7 +202,7 @@ export default function SavedAddresses() {
             )}
 
             {atLimit && !editing && (
-                <p className="text-xs text-soft-brown mt-4">
+                <p className="text-xs text-slate mt-4">
                     Maximum {MAX_ADDRESSES} addresses saved. Delete one to add another.
                 </p>
             )}

@@ -109,7 +109,7 @@ export default function AdminCategoriesPage() {
             <AdminPageHeader
                 title="Categories"
                 subtitle="Organize products into browsable collections on your store"
-                actions={<Button variant="gold" onClick={openNew}><Plus size={16} /> Add Category</Button>}
+                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> Add Category</Button>}
             />
 
             <AdminSummaryGrid
@@ -161,19 +161,19 @@ export default function AdminCategoriesPage() {
                                                 <img
                                                     src={imageUrl(cat.image)}
                                                     alt=""
-                                                    className="w-14 h-14 rounded-xl object-cover border border-admin-border bg-warm-beige/30"
+                                                    className="w-14 h-14 rounded-xl object-cover border border-admin-border bg-sand/30"
                                                 />
                                             ) : (
-                                                <div className="w-14 h-14 rounded-xl border border-admin-border bg-warm-beige/30 flex items-center justify-center">
+                                                <div className="w-14 h-14 rounded-xl border border-admin-border bg-sand/30 flex items-center justify-center">
                                                     <FolderOpen size={18} className="text-admin-muted/60" />
                                                 </div>
                                             )}
                                         </td>
                                         <td className="p-4 align-top">
-                                            <p className="font-serif text-base text-charcoal">{cat.label}</p>
+                                            <p className="font-display text-base text-ink">{cat.label}</p>
                                         </td>
                                         <td className="p-4 align-top">
-                                            <code className="text-xs text-admin-muted bg-warm-beige/40 px-2 py-1 rounded-md">/{cat.slug}</code>
+                                            <code className="text-xs text-admin-muted bg-sand/40 px-2 py-1 rounded-md">/{cat.slug}</code>
                                         </td>
                                         <td className="p-4 align-top">
                                             <p className="text-admin-muted line-clamp-2 leading-relaxed">{cat.description || '—'}</p>
@@ -181,7 +181,7 @@ export default function AdminCategoriesPage() {
                                         <td className="p-4 align-top text-center">
                                             <span
                                                 className={`inline-flex items-center justify-center min-w-[1.75rem] px-2 py-0.5 rounded-full text-xs font-medium ${
-                                                    cat.productCount > 0 ? 'bg-wine/10 text-wine' : 'bg-soft-brown/10 text-admin-muted'
+                                                    cat.productCount > 0 ? 'bg-forest/10 text-forest' : 'bg-slate/10 text-admin-muted'
                                                 }`}
                                                 title={cat.productCount === 0 ? "No products yet — won't show on the storefront until it has at least one" : undefined}
                                             >
@@ -189,7 +189,7 @@ export default function AdminCategoriesPage() {
                                             </span>
                                         </td>
                                         <td className="p-4 align-top text-center">
-                                            <span className="font-serif text-charcoal">{cat.order}</span>
+                                            <span className="font-display text-ink">{cat.order}</span>
                                         </td>
                                         <td className="p-4 align-top">
                                             <AdminStatusPill tone={cat.isPublished ? 'success' : 'muted'}>
@@ -248,7 +248,7 @@ export default function AdminCategoriesPage() {
                                 </button>
                             </div>
                         ) : (
-                            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-wine/30 hover:bg-wine/5 transition-colors">
+                            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-forest/30 hover:bg-forest/5 transition-colors">
                                 <Upload size={24} className="text-admin-muted/80" />
                                 <span className="text-sm text-admin-muted">{uploading ? 'Uploading…' : 'Click to upload image'}</span>
                                 <span className="text-xs text-admin-muted">JPG, PNG, WebP · max 5MB</span>
@@ -256,7 +256,7 @@ export default function AdminCategoriesPage() {
                             </label>
                         )}
                         {form.image && (
-                            <label className="inline-flex items-center gap-2 mt-3 text-xs text-wine cursor-pointer hover:text-wine-light">
+                            <label className="inline-flex items-center gap-2 mt-3 text-xs text-forest cursor-pointer hover:text-forest-light">
                                 <Upload size={14} />
                                 {uploading ? 'Uploading…' : 'Replace image'}
                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
@@ -265,15 +265,15 @@ export default function AdminCategoriesPage() {
                     </div>
                     <div>
                         <label className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">Description</label>
-                        <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-warm-beige/60 rounded-lg" />
+                        <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-sand/60 rounded-lg" />
                     </div>
                     <Input label="Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
                     <label className="flex items-center gap-2 text-sm">
                         <input type="checkbox" checked={form.isPublished} onChange={(e) => setForm({ ...form, isPublished: e.target.checked })} />
                         Published (visible on website)
                     </label>
-                    <div className="sticky bottom-0 pt-4 pb-2 bg-ivory border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
-                        <Button variant="gold" className="w-full" onClick={handleSave}>Save Category</Button>
+                    <div className="sticky bottom-0 pt-4 pb-2 bg-cream border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
+                        <Button variant="turmeric" className="w-full" onClick={handleSave}>Save Category</Button>
                     </div>
                 </div>
             </Drawer>

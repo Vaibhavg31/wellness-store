@@ -208,7 +208,7 @@ final class OrderRoutes
 
             $from = $filters['from'] !== '' ? $filters['from'] : 'all';
             $to = $filters['to'] !== '' ? $filters['to'] : 'all';
-            $baseName = "krivea-orders-{$from}-to-{$to}";
+            $baseName = "wellness-orders-{$from}-to-{$to}";
 
             if ($format === 'pdf') {
                 ExportHelper::exportTablePdf("{$baseName}.pdf", 'Orders Export', $headers, $rows);

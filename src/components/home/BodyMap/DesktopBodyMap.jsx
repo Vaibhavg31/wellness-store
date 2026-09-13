@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useLenisScroll } from '@/components/home/DayInHerSparkle/useLenisScroll';
+import { useLenisScroll } from '@/hooks/useLenisScroll';
 import { bestMatchForGoal } from '../wellnessRituals';
 import { ZONES } from './bodyMapZones';
 import BodyFigure from './BodyFigure';
@@ -76,11 +76,11 @@ export default function DesktopBodyMap({ products }) {
                                 className="min-h-[85vh] flex flex-col justify-center py-12"
                             >
                                 <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 border border-white/15 mb-5">
-                                    <Icon size={20} className="text-gold-light" />
+                                    <Icon size={20} className="text-turmeric-light" />
                                 </span>
-                                <p className="type-eyebrow text-gold-light mb-2">Zone {i + 1} of {ZONES.length}</p>
-                                <h3 className="font-serif text-3xl sm:text-4xl text-ivory leading-tight mb-4">{zone.title}</h3>
-                                <p className="text-ivory/65 font-light leading-relaxed mb-6 max-w-md">{zone.copy}</p>
+                                <p className="type-eyebrow text-turmeric-light mb-2">Zone {i + 1} of {ZONES.length}</p>
+                                <h3 className="font-display text-3xl sm:text-4xl text-cream leading-tight mb-4">{zone.title}</h3>
+                                <p className="text-cream/65 font-light leading-relaxed mb-6 max-w-md">{zone.copy}</p>
                                 <div ref={(el) => { cardRefs.current[i] = el; }} className="max-w-md">
                                     <ZoneProductCard product={product} />
                                 </div>

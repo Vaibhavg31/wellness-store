@@ -4,7 +4,7 @@ import { MapPin, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { imageUrl } from '@/services/api';
-import { useLenisScroll } from '@/components/home/DayInHerSparkle/useLenisScroll';
+import { useLenisScroll } from '@/hooks/useLenisScroll';
 import { REGIONS, productsForIngredient } from './sourceRegions';
 import IndiaMap from './IndiaMap';
 
@@ -77,11 +77,11 @@ export default function DesktopSourceTrail({ products }) {
                         <div key={stop.id} className="min-h-[70vh] flex items-center py-10">
                             <div ref={(el) => { cardRefs.current[i] = el; }} className="w-full max-w-md">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <MapPin size={14} className="text-gold-light" />
-                                    <p className="type-eyebrow text-gold-light">{stop.region}</p>
+                                    <MapPin size={14} className="text-turmeric-light" />
+                                    <p className="type-eyebrow text-turmeric-light">{stop.region}</p>
                                 </div>
-                                <h3 className="font-serif text-2xl sm:text-3xl text-ivory leading-tight mb-3">{stop.ingredient}</h3>
-                                <p className="text-ivory/65 font-light leading-relaxed mb-5">{stop.note}</p>
+                                <h3 className="font-display text-2xl sm:text-3xl text-cream leading-tight mb-3">{stop.ingredient}</h3>
+                                <p className="text-cream/65 font-light leading-relaxed mb-5">{stop.note}</p>
 
                                 {matches[0] && (
                                     <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.06] backdrop-blur-sm p-3 mb-4">
@@ -91,15 +91,15 @@ export default function DesktopSourceTrail({ products }) {
                                             className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-white/10"
                                         />
                                         <span className="min-w-0">
-                                            <span className="block text-xs text-ivory/50">Sourced for</span>
-                                            <span className="block text-sm text-ivory font-medium truncate">{matches[0].title}</span>
+                                            <span className="block text-xs text-cream/50">Sourced for</span>
+                                            <span className="block text-sm text-cream font-medium truncate">{matches[0].title}</span>
                                         </span>
                                     </div>
                                 )}
 
                                 <Link
                                     to={shopHref}
-                                    className="inline-flex items-center gap-1.5 text-sm font-medium text-gold-light hover:text-gold transition-colors"
+                                    className="inline-flex items-center gap-1.5 text-sm font-medium text-turmeric-light hover:text-turmeric transition-colors"
                                 >
                                     Shop products with this ingredient
                                     <ArrowRight size={14} />

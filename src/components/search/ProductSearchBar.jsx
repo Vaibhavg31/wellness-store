@@ -23,26 +23,26 @@ export default function ProductSearchBar({
     return (
         <div
             className={cn(
-                'flex items-center gap-2 rounded-full border border-border/70 bg-ivory focus-within:border-wine/40 focus-within:ring-2 focus-within:ring-wine/10 transition-all',
+                'flex items-center gap-2 rounded-full border border-border/70 bg-cream focus-within:border-forest/40 focus-within:ring-2 focus-within:ring-forest/10 transition-all',
                 sizeClass,
                 className,
             )}
         >
-            <Search size={size === 'compact' ? 16 : 18} className="text-soft-brown flex-shrink-0" strokeWidth={1.25} />
+            <Search size={size === 'compact' ? 16 : 18} className="text-slate flex-shrink-0" strokeWidth={1.25} />
             <input
                 type="search"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="flex-1 bg-transparent text-charcoal placeholder:text-soft-brown/45 focus:outline-none min-w-0 font-light"
+                className="flex-1 bg-transparent text-ink placeholder:text-slate/45 focus:outline-none min-w-0 font-light"
                 aria-label={placeholder}
             />
             {value && (
                 <button
                     type="button"
                     onClick={() => onChange('')}
-                    className="p-1 rounded-full hover:bg-warm-beige/60 text-soft-brown transition-colors flex-shrink-0"
+                    className="p-1 rounded-full hover:bg-sand/60 text-slate transition-colors flex-shrink-0"
                     aria-label="Clear search"
                 >
                     <X size={14} />

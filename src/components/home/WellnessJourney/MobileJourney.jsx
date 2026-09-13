@@ -36,8 +36,8 @@ function StageProduct({ product }) {
                     className="w-10 h-10 rounded-md object-cover flex-shrink-0 bg-white/10"
                 />
                 <span className="min-w-0">
-                    <span className="block text-sm text-ivory/90 truncate">{product.title}</span>
-                    <span className="block text-xs text-gold-light">{formatPrice(product.price)}</span>
+                    <span className="block text-sm text-cream/90 truncate">{product.title}</span>
+                    <span className="block text-xs text-turmeric-light">{formatPrice(product.price)}</span>
                 </span>
             </Link>
             <button
@@ -45,12 +45,12 @@ function StageProduct({ product }) {
                 onClick={handleAdd}
                 disabled={justAdded}
                 className={`flex-shrink-0 inline-flex items-center gap-1 rounded-md px-2.5 py-2 text-xs font-medium transition-colors ${
-                    justAdded ? 'bg-emerald text-ivory' : 'bg-gold text-charcoal hover:bg-gold-light'
+                    justAdded ? 'bg-emerald text-cream' : 'bg-turmeric text-ink hover:bg-turmeric-light'
                 }`}
             >
                 {justAdded ? <Check size={13} strokeWidth={2} /> : <ShoppingBag size={13} strokeWidth={1.5} />}
             </button>
-            <Link to={`/product/${product.id}`} className="flex-shrink-0 text-ivory/40" aria-label={`View ${product.title}`}>
+            <Link to={`/product/${product.id}`} className="flex-shrink-0 text-cream/40" aria-label={`View ${product.title}`}>
                 <ArrowRight size={14} />
             </Link>
         </div>
@@ -73,7 +73,7 @@ export default function MobileJourney({ products }) {
             <div className="relative max-w-md mx-auto space-y-10">
                 <div className="absolute left-[19px] top-3 bottom-3 w-px bg-white/10" aria-hidden="true" />
                 <motion.div
-                    className="absolute left-[19px] top-3 w-px bg-gradient-to-b from-gold-light to-gold origin-top"
+                    className="absolute left-[19px] top-3 w-px bg-gradient-to-b from-turmeric-light to-turmeric origin-top"
                     style={{ bottom: '3px' }}
                     initial={{ scaleY: 0 }}
                     whileInView={{ scaleY: 1 }}
@@ -94,11 +94,11 @@ export default function MobileJourney({ products }) {
                             className="relative pl-12"
                         >
                             <span className="absolute left-0 top-0 w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center">
-                                <Icon size={16} className="text-gold-light" />
+                                <Icon size={16} className="text-turmeric-light" />
                             </span>
-                            <p className="type-eyebrow text-gold-light mb-1">{stage.time}</p>
-                            <h3 className="font-serif text-xl text-ivory mb-2">{stage.title}</h3>
-                            <p className="text-ivory/60 text-sm font-light leading-relaxed mb-3">{stage.copy}</p>
+                            <p className="type-eyebrow text-turmeric-light mb-1">{stage.time}</p>
+                            <h3 className="font-display text-xl text-cream mb-2">{stage.title}</h3>
+                            <p className="text-cream/60 text-sm font-light leading-relaxed mb-3">{stage.copy}</p>
                             <StageProduct product={product} />
                         </motion.div>
                     );

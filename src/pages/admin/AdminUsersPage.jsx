@@ -95,7 +95,7 @@ function UserProfileSection({ user }) {
                     </div>
                 )}
                 <div>
-                    <h3 className="font-serif text-xl text-charcoal">{user.name || 'Unnamed user'}</h3>
+                    <h3 className="font-display text-xl text-ink">{user.name || 'Unnamed user'}</h3>
                     <p className="text-sm text-admin-muted break-all">{user.email}</p>
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {user.isGuest && (
@@ -126,7 +126,7 @@ function UserProfileSection({ user }) {
                 {fields.map(({ label, value }) => (
                     <div key={label}>
                         <dt className="text-[10px] uppercase tracking-wider text-admin-muted mb-0.5">{label}</dt>
-                        <dd className="text-charcoal break-all">{value || '—'}</dd>
+                        <dd className="text-ink break-all">{value || '—'}</dd>
                     </div>
                 ))}
             </dl>
@@ -145,9 +145,9 @@ function UserStatsSection({ user }) {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {stats.map((s) => (
-                <div key={s.label} className="rounded-xl bg-ivory border border-admin-border px-3 py-3 text-center">
+                <div key={s.label} className="rounded-xl bg-cream border border-admin-border px-3 py-3 text-center">
                     <p className="text-[10px] uppercase tracking-wider text-admin-muted">{s.label}</p>
-                    <p className="font-serif text-xl text-charcoal mt-0.5">{s.value}</p>
+                    <p className="font-display text-xl text-ink mt-0.5">{s.value}</p>
                 </div>
             ))}
         </div>
@@ -199,7 +199,7 @@ function UserOrdersSection({ orders, onSelectOrder }) {
                                     <OrderStatusBadge status={order.status} />
                                 </td>
                                 <td className="p-3">
-                                    <ChevronRight size={14} className="text-wine" />
+                                    <ChevronRight size={14} className="text-forest" />
                                 </td>
                             </tr>
                         ))}
@@ -218,14 +218,14 @@ function OrderDetailView({ order, onBack }) {
             <button
                 type="button"
                 onClick={onBack}
-                className="inline-flex items-center gap-1 text-sm text-admin-muted hover:text-charcoal"
+                className="inline-flex items-center gap-1 text-sm text-admin-muted hover:text-ink"
             >
                 <ChevronLeft size={16} />
                 Back to user
             </button>
 
             <div>
-                <h3 className="font-serif text-xl text-charcoal mb-1">Order {shortOrderId(order.id)}</h3>
+                <h3 className="font-display text-xl text-ink mb-1">Order {shortOrderId(order.id)}</h3>
                 <p className="text-sm text-admin-muted">
                     {formatOrderDate(order.createdAt)} · {paymentLabel(order)}
                 </p>
@@ -414,7 +414,7 @@ export default function AdminUsersPage() {
             await api.download(
                 `/api/users/admin/export${formatParam}`,
                 adminToken,
-                `krivea-users-${from}-to-${to}.${ext}`,
+                `wellness-users-${from}-to-${to}.${ext}`,
             );
             setExportModalOpen(false);
         } catch (err) {
@@ -478,9 +478,9 @@ export default function AdminUsersPage() {
             <AdminStatStrip
                 columns={6}
                 stats={[
-                    { label: 'Revenue', value: formatPrice(stats.totalRevenue), tone: 'gold' },
+                    { label: 'Revenue', value: formatPrice(stats.totalRevenue), tone: 'turmeric' },
                     { label: 'Users', value: stats.total },
-                    { label: 'Orders', value: stats.totalOrders, tone: 'wine' },
+                    { label: 'Orders', value: stats.totalOrders, tone: 'forest' },
                     { label: 'With orders', value: stats.withOrders },
                     { label: 'Verified', value: stats.verified, tone: 'emerald' },
                     { label: 'Blocked', value: stats.blocked, tone: 'red' },
@@ -514,17 +514,17 @@ export default function AdminUsersPage() {
                                     <th className="p-4 font-medium text-admin-muted">Contact</th>
                                     <th className="p-4 font-medium text-admin-muted">Phone</th>
                                     <th className="p-4 font-medium text-admin-muted">
-                                        <button type="button" onClick={() => toggleSort('orderCount')} className="inline-flex items-center gap-1 hover:text-charcoal">
+                                        <button type="button" onClick={() => toggleSort('orderCount')} className="inline-flex items-center gap-1 hover:text-ink">
                                             Orders <ArrowUpDown size={12} />
                                         </button>
                                     </th>
                                     <th className="p-4 font-medium text-admin-muted">
-                                        <button type="button" onClick={() => toggleSort('totalSpent')} className="inline-flex items-center gap-1 hover:text-charcoal">
+                                        <button type="button" onClick={() => toggleSort('totalSpent')} className="inline-flex items-center gap-1 hover:text-ink">
                                             Spent <ArrowUpDown size={12} />
                                         </button>
                                     </th>
                                     <th className="p-4 font-medium text-admin-muted">
-                                        <button type="button" onClick={() => toggleSort('createdAt')} className="inline-flex items-center gap-1 hover:text-charcoal">
+                                        <button type="button" onClick={() => toggleSort('createdAt')} className="inline-flex items-center gap-1 hover:text-ink">
                                             Joined <ArrowUpDown size={12} />
                                         </button>
                                     </th>
@@ -548,7 +548,7 @@ export default function AdminUsersPage() {
                                                     </div>
                                                 )}
                                                 <div>
-                                                    <p className="font-medium text-charcoal">{user.name || '—'}</p>
+                                                    <p className="font-medium text-ink">{user.name || '—'}</p>
                                                     <div className="flex flex-wrap gap-1 mt-0.5">
                                                         {user.isGuest && (
                                                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-800">Guest</span>
@@ -561,13 +561,13 @@ export default function AdminUsersPage() {
                                             </div>
                                         </td>
                                         <td className="p-4">
-                                            <p className="text-charcoal flex items-center gap-1 truncate max-w-[12rem]">
+                                            <p className="text-ink flex items-center gap-1 truncate max-w-[12rem]">
                                                 <Mail size={12} className="text-admin-muted/80 flex-shrink-0" />
                                                 {user.email}
                                             </p>
                                         </td>
                                         <td className="p-4">
-                                            <p className="text-charcoal flex items-center gap-1">
+                                            <p className="text-ink flex items-center gap-1">
                                                 <Phone size={12} className="text-admin-muted/80" />
                                                 {user.phone || '—'}
                                             </p>
@@ -588,7 +588,7 @@ export default function AdminUsersPage() {
                                             <button
                                                 type="button"
                                                 onClick={(e) => { e.stopPropagation(); openUserDetail(user); }}
-                                                className="text-wine hover:text-wine-light text-xs font-medium inline-flex items-center gap-0.5"
+                                                className="text-forest hover:text-forest-light text-xs font-medium inline-flex items-center gap-0.5"
                                             >
                                                 View <ChevronRight size={14} />
                                             </button>
@@ -601,7 +601,7 @@ export default function AdminUsersPage() {
                         {users.length === 0 && !error && (
                             <div className="text-center py-16">
                                 <User size={36} className="text-admin-muted/50 mx-auto mb-4" />
-                                <p className="text-charcoal font-medium mb-1">No users found</p>
+                                <p className="text-ink font-medium mb-1">No users found</p>
                                 <p className="text-admin-muted text-sm">
                                     {hasActiveFilters ? 'Try adjusting your filters.' : 'Users appear here after Google sign-in.'}
                                 </p>
@@ -626,7 +626,7 @@ export default function AdminUsersPage() {
             >
                 {detailLoading ? (
                     <div className="flex items-center justify-center py-20">
-                        <div className="w-8 h-8 border-2 border-wine/30 border-t-wine rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
                     </div>
                 ) : selectedOrder ? (
                     <OrderDetailView order={selectedOrder} onBack={() => setSelectedOrder(null)} />
@@ -651,7 +651,7 @@ export default function AdminUsersPage() {
                                             maxLength={10}
                                         />
                                         <Button
-                                            variant="gold"
+                                            variant="turmeric"
                                             size="sm"
                                             className="shrink-0"
                                             onClick={savePhone}

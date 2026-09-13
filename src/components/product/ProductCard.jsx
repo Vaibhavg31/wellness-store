@@ -67,7 +67,7 @@ function ProductCard({ product, compact = false, index = 0 }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(index * 0.04, 0.32), duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
-                <div className="relative overflow-hidden bg-warm-beige/60 rounded-lg border border-border/40 mb-2 transition-all duration-300 group-hover:border-wine/25 group-hover:shadow-md">
+                <div className="relative overflow-hidden bg-sand/60 rounded-lg border border-border/40 mb-2 transition-all duration-300 group-hover:border-forest/25 group-hover:shadow-md">
                     {badges[0] && (
                         <div className="absolute top-1.5 left-1.5 z-10">
                             <Badge variant={badges[0].variant} className="!text-[8px] !px-1.5 !py-0.5 scale-90 origin-top-left">
@@ -81,7 +81,7 @@ function ProductCard({ product, compact = false, index = 0 }) {
                         onClick={handleWishlist}
                         animate={heartPulse ? { scale: [1, 1.25, 1] } : { scale: 1 }}
                         transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        className={`absolute top-1.5 right-1.5 z-10 p-1.5 rounded-full bg-ivory/90 shadow-sm transition-colors ${wished ? 'text-wine' : 'text-soft-brown/70 hover:text-wine'}`}
+                        className={`absolute top-1.5 right-1.5 z-10 p-1.5 rounded-full bg-cream/90 shadow-sm transition-colors ${wished ? 'text-forest' : 'text-slate/70 hover:text-forest'}`}
                         aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
                     >
                         <Heart size={11} strokeWidth={1.5} fill={wished ? 'currentColor' : 'none'} />
@@ -102,8 +102,8 @@ function ProductCard({ product, compact = false, index = 0 }) {
                     </Link>
 
                     {outOfStock && (
-                        <div className="absolute inset-0 bg-charcoal/30 flex items-center justify-center">
-                            <span className="type-eyebrow-sm bg-ivory px-2 py-1 rounded-full text-charcoal">Sold Out</span>
+                        <div className="absolute inset-0 bg-ink/30 flex items-center justify-center">
+                            <span className="type-eyebrow-sm bg-cream px-2 py-1 rounded-full text-ink">Sold Out</span>
                         </div>
                     )}
 
@@ -112,7 +112,7 @@ function ProductCard({ product, compact = false, index = 0 }) {
                         onClick={handleAdd}
                         disabled={outOfStock || justAdded}
                         className={`absolute bottom-1.5 right-1.5 z-10 p-2 rounded-full shadow-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 disabled:opacity-50 ${
-                            justAdded ? 'bg-emerald text-ivory' : 'bg-wine text-ivory hover:bg-wine-light'
+                            justAdded ? 'bg-emerald text-cream' : 'bg-forest text-cream hover:bg-forest-light'
                         }`}
                         aria-label="Add to bag"
                     >
@@ -122,20 +122,20 @@ function ProductCard({ product, compact = false, index = 0 }) {
 
                 <div className="px-0.5 space-y-0.5 flex-1">
                     <Link to={`/product/${product.id}`}>
-                        <h3 className="text-xs sm:text-sm text-charcoal leading-snug line-clamp-2 group-hover:text-wine transition-colors font-normal">
+                        <h3 className="text-xs sm:text-sm text-ink leading-snug line-clamp-2 group-hover:text-forest transition-colors font-normal">
                             {product.title}
                         </h3>
                     </Link>
                     {product.reviewCount > 0 && (
                         <div className="flex items-center gap-1">
-                            <Star size={9} className="text-gold fill-gold flex-shrink-0" strokeWidth={0} />
-                            <span className="text-xs text-soft-brown">{product.rating}</span>
+                            <Star size={9} className="text-turmeric fill-turmeric flex-shrink-0" strokeWidth={0} />
+                            <span className="text-xs text-slate">{product.rating}</span>
                         </div>
                     )}
                     <div className="flex items-baseline gap-1.5 pt-0.5">
-                        <span className="text-xs sm:text-sm font-medium text-charcoal">{formatPrice(product.price)}</span>
+                        <span className="text-xs sm:text-sm font-medium text-ink">{formatPrice(product.price)}</span>
                         {product.originalPrice > product.price && (
-                            <span className="text-xs text-soft-brown/45 line-through">{formatPrice(product.originalPrice)}</span>
+                            <span className="text-xs text-slate/45 line-through">{formatPrice(product.originalPrice)}</span>
                         )}
                     </div>
                 </div>
@@ -151,7 +151,7 @@ function ProductCard({ product, compact = false, index = 0 }) {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-            <div className="relative overflow-hidden bg-warm-beige rounded-xl sm:rounded-2xl border border-border/30 mb-3 sm:mb-4 transition-all duration-500 group-hover:border-wine/20 group-hover:luxury-shadow-hover">
+            <div className="relative overflow-hidden bg-sand rounded-xl sm:rounded-2xl border border-border/30 mb-3 sm:mb-4 transition-all duration-500 group-hover:border-forest/20 group-hover:soft-shadow-hover">
                 <div className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 z-10 flex flex-col gap-1.5 sm:gap-2">
                     {badges.slice(0, 2).map((badge) => (
                         <Badge key={badge.label} variant={badge.variant}>{badge.label}</Badge>
@@ -164,7 +164,7 @@ function ProductCard({ product, compact = false, index = 0 }) {
                         onClick={handleWishlist}
                         animate={heartPulse ? { scale: [1, 1.2, 1] } : { scale: 1 }}
                         transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        className={`p-2 sm:p-2.5 rounded-full bg-ivory/95 shadow-sm backdrop-blur-sm transition-colors ${wished ? 'text-wine' : 'text-soft-brown hover:text-wine'}`}
+                        className={`p-2 sm:p-2.5 rounded-full bg-cream/95 shadow-sm backdrop-blur-sm transition-colors ${wished ? 'text-forest' : 'text-slate hover:text-forest'}`}
                         aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
                     >
                         <Heart size={14} strokeWidth={1.25} fill={wished ? 'currentColor' : 'none'} />
@@ -186,8 +186,8 @@ function ProductCard({ product, compact = false, index = 0 }) {
                 </Link>
 
                 {outOfStock && (
-                    <div className="absolute inset-0 bg-charcoal/35 flex items-center justify-center pointer-events-none">
-                        <span className="px-3 py-1.5 rounded-full bg-ivory type-eyebrow-sm text-charcoal">Sold Out</span>
+                    <div className="absolute inset-0 bg-ink/35 flex items-center justify-center pointer-events-none">
+                        <span className="px-3 py-1.5 rounded-full bg-cream type-eyebrow-sm text-ink">Sold Out</span>
                     </div>
                 )}
 
@@ -198,8 +198,8 @@ function ProductCard({ product, compact = false, index = 0 }) {
                         disabled={outOfStock || justAdded}
                         className={`w-full flex items-center justify-center gap-1.5 py-2.5 rounded-full type-eyebrow-sm font-medium transition-colors disabled:opacity-60 shadow-lg ${
                             justAdded
-                                ? 'bg-emerald text-ivory shadow-emerald/20'
-                                : 'bg-wine text-ivory hover:bg-wine-light shadow-wine/20'
+                                ? 'bg-emerald text-cream shadow-emerald/20'
+                                : 'bg-forest text-cream hover:bg-forest-light shadow-forest/20'
                         }`}
                     >
                         <AnimatePresence mode="wait">
@@ -219,22 +219,22 @@ function ProductCard({ product, compact = false, index = 0 }) {
             </div>
 
             <div className="space-y-1 px-0.5 flex-1 flex flex-col">
-                <p className="type-eyebrow-sm text-wine/65 capitalize">{product.category}</p>
+                <p className="type-eyebrow-sm text-forest/65 capitalize">{product.category}</p>
                 <Link to={`/product/${product.id}`}>
-                    <h3 className="font-serif text-[15px] sm:text-lg font-light text-charcoal hover:text-wine transition-colors line-clamp-2 leading-snug">
+                    <h3 className="font-display text-[15px] sm:text-lg font-light text-ink hover:text-forest transition-colors line-clamp-2 leading-snug">
                         {product.title}
                     </h3>
                 </Link>
                 {product.reviewCount > 0 && (
                     <div className="flex items-center gap-1">
-                        <Star size={10} className="text-gold fill-gold" strokeWidth={0} />
-                        <span className="text-xs text-soft-brown">{product.rating} · {product.reviewCount}</span>
+                        <Star size={10} className="text-turmeric fill-turmeric" strokeWidth={0} />
+                        <span className="text-xs text-slate">{product.rating} · {product.reviewCount}</span>
                     </div>
                 )}
                 <div className="flex items-baseline gap-2 pt-0.5 mt-auto">
-                    <span className="font-serif text-base sm:text-lg text-charcoal">{formatPrice(product.price)}</span>
+                    <span className="font-display text-base sm:text-lg text-ink">{formatPrice(product.price)}</span>
                     {product.originalPrice > product.price && (
-                        <span className="text-xs text-soft-brown/50 line-through">{formatPrice(product.originalPrice)}</span>
+                        <span className="text-xs text-slate/50 line-through">{formatPrice(product.originalPrice)}</span>
                     )}
                 </div>
             </div>

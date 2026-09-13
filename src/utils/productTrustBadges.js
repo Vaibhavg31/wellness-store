@@ -1,4 +1,4 @@
-import { Shield, Truck, RotateCcw, Sparkles, Sun, Droplet, BadgeCheck, HeartPulse, Ban } from 'lucide-react';
+import { Shield, Truck, RotateCcw, Sparkles, Leaf, Wheat, Droplet, BadgeCheck } from 'lucide-react';
 import { FREE_DELIVERY_THRESHOLD } from '@/constants';
 
 /**
@@ -12,13 +12,12 @@ import { FREE_DELIVERY_THRESHOLD } from '@/constants';
  * every other badge here. Nothing is added automatically.
  */
 export const BADGE_ICONS = {
-    'Anti-Tarnish': Shield,
-    'Long-Lasting Shine': Sparkles,
-    'Everyday Wearable': Sun,
-    'Waterproof': Droplet,
-    '316L Surgical Steel': BadgeCheck,
-    'Hypoallergenic': HeartPulse,
-    'Nickel-Free': Ban,
+    'FSSAI Certified': Shield,
+    'Lab Tested': Sparkles,
+    '100% Vegetarian': Leaf,
+    'Gluten-Free': Wheat,
+    'No Added Sugar': Droplet,
+    'GMP Certified': BadgeCheck,
     'Free Delivery': Truck,
     'Fast Returns': RotateCcw,
 };

@@ -88,7 +88,7 @@ export default function AdminFeedbackPage() {
                 columns={3}
                 stats={[
                     { label: 'Total messages', value: feedback.length },
-                    { label: 'Unread', value: unreadCount, color: 'text-gold-ink', sub: unreadCount > 0 ? 'Needs attention' : undefined },
+                    { label: 'Unread', value: unreadCount, color: 'text-turmeric-ink', sub: unreadCount > 0 ? 'Needs attention' : undefined },
                     { label: 'Read', value: readCount, color: 'text-emerald' },
                 ]}
             />
@@ -144,10 +144,10 @@ export default function AdminFeedbackPage() {
                                 {filteredFeedback.map((item) => (
                                     <tr
                                         key={item.id}
-                                        className={`border-b border-admin-border-light hover:bg-admin-surface-alt/60 ${!item.isRead ? 'bg-gold/5' : ''}`}
+                                        className={`border-b border-admin-border-light hover:bg-admin-surface-alt/60 ${!item.isRead ? 'bg-turmeric/5' : ''}`}
                                     >
                                         <td className="p-4 align-top">
-                                            <p className="font-medium text-charcoal">{item.name}</p>
+                                            <p className="font-medium text-ink">{item.name}</p>
                                             <p className="text-xs text-admin-muted flex items-center gap-1 mt-1 break-all">
                                                 <Mail size={11} className="flex-shrink-0" />
                                                 {item.email}
@@ -157,7 +157,7 @@ export default function AdminFeedbackPage() {
                                             )}
                                         </td>
                                         <td className="p-4 align-top">
-                                            <p className="text-charcoal leading-relaxed line-clamp-4">{item.message}</p>
+                                            <p className="text-ink leading-relaxed line-clamp-4">{item.message}</p>
                                         </td>
                                         <td className="p-4 align-top text-xs text-admin-muted">
                                             {new Date(item.createdAt).toLocaleString('en-IN', {

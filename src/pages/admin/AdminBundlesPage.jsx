@@ -199,7 +199,7 @@ export default function AdminBundlesPage() {
             <AdminPageHeader
                 title="Bundles"
                 subtitle="Group products together at a discount — shown on the product page and homepage"
-                actions={<Button variant="gold" onClick={openNew}><Plus size={16} /> New Bundle</Button>}
+                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> New Bundle</Button>}
             />
 
             <AdminSummaryGrid
@@ -207,7 +207,7 @@ export default function AdminBundlesPage() {
                 stats={[
                     { label: 'Total bundles', value: bundles.length },
                     { label: 'Published', value: publishedCount, color: 'text-emerald' },
-                    { label: 'Combined savings offered', value: formatPrice(totalSavingsOffered), color: 'text-gold-ink' },
+                    { label: 'Combined savings offered', value: formatPrice(totalSavingsOffered), color: 'text-turmeric-ink' },
                 ]}
             />
 
@@ -240,7 +240,7 @@ export default function AdminBundlesPage() {
                                 {filteredBundles.map((bundle) => (
                                     <tr key={bundle.id} className="border-b border-admin-border-light hover:bg-admin-surface-alt/60">
                                         <td className="p-4 align-top">
-                                            <p className="text-charcoal font-medium">{bundle.title}</p>
+                                            <p className="text-ink font-medium">{bundle.title}</p>
                                             {bundle.subtitle && <p className="text-xs text-admin-muted mt-0.5">{bundle.subtitle}</p>}
                                         </td>
                                         <td className="p-4 align-top">
@@ -258,7 +258,7 @@ export default function AdminBundlesPage() {
                                             <p className="text-xs text-admin-muted mt-1.5">{bundle.items.length} products</p>
                                         </td>
                                         <td className="p-4 align-top">
-                                            <p className="font-serif text-base text-charcoal">{formatPrice(bundle.pricing.bundlePrice)}</p>
+                                            <p className="font-display text-base text-ink">{formatPrice(bundle.pricing.bundlePrice)}</p>
                                             {bundle.pricing.discountAmount > 0 && (
                                                 <p className="text-xs text-admin-muted">
                                                     <span className="line-through">{formatPrice(bundle.pricing.subtotal)}</span>
@@ -313,7 +313,7 @@ export default function AdminBundlesPage() {
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                             rows={2}
-                            className="w-full px-4 py-3 border border-warm-beige/60 rounded-lg text-sm"
+                            className="w-full px-4 py-3 border border-sand/60 rounded-lg text-sm"
                             placeholder="Shown under the bundle title"
                         />
                     </div>
@@ -356,7 +356,7 @@ export default function AdminBundlesPage() {
                         <button
                             type="button"
                             onClick={addItem}
-                            className="mt-2 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-wine bg-wine/5 hover:bg-wine/10 border border-wine/20"
+                            className="mt-2 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20"
                         >
                             <Plus size={14} /> Add product
                         </button>
@@ -392,7 +392,7 @@ export default function AdminBundlesPage() {
                             <span className="text-admin-muted">Customer sees</span>
                             <div className="flex items-center gap-3">
                                 <span className="text-admin-muted/80 line-through">{formatPrice(preview.subtotal)}</span>
-                                <span className="font-semibold text-charcoal">{formatPrice(bundlePrice)}</span>
+                                <span className="font-semibold text-ink">{formatPrice(bundlePrice)}</span>
                                 {discountAmount > 0 && (
                                     <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald/10 text-emerald border border-emerald/20">
                                         Save {formatPrice(discountAmount)}
@@ -407,8 +407,8 @@ export default function AdminBundlesPage() {
                         Published (visible to customers)
                     </label>
 
-                    <div className="sticky bottom-0 pt-4 pb-2 bg-ivory border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
-                        <Button variant="gold" className="w-full" onClick={handleSave} disabled={saving}>
+                    <div className="sticky bottom-0 pt-4 pb-2 bg-cream border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
+                        <Button variant="turmeric" className="w-full" onClick={handleSave} disabled={saving}>
                             {saving ? 'Saving…' : editing ? 'Update Bundle' : 'Create Bundle'}
                         </Button>
                     </div>

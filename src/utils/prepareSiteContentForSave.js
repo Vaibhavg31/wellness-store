@@ -17,7 +17,7 @@ export function prepareSiteContentForSave(content) {
 
     const hero = {
         ...content.hero,
-        orbitProductIds: (content.hero?.orbitProductIds ?? []).filter(Boolean),
+        productImageIds: (content.hero?.productImageIds ?? []).filter(Boolean),
     };
 
     return {

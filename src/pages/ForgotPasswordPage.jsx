@@ -30,24 +30,24 @@ export default function ForgotPasswordPage() {
         <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-cream">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
                 <Logo size="md" showHover className="mx-auto mb-8" />
-                <h1 className="font-serif text-3xl text-charcoal text-center mb-2">Forgot password</h1>
-                <p className="text-soft-brown text-sm text-center mb-8">
+                <h1 className="font-display text-3xl text-ink text-center mb-2">Forgot password</h1>
+                <p className="text-slate text-sm text-center mb-8">
                     Enter your email and we&apos;ll send a secure reset link if an account exists.
                 </p>
 
                 {sent ? (
-                    <div className="p-5 rounded-2xl bg-wine/5 border border-wine/15 text-center">
-                        <p className="text-charcoal mb-4">Check your inbox for a reset link. It expires in 1 hour.</p>
-                        <Link to="/login" className="text-wine hover:text-wine-light text-sm">Back to sign in</Link>
+                    <div className="p-5 rounded-2xl bg-forest/5 border border-forest/15 text-center">
+                        <p className="text-ink mb-4">Check your inbox for a reset link. It expires in 1 hour.</p>
+                        <Link to="/login" className="text-forest hover:text-forest-light text-sm">Back to sign in</Link>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
                         {error && <p className="text-sm text-red-600 text-center" role="alert">{error}</p>}
-                        <Button variant="gold" size="lg" className="w-full" type="submit" disabled={loading}>
+                        <Button variant="turmeric" size="lg" className="w-full" type="submit" disabled={loading}>
                             {loading ? 'Sending…' : 'Send reset link'}
                         </Button>
-                        <Link to="/login" className="block text-center text-sm text-soft-brown hover:text-wine">← Back to sign in</Link>
+                        <Link to="/login" className="block text-center text-sm text-slate hover:text-forest">← Back to sign in</Link>
                     </form>
                 )}
             </motion.div>

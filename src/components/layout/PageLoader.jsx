@@ -21,15 +21,15 @@ export default function PageLoader({ message = 'Loading...' }) {
         className="flex flex-col items-center"
       >
         <Logo size="lg" showHover={false} />
-        <p className="mt-6 font-serif text-sm tracking-[0.25em] uppercase text-emerald/80">
+        <p className="mt-6 font-display text-sm tracking-[0.25em] uppercase text-emerald/80">
           {message}
         </p>
-        <p className="mt-2 text-xs text-soft-brown tracking-wide">{BRAND_TAGLINE}</p>
+        <p className="mt-2 text-xs text-slate tracking-wide">{BRAND_TAGLINE}</p>
       </motion.div>
 
       <div className="mt-10 w-48 h-px bg-border overflow-hidden rounded-full">
         <motion.div
-          className="h-full bg-gradient-to-r from-emerald via-gold to-emerald"
+          className="h-full bg-gradient-to-r from-emerald via-turmeric to-emerald"
           initial={{ x: '-100%' }}
           animate={{ x: '100%' }}
           transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
@@ -40,7 +40,7 @@ export default function PageLoader({ message = 'Loading...' }) {
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}
-            className="w-1.5 h-1.5 rounded-full bg-gold"
+            className="w-1.5 h-1.5 rounded-full bg-turmeric"
             animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.1, 0.8] }}
             transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
           />

@@ -313,7 +313,7 @@ final class AuthRoutes
             Response::json([
                 'role'     => 'admin',
                 'token'    => $token,
-                'redirect' => $_ENV['ADMIN_PATH'] ?? '/krivea-studio',
+                'redirect' => $_ENV['ADMIN_PATH'] ?? '/wellness-studio',
                 'user'     => ['email' => $email],
             ]);
         }
@@ -614,7 +614,7 @@ final class AuthRoutes
                 Response::json([
                     'role'     => 'admin',
                     'token'    => $token,
-                    'redirect' => $_ENV['ADMIN_PATH'] ?? '/krivea-studio',
+                    'redirect' => $_ENV['ADMIN_PATH'] ?? '/wellness-studio',
                     'user'     => ['email' => $email, 'name' => $name, 'avatar' => $avatar],
                 ]);
             }
@@ -682,7 +682,7 @@ final class AuthRoutes
             Response::error('Too many login attempts. Try again later.', 429);
         }
 
-        $adminUser     = $_ENV['ADMIN_USERNAME'] ?? 'krivea_admin';
+        $adminUser     = $_ENV['ADMIN_USERNAME'] ?? 'wellness_admin';
         $adminPassHash = $_ENV['ADMIN_PASSWORD_HASH'] ?? null;
 
         $validUser = hash_equals($adminUser, $username);

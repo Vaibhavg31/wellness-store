@@ -15,7 +15,7 @@ export const FALLBACK_PRODUCTS = [
         stock: 24,
         images: [
             'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=900&q=85',
-            'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=900&q=85',
+            'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=900&q=85',
         ],
         isNew: true,
         isBestSeller: true,
@@ -55,7 +55,7 @@ export const FALLBACK_PRODUCTS = [
         features: ['Ayurvedic', 'GMP Certified'],
         stock: 30,
         images: [
-            'https://images.unsplash.com/photo-1611072965169-4b53fe4c574f?w=900&q=85',
+            'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=900&q=85',
         ],
         isNew: true,
         isBestSeller: false,
@@ -95,7 +95,7 @@ export const FALLBACK_PRODUCTS = [
         features: ['Vegan', 'Lab Tested'],
         stock: 15,
         images: [
-            'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=900&q=85',
+            'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=900&q=85',
         ],
         isNew: true,
         isBestSeller: false,
@@ -135,7 +135,7 @@ export const FALLBACK_PRODUCTS = [
         features: ['Ayurvedic', 'Lab Tested'],
         stock: 40,
         images: [
-            'https://images.unsplash.com/photo-1611072965169-4b53fe4c574f?w=900&q=85',
+            'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=900&q=85',
         ],
         isNew: false,
         isBestSeller: false,
@@ -163,17 +163,11 @@ export const FALLBACK_PRODUCTS = [
     },
 ];
 
-/** Hero stage — high-res wellness/nutrition stills for the cinematic carousel. */
-export const HERO_JEWELRY_IMAGES = [
+/** Hero stage — high-res real product/lifestyle stills for the photography carousel. */
+export const HERO_PRODUCT_IMAGES = [
     'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=1200&q=90',
     'https://images.unsplash.com/photo-1550572017-edd951b55104?w=1200&q=90',
-    'https://images.unsplash.com/photo-1611072965169-4b53fe4c574f?w=1200&q=90',
+    'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=1200&q=90',
     'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=1200&q=90',
-    'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=1200&q=90',
+    'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=1200&q=90',
 ];
-
-/** Subtle looping background video for the hero. */
-export const HERO_VIDEO_URL = '';
-
-export const HERO_VIDEO_POSTER =
-    'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=1600&q=85';

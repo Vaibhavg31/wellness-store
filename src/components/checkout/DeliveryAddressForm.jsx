@@ -64,8 +64,8 @@ export default function DeliveryAddressForm({ value, onChange, errors = {}, comp
         : undefined;
 
     const labelClass = compact
-        ? 'block text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-soft-brown mb-1.5 sm:mb-2 font-medium'
-        : 'block text-xs tracking-[0.15em] uppercase text-soft-brown mb-2 font-medium';
+        ? 'block text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-slate mb-1.5 sm:mb-2 font-medium'
+        : 'block text-xs tracking-[0.15em] uppercase text-slate mb-2 font-medium';
 
     return (
         <div className={compact ? 'space-y-3 sm:space-y-4' : 'space-y-4'}>
@@ -78,7 +78,7 @@ export default function DeliveryAddressForm({ value, onChange, errors = {}, comp
                     onChange={(e) => update({ address: e.target.value })}
                     rows={compact ? 2 : 3}
                     required
-                    className={`w-full bg-ivory/60 border focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/20 transition-all duration-300 resize-none text-dark-chocolate placeholder:text-soft-brown/45 font-light ${
+                    className={`w-full bg-cream/60 border focus:outline-none focus:border-turmeric focus:ring-1 focus:ring-turmeric/20 transition-all duration-300 resize-none text-ink placeholder:text-slate/45 font-light ${
                         compact
                             ? 'px-4 py-3 text-sm rounded-xl sm:px-5 sm:py-3.5 sm:text-base sm:rounded-2xl'
                             : 'px-5 py-3.5 rounded-2xl'
@@ -157,9 +157,9 @@ export default function DeliveryAddressForm({ value, onChange, errors = {}, comp
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="mt-1.5 text-xs text-soft-brown flex items-center gap-1.5"
+                            className="mt-1.5 text-xs text-slate flex items-center gap-1.5"
                         >
-                            <Loader2 size={12} className="animate-spin text-wine" />
+                            <Loader2 size={12} className="animate-spin text-forest" />
                             Looking up city & state…
                         </motion.p>
                     )}
@@ -190,7 +190,7 @@ export default function DeliveryAddressForm({ value, onChange, errors = {}, comp
                         </motion.p>
                     )}
                 </AnimatePresence>
-                <p className="mt-1.5 text-[11px] text-soft-brown/80 leading-relaxed">
+                <p className="mt-1.5 text-[11px] text-slate/80 leading-relaxed">
                     {compact
                         ? 'Enter PIN last to auto-fill city & state.'
                         : 'Enter PIN last. We\'ll auto-fill city and state when possible.'}
@@ -201,12 +201,12 @@ export default function DeliveryAddressForm({ value, onChange, errors = {}, comp
                 <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start gap-2.5 p-3.5 sm:p-4 rounded-xl bg-wine/5 border border-wine/10"
+                    className="flex items-start gap-2.5 p-3.5 sm:p-4 rounded-xl bg-forest/5 border border-forest/10"
                 >
-                    <MapPin size={14} className="text-wine mt-0.5 flex-shrink-0" />
+                    <MapPin size={14} className="text-forest mt-0.5 flex-shrink-0" />
                     <div className="min-w-0 flex-1">
-                        <p className="text-[10px] tracking-[0.12em] sm:tracking-[0.15em] uppercase text-wine/70 mb-1">Delivery preview</p>
-                        <p className="text-xs sm:text-sm text-charcoal leading-relaxed break-words whitespace-pre-line">{preview}</p>
+                        <p className="text-[10px] tracking-[0.12em] sm:tracking-[0.15em] uppercase text-forest/70 mb-1">Delivery preview</p>
+                        <p className="text-xs sm:text-sm text-ink leading-relaxed break-words whitespace-pre-line">{preview}</p>
                     </div>
                 </motion.div>
             )}

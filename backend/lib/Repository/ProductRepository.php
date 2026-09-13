@@ -440,20 +440,7 @@ final class ProductRepository extends MysqlRepository
         $stmt = $this->pdo()->prepare('SELECT * FROM products WHERE id = ? AND is_published = 1 LIMIT 1');
         $stmt->execute([$id]);
         $row = $stmt->fetch();
-        if ($row) {
-            return $this->rowToArray($row);
-        }
-
-        // Legacy rims-* → krivea-*
-        if (str_starts_with($id, 'rims-')) {
-            $newId = 'krivea-' . substr($id, 5);
-            $stmt->execute([$newId]);
-            $row = $stmt->fetch();
-            if ($row) {
-                return $this->rowToArray($row);
-            }
-        }
-        return null;
+        return $row ? $this->rowToArray($row) : null;
     }
 
     /**

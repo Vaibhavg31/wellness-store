@@ -88,18 +88,18 @@ export default function VerifyEmailPage() {
 
                 {status === 'loading' && (
                     <>
-                        <h1 className="font-serif text-3xl text-charcoal mb-3">Verifying your email…</h1>
-                        <p className="text-soft-brown text-sm">Please wait a moment.</p>
+                        <h1 className="font-display text-3xl text-ink mb-3">Verifying your email…</h1>
+                        <p className="text-slate text-sm">Please wait a moment.</p>
                     </>
                 )}
 
                 {status === 'success' && (
                     <>
                         <CheckCircle size={48} className="text-emerald mx-auto mb-4" />
-                        <h1 className="font-serif text-3xl text-charcoal mb-3">You&apos;re signed in</h1>
-                        <p className="text-soft-brown text-sm mb-8">{message}</p>
+                        <h1 className="font-display text-3xl text-ink mb-3">You&apos;re signed in</h1>
+                        <p className="text-slate text-sm mb-8">{message}</p>
                         <Button
-                            variant="gold"
+                            variant="turmeric"
                             size="lg"
                             className="w-full"
                             type="button"
@@ -112,11 +112,11 @@ export default function VerifyEmailPage() {
 
                 {(status === 'error' || status === 'invalid') && (
                     <>
-                        <XCircle size={48} className="text-wine mx-auto mb-4" />
-                        <h1 className="font-serif text-3xl text-charcoal mb-3">
+                        <XCircle size={48} className="text-forest mx-auto mb-4" />
+                        <h1 className="font-display text-3xl text-ink mb-3">
                             {status === 'invalid' ? 'Invalid link' : 'Verification failed'}
                         </h1>
-                        <p className="text-soft-brown text-sm mb-8">
+                        <p className="text-slate text-sm mb-8">
                             {status === 'invalid'
                                 ? 'This verification link is missing required information.'
                                 : message}
@@ -126,9 +126,9 @@ export default function VerifyEmailPage() {
                                 to={`/verify-email-pending?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(redirectTo)}`}
                                 className="block"
                             >
-                                <Button variant="gold" size="lg" className="w-full">Request a new link</Button>
+                                <Button variant="turmeric" size="lg" className="w-full">Request a new link</Button>
                             </Link>
-                            <Link to="/login" className="block text-sm text-wine hover:text-wine-light">
+                            <Link to="/login" className="block text-sm text-forest hover:text-forest-light">
                                 Back to sign in
                             </Link>
                         </div>

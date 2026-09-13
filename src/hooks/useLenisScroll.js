@@ -6,9 +6,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 // Module-level singleton, ref-counted across every consumer. Each
-// scroll-story section on the homepage (DayInHerSparkle, WellnessJourney,
-// BodyMap, SourceTrail) used to call `new Lenis()` independently — with
-// several of them mounted at once, that meant multiple Lenis instances all
+// scroll-story section on the homepage (WellnessJourney, BodyMap,
+// SourceTrail) used to call `new Lenis()` independently — with several of
+// them mounted at once, that meant multiple Lenis instances all
 // virtualizing the *same* native scroll simultaneously, each computing its
 // own (different) smoothed position and each driving ScrollTrigger.update
 // on its own tick. The result: compounding scroll deltas, wrong effective

@@ -31,14 +31,14 @@ function OrderCard({ order, index }) {
         >
             <Link
                 to={`/orders/${order.id}`}
-                className="group block bg-ivory rounded-2xl border border-border/40 overflow-hidden hover:border-wine/20 hover:luxury-shadow-hover transition-all duration-300"
+                className="group block bg-cream rounded-2xl border border-border/40 overflow-hidden hover:border-forest/20 hover:soft-shadow-hover transition-all duration-300"
             >
                 <div className="p-5 sm:p-6">
                     <div className="flex items-start justify-between gap-4 mb-4">
                         <div>
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-soft-brown mb-1">Order</p>
-                            <p className="font-mono text-sm text-charcoal">{shortOrderId(order.id)}</p>
-                            <p className="text-xs text-soft-brown mt-1">{formatOrderDate(order.createdAt)}</p>
+                            <p className="text-[10px] uppercase tracking-[0.2em] text-slate mb-1">Order</p>
+                            <p className="font-mono text-sm text-ink">{shortOrderId(order.id)}</p>
+                            <p className="text-xs text-slate mt-1">{formatOrderDate(order.createdAt)}</p>
                         </div>
                         <OrderStatusBadge status={order.status} audience="user" />
                     </div>
@@ -49,25 +49,25 @@ function OrderCard({ order, index }) {
                                 <img
                                     src={imageUrl(firstItem.image)}
                                     alt=""
-                                    className="w-16 h-20 object-cover rounded-xl bg-warm-beige"
+                                    className="w-16 h-20 object-cover rounded-xl bg-sand"
                                 />
                                 {itemCount > 1 && (
-                                    <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-wine text-ivory text-[10px] flex items-center justify-center font-medium">
+                                    <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-forest text-cream text-[10px] flex items-center justify-center font-medium">
                                         +{itemCount - 1}
                                     </span>
                                 )}
                             </div>
                         )}
                         <div className="flex-1 min-w-0">
-                            <p className="text-charcoal font-medium line-clamp-2 group-hover:text-wine transition-colors">
+                            <p className="text-ink font-medium line-clamp-2 group-hover:text-forest transition-colors">
                                 {firstItem?.title || 'Your order'}
                             </p>
                             {itemCount > 1 && (
-                                <p className="text-xs text-soft-brown mt-1">
+                                <p className="text-xs text-slate mt-1">
                                     + {itemCount - 1} more piece{itemCount - 1 === 1 ? '' : 's'}
                                 </p>
                             )}
-                            <p className="font-serif text-xl text-charcoal mt-2">{formatPrice(order.total)}</p>
+                            <p className="font-display text-xl text-ink mt-2">{formatPrice(order.total)}</p>
                         </div>
                     </div>
 
@@ -78,15 +78,15 @@ function OrderCard({ order, index }) {
                     )}
 
                     <div className="flex items-center justify-between pt-3 border-t border-border/30">
-                        <p className="text-xs text-soft-brown">{paymentLabel(order)}</p>
-                        <span className="inline-flex items-center gap-1 text-sm text-wine font-medium group-hover:gap-2 transition-all">
+                        <p className="text-xs text-slate">{paymentLabel(order)}</p>
+                        <span className="inline-flex items-center gap-1 text-sm text-forest font-medium group-hover:gap-2 transition-all">
                             Track order <ChevronRight size={16} />
                         </span>
                     </div>
                 </div>
 
                 {status === 'delivered' && (
-                    <div className="px-5 py-2.5 bg-gradient-to-r from-gold/10 to-wine/5 border-t border-gold/20 text-xs text-gold-ink flex items-center gap-2">
+                    <div className="px-5 py-2.5 bg-gradient-to-r from-turmeric/10 to-forest/5 border-t border-turmeric/20 text-xs text-turmeric-ink flex items-center gap-2">
                         <Sparkles size={12} />
                         Delivered. We hope you love your pieces
                     </div>
@@ -126,13 +126,13 @@ export default function OrdersPage() {
     if (!isAuthenticated) {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-                <Package size={40} className="text-wine/30 mb-4" />
-                <h1 className="font-serif text-3xl mb-3">Your Orders</h1>
-                <p className="text-soft-brown mb-6 max-w-sm">
+                <Package size={40} className="text-forest/30 mb-4" />
+                <h1 className="font-display text-3xl mb-3">Your Orders</h1>
+                <p className="text-slate mb-6 max-w-sm">
                     Sign in to track your orders from our warehouse to your doorstep.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
-                    <Link to={loginUrl('/orders')}><Button variant="gold">Sign In</Button></Link>
+                    <Link to={loginUrl('/orders')}><Button variant="turmeric">Sign In</Button></Link>
                     <Link to="/shop"><Button variant="outline">Continue Shopping</Button></Link>
                 </div>
             </div>
@@ -143,11 +143,11 @@ export default function OrdersPage() {
         <div className="pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-cream pt-4 sm:pt-8">
             <div className="max-w-3xl mx-auto">
                 <div className="mb-8">
-                    <Link to="/account" className="inline-flex items-center gap-1.5 text-sm text-soft-brown hover:text-wine mb-4 transition-colors">
+                    <Link to="/account" className="inline-flex items-center gap-1.5 text-sm text-slate hover:text-forest mb-4 transition-colors">
                         <ArrowLeft size={16} /> Back to account
                     </Link>
-                    <h1 className="font-serif text-3xl md:text-4xl text-charcoal mb-2">Your Orders</h1>
-                    <p className="text-soft-brown">
+                    <h1 className="font-display text-3xl md:text-4xl text-ink mb-2">Your Orders</h1>
+                    <p className="text-slate">
                         {activeCount > 0
                             ? `${activeCount} order${activeCount === 1 ? '' : 's'} on the way. Follow each journey below`
                             : 'Every piece has a story. Here are yours'}
@@ -168,8 +168,8 @@ export default function OrdersPage() {
                                 onClick={() => setFilter(f.key)}
                                 className={`px-4 py-1.5 rounded-full text-sm transition-colors ${
                                     filter === f.key
-                                        ? 'bg-wine text-ivory'
-                                        : 'bg-ivory border border-border/40 text-soft-brown hover:text-charcoal'
+                                        ? 'bg-forest text-cream'
+                                        : 'bg-cream border border-border/40 text-slate hover:text-ink'
                                 }`}
                             >
                                 {f.label}
@@ -180,21 +180,21 @@ export default function OrdersPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className="w-8 h-8 border-2 border-wine/30 border-t-wine rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="bg-ivory rounded-2xl p-12 text-center border border-border/40">
-                        <Package size={36} className="text-wine/20 mx-auto mb-4" />
-                        <p className="text-charcoal font-medium mb-2">
+                    <div className="bg-cream rounded-2xl p-12 text-center border border-border/40">
+                        <Package size={36} className="text-forest/20 mx-auto mb-4" />
+                        <p className="text-ink font-medium mb-2">
                             {filter === 'all' ? 'No orders yet' : `No ${filter} orders`}
                         </p>
-                        <p className="text-soft-brown text-sm mb-6">
+                        <p className="text-slate text-sm mb-6">
                             {filter === 'all'
                                 ? 'When you place an order, you\'ll see a live journey here.'
                                 : 'Try a different filter to see other orders.'}
                         </p>
                         {filter === 'all' && (
-                            <Link to="/shop"><Button variant="gold">Discover Collection</Button></Link>
+                            <Link to="/shop"><Button variant="turmeric">Discover Collection</Button></Link>
                         )}
                     </div>
                 ) : (

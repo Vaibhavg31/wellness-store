@@ -6,15 +6,15 @@ export default function NotFoundPage() {
       <div className="max-w-md">
         <Logo size="xl" showHover className="mx-auto mb-10"/>
         <p className="text-[10px] tracking-[0.4em] uppercase text-emerald mb-4">404</p>
-        <h1 className="font-serif text-4xl md:text-5xl font-light text-charcoal mb-4">
+        <h1 className="font-display text-4xl md:text-5xl font-light text-ink mb-4">
           Page Not Found
         </h1>
-        <p className="text-soft-brown font-light leading-relaxed mb-10">
+        <p className="text-slate font-light leading-relaxed mb-10">
           The page you&apos;re looking for seems to have wandered off.
           Let us guide you back to our collection.
         </p>
         <Link to="/">
-          <Button variant="gold" size="lg">
+          <Button variant="turmeric" size="lg">
             Return Home
           </Button>
         </Link>

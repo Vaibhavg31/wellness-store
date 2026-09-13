@@ -58,9 +58,9 @@ export default function OrderDetailPage() {
     if (!isAuthenticated) {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-                <Package size={40} className="text-wine/30 mb-4" />
-                <h1 className="font-serif text-3xl mb-3">Sign in to view this order</h1>
-                <Link to={loginUrl(`/orders/${id}`)}><Button variant="gold">Sign In</Button></Link>
+                <Package size={40} className="text-forest/30 mb-4" />
+                <h1 className="font-display text-3xl mb-3">Sign in to view this order</h1>
+                <Link to={loginUrl(`/orders/${id}`)}><Button variant="turmeric">Sign In</Button></Link>
             </div>
         );
     }
@@ -68,7 +68,7 @@ export default function OrderDetailPage() {
     if (loading) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-wine/30 border-t-wine rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
             </div>
         );
     }
@@ -76,9 +76,9 @@ export default function OrderDetailPage() {
     if (error || !order) {
         return (
             <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 text-center">
-                <Package size={40} className="text-soft-brown/30 mb-4" />
-                <h1 className="font-serif text-2xl mb-2">Order not found</h1>
-                <p className="text-soft-brown text-sm mb-6">{error || 'This order may not exist or belongs to another account.'}</p>
+                <Package size={40} className="text-slate/30 mb-4" />
+                <h1 className="font-display text-2xl mb-2">Order not found</h1>
+                <p className="text-slate text-sm mb-6">{error || 'This order may not exist or belongs to another account.'}</p>
                 <Link to="/orders"><Button variant="outline">Back to orders</Button></Link>
             </div>
         );
@@ -91,7 +91,7 @@ export default function OrderDetailPage() {
     return (
         <div className="pb-24 px-4 sm:px-6 lg:px-8 min-h-screen bg-cream">
             <div className="max-w-3xl mx-auto pt-4 sm:pt-8">
-                <Link to="/orders" className="inline-flex items-center gap-1.5 text-sm text-soft-brown hover:text-wine mb-6 transition-colors">
+                <Link to="/orders" className="inline-flex items-center gap-1.5 text-sm text-slate hover:text-forest mb-6 transition-colors">
                     <ArrowLeft size={16} /> All orders
                 </Link>
 
@@ -99,29 +99,29 @@ export default function OrderDetailPage() {
                     <motion.div
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mb-6 rounded-2xl bg-gradient-to-r from-wine/10 via-gold/10 to-blush/20 border border-gold/30 p-5 text-center"
+                        className="mb-6 rounded-2xl bg-gradient-to-r from-forest/10 via-turmeric/10 to-sage-light/40 border border-turmeric/30 p-5 text-center"
                     >
-                        <Sparkles size={24} className="text-gold mx-auto mb-2" />
-                        <p className="font-serif text-xl text-charcoal">Your pieces have arrived</p>
-                        <p className="text-sm text-soft-brown mt-1">Thank you for choosing us. We hope you feel the difference.</p>
+                        <Sparkles size={24} className="text-turmeric mx-auto mb-2" />
+                        <p className="font-display text-xl text-ink">Your order has arrived</p>
+                        <p className="text-sm text-slate mt-1">Thank you for choosing us. We hope you feel the difference.</p>
                     </motion.div>
                 )}
 
                 <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
                     <div>
-                        <p className="text-[10px] uppercase tracking-[0.25em] text-soft-brown mb-1">Order</p>
+                        <p className="text-[10px] uppercase tracking-[0.25em] text-slate mb-1">Order</p>
                         <div className="flex items-center gap-2">
-                            <h1 className="font-mono text-lg text-charcoal">{shortOrderId(order.id)}</h1>
+                            <h1 className="font-mono text-lg text-ink">{shortOrderId(order.id)}</h1>
                             <button
                                 type="button"
                                 onClick={copyOrderId}
-                                className="p-1.5 rounded-lg hover:bg-warm-beige/60 text-soft-brown"
+                                className="p-1.5 rounded-lg hover:bg-sand/60 text-slate"
                                 aria-label="Copy order ID"
                             >
                                 <Copy size={14} />
                             </button>
                         </div>
-                        <p className="text-sm text-soft-brown mt-1">{formatOrderDate(order.createdAt)}</p>
+                        <p className="text-sm text-slate mt-1">{formatOrderDate(order.createdAt)}</p>
                     </div>
                     <OrderStatusBadge status={order.status} audience="user" className="text-sm px-3 py-1" />
                 </div>
@@ -131,11 +131,11 @@ export default function OrderDetailPage() {
                 </div>
 
                 <div className="grid gap-4 mb-8">
-                    <section className="bg-ivory rounded-2xl border border-border/40 p-5 sm:p-6">
-                        <p className="text-xs tracking-[0.2em] uppercase text-soft-brown mb-4">Items</p>
+                    <section className="bg-cream rounded-2xl border border-border/40 p-5 sm:p-6">
+                        <p className="text-xs tracking-[0.2em] uppercase text-slate mb-4">Items</p>
                         <OrderLineItems items={order.items} />
                         <div className="mt-4 pt-4 border-t border-border/30 space-y-2 text-sm">
-                            <div className="flex justify-between text-soft-brown">
+                            <div className="flex justify-between text-slate">
                                 <span>Subtotal</span>
                                 <span>{formatPrice(order.subtotal)}</span>
                             </div>
@@ -148,28 +148,28 @@ export default function OrderDetailPage() {
                                     <span>−{formatPrice(order.discountAmount || 0)}</span>
                                 </div>
                             )}
-                            <div className="flex justify-between text-soft-brown">
+                            <div className="flex justify-between text-slate">
                                 <span>Delivery</span>
                                 <span>{order.deliveryFee > 0 ? formatPrice(order.deliveryFee) : 'Complimentary'}</span>
                             </div>
-                            <div className="flex justify-between font-serif text-xl text-charcoal pt-1">
+                            <div className="flex justify-between font-display text-xl text-ink pt-1">
                                 <span>Total</span>
                                 <span>{formatPrice(order.total)}</span>
                             </div>
-                            <p className="text-xs text-soft-brown pt-1">{paymentLabel(order)}</p>
+                            <p className="text-xs text-slate pt-1">{paymentLabel(order)}</p>
                         </div>
                     </section>
 
-                    <section className="bg-ivory rounded-2xl border border-border/40 p-5 sm:p-6">
-                        <p className="text-xs tracking-[0.2em] uppercase text-soft-brown mb-4 flex items-center gap-2">
+                    <section className="bg-cream rounded-2xl border border-border/40 p-5 sm:p-6">
+                        <p className="text-xs tracking-[0.2em] uppercase text-slate mb-4 flex items-center gap-2">
                             <MapPin size={14} /> Delivery address
                         </p>
-                        <p className="font-medium text-charcoal">{s.name}</p>
-                        <p className="text-sm text-charcoal/80 mt-1 whitespace-pre-line leading-relaxed">
+                        <p className="font-medium text-ink">{s.name}</p>
+                        <p className="text-sm text-ink/80 mt-1 whitespace-pre-line leading-relaxed">
                             {formatIndianAddress(s, { multiline: true }) || '—'}
                         </p>
                         {s.phone && (
-                            <p className="text-sm text-soft-brown mt-3 flex items-center gap-2">
+                            <p className="text-sm text-slate mt-3 flex items-center gap-2">
                                 <Phone size={14} /> {s.phone}
                             </p>
                         )}
@@ -178,7 +178,7 @@ export default function OrderDetailPage() {
 
                 <div className="flex flex-col sm:flex-row gap-3">
                     <Link to="/shop" className="flex-1">
-                        <Button variant="gold" className="w-full">Continue Shopping</Button>
+                        <Button variant="turmeric" className="w-full">Continue Shopping</Button>
                     </Link>
                     <a
                         href={getWhatsAppUrl(`Hi, I have a question about my order ${order.id}`)}

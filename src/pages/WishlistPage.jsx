@@ -40,7 +40,7 @@ function WishlistItem({ product, onRemove, onAddToCart, onMoveToCart }) {
             initial="hidden"
             animate={removing ? 'exit' : 'visible'}
             exit="exit"
-            className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-5 bg-ivory rounded-xl border border-border/40 items-start sm:items-center"
+            className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-5 bg-cream rounded-xl border border-border/40 items-start sm:items-center"
         >
             <Link to={`/product/${product.id}`} className="flex-shrink-0 overflow-hidden rounded-lg">
                 <motion.img
@@ -54,17 +54,17 @@ function WishlistItem({ product, onRemove, onAddToCart, onMoveToCart }) {
 
             <div className="flex-1 min-w-0">
                 <Link to={`/product/${product.id}`}>
-                    <h3 className="font-serif text-lg text-charcoal hover:text-wine transition-colors line-clamp-2">
+                    <h3 className="font-display text-lg text-ink hover:text-forest transition-colors line-clamp-2">
                         {product.title}
                     </h3>
                 </Link>
-                <p className="text-sm text-soft-brown capitalize mt-1">{product.category}</p>
-                <p className="font-serif text-lg text-charcoal mt-2">{formatPrice(product.price)}</p>
+                <p className="text-sm text-slate capitalize mt-1">{product.category}</p>
+                <p className="font-display text-lg text-ink mt-2">{formatPrice(product.price)}</p>
             </div>
 
             <div className="flex flex-wrap gap-2 w-full sm:w-auto items-center">
                 <Button
-                    variant="gold"
+                    variant="turmeric"
                     size="sm"
                     onClick={handleAdd}
                     className="gap-1.5 min-w-[110px] transition-all"
@@ -102,14 +102,14 @@ function WishlistItem({ product, onRemove, onAddToCart, onMoveToCart }) {
                     whileTap={{ scale: 0.88 }}
                     onClick={handleRemove}
                     disabled={removing}
-                    className="p-2.5 rounded-full text-soft-brown hover:text-wine hover:bg-wine/5 transition-colors"
+                    className="p-2.5 rounded-full text-slate hover:text-forest hover:bg-forest/5 transition-colors"
                     aria-label="Remove from wishlist"
                 >
                     <motion.div
                         animate={removing ? { scale: [1, 1.2, 0], opacity: [1, 0.6, 0] } : { scale: 1, opacity: 1 }}
                         transition={{ duration: 0.28 }}
                     >
-                        <Heart size={18} fill="currentColor" className="text-wine" />
+                        <Heart size={18} fill="currentColor" className="text-forest" />
                     </motion.div>
                 </motion.button>
             </div>
@@ -169,15 +169,15 @@ export default function WishlistPage() {
                 transition={{ duration: 0.45 }}
                 className="pb-20 text-center px-6 min-h-[60vh] flex flex-col items-center justify-center"
             >
-                <div className="w-16 h-16 rounded-full bg-wine/5 flex items-center justify-center mb-6">
-                    <Heart size={28} className="text-wine/40" strokeWidth={1} />
+                <div className="w-16 h-16 rounded-full bg-forest/5 flex items-center justify-center mb-6">
+                    <Heart size={28} className="text-forest/40" strokeWidth={1} />
                 </div>
-                <h1 className="font-serif text-3xl font-light mb-4">Your Wishlist is Empty</h1>
-                <p className="text-soft-brown font-light mb-2 max-w-md mx-auto leading-relaxed">
+                <h1 className="font-display text-3xl font-light mb-4">Your Wishlist is Empty</h1>
+                <p className="text-slate font-light mb-2 max-w-md mx-auto leading-relaxed">
                     Save pieces you love and return anytime. Your wishlist is stored on this device.
                 </p>
                 <Link to="/shop" className="inline-block mt-8">
-                    <Button variant="gold" size="lg">Explore Collection</Button>
+                    <Button variant="turmeric" size="lg">Explore Collection</Button>
                 </Link>
             </motion.div>
         );
@@ -188,8 +188,8 @@ export default function WishlistPage() {
             <div className="max-w-5xl mx-auto">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
                     <div>
-                        <p className="text-[10px] tracking-[0.3em] uppercase text-wine mb-2">Saved for later</p>
-                        <h1 className="font-serif text-3xl md:text-4xl text-charcoal">
+                        <p className="text-[10px] tracking-[0.3em] uppercase text-forest mb-2">Saved for later</p>
+                        <h1 className="font-display text-3xl md:text-4xl text-ink">
                             My Wishlist ({items.length})
                         </h1>
                     </div>
@@ -207,7 +207,7 @@ export default function WishlistPage() {
                 />
 
                 {filteredItems.length === 0 && search.trim() ? (
-                    <p className="text-center text-soft-brown py-12 text-sm">No items match your search.</p>
+                    <p className="text-center text-slate py-12 text-sm">No items match your search.</p>
                 ) : (
                 <LayoutGroup>
                     <motion.div layout className="space-y-4">
@@ -227,7 +227,7 @@ export default function WishlistPage() {
                 )}
 
                 <div className="mt-10 text-center">
-                    <Link to="/cart" className="inline-flex items-center gap-2 text-sm text-wine font-medium hover:text-wine-light transition-colors">
+                    <Link to="/cart" className="inline-flex items-center gap-2 text-sm text-forest font-medium hover:text-forest-light transition-colors">
                         Go to Bag <ArrowRight size={16} />
                     </Link>
                 </div>

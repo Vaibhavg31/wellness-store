@@ -11,7 +11,7 @@ export default function BundleShowcase() {
     if (loading || bundles.length === 0) return null;
 
     return (
-        <section className="py-12 sm:py-16 bg-warm-beige/30">
+        <section className="py-12 sm:py-16 bg-sand/30">
             <div className="max-w-7xl mx-auto px-6 lg:px-12">
                 <SectionTitle subtitle="Bundle & Save" title="Better Together" className="mb-8 sm:mb-10" />
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

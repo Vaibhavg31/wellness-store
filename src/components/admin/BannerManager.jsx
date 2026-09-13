@@ -134,7 +134,7 @@ export default function BannerManager({ filterTarget }) {
                         ? `Showing banners tagged for this section (or "Both"). ${banners.length - visibleBanners.length > 0 ? `${banners.length - visibleBanners.length} more tagged for the other section only.` : ''}`
                         : 'Images shown here power both Banner Slider (Rotating) and Image Banners (Stacked).'}
                 </p>
-                <Button variant="gold" size="sm" onClick={openNew} className="gap-1.5 flex-shrink-0"><Plus size={14} /> Add Banner</Button>
+                <Button variant="turmeric" size="sm" onClick={openNew} className="gap-1.5 flex-shrink-0"><Plus size={14} /> Add Banner</Button>
             </div>
 
             <AdminSummaryGrid
@@ -175,18 +175,18 @@ export default function BannerManager({ filterTarget }) {
                                             <img
                                                 src={imageUrl(banner.image)}
                                                 alt=""
-                                                className="w-20 h-12 rounded-lg object-cover border border-admin-border bg-warm-beige/30"
+                                                className="w-20 h-12 rounded-lg object-cover border border-admin-border bg-sand/30"
                                             />
                                         </td>
                                         <td className="p-3 align-top">
-                                            <p className="font-serif text-sm text-charcoal">{banner.title || '—'}</p>
+                                            <p className="font-display text-sm text-ink">{banner.title || '—'}</p>
                                             <p className="text-xs text-admin-muted mt-0.5">{banner.subtitle || ''}</p>
                                         </td>
                                         <td className="p-3 align-top">
                                             <span className="text-xs text-admin-muted">{TARGET_LABELS[banner.displayTarget] || 'Both'}</span>
                                         </td>
                                         <td className="p-3 align-top text-center">
-                                            <span className="font-serif text-charcoal">{banner.order}</span>
+                                            <span className="font-display text-ink">{banner.order}</span>
                                         </td>
                                         <td className="p-3 align-top">
                                             <button type="button" onClick={() => toggleEnabled(banner)}>
@@ -231,7 +231,7 @@ export default function BannerManager({ filterTarget }) {
                                 </div>
                             </div>
                         ) : (
-                            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-wine/30 hover:bg-wine/5 transition-colors">
+                            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-forest/30 hover:bg-forest/5 transition-colors">
                                 <Upload size={24} className="text-admin-muted/80" />
                                 <span className="text-sm text-admin-muted">{uploading ? 'Uploading…' : 'Click to upload image'}</span>
                                 <span className="text-xs text-admin-muted px-4 text-center">
@@ -242,7 +242,7 @@ export default function BannerManager({ filterTarget }) {
                             </label>
                         )}
                         {form.image && (
-                            <label className="inline-flex items-center gap-2 mt-3 text-xs text-wine cursor-pointer hover:text-wine-light">
+                            <label className="inline-flex items-center gap-2 mt-3 text-xs text-forest cursor-pointer hover:text-forest-light">
                                 <Upload size={14} />
                                 {uploading ? 'Uploading…' : 'Replace image'}
                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
@@ -259,7 +259,7 @@ export default function BannerManager({ filterTarget }) {
                         <select
                             value={form.displayTarget}
                             onChange={(e) => setForm({ ...form, displayTarget: e.target.value })}
-                            className="w-full px-4 py-3 bg-admin-surface-alt border border-warm-beige/60 text-charcoal rounded-lg text-sm focus:outline-none focus:border-muted-gold focus:ring-1 focus:ring-muted-gold/30"
+                            className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink rounded-lg text-sm focus:outline-none focus:border-turmeric-ink focus:ring-1 focus:ring-turmeric-ink/30"
                         >
                             <option value="both">Both — Slider and Stacked</option>
                             <option value="slider">Banner Slider only (rotating)</option>
@@ -270,8 +270,8 @@ export default function BannerManager({ filterTarget }) {
                         <input type="checkbox" checked={form.isEnabled} onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })} />
                         Live
                     </label>
-                    <div className="sticky bottom-0 pt-4 pb-2 bg-ivory border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
-                        <Button variant="gold" className="w-full" onClick={handleSave} disabled={saving || !form.image}>
+                    <div className="sticky bottom-0 pt-4 pb-2 bg-cream border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
+                        <Button variant="turmeric" className="w-full" onClick={handleSave} disabled={saving || !form.image}>
                             {saving ? 'Saving…' : 'Save Banner'}
                         </Button>
                     </div>

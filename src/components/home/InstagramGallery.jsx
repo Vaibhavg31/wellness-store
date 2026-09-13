@@ -30,25 +30,25 @@ export default function InstagramGallery() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-40px' }}
                     transition={{ duration: 0.45 }}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-10 sm:mb-12 p-6 sm:p-8 rounded-2xl border border-wine/10 bg-white/80"
+                    className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-10 sm:mb-12 p-6 sm:p-8 rounded-2xl border border-forest/10 bg-white/80"
                 >
                     <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[3px] bg-gradient-to-tr from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] flex-shrink-0">
-                        <div className="w-full h-full rounded-full bg-ivory flex items-center justify-center">
-                            <InstagramIcon size={36} className="text-wine" filled />
+                        <div className="w-full h-full rounded-full bg-cream flex items-center justify-center">
+                            <InstagramIcon size={36} className="text-forest" filled />
                         </div>
                     </div>
                     <div className="text-center sm:text-left">
-                        <h2 id="instagram-section-title" className="font-serif text-xl sm:text-2xl text-charcoal mb-1">
+                        <h2 id="instagram-section-title" className="font-display text-xl sm:text-2xl text-ink mb-1">
                             @{social.instagramHandle}
                         </h2>
                         {showProfileLink && (
-                            <p className="text-sm text-soft-brown font-light mb-4">
+                            <p className="text-sm text-slate font-light mb-4">
                                 instagram.com/{social.instagramHandle}
                             </p>
                         )}
                         {showProfileLink && (
                             <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="inline-flex">
-                                <Button variant="outline" size="md" className="gap-2 border-wine/25 text-wine hover:bg-wine/5">
+                                <Button variant="outline" size="md" className="gap-2 border-forest/25 text-forest hover:bg-forest/5">
                                     <InstagramIcon size={18} filled />
                                     View on Instagram
                                 </Button>
@@ -66,7 +66,7 @@ export default function InstagramGallery() {
                             href={profileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group relative aspect-square overflow-hidden rounded-lg sm:rounded-xl ring-1 ring-border/30 hover:ring-wine/30 transition-all duration-300"
+                            className="group relative aspect-square overflow-hidden rounded-lg sm:rounded-xl ring-1 ring-border/30 hover:ring-forest/30 transition-all duration-300"
                             aria-label={`View @${social.instagramHandle} on Instagram`}
                         >
                             <img
@@ -75,10 +75,10 @@ export default function InstagramGallery() {
                                 loading="lazy"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 bg-wine/0 group-hover:bg-wine/40 transition-colors duration-400 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-forest/0 group-hover:bg-forest/40 transition-colors duration-400 flex items-center justify-center">
                                 <InstagramIcon
                                     size={22}
-                                    className="text-ivory opacity-0 group-hover:opacity-100 transition-opacity duration-400"
+                                    className="text-cream opacity-0 group-hover:opacity-100 transition-opacity duration-400"
                                 />
                             </div>
                         </a>

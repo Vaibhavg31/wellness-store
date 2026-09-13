@@ -41,7 +41,7 @@ function SignOutOverlay({ active }) {
                         exit={{ opacity: 0 }}
                     />
                     <motion.div
-                        className="absolute inset-0 bg-gradient-to-b from-wine/5 via-transparent to-gold/10"
+                        className="absolute inset-0 bg-gradient-to-b from-forest/5 via-transparent to-turmeric/10"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -58,13 +58,13 @@ function SignOutOverlay({ active }) {
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ delay: 0.08, duration: 0.35, ease: 'backOut' }}
-                            className="w-16 h-16 rounded-full bg-wine/10 border border-wine/15 flex items-center justify-center mx-auto mb-5"
+                            className="w-16 h-16 rounded-full bg-forest/10 border border-forest/15 flex items-center justify-center mx-auto mb-5"
                         >
                             <motion.div
                                 animate={{ x: [0, -2, 2, 0] }}
                                 transition={{ duration: 0.55, ease: 'easeInOut' }}
                             >
-                                <LogOut size={26} className="text-wine" strokeWidth={1.5} />
+                                <LogOut size={26} className="text-forest" strokeWidth={1.5} />
                             </motion.div>
                         </motion.div>
 
@@ -72,7 +72,7 @@ function SignOutOverlay({ active }) {
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.12, duration: 0.35 }}
-                            className="font-serif text-2xl md:text-3xl text-charcoal mb-2"
+                            className="font-display text-2xl md:text-3xl text-ink mb-2"
                         >
                             Signing you out
                         </motion.p>
@@ -80,13 +80,13 @@ function SignOutOverlay({ active }) {
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.18, duration: 0.35 }}
-                            className="text-sm text-soft-brown font-light"
+                            className="text-sm text-slate font-light"
                         >
                             Thanks for visiting {BRAND_NAME}
                         </motion.p>
 
                         <motion.div
-                            className="mt-6 h-px w-16 mx-auto bg-gradient-to-r from-transparent via-wine/30 to-transparent"
+                            className="mt-6 h-px w-16 mx-auto bg-gradient-to-r from-transparent via-forest/30 to-transparent"
                             initial={{ scaleX: 0, opacity: 0 }}
                             animate={{ scaleX: 1, opacity: 1 }}
                             transition={{ delay: 0.22, duration: 0.4 }}

@@ -8,7 +8,7 @@ import QuickShop from '@/components/home/QuickShop';
 import Categories from '@/components/home/Categories';
 import BundleShowcase from '@/components/home/BundleShowcase';
 import WhyChoose from '@/components/home/WhyChoose';
-import AntiTarnishBanner from '@/components/home/AntiTarnishBanner';
+import CertifiedBanner from '@/components/home/CertifiedBanner';
 import CustomerReviews from '@/components/home/CustomerReviews';
 import InstagramStrip from '@/components/home/InstagramStrip';
 import InstagramGallery from '@/components/home/InstagramGallery';
@@ -20,30 +20,27 @@ import { useProducts } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { FALLBACK_PRODUCTS } from '@/data/fallbackProducts';
 
-const JewelExplorerSection = lazy(() => import('@/components/home/JewelExplorer3D/JewelExplorerSection'));
-const DayInHerSparkle = lazy(() => import('@/components/home/DayInHerSparkle'));
 const RitualBuilder = lazy(() => import('@/components/home/RitualBuilder'));
 const WellnessJourney = lazy(() => import('@/components/home/WellnessJourney'));
 const BodyMap = lazy(() => import('@/components/home/BodyMap'));
 const SourceTrail = lazy(() => import('@/components/home/SourceTrail'));
-const OpeningIntro = lazy(() => import('@/components/home/OpeningIntro'));
 
 function ProductSkeleton() {
     return (
         <div className="animate-pulse">
-            <div className="aspect-[3/4] rounded-2xl bg-warm-beige/80 mb-4" />
-            <div className="h-3 w-16 bg-warm-beige/80 rounded mb-2" />
-            <div className="h-4 w-full bg-warm-beige/60 rounded mb-2" />
-            <div className="h-4 w-20 bg-warm-beige/60 rounded" />
+            <div className="aspect-[3/4] rounded-2xl bg-sand/80 mb-4" />
+            <div className="h-3 w-16 bg-sand/80 rounded mb-2" />
+            <div className="h-4 w-full bg-sand/60 rounded mb-2" />
+            <div className="h-4 w-20 bg-sand/60 rounded" />
         </div>
     );
 }
 
 function FeaturedSkeleton() {
     return (
-        <section className="py-16 bg-ivory">
+        <section className="py-16 bg-cream">
             <div className="max-w-7xl mx-auto px-6 lg:px-12">
-                <div className="h-8 w-48 bg-warm-beige/80 rounded animate-pulse mb-10" />
+                <div className="h-8 w-48 bg-sand/80 rounded animate-pulse mb-10" />
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
                     {Array.from({ length: 8 }).map((_, i) => (
                         <ProductSkeleton key={i} />
@@ -62,11 +59,6 @@ function FeaturedSkeleton() {
  */
 function buildSectionRenderers({ displayProducts, loading, error }) {
     return {
-        openingIntro: () => (
-            <Suspense key="openingIntro" fallback={<div className="h-[92vh] min-h-[560px] max-h-[920px] bg-[#0F5132] animate-pulse" aria-hidden="true" />}>
-                <OpeningIntro />
-            </Suspense>
-        ),
         hero: () => <HeroCinematic key="hero" products={displayProducts} />,
         videoBanner: () => <VideoBanner key="videoBanner" />,
         brandMarquee: () => <BrandMarquee key="brandMarquee" />,
@@ -78,16 +70,6 @@ function buildSectionRenderers({ displayProducts, loading, error }) {
                 <InstagramGallery />
             </span>
         ),
-        jewelExplorer3D: () => (
-            <Suspense key="jewelExplorer3D" fallback={<div className="h-32 bg-warm-beige/20 animate-pulse" aria-hidden="true" />}>
-                <JewelExplorerSection />
-            </Suspense>
-        ),
-        dayInHerSparkle: () => (
-            <Suspense key="dayInHerSparkle" fallback={<div className="h-32 bg-charcoal animate-pulse" aria-hidden="true" />}>
-                <DayInHerSparkle products={displayProducts} />
-            </Suspense>
-        ),
         featured: () => (
             <span key="featured" style={{ display: 'contents' }}>
                 {loading ? <FeaturedSkeleton /> : <QuickShop products={displayProducts} apiError={error} />}
@@ -97,7 +79,7 @@ function buildSectionRenderers({ displayProducts, loading, error }) {
         categories: () => <Categories key="categories" />,
         bundles: () => <BundleShowcase key="bundles" />,
         ritualBuilder: () => (
-            <Suspense key="ritualBuilder" fallback={<div className="h-[32rem] bg-ivory animate-pulse" aria-hidden="true" />}>
+            <Suspense key="ritualBuilder" fallback={<div className="h-[32rem] bg-cream animate-pulse" aria-hidden="true" />}>
                 <RitualBuilder products={displayProducts} />
             </Suspense>
         ),
@@ -117,7 +99,7 @@ function buildSectionRenderers({ displayProducts, loading, error }) {
             </Suspense>
         ),
         whyChoose: () => <WhyChoose key="whyChoose" />,
-        antiTarnishBanner: () => <AntiTarnishBanner key="antiTarnishBanner" />,
+        certifiedBanner: () => <CertifiedBanner key="certifiedBanner" />,
         reviews: () => <CustomerReviews key="reviews" />,
         newsletter: () => <Newsletter key="newsletter" />,
     };

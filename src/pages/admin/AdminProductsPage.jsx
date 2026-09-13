@@ -84,7 +84,7 @@ export default function AdminProductsPage() {
                 subtitle="Manage your catalog, pricing, and visibility"
                 actions={(
                     <Link to={`${ADMIN_PATH}/products/new`}>
-                        <Button variant="gold" size="sm" className="gap-2">
+                        <Button variant="turmeric" size="sm" className="gap-2">
                             <Plus size={16} /> Add Product
                         </Button>
                     </Link>
@@ -139,7 +139,7 @@ export default function AdminProductsPage() {
                                             <div className="flex items-center gap-3">
                                                 <img src={imageUrl(product.images?.[0] || '')} alt="" className="w-11 h-11 rounded-lg object-cover border border-admin-border-light" />
                                                 <div>
-                                                    <p className="font-medium text-charcoal">{product.title}</p>
+                                                    <p className="font-medium text-ink">{product.title}</p>
                                                     <p className="text-xs text-admin-muted line-clamp-1">
                                                         {product.hasVariants
                                                             ? `${product.variants.length} option${product.variants.length === 1 ? '' : 's'}${product.tags?.length ? ` · ${product.tags.join(', ')}` : ''}`
@@ -169,7 +169,7 @@ export default function AdminProductsPage() {
                                             <div className="flex gap-1">
                                                 <Link
                                                     to={`${ADMIN_PATH}/products/${product.id}`}
-                                                    className="p-2 rounded-lg hover:bg-admin-surface-alt text-charcoal transition-colors inline-flex"
+                                                    className="p-2 rounded-lg hover:bg-admin-surface-alt text-ink transition-colors inline-flex"
                                                     title="Edit"
                                                 >
                                                     <Pencil size={16} />

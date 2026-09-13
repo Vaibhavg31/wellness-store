@@ -82,7 +82,7 @@ final class ProductRoutes
 
             $now     = gmdate('c');
             $product = [
-                'id'            => Database::generateId('krivea'),
+                'id'            => Database::generateId('product'),
                 'title'         => $body['title'],
                 'price'         => (float) $body['price'],
                 'originalPrice' => (float) $body['originalPrice'],

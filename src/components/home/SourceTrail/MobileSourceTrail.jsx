@@ -21,11 +21,11 @@ export default function MobileSourceTrail({ products }) {
                         transition={{ duration: 0.5, delay: i * 0.03 }}
                     >
                         <div className="flex items-center gap-2 mb-2">
-                            <MapPin size={13} className="text-gold-light" />
-                            <p className="type-eyebrow text-gold-light">{stop.region}</p>
+                            <MapPin size={13} className="text-turmeric-light" />
+                            <p className="type-eyebrow text-turmeric-light">{stop.region}</p>
                         </div>
-                        <h3 className="font-serif text-xl text-ivory mb-2">{stop.ingredient}</h3>
-                        <p className="text-ivory/60 text-sm font-light leading-relaxed mb-3">{stop.note}</p>
+                        <h3 className="font-display text-xl text-cream mb-2">{stop.ingredient}</h3>
+                        <p className="text-cream/60 text-sm font-light leading-relaxed mb-3">{stop.note}</p>
 
                         {matches[0] && (
                             <div className="flex items-center gap-3 rounded-lg border border-white/15 bg-white/[0.06] p-2.5 mb-3">
@@ -34,11 +34,11 @@ export default function MobileSourceTrail({ products }) {
                                     alt=""
                                     className="w-10 h-10 rounded-md object-cover flex-shrink-0 bg-white/10"
                                 />
-                                <span className="min-w-0 text-sm text-ivory/90 truncate">{matches[0].title}</span>
+                                <span className="min-w-0 text-sm text-cream/90 truncate">{matches[0].title}</span>
                             </div>
                         )}
 
-                        <Link to={shopHref} className="inline-flex items-center gap-1.5 text-sm font-medium text-gold-light">
+                        <Link to={shopHref} className="inline-flex items-center gap-1.5 text-sm font-medium text-turmeric-light">
                             Shop products with this ingredient
                             <ArrowRight size={13} />
                         </Link>

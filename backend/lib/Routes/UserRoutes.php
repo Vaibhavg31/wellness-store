@@ -449,7 +449,7 @@ final class UserRoutes
 
             $from = $filters['from'] ? $filters['from'] : 'all';
             $to = $filters['to'] ? $filters['to'] : 'all';
-            $baseName = "krivea-users-{$from}-to-{$to}";
+            $baseName = "wellness-users-{$from}-to-{$to}";
 
             if ($format === 'pdf') {
                 ExportHelper::exportTablePdf("{$baseName}.pdf", 'Users Export', $headers, $rows);

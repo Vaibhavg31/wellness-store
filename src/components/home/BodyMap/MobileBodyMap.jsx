@@ -27,10 +27,10 @@ export default function MobileBodyMap({ products }) {
                             transition={{ duration: 0.5, delay: i * 0.03 }}
                         >
                             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/15 mb-3">
-                                <Icon size={16} className="text-gold-light" />
+                                <Icon size={16} className="text-turmeric-light" />
                             </span>
-                            <h3 className="font-serif text-xl text-ivory mb-2">{zone.title}</h3>
-                            <p className="text-ivory/60 text-sm font-light leading-relaxed mb-3">{zone.copy}</p>
+                            <h3 className="font-display text-xl text-cream mb-2">{zone.title}</h3>
+                            <p className="text-cream/60 text-sm font-light leading-relaxed mb-3">{zone.copy}</p>
                             <ZoneProductCard product={product} />
                         </motion.div>
                     );

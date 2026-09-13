@@ -17,7 +17,7 @@ import {
     WHATSAPP_DISPLAY,
     WHATSAPP_NUMBER,
 } from '@/constants';
-import { HERO_JEWELRY_IMAGES, HERO_VIDEO_POSTER, HERO_VIDEO_URL } from '@/data/fallbackProducts';
+import { HERO_PRODUCT_IMAGES } from '@/data/fallbackProducts';
 
 /** Canonical defaults — merged with API settings; constants remain ultimate fallback. */
 export const DEFAULT_SITE_CONTENT = {
@@ -35,10 +35,10 @@ export const DEFAULT_SITE_CONTENT = {
         primaryDark: '#0A3D25',
         accentColor: '#D97706',
         accentLight: '#F59E0B',
-        blushColor: '#FDE68A',
+        tintColor: '#DCEEE1',
         backgroundColor: '#FBF9F4',
         textColor: '#1C1A16',
-        fontHeading: '"Cormorant Garamond", Georgia, serif',
+        fontHeading: '"Manrope", system-ui, sans-serif',
         fontBody: '"Inter", system-ui, sans-serif',
     },
 
@@ -75,11 +75,7 @@ export const DEFAULT_SITE_CONTENT = {
 
     navLinks: NAV_LINKS,
 
-    // Note: jewelExplorer3D and dayInHerSparkle are intentionally left out —
-    // they were built for the original jewelry-brand template and don't fit
-    // a wellness/supplements store, so they stay off by default.
     sections: {
-        openingIntro: true,
         hero: true,
         videoBanner: true,
         brandMarquee: true,
@@ -94,7 +90,7 @@ export const DEFAULT_SITE_CONTENT = {
         bodyMap: true,
         sourceTrail: true,
         whyChoose: true,
-        antiTarnishBanner: true,
+        certifiedBanner: true,
         reviews: true,
         instagram: true,
         newsletter: true,
@@ -147,14 +143,9 @@ export const DEFAULT_SITE_CONTENT = {
         headlineAccent: 'Science',
         subheadline: BRAND_DESCRIPTION,
         primaryCta: { label: 'Shop Now', href: '/shop' },
-        secondaryCta: { label: 'Featured Product', href: '' },
         featuredProductId: '',
-        centerImage: '',
-        scrollCue: 'Scroll to explore',
-        videoUrl: HERO_VIDEO_URL,
-        videoPoster: HERO_VIDEO_POSTER,
-        orbitImages: HERO_JEWELRY_IMAGES,
-        orbitProductIds: [],
+        images: HERO_PRODUCT_IMAGES,
+        productImageIds: [],
         trustBadges: [
             { icon: 'shield', label: 'FSSAI Certified' },
             { icon: 'star', label: '4.9★ Rated' },
@@ -187,7 +178,7 @@ export const DEFAULT_SITE_CONTENT = {
         ctaText: "Stay connected with us on Instagram and WhatsApp. We're always happy to help.",
     },
 
-    antiTarnishBanner: {
+    certifiedBanner: {
         badge: 'FSSAI & GMP Certified',
         title: 'Purity You Can Verify',
         description: 'Every product is manufactured in certified facilities and third-party lab tested before it reaches you.',

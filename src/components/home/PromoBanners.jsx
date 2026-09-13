@@ -8,10 +8,10 @@ export default function PromoBanners() {
     if (!loading && banners.length === 0) return null;
 
     return (
-        <section className="py-8 sm:py-12 md:py-16 bg-ivory">
+        <section className="py-8 sm:py-12 md:py-16 bg-cream">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
                 {loading ? (
-                    <div className="aspect-[21/9] sm:aspect-[3/1] rounded-2xl bg-warm-beige/60 animate-pulse" />
+                    <div className="aspect-[21/9] sm:aspect-[3/1] rounded-2xl bg-sand/60 animate-pulse" />
                 ) : (
                     banners.map((banner) => {
                         const content = (
@@ -23,19 +23,19 @@ export default function PromoBanners() {
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                                 {(banner.title || banner.subtitle || banner.ctaLabel) && (
-                                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-charcoal/10 to-transparent flex flex-col justify-end p-5 sm:p-8">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent flex flex-col justify-end p-5 sm:p-8">
                                         {banner.subtitle && (
-                                            <p className="text-ivory/80 text-xs sm:text-sm tracking-[0.15em] uppercase mb-1.5">
+                                            <p className="text-cream/80 text-xs sm:text-sm tracking-[0.15em] uppercase mb-1.5">
                                                 {banner.subtitle}
                                             </p>
                                         )}
                                         {banner.title && (
-                                            <h3 className="font-serif text-xl sm:text-3xl text-ivory mb-2 sm:mb-4 max-w-lg">
+                                            <h3 className="font-display text-xl sm:text-3xl text-cream mb-2 sm:mb-4 max-w-lg">
                                                 {banner.title}
                                             </h3>
                                         )}
                                         {banner.ctaLabel && (
-                                            <span className="inline-flex items-center gap-2 text-xs tracking-[0.15em] uppercase text-charcoal bg-ivory px-4 sm:px-5 py-2 sm:py-2.5 rounded-sm w-fit font-medium group-hover:bg-gold transition-colors">
+                                            <span className="inline-flex items-center gap-2 text-xs tracking-[0.15em] uppercase text-ink bg-cream px-4 sm:px-5 py-2 sm:py-2.5 rounded-sm w-fit font-medium group-hover:bg-turmeric transition-colors">
                                                 {banner.ctaLabel}
                                             </span>
                                         )}

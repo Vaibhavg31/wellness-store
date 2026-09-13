@@ -31,17 +31,16 @@ import {
     SectionHeader,
 } from '@/components/admin/AdminFormUi';
 
-const TAG_OPTIONS = ['New', 'Sale', 'Limited', 'Best Seller', 'Anti-Tarnish'];
+const TAG_OPTIONS = ['New', 'Sale', 'Limited', 'Best Seller', 'Combo Deal'];
 
 // Keep labels in sync with BADGE_ICONS in src/utils/productTrustBadges.js
 const BADGE_OPTIONS = [
-    'Anti-Tarnish',
-    'Long-Lasting Shine',
-    'Everyday Wearable',
-    'Waterproof',
-    '316L Surgical Steel',
-    'Hypoallergenic',
-    'Nickel-Free',
+    'FSSAI Certified',
+    'Lab Tested',
+    '100% Vegetarian',
+    'Gluten-Free',
+    'No Added Sugar',
+    'GMP Certified',
     'Free Delivery',
     'Fast Returns',
 ];
@@ -465,7 +464,7 @@ export default function AdminProductFormPage() {
         <div className="max-w-5xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="font-serif text-3xl text-charcoal mb-1 max-lg:hidden">
+                    <h1 className="font-display text-3xl text-ink mb-1 max-lg:hidden">
                         {isNew ? 'Add Product' : 'Edit Product'}
                     </h1>
                     <p className="text-admin-muted text-sm max-w-xl">
@@ -588,7 +587,7 @@ export default function AdminProductFormPage() {
                                 {optional.variants ? `Customer sees (default: "${defaultVariant?.label || '—'}")` : 'Customer sees'}
                             </span>
                             <div className="flex items-center gap-3">
-                                <span className="font-semibold text-charcoal">{formatPrice(price)}</span>
+                                <span className="font-semibold text-ink">{formatPrice(price)}</span>
                                 {originalPrice > price && (
                                     <>
                                         <span className="text-admin-muted/80 line-through">{formatPrice(originalPrice)}</span>
@@ -620,8 +619,8 @@ export default function AdminProductFormPage() {
                                             onClick={() => setDefaultVariant(i)}
                                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-colors ${
                                                 v.isDefault
-                                                    ? 'bg-wine text-ivory border-wine'
-                                                    : 'border-admin-border text-admin-muted hover:border-wine/40 bg-white'
+                                                    ? 'bg-forest text-cream border-forest'
+                                                    : 'border-admin-border text-admin-muted hover:border-forest/40 bg-white'
                                             }`}
                                             title="Pre-selected option on the product page"
                                         >
@@ -668,7 +667,7 @@ export default function AdminProductFormPage() {
                                                     type="button"
                                                     onClick={() => updateVariant(i, { image: '' })}
                                                     className={`px-3 py-2 rounded-lg border text-xs transition-colors ${
-                                                        !v.image ? 'border-wine bg-wine/5 text-wine' : 'border-admin-border text-admin-muted hover:border-wine/30'
+                                                        !v.image ? 'border-forest bg-forest/5 text-forest' : 'border-admin-border text-admin-muted hover:border-forest/30'
                                                     }`}
                                                 >
                                                     Same as product
@@ -679,7 +678,7 @@ export default function AdminProductFormPage() {
                                                         type="button"
                                                         onClick={() => updateVariant(i, { image: img })}
                                                         className={`w-11 h-11 rounded-lg overflow-hidden border-2 transition-colors shrink-0 ${
-                                                            v.image === img ? 'border-wine' : 'border-transparent opacity-70 hover:opacity-100'
+                                                            v.image === img ? 'border-forest' : 'border-transparent opacity-70 hover:opacity-100'
                                                         }`}
                                                         title="Use this photo for this option"
                                                     >
@@ -689,7 +688,7 @@ export default function AdminProductFormPage() {
                                                 {v.image && !form.images.includes(v.image) && (
                                                     <button
                                                         type="button"
-                                                        className="w-11 h-11 rounded-lg overflow-hidden border-2 border-wine shrink-0"
+                                                        className="w-11 h-11 rounded-lg overflow-hidden border-2 border-forest shrink-0"
                                                         title="This option's own uploaded photo"
                                                     >
                                                         <img src={imageUrl(v.image)} alt="" className="w-full h-full object-cover" />
@@ -699,7 +698,7 @@ export default function AdminProductFormPage() {
                                                     className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed text-xs cursor-pointer transition-colors ${
                                                         uploadingVariantPhoto === i
                                                             ? 'border-admin-border text-admin-muted pointer-events-none'
-                                                            : 'border-wine/40 text-wine hover:bg-wine/5'
+                                                            : 'border-forest/40 text-forest hover:bg-forest/5'
                                                     }`}
                                                 >
                                                     <Upload size={12} />
@@ -762,7 +761,7 @@ export default function AdminProductFormPage() {
                         <button
                             type="button"
                             onClick={addVariant}
-                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-wine bg-wine/5 hover:bg-wine/10 border border-wine/20"
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20"
                         >
                             <Plus size={14} /> Add option
                         </button>
@@ -775,7 +774,7 @@ export default function AdminProductFormPage() {
                         title="Photos"
                         description="At least one image required"
                         action={(
-                            <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-wine bg-wine/5 hover:bg-wine/10 border border-wine/20 cursor-pointer">
+                            <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20 cursor-pointer">
                                 <Upload size={14} />
                                 {uploading ? 'Uploading…' : 'Upload'}
                                 <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
@@ -783,7 +782,7 @@ export default function AdminProductFormPage() {
                         )}
                     />
                     {form.images.length === 0 ? (
-                        <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-12 cursor-pointer hover:border-wine/30 hover:bg-wine/5 transition-colors">
+                        <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-12 cursor-pointer hover:border-forest/30 hover:bg-forest/5 transition-colors">
                             <ImageIcon size={32} className="text-admin-muted/40" />
                             <span className="text-sm text-admin-muted">Click to upload product images</span>
                             <span className="text-xs text-admin-muted">JPG, PNG, WebP · max 5MB each</span>
@@ -806,7 +805,7 @@ export default function AdminProductFormPage() {
                                         <X size={12} />
                                     </button>
                                     {i === 0 ? (
-                                        <span className="absolute bottom-1.5 left-1.5 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-charcoal/70 text-white">
+                                        <span className="absolute bottom-1.5 left-1.5 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-ink/70 text-white">
                                             Cover
                                         </span>
                                     ) : (
@@ -818,7 +817,7 @@ export default function AdminProductFormPage() {
                                                 next.unshift(picked);
                                                 return { ...prev, images: next };
                                             })}
-                                            className="absolute bottom-1.5 left-1.5 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-charcoal/60 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                                            className="absolute bottom-1.5 left-1.5 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-ink/60 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                                         >
                                             Set as cover
                                         </button>
@@ -844,11 +843,11 @@ export default function AdminProductFormPage() {
                                 onClick={() => update('isPublished', true)}
                                 className={`rounded-xl border p-3 text-left transition-all ${
                                     form.isPublished
-                                        ? 'border-wine bg-wine/5 ring-2 ring-wine/20'
+                                        ? 'border-forest bg-forest/5 ring-2 ring-forest/20'
                                         : 'border-admin-border bg-admin-surface-alt hover:border-border'
                                 }`}
                             >
-                                <p className="text-sm font-semibold text-charcoal">Published</p>
+                                <p className="text-sm font-semibold text-ink">Published</p>
                                 <p className="text-[11px] text-admin-muted mt-0.5">Visible on the storefront</p>
                             </button>
                             <button
@@ -856,11 +855,11 @@ export default function AdminProductFormPage() {
                                 onClick={() => update('isPublished', false)}
                                 className={`rounded-xl border p-3 text-left transition-all ${
                                     !form.isPublished
-                                        ? 'border-wine bg-wine/5 ring-2 ring-wine/20'
+                                        ? 'border-forest bg-forest/5 ring-2 ring-forest/20'
                                         : 'border-admin-border bg-admin-surface-alt hover:border-border'
                                 }`}
                             >
-                                <p className="text-sm font-semibold text-charcoal">Hidden</p>
+                                <p className="text-sm font-semibold text-ink">Hidden</p>
                                 <p className="text-[11px] text-admin-muted mt-0.5">Draft — not shown to customers</p>
                             </button>
                         </div>
@@ -881,8 +880,8 @@ export default function AdminProductFormPage() {
                                     onClick={() => toggleTag(tag)}
                                     className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
                                         tagExists(form.tags, tag)
-                                            ? 'bg-wine text-ivory border-wine'
-                                            : 'border-admin-border text-admin-muted hover:border-wine/40 bg-white'
+                                            ? 'bg-forest text-cream border-forest'
+                                            : 'border-admin-border text-admin-muted hover:border-forest/40 bg-white'
                                     }`}
                                 >
                                     {tag}
@@ -897,13 +896,13 @@ export default function AdminProductFormPage() {
                                     {customTagsOnly.map((tag) => (
                                         <span
                                             key={tag}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-wine/10 text-wine border border-wine/25"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-forest/10 text-forest border border-forest/25"
                                         >
                                             {tag}
                                             <button
                                                 type="button"
                                                 onClick={() => removeTag(tag)}
-                                                className="p-0.5 rounded-full hover:bg-wine/20"
+                                                className="p-0.5 rounded-full hover:bg-forest/20"
                                                 aria-label={`Remove ${tag}`}
                                             >
                                                 <X size={12} />
@@ -947,7 +946,7 @@ export default function AdminProductFormPage() {
                                     className="mt-0.5 rounded border-border"
                                 />
                                 <span>
-                                    <span className="text-sm font-medium text-charcoal">New arrival</span>
+                                    <span className="text-sm font-medium text-ink">New arrival</span>
                                     <span className="text-xs text-admin-muted block mt-0.5">Highlight in new arrivals</span>
                                 </span>
                             </label>
@@ -959,7 +958,7 @@ export default function AdminProductFormPage() {
                                     className="mt-0.5 rounded border-border"
                                 />
                                 <span>
-                                    <span className="text-sm font-medium text-charcoal">Best seller</span>
+                                    <span className="text-sm font-medium text-ink">Best seller</span>
                                     <span className="text-xs text-admin-muted block mt-0.5">Show best seller badge</span>
                                 </span>
                             </label>
@@ -971,7 +970,7 @@ export default function AdminProductFormPage() {
                                     className="mt-0.5 rounded border-border"
                                 />
                                 <span>
-                                    <span className="text-sm font-medium text-charcoal">Pin to Trending</span>
+                                    <span className="text-sm font-medium text-ink">Pin to Trending</span>
                                     <span className="text-xs text-admin-muted block mt-0.5">Force into the homepage &quot;Trending Now&quot; row, ahead of real sales data</span>
                                 </span>
                             </label>
@@ -993,8 +992,8 @@ export default function AdminProductFormPage() {
                                     onClick={() => toggleBadge(badge)}
                                     className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
                                         tagExists(form.badges, badge)
-                                            ? 'bg-wine text-ivory border-wine'
-                                            : 'border-admin-border text-admin-muted hover:border-wine/40 bg-white'
+                                            ? 'bg-forest text-cream border-forest'
+                                            : 'border-admin-border text-admin-muted hover:border-forest/40 bg-white'
                                     }`}
                                 >
                                     {resolveBadgeLabel(badge, siteContent)}
@@ -1009,13 +1008,13 @@ export default function AdminProductFormPage() {
                                     {customBadgesOnly.map((badge) => (
                                         <span
                                             key={badge}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-wine/10 text-wine border border-wine/25"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-forest/10 text-forest border border-forest/25"
                                         >
                                             {badge}
                                             <button
                                                 type="button"
                                                 onClick={() => removeBadge(badge)}
-                                                className="p-0.5 rounded-full hover:bg-wine/20"
+                                                className="p-0.5 rounded-full hover:bg-forest/20"
                                                 aria-label={`Remove ${badge}`}
                                             >
                                                 <X size={12} />
@@ -1091,7 +1090,7 @@ export default function AdminProductFormPage() {
                         <button
                             type="button"
                             onClick={() => update('features', [...form.features, ''])}
-                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-wine bg-wine/5 hover:bg-wine/10 border border-wine/20"
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20"
                         >
                             <Plus size={14} /> Add feature
                         </button>
@@ -1113,7 +1112,7 @@ export default function AdminProductFormPage() {
                                     className="mt-0.5 rounded border-border"
                                 />
                                 <span>
-                                    <span className="text-sm font-medium text-charcoal">Cash on delivery</span>
+                                    <span className="text-sm font-medium text-ink">Cash on delivery</span>
                                     <span className="text-xs text-admin-muted block mt-0.5">Allow COD at checkout</span>
                                 </span>
                             </label>
@@ -1125,7 +1124,7 @@ export default function AdminProductFormPage() {
                                     className="mt-0.5 rounded border-border"
                                 />
                                 <span>
-                                    <span className="text-sm font-medium text-charcoal">Online payment</span>
+                                    <span className="text-sm font-medium text-ink">Online payment</span>
                                     <span className="text-xs text-admin-muted block mt-0.5">Allow Razorpay checkout</span>
                                 </span>
                             </label>
@@ -1137,17 +1136,17 @@ export default function AdminProductFormPage() {
                     <div className="flex-1 space-y-1">
                         <div className="flex justify-between text-sm text-admin-muted">
                             <span>Category</span>
-                            <span className="capitalize text-charcoal">
+                            <span className="capitalize text-ink">
                                 {categories.find((c) => c.slug === form.category)?.label || '—'}
                             </span>
                         </div>
                         <div className="flex justify-between text-sm text-admin-muted">
                             <span>Images</span>
-                            <span className="text-charcoal">{form.images.length} uploaded</span>
+                            <span className="text-ink">{form.images.length} uploaded</span>
                         </div>
                         <div className="flex justify-between items-baseline pt-2 border-t border-admin-border">
-                            <span className="text-sm font-medium text-charcoal">Sale price</span>
-                            <span className="font-serif text-2xl text-charcoal">
+                            <span className="text-sm font-medium text-ink">Sale price</span>
+                            <span className="font-display text-2xl text-ink">
                                 {Number.isFinite(price) && price > 0 ? formatPrice(price) : '—'}
                             </span>
                         </div>
@@ -1164,7 +1163,7 @@ export default function AdminProductFormPage() {
                         </Button>
                         <Button
                             type="submit"
-                            variant="gold"
+                            variant="turmeric"
                             loading={saving}
                             disabled={uploading}
                             size="lg"

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import SectionTitle from '@/components/ui/SectionTitle';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import DesktopJourney from './DesktopJourney';
 import MobileJourney from './MobileJourney';
 
@@ -15,14 +16,6 @@ function useIsMobile() {
     }, []);
 
     return isMobile;
-}
-
-function useReducedMotion() {
-    const [reduced, setReduced] = useState(false);
-    useEffect(() => {
-        setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    }, []);
-    return reduced;
 }
 
 /**

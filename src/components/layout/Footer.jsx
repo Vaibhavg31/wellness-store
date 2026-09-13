@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import InstagramIcon from '@/components/ui/InstagramIcon';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
 import Logo from '@/components/ui/Logo';
 import Input from '@/components/ui/Input';
@@ -20,6 +21,7 @@ const socialIcons = {
 
 export default function Footer() {
     const { content } = useSiteContent();
+    const reducedMotion = useReducedMotion();
     const { social, footer, brandName } = content;
     const instagramUrl = social.instagramUrl?.trim();
     const instagramLinked = hasInstagramUrl(instagramUrl);
@@ -56,22 +58,24 @@ export default function Footer() {
     const hasMoreCollections = allCollectionLinks.length > FOOTER_COLLECTIONS_LIMIT;
 
     return (
-        <footer className="bg-footer-gradient text-ivory/80 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-30 pointer-events-none" aria-hidden="true">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-blush/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gold/10 rounded-full blur-3xl" />
+        <footer className="bg-footer-gradient text-cream/80 relative overflow-hidden">
+            {/* Decorative ambient blobs — slow drift (see .animate-drift-ambient*
+                in index.css), "alive, natural" rather than static or sparkling. */}
+            <div className="absolute inset-0 opacity-40 pointer-events-none" aria-hidden="true">
+                <div className={`absolute top-0 left-1/4 w-96 h-96 bg-sage-light/25 rounded-full blur-3xl ${reducedMotion ? '' : 'animate-drift-ambient-slow'}`} />
+                <div className={`absolute bottom-0 right-1/4 w-80 h-80 bg-turmeric/15 rounded-full blur-3xl ${reducedMotion ? '' : 'animate-drift-ambient'}`} />
             </div>
 
-            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blush/20 to-transparent" />
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-turmeric-light/20 to-transparent" />
 
             <div className="relative max-w-7xl mx-auto px-6 lg:px-12 pt-28 pb-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 lg:gap-10">
                     <div className="lg:col-span-4">
                         <Logo size="xl" showHover className="mb-8" />
-                        <p className="text-sm font-light leading-relaxed text-ivory/60 max-w-xs mb-2">
+                        <p className="text-sm font-light leading-relaxed text-cream/60 max-w-xs mb-2">
                             {footer.tagline}
                         </p>
-                        <p className="text-sm font-light leading-relaxed text-ivory/40 max-w-xs">
+                        <p className="text-sm font-light leading-relaxed text-cream/40 max-w-xs">
                             {footer.description}
                         </p>
                         <div className="flex gap-3 mt-10">
@@ -80,7 +84,7 @@ export default function Footer() {
                                 href={instagramUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-3 rounded-full border border-ivory/15 text-ivory/55 hover:border-blush hover:text-blush hover:bg-blush/10 transition-all duration-500"
+                                className="p-3 rounded-full border border-cream/15 text-cream/55 hover:border-turmeric-light hover:text-turmeric-light hover:bg-turmeric-light/10 transition-all duration-500"
                                 aria-label="Instagram"
                             >
                                 {socialIcons.instagram}
@@ -102,21 +106,21 @@ export default function Footer() {
                             href={instagramUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-6 block p-4 rounded-xl border border-ivory/12 bg-ivory/5 hover:bg-ivory/10 hover:border-blush/30 transition-all duration-300 group"
+                            className="mt-6 block p-4 rounded-xl border border-cream/12 bg-cream/5 hover:bg-cream/10 hover:border-turmeric-light/30 transition-all duration-300 group"
                         >
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] p-[2px] flex-shrink-0">
-                                    <span className="w-full h-full rounded-full bg-wine-deep flex items-center justify-center">
-                                        <InstagramIcon size={16} className="text-ivory" filled />
+                                    <span className="w-full h-full rounded-full bg-forest-deep flex items-center justify-center">
+                                        <InstagramIcon size={16} className="text-cream" filled />
                                     </span>
                                 </span>
                                 <div>
-                                    <p className="type-eyebrow text-blush/70">Instagram</p>
-                                    <p className="text-sm font-medium text-ivory group-hover:text-blush transition-colors">@{social.instagramHandle}</p>
+                                    <p className="type-eyebrow text-turmeric-light/70">Instagram</p>
+                                    <p className="text-sm font-medium text-cream group-hover:text-turmeric-light transition-colors">@{social.instagramHandle}</p>
                                 </div>
                             </div>
-                            <p className="text-xs text-ivory/45 leading-relaxed">{footer.instagramCardText}</p>
-                            <span className="inline-block mt-3 text-xs tracking-wide text-blush/80 group-hover:text-blush">
+                            <p className="text-xs text-cream/45 leading-relaxed">{footer.instagramCardText}</p>
+                            <span className="inline-block mt-3 text-xs tracking-wide text-turmeric-light/80 group-hover:text-turmeric-light">
                                 View profile →
                             </span>
                         </a>
@@ -124,11 +128,11 @@ export default function Footer() {
                     </div>
 
                     <div className="lg:col-span-2">
-                        <h4 className="type-eyebrow text-blush/70 mb-7">Explore</h4>
+                        <h4 className="type-eyebrow text-turmeric-light/70 mb-7">Explore</h4>
                         <ul className="space-y-3.5">
                             {(content.navLinks ?? []).map((item) => (
                                 <li key={item.href}>
-                                    <Link to={item.href} className="text-sm font-light text-ivory/50 hover:text-blush transition-colors duration-500">
+                                    <Link to={item.href} className="text-sm font-light text-cream/50 hover:text-turmeric-light transition-colors duration-500">
                                         {item.label}
                                     </Link>
                                 </li>
@@ -137,18 +141,18 @@ export default function Footer() {
                     </div>
 
                     <div className="lg:col-span-3">
-                        <h4 className="type-eyebrow text-blush/70 mb-7">Collections</h4>
+                        <h4 className="type-eyebrow text-turmeric-light/70 mb-7">Collections</h4>
                         <ul className="space-y-3.5">
                             {collectionLinks.map((cat) => (
                                 <li key={cat.id}>
-                                    <Link to={`/category/${cat.id}`} className="text-sm font-light text-ivory/50 hover:text-blush transition-colors duration-500">
+                                    <Link to={`/category/${cat.id}`} className="text-sm font-light text-cream/50 hover:text-turmeric-light transition-colors duration-500">
                                         {cat.label}
                                     </Link>
                                 </li>
                             ))}
                             {hasMoreCollections && (
                                 <li>
-                                    <Link to="/shop" className="text-sm font-light text-blush/80 hover:text-blush transition-colors duration-500">
+                                    <Link to="/shop" className="text-sm font-light text-turmeric-light/80 hover:text-turmeric-light transition-colors duration-500">
                                         View all collections
                                     </Link>
                                 </li>
@@ -157,15 +161,15 @@ export default function Footer() {
                     </div>
 
                     <div className="lg:col-span-3">
-                        <h4 className="type-eyebrow text-blush/70 mb-7">
+                        <h4 className="type-eyebrow text-turmeric-light/70 mb-7">
                             {footer.newsletterTitle}
                         </h4>
-                        <p className="text-sm font-light text-ivory/45 mb-6 leading-relaxed">
+                        <p className="text-sm font-light text-cream/45 mb-6 leading-relaxed">
                             {footer.newsletterDescription}
                         </p>
 
                         {subscribed ? (
-                            <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-blush/80 font-light">
+                            <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-turmeric-light/80 font-light">
                                 ✦ Thank you for subscribing! Welcome to the family.
                             </motion.p>
                         ) : (
@@ -175,10 +179,10 @@ export default function Footer() {
                                     placeholder="Your email address"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="bg-wine-deep/40 border-ivory/15 text-ivory placeholder:text-ivory/30 rounded-full"
+                                    className="bg-forest-deep/40 border-cream/15 text-cream placeholder:text-cream/30 rounded-full"
                                     required
                                 />
-                                <Button variant="gold" size="sm" className="w-full" type="submit" disabled={loading}>
+                                <Button variant="turmeric" size="sm" className="w-full" type="submit" disabled={loading}>
                                     {loading ? 'Subscribing...' : 'Subscribe'}
                                 </Button>
                             </form>
@@ -191,33 +195,33 @@ export default function Footer() {
                     whileInView={{ scaleX: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="mt-24 pt-8 border-t border-ivory/10"
+                    className="mt-24 pt-8 border-t border-cream/10"
                 >
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-xs text-ivory/35 tracking-wide">
+                        <p className="text-xs text-cream/35 tracking-wide">
                             &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
                         </p>
-                        <div className="flex gap-8 text-xs text-ivory/35">
-                            <Link to="/privacy" className="hover:text-blush/60 transition-colors duration-500">Privacy Policy</Link>
-                            <Link to="/terms" className="hover:text-blush/60 transition-colors duration-500">Terms of Service</Link>
+                        <div className="flex gap-8 text-xs text-cream/35">
+                            <Link to="/privacy" className="hover:text-turmeric-light/60 transition-colors duration-500">Privacy Policy</Link>
+                            <Link to="/terms" className="hover:text-turmeric-light/60 transition-colors duration-500">Terms of Service</Link>
                         </div>
                     </div>
 
-                    <p className="mt-6 flex items-center justify-center gap-3 type-eyebrow text-ivory/30 font-light">
-                        <span className="text-gold/35 select-none" aria-hidden="true">✦</span>
+                    <p className="mt-6 flex items-center justify-center gap-3 type-eyebrow text-cream/30 font-light">
+                        <span className="text-turmeric/35 select-none" aria-hidden="true">✦</span>
                         <span>
                             {DEVELOPER_CREDIT}{' '}
                             <a
                                 href={DEVELOPER_URL}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-gold/50 hover:text-gold/80 transition-colors duration-500 font-medium tracking-[0.3em]"
+                                className="text-turmeric/50 hover:text-turmeric/80 transition-colors duration-500 font-medium tracking-[0.3em]"
                                 aria-label={`${DEVELOPER_CREDIT} ${DEVELOPER_NAME}`}
                             >
                                 {DEVELOPER_NAME}
                             </a>
                         </span>
-                        <span className="text-gold/35 select-none" aria-hidden="true">✦</span>
+                        <span className="text-turmeric/35 select-none" aria-hidden="true">✦</span>
                     </p>
                 </motion.div>
             </div>

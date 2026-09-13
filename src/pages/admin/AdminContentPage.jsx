@@ -21,11 +21,11 @@ import {
 } from '@/components/admin/ContentEditor';
 
 const HEADING_FONT_OPTIONS = [
-    { value: '"Cormorant Garamond", Georgia, serif', label: 'Cormorant Garamond (default)' },
-    { value: '"Playfair Display", Georgia, serif', label: 'Playfair Display' },
-    { value: 'Georgia, serif', label: 'Georgia' },
-    { value: '"Times New Roman", Times, serif', label: 'Times New Roman' },
-    { value: '"Inter", system-ui, sans-serif', label: 'Inter (sans-serif)' },
+    { value: '"Manrope", system-ui, sans-serif', label: 'Manrope (default)' },
+    { value: '"Poppins", system-ui, sans-serif', label: 'Poppins' },
+    { value: '"Sora", system-ui, sans-serif', label: 'Sora' },
+    { value: '"Space Grotesk", system-ui, sans-serif', label: 'Space Grotesk' },
+    { value: 'Georgia, serif', label: 'Georgia (serif)' },
 ];
 
 const BODY_FONT_OPTIONS = [
@@ -56,8 +56,6 @@ const SECTION_LABELS = {
     brandMarquee: 'Brand Marquee',
     banners: 'Image Banners (Stacked)',
     bannerSlider: 'Banner Slider (Rotating)',
-    jewelExplorer3D: '3D Jewel Explorer',
-    dayInHerSparkle: 'A Day in Her Sparkle (Scroll Story)',
     featured: 'Featured Collection',
     trending: 'Trending Now',
     categories: 'Shop by Category',
@@ -66,9 +64,8 @@ const SECTION_LABELS = {
     wellnessJourney: '24 Hours With Your Ritual (Scroll Story)',
     bodyMap: 'Body Map (Scroll Story)',
     sourceTrail: 'The Source Trail (Scroll Story)',
-    openingIntro: 'Opening Intro (Before Hero)',
     whyChoose: 'Why Choose Us',
-    antiTarnishBanner: 'Anti-Tarnish Banner',
+    certifiedBanner: 'Certified Banner (FSSAI/GMP)',
     reviews: 'Customer Reviews',
     instagram: 'Instagram Gallery',
     newsletter: 'Newsletter',
@@ -222,7 +219,7 @@ export default function AdminContentPage() {
             case 'videoBanner':
                 return (
                     <div className="space-y-4 pt-3">
-                        <p className="text-xs text-admin-muted bg-wine/5 border border-wine/10 rounded-lg px-3 py-2">
+                        <p className="text-xs text-admin-muted bg-forest/5 border border-forest/10 rounded-lg px-3 py-2">
                             A full-width autoplay video banner. Hidden automatically until you upload a video.
                         </p>
                         <VideoUploadField
@@ -253,11 +250,11 @@ export default function AdminContentPage() {
                                         onClick={() => update('videoBanner', { ...content.videoBanner, fit: opt.value })}
                                         className={`rounded-xl border p-3 text-left transition-all ${
                                             content.videoBanner.fit === opt.value
-                                                ? 'border-wine bg-wine/5 ring-2 ring-wine/20'
+                                                ? 'border-forest bg-forest/5 ring-2 ring-forest/20'
                                                 : 'border-admin-border bg-admin-surface-alt hover:border-border'
                                         }`}
                                     >
-                                        <p className="text-sm font-semibold text-charcoal">{opt.title}</p>
+                                        <p className="text-sm font-semibold text-ink">{opt.title}</p>
                                         <p className="text-[11px] text-admin-muted mt-0.5">{opt.desc}</p>
                                     </button>
                                 ))}
@@ -307,20 +304,20 @@ export default function AdminContentPage() {
                                 <Input value={content.hero.primaryCta?.href} onChange={(e) => update('hero', { ...content.hero, primaryCta: { ...content.hero.primaryCta, href: e.target.value } })} placeholder="/shop" />
                             </AdminField>
                         </div>
-                        <AdminField label="Featured Product ID" hint="Pins a product to the hero center circle and secondary CTA. Leave empty for brand logo in center.">
+                        <AdminField label="Featured Product ID" hint="Pins a product to the small featured-product card and its CTA. Leave empty to hide that card.">
                             <Input value={content.hero.featuredProductId} onChange={(e) => update('hero', { ...content.hero, featuredProductId: e.target.value })} />
                         </AdminField>
-                        <AdminField label="Orbit Products" hint="The 4 tiles that spin around the hero. Leave any slot on Auto to fall back to your best-seller / new-arrival products.">
+                        <AdminField label="Hero Photos" hint="Up to 4 real product photos shown in the hero's rotating photo stage. Leave any slot on Auto to fall back to your best-seller / new-arrival products.">
                             <div className="grid grid-cols-2 gap-3">
                                 {[0, 1, 2, 3].map((slot) => (
                                     <AdminSelect
                                         key={slot}
-                                        aria-label={`Orbit product ${slot + 1}`}
-                                        value={content.hero.orbitProductIds?.[slot] ?? ''}
+                                        aria-label={`Hero photo ${slot + 1}`}
+                                        value={content.hero.productImageIds?.[slot] ?? ''}
                                         onChange={(e) => {
-                                            const next = [...(content.hero.orbitProductIds ?? [])];
+                                            const next = [...(content.hero.productImageIds ?? [])];
                                             next[slot] = e.target.value;
-                                            update('hero', { ...content.hero, orbitProductIds: next });
+                                            update('hero', { ...content.hero, productImageIds: next });
                                         }}
                                         className="w-full"
                                         options={[
@@ -331,27 +328,13 @@ export default function AdminContentPage() {
                                 ))}
                             </div>
                         </AdminField>
-                        <AdminField label="Scroll Cue" hint="Shown in the hero banner when the 3D Jewel Explorer section is enabled. Links down to that section.">
-                            <Input value={content.hero.scrollCue} onChange={(e) => update('hero', { ...content.hero, scrollCue: e.target.value })} placeholder="Explore in 3D ↓" />
-                        </AdminField>
-                        <ImageUploadField
-                            label="Center Image"
-                            hint="Hero 3D stage center circle. Leave empty to use featured product, then brand logo."
-                            value={content.hero.centerImage}
-                            onChange={(v) => update('hero', { ...content.hero, centerImage: v })}
-                            adminToken={adminToken}
-                        />
-                        <ImageUploadField label="Video Poster" value={content.hero.videoPoster} onChange={(v) => update('hero', { ...content.hero, videoPoster: v })} adminToken={adminToken} />
-                        <AdminField label="Background Video URL">
-                            <Input value={content.hero.videoUrl} onChange={(e) => update('hero', { ...content.hero, videoUrl: e.target.value })} />
-                        </AdminField>
                     </div>
                 );
 
             case 'bannerSlider':
                 return (
                     <div className="pt-3 space-y-3">
-                        <p className="text-xs text-admin-muted bg-wine/5 border border-wine/10 rounded-lg px-3 py-2">
+                        <p className="text-xs text-admin-muted bg-forest/5 border border-forest/10 rounded-lg px-3 py-2">
                             Full-width rotating carousel — one image visible at a time, auto-advancing.
                             Not the same as "Image Banners (Stacked)" below. Tag a banner "Both" to show it in both places.
                         </p>
@@ -362,7 +345,7 @@ export default function AdminContentPage() {
             case 'banners':
                 return (
                     <div className="pt-3 space-y-3">
-                        <p className="text-xs text-admin-muted bg-wine/5 border border-wine/10 rounded-lg px-3 py-2">
+                        <p className="text-xs text-admin-muted bg-forest/5 border border-forest/10 rounded-lg px-3 py-2">
                             All enabled images shown stacked, full-size, one after another — not a carousel.
                             Not the same as "Banner Slider" above. Tag a banner "Both" to show it in both places.
                         </p>
@@ -405,19 +388,19 @@ export default function AdminContentPage() {
                     </div>
                 );
 
-            case 'antiTarnishBanner':
+            case 'certifiedBanner':
                 return (
                     <div className="space-y-4 pt-3">
                         <AdminField label="Badge">
-                            <Input value={content.antiTarnishBanner.badge} onChange={(e) => update('antiTarnishBanner', { ...content.antiTarnishBanner, badge: e.target.value })} />
+                            <Input value={content.certifiedBanner.badge} onChange={(e) => update('certifiedBanner', { ...content.certifiedBanner, badge: e.target.value })} />
                         </AdminField>
                         <AdminField label="Title">
-                            <Input value={content.antiTarnishBanner.title} onChange={(e) => update('antiTarnishBanner', { ...content.antiTarnishBanner, title: e.target.value })} />
+                            <Input value={content.certifiedBanner.title} onChange={(e) => update('certifiedBanner', { ...content.certifiedBanner, title: e.target.value })} />
                         </AdminField>
                         <AdminField label="Description">
-                            <AdminTextarea value={content.antiTarnishBanner.description} onChange={(e) => update('antiTarnishBanner', { ...content.antiTarnishBanner, description: e.target.value })} rows={4} />
+                            <AdminTextarea value={content.certifiedBanner.description} onChange={(e) => update('certifiedBanner', { ...content.certifiedBanner, description: e.target.value })} rows={4} />
                         </AdminField>
-                        <ImageUploadField label="Banner Image" value={content.antiTarnishBanner.image} onChange={(v) => update('antiTarnishBanner', { ...content.antiTarnishBanner, image: v })} adminToken={adminToken} />
+                        <ImageUploadField label="Banner Image" value={content.certifiedBanner.image} onChange={(v) => update('certifiedBanner', { ...content.certifiedBanner, image: v })} adminToken={adminToken} />
                     </div>
                 );
 
@@ -448,7 +431,7 @@ export default function AdminContentPage() {
             case 'promoBanner':
                 return (
                     <div className="space-y-4 pt-3">
-                        <p className="text-xs text-admin-muted bg-wine/5 border border-wine/10 rounded-lg px-3 py-2">
+                        <p className="text-xs text-admin-muted bg-forest/5 border border-forest/10 rounded-lg px-3 py-2">
                             This is a text-only strip pinned above the navigation on every page (see "Free
                             delivery above..." at the very top of the site) — no image, and unrelated to
                             Banner Slider / Image Banners below.
@@ -457,11 +440,11 @@ export default function AdminContentPage() {
                             <button
                                 type="button"
                                 onClick={() => update('promo', { ...content.promo, enabled: !content.promo.enabled })}
-                                className={`relative w-12 h-6 rounded-full transition-colors ${content.promo.enabled ? 'bg-emerald' : 'bg-soft-brown/30'}`}
+                                className={`relative w-12 h-6 rounded-full transition-colors ${content.promo.enabled ? 'bg-emerald' : 'bg-slate/30'}`}
                             >
-                                <span className={`absolute top-0.5 w-5 h-5 bg-ivory rounded-full shadow transition-transform ${content.promo.enabled ? 'left-6' : 'left-0.5'}`} />
+                                <span className={`absolute top-0.5 w-5 h-5 bg-cream rounded-full shadow transition-transform ${content.promo.enabled ? 'left-6' : 'left-0.5'}`} />
                             </button>
-                            <span className="text-sm text-charcoal">Show promo banner</span>
+                            <span className="text-sm text-ink">Show promo banner</span>
                         </label>
                         <AdminField label="Banner Text (before code)">
                             <Input value={content.promo.text} onChange={(e) => update('promo', { ...content.promo, text: e.target.value })} />
@@ -482,7 +465,7 @@ export default function AdminContentPage() {
                 return (
                     <p className="text-sm text-admin-muted pt-3">
                         Shows products marked "Trending" in{' '}
-                        <Link to={`${ADMIN_PATH}/products`} className="text-wine font-medium hover:underline">Products</Link>. No extra content to configure here.
+                        <Link to={`${ADMIN_PATH}/products`} className="text-forest font-medium hover:underline">Products</Link>. No extra content to configure here.
                     </p>
                 );
 
@@ -490,7 +473,7 @@ export default function AdminContentPage() {
                 return (
                     <p className="text-sm text-admin-muted pt-3">
                         Shows categories with at least one product, managed in{' '}
-                        <Link to={`${ADMIN_PATH}/categories`} className="text-wine font-medium hover:underline">Categories</Link>. No extra content to configure here.
+                        <Link to={`${ADMIN_PATH}/categories`} className="text-forest font-medium hover:underline">Categories</Link>. No extra content to configure here.
                     </p>
                 );
 
@@ -498,7 +481,7 @@ export default function AdminContentPage() {
                 return (
                     <p className="text-sm text-admin-muted pt-3">
                         Shows every published bundle offer, managed in{' '}
-                        <Link to={`${ADMIN_PATH}/bundles`} className="text-wine font-medium hover:underline">Bundles</Link>. Hidden automatically when there are no bundles to show.
+                        <Link to={`${ADMIN_PATH}/bundles`} className="text-forest font-medium hover:underline">Bundles</Link>. Hidden automatically when there are no bundles to show.
                     </p>
                 );
 
@@ -530,90 +513,13 @@ export default function AdminContentPage() {
                     </p>
                 );
 
-            case 'openingIntro':
-                return (
-                    <p className="text-sm text-admin-muted pt-3">
-                        A cinematic figure moment shown before the hero banner, with a parallax 3D layer. No extra content to configure here.
-                    </p>
-                );
-
             case 'reviews':
                 return (
                     <p className="text-sm text-admin-muted pt-3">
                         Shows approved reviews from{' '}
-                        <Link to={`${ADMIN_PATH}/reviews`} className="text-wine font-medium hover:underline">Reviews</Link>. No extra content to configure here.
+                        <Link to={`${ADMIN_PATH}/reviews`} className="text-forest font-medium hover:underline">Reviews</Link>. No extra content to configure here.
                     </p>
                 );
-
-            case 'jewelExplorer3D':
-                return (
-                    <p className="text-sm text-admin-muted pt-3">
-                        Interactive 3D jewelry viewer. No extra content to configure here.
-                    </p>
-                );
-
-            case 'dayInHerSparkle': {
-                const story = content.dayInHerSparkle;
-                const updateStage = (i, field, value) => {
-                    const stages = story.stages.map((s, idx) => (idx === i ? { ...s, [field]: value } : s));
-                    update('dayInHerSparkle', { ...story, stages });
-                };
-                return (
-                    <div className="space-y-4 pt-3">
-                        <p className="text-xs text-admin-muted bg-wine/5 border border-wine/10 rounded-lg px-3 py-2">
-                            Scroll-driven story: one piece worn across the day, proving it never tarnishes.
-                            Desktop pins and crossfades between stages as you scroll; mobile swipes between them.
-                        </p>
-                        <AdminField label="Eyebrow">
-                            <Input value={story.eyebrow} onChange={(e) => update('dayInHerSparkle', { ...story, eyebrow: e.target.value })} />
-                        </AdminField>
-                        <AdminField label="Title">
-                            <Input value={story.title} onChange={(e) => update('dayInHerSparkle', { ...story, title: e.target.value })} />
-                        </AdminField>
-                        <AdminField label="Description">
-                            <AdminTextarea value={story.description} onChange={(e) => update('dayInHerSparkle', { ...story, description: e.target.value })} />
-                        </AdminField>
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            <AdminField label="CTA Button Label">
-                                <Input value={story.ctaLabel} onChange={(e) => update('dayInHerSparkle', { ...story, ctaLabel: e.target.value })} />
-                            </AdminField>
-                            <AdminField label="Featured Product" hint="Which product this piece is — links the final CTA and picks the 3D shape.">
-                                <AdminSelect
-                                    aria-label="Day in Her Sparkle product"
-                                    value={story.productId ?? ''}
-                                    onChange={(e) => update('dayInHerSparkle', { ...story, productId: e.target.value })}
-                                    className="w-full"
-                                    options={[{ value: '', label: 'None' }, ...products.map((p) => ({ value: p.id, label: p.title }))]}
-                                />
-                            </AdminField>
-                        </div>
-
-                        <p className="text-xs tracking-[0.15em] uppercase text-admin-muted pt-2">Stages</p>
-                        {story.stages.map((stage, i) => (
-                            <div key={stage.id} className="rounded-xl border border-border/50 p-4 space-y-3">
-                                <p className="text-xs font-medium text-charcoal">{stage.label || `Stage ${i + 1}`}</p>
-                                <div className="grid sm:grid-cols-3 gap-3">
-                                    <AdminField label="Label">
-                                        <Input value={stage.label} onChange={(e) => updateStage(i, 'label', e.target.value)} />
-                                    </AdminField>
-                                    <AdminField label="Time Label">
-                                        <Input value={stage.timeLabel} onChange={(e) => updateStage(i, 'timeLabel', e.target.value)} placeholder="7:00 AM" />
-                                    </AdminField>
-                                    <AdminField label="Copy Line">
-                                        <Input value={stage.copy} onChange={(e) => updateStage(i, 'copy', e.target.value)} placeholder="Still sparkling at 7am." />
-                                    </AdminField>
-                                </div>
-                                <ImageUploadField
-                                    label="Stage Image"
-                                    value={stage.image}
-                                    onChange={(v) => updateStage(i, 'image', v)}
-                                    adminToken={adminToken}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                );
-            }
 
             default:
                 return null;
@@ -626,7 +532,7 @@ export default function AdminContentPage() {
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="font-serif text-3xl text-charcoal mb-1 max-lg:hidden">Content Manager</h1>
+                    <h1 className="font-display text-3xl text-ink mb-1 max-lg:hidden">Content Manager</h1>
                     <p className="text-admin-muted text-sm">Edit website text, images, and sections. No code required.</p>
                 </div>
                 <AdminSaveBar
@@ -647,8 +553,8 @@ export default function AdminContentPage() {
                             onClick={() => setTab(id)}
                             className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm whitespace-nowrap transition-colors ${
                                 tab === id
-                                    ? 'bg-wine text-ivory'
-                                    : 'text-admin-muted hover:bg-admin-surface hover:text-charcoal'
+                                    ? 'bg-forest text-cream'
+                                    : 'text-admin-muted hover:bg-admin-surface hover:text-ink'
                             }`}
                         >
                             <Icon size={16} strokeWidth={1.5} />
@@ -722,7 +628,7 @@ export default function AdminContentPage() {
                             <AdminSection title="Payment Methods" description="Managed in Settings → Store Services. Individual products can override in the product editor.">
                                 <p className="text-sm text-admin-muted">
                                     Cash on Delivery and Online Payment toggles are in{' '}
-                                    <Link to={`${ADMIN_PATH}/settings`} className="text-wine font-medium hover:underline">
+                                    <Link to={`${ADMIN_PATH}/settings`} className="text-forest font-medium hover:underline">
                                         Settings
                                     </Link>
                                     .
@@ -763,7 +669,7 @@ export default function AdminContentPage() {
                                     <ColorField label="Primary — Dark" hint="Footer, deep backgrounds" value={content.theme.primaryDark} onChange={(v) => update('theme', { ...content.theme, primaryDark: v })} />
                                     <ColorField label="Accent Color" hint="Badges, price highlights" value={content.theme.accentColor} onChange={(v) => update('theme', { ...content.theme, accentColor: v })} />
                                     <ColorField label="Accent — Light" hint="Hover fills" value={content.theme.accentLight} onChange={(v) => update('theme', { ...content.theme, accentLight: v })} />
-                                    <ColorField label="Blush / Highlight" hint="CTAs on dark backgrounds" value={content.theme.blushColor} onChange={(v) => update('theme', { ...content.theme, blushColor: v })} />
+                                    <ColorField label="Sage / Background Tint" hint="Gentle backgrounds and decorative blobs" value={content.theme.tintColor} onChange={(v) => update('theme', { ...content.theme, tintColor: v })} />
                                     <ColorField label="Background Color" hint="Page background" value={content.theme.backgroundColor} onChange={(v) => update('theme', { ...content.theme, backgroundColor: v })} />
                                     <ColorField label="Text Color" hint="Body text" value={content.theme.textColor} onChange={(v) => update('theme', { ...content.theme, textColor: v })} />
                                 </div>
@@ -869,11 +775,11 @@ export default function AdminContentPage() {
                                 <button
                                     type="button"
                                     onClick={() => update('popup', { ...content.popup, enabled: !content.popup.enabled })}
-                                    className={`relative w-12 h-6 rounded-full transition-colors ${content.popup.enabled ? 'bg-emerald' : 'bg-soft-brown/30'}`}
+                                    className={`relative w-12 h-6 rounded-full transition-colors ${content.popup.enabled ? 'bg-emerald' : 'bg-slate/30'}`}
                                 >
-                                    <span className={`absolute top-0.5 w-5 h-5 bg-ivory rounded-full shadow transition-transform ${content.popup.enabled ? 'left-6' : 'left-0.5'}`} />
+                                    <span className={`absolute top-0.5 w-5 h-5 bg-cream rounded-full shadow transition-transform ${content.popup.enabled ? 'left-6' : 'left-0.5'}`} />
                                 </button>
-                                <span className="text-sm text-charcoal">Show announcement popup</span>
+                                <span className="text-sm text-ink">Show announcement popup</span>
                             </label>
 
                             <div className="grid sm:grid-cols-2 gap-4">

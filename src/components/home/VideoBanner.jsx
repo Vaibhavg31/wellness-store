@@ -42,7 +42,7 @@ export default function VideoBanner() {
     };
 
     return (
-        <section className="relative w-full overflow-hidden bg-charcoal" aria-label={banner.title || 'Video banner'}>
+        <section className="relative w-full overflow-hidden bg-ink" aria-label={banner.title || 'Video banner'}>
             <div className="relative w-full" style={{ aspectRatio, maxHeight: '85vh' }}>
                 {reducedMotion ? (
                     banner.poster && (
@@ -83,16 +83,16 @@ export default function VideoBanner() {
                             className="max-w-xl"
                         >
                             {banner.subtitle && (
-                                <p className="type-eyebrow text-ivory/70 mb-2">{banner.subtitle}</p>
+                                <p className="type-eyebrow text-cream/70 mb-2">{banner.subtitle}</p>
                             )}
                             {banner.title && (
-                                <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl text-ivory font-medium leading-tight mb-5">
+                                <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl text-cream font-medium leading-tight mb-5">
                                     {banner.title}
                                 </h2>
                             )}
                             {banner.ctaLabel && (
                                 <Link to={banner.ctaHref || '/shop'}>
-                                    <Button variant="gold" size="lg">{banner.ctaLabel}</Button>
+                                    <Button variant="turmeric" size="lg">{banner.ctaLabel}</Button>
                                 </Link>
                             )}
                         </motion.div>
@@ -103,7 +103,7 @@ export default function VideoBanner() {
                     <button
                         type="button"
                         onClick={toggleMute}
-                        className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-10 p-2.5 rounded-full bg-black/40 hover:bg-black/60 text-ivory backdrop-blur-sm transition-colors"
+                        className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-10 p-2.5 rounded-full bg-black/40 hover:bg-black/60 text-cream backdrop-blur-sm transition-colors"
                         aria-label={muted ? 'Unmute video' : 'Mute video'}
                     >
                         {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}

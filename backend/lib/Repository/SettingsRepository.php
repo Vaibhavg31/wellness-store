@@ -26,10 +26,10 @@ final class SettingsRepository
             'primaryDark'     => '#0A3D25',
             'accentColor'     => '#D97706',
             'accentLight'     => '#F59E0B',
-            'blushColor'      => '#FDE68A',
+            'tintColor'       => '#DCEEE1',
             'backgroundColor' => '#FBF9F4',
             'textColor'       => '#1C1A16',
-            'fontHeading'     => '"Fraunces", Georgia, serif',
+            'fontHeading'     => '"Manrope", system-ui, sans-serif',
             'fontBody'        => '"Inter", system-ui, sans-serif',
         ],
         'contact' => [
@@ -67,7 +67,6 @@ final class SettingsRepository
             ['label' => 'Contact',  'href' => '/contact'],
         ],
         'sections' => [
-            'openingIntro'      => true,
             'hero'              => true,
             'videoBanner'       => true,
             'brandMarquee'      => true,
@@ -82,7 +81,7 @@ final class SettingsRepository
             'bodyMap'           => true,
             'sourceTrail'       => true,
             'whyChoose'         => true,
-            'antiTarnishBanner' => true,
+            'certifiedBanner'   => true,
             'reviews'           => true,
             'instagram'         => true,
             'newsletter'        => true,
@@ -101,17 +100,13 @@ final class SettingsRepository
             'headlineAccent'      => 'Science',
             'subheadline'         => 'Clean-label supplements and nutrition, honestly sourced and lab tested for purity.',
             'primaryCta'          => ['label' => 'Shop Now', 'href' => '/shop'],
-            'secondaryCta'        => ['label' => 'Our Story', 'href' => '/about'],
             'featuredProductId'   => '',
-            'scrollCue'           => 'Scroll to explore',
-            'videoUrl'            => '',
-            'videoPoster'         => '',
-            'orbitImages'         => [],
-            'orbitProductIds'     => [],
+            'images'              => [],
+            'productImageIds'     => [],
             'trustBadges'         => [
-                ['icon' => 'shield', 'label' => 'FSSAI Certified'],
-                ['icon' => 'flask',  'label' => 'Lab Tested'],
-                ['icon' => 'leaf',   'label' => '100% Natural'],
+                ['icon' => 'shield',   'label' => 'FSSAI Certified'],
+                ['icon' => 'star',     'label' => '4.9★ Rated'],
+                ['icon' => 'sparkles', 'label' => 'Lab Tested'],
             ],
         ],
         // Renders nothing on the storefront until a video is uploaded —
@@ -149,7 +144,7 @@ final class SettingsRepository
             'benefits'    => [],
             'ctaText'     => "Stay connected with us on Instagram and WhatsApp. We're always happy to help.",
         ],
-        'antiTarnishBanner' => [
+        'certifiedBanner' => [
             'badge'       => 'FSSAI & GMP Certified',
             'title'       => 'Purity You Can Verify',
             'description' => 'Every product is manufactured in certified facilities and third-party lab tested before it reaches you.',
@@ -302,7 +297,7 @@ final class SettingsRepository
                 'primaryDark'     => $row['theme_primary_dark']     ?? $this->defaults['theme']['primaryDark'],
                 'accentColor'     => $row['theme_accent_color']     ?? $this->defaults['theme']['accentColor'],
                 'accentLight'     => $row['theme_accent_light']     ?? $this->defaults['theme']['accentLight'],
-                'blushColor'      => $row['theme_blush_color']      ?? $this->defaults['theme']['blushColor'],
+                'tintColor'       => $row['theme_blush_color']      ?? $this->defaults['theme']['tintColor'],
                 'backgroundColor' => $row['theme_background_color'] ?? $this->defaults['theme']['backgroundColor'],
                 'textColor'       => $row['theme_text_color']       ?? $this->defaults['theme']['textColor'],
                 'fontHeading'     => $row['theme_font_heading']     ?? $this->defaults['theme']['fontHeading'],
@@ -347,14 +342,10 @@ final class SettingsRepository
                 'headlineAccent'    => $row['hero_headline_accent'],
                 'subheadline'       => $row['hero_subheadline'],
                 'primaryCta'        => ['label' => $row['hero_primary_cta_label'],   'href' => $row['hero_primary_cta_href']],
-                'secondaryCta'      => ['label' => $row['hero_secondary_cta_label'], 'href' => $row['hero_secondary_cta_href']],
                 'featuredProductId' => $row['hero_featured_product_id'],
-                'scrollCue'         => $row['hero_scroll_cue'],
-                'videoUrl'          => $row['hero_video_url'],
-                'videoPoster'       => $row['hero_video_poster'],
                 'trustBadges'       => $this->fetchList('site_hero_trust_badges', fn($r) => ['icon' => $r['icon'], 'label' => $r['label']]),
-                'orbitImages'       => $this->fetchList('site_hero_orbit_images',  fn($r) => $r['url']),
-                'orbitProductIds'   => $this->fetchList('site_hero_orbit_products', fn($r) => $r['product_id']),
+                'images'            => $this->fetchList('site_hero_orbit_images',  fn($r) => $r['url']),
+                'productImageIds'   => $this->fetchList('site_hero_orbit_products', fn($r) => $r['product_id']),
             ],
             // Falls back to defaults for columns from migration 005 — keeps
             // this endpoint working on a database that hasn't been migrated
@@ -390,7 +381,7 @@ final class SettingsRepository
                     'description' => $r['description'],
                 ]),
             ],
-            'antiTarnishBanner' => [
+            'certifiedBanner' => [
                 'badge'       => $row['quality_promise_badge'],
                 'title'       => $row['quality_promise_title'],
                 'description' => $row['quality_promise_description'],
@@ -649,8 +640,8 @@ final class SettingsRepository
         $pr = $s['promo']    ?? [];
         $h  = $s['hero']     ?? [];
         $fe = $s['featured'] ?? [];
-        $wc = $s['whyChoose']         ?? [];
-        $at = $s['antiTarnishBanner'] ?? [];
+        $wc = $s['whyChoose']       ?? [];
+        $at = $s['certifiedBanner'] ?? [];
         $nl = $s['newsletter']        ?? [];
         $ig = $s['instagram']         ?? [];
         $ab = $s['about']             ?? [];
@@ -666,10 +657,10 @@ final class SettingsRepository
         $pdo->prepare($sql)->execute([
             $s['siteName'] ?? '', $s['brandName'] ?? '', $s['brandShort'] ?? '',
             $s['brandTagline'] ?? '', $s['brandDescription'] ?? '', $s['logo'] ?? '', $s['favicon'] ?? '',
-            $th['primaryColor'] ?? '#5A0009', $th['primaryLight'] ?? '#7A000F', $th['primaryDark'] ?? '#3E0007',
-            $th['accentColor'] ?? '#D9B26F', $th['accentLight'] ?? '#E8CC91', $th['blushColor'] ?? '#F2B8B5',
-            $th['backgroundColor'] ?? '#FDF6F0', $th['textColor'] ?? '#231414',
-            $th['fontHeading'] ?? '"Cormorant Garamond", Georgia, serif',
+            $th['primaryColor'] ?? '#0F5132', $th['primaryLight'] ?? '#15803D', $th['primaryDark'] ?? '#0A3D25',
+            $th['accentColor'] ?? '#D97706', $th['accentLight'] ?? '#F59E0B', $th['tintColor'] ?? '#DCEEE1',
+            $th['backgroundColor'] ?? '#FBF9F4', $th['textColor'] ?? '#1C1A16',
+            $th['fontHeading'] ?? '"Manrope", system-ui, sans-serif',
             $th['fontBody'] ?? '"Inter", system-ui, sans-serif',
             $c['email'] ?? '', $c['whatsappNumber'] ?? '', $c['whatsappDisplay'] ?? '',
             $c['whatsappDefaultMessage'] ?? '', $c['businessHours'] ?? '',
@@ -730,11 +721,11 @@ final class SettingsRepository
             $stmt->execute([$item['icon'] ?? '', $item['label'] ?? '', $i]);
         }, 'INSERT INTO site_hero_trust_badges (icon, label, sort_order) VALUES (?, ?, ?)');
 
-        $this->replaceList('site_hero_orbit_images', $h['orbitImages'] ?? [], function (\PDOStatement $stmt, string $url, int $i) {
+        $this->replaceList('site_hero_orbit_images', $h['images'] ?? [], function (\PDOStatement $stmt, string $url, int $i) {
             $stmt->execute([$url, $i]);
         }, 'INSERT INTO site_hero_orbit_images (url, sort_order) VALUES (?, ?)');
 
-        $this->replaceList('site_hero_orbit_products', $h['orbitProductIds'] ?? [], function (\PDOStatement $stmt, string $productId, int $i) {
+        $this->replaceList('site_hero_orbit_products', $h['productImageIds'] ?? [], function (\PDOStatement $stmt, string $productId, int $i) {
             $stmt->execute([$productId, $i]);
         }, 'INSERT INTO site_hero_orbit_products (product_id, sort_order) VALUES (?, ?)');
 

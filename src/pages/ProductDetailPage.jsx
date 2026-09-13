@@ -44,13 +44,6 @@ export default function ProductDetailPage() {
     const [showMobileBar, setShowMobileBar]    = useState(false);
     const buyBoxRef = useRef(null);
 
-    // Redirect legacy rims-* URLs to krivea-*
-    useEffect(() => {
-        if (product && id.startsWith('rims-') && product.id !== id) {
-            navigate(`/product/${product.id}`, { replace: true });
-        }
-    }, [product, id, navigate]);
-
     useEffect(() => {
         setSelectedImage(0);
         setQuantity(1);
@@ -79,7 +72,7 @@ export default function ProductDetailPage() {
     if (loading) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-wine/30 border-t-wine rounded-full animate-spin" aria-label="Loading product" />
+                <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" aria-label="Loading product" />
             </div>
         );
     }
@@ -87,7 +80,7 @@ export default function ProductDetailPage() {
     if (!product) {
         return (
             <div className="pb-20 pt-8 text-center px-6">
-                <h1 className="font-serif text-3xl mb-4">Product Not Found</h1>
+                <h1 className="font-display text-3xl mb-4">Product Not Found</h1>
                 <Link to="/shop"><Button variant="outline">Back to Shop</Button></Link>
             </div>
         );
@@ -151,7 +144,7 @@ export default function ProductDetailPage() {
 
     const handleAddToCart = () => {
         if (outOfStock) {
-            showToast('This piece is out of stock', 'error');
+            showToast('This item is out of stock', 'error');
             return;
         }
         if (addToCart(cartProduct, quantity)) {
@@ -163,7 +156,7 @@ export default function ProductDetailPage() {
 
     const handleBuyNow = () => {
         if (outOfStock) {
-            showToast('This piece is out of stock', 'error');
+            showToast('This item is out of stock', 'error');
             return;
         }
         if (addToCart(cartProduct, quantity)) {
@@ -178,7 +171,7 @@ export default function ProductDetailPage() {
     return (
         <div className="pb-28 lg:pb-20 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <Link to="/shop" className="inline-flex items-center gap-2 text-sm text-soft-brown hover:text-wine mb-6 sm:mb-8 group transition-colors">
+                <Link to="/shop" className="inline-flex items-center gap-2 text-sm text-slate hover:text-forest mb-6 sm:mb-8 group transition-colors">
                     <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                     Back to Shop
                 </Link>
@@ -190,9 +183,9 @@ export default function ProductDetailPage() {
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                         className="min-w-0"
                     >
-                        <p className="type-eyebrow text-soft-brown mb-3">Product gallery</p>
+                        <p className="type-eyebrow text-slate mb-3">Product gallery</p>
 
-                        <div className="relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl bg-warm-beige/40 luxury-shadow-lg mb-3 sm:mb-4 group">
+                        <div className="relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl bg-sand/40 soft-shadow-lg mb-3 sm:mb-4 group">
                             <AnimatePresence mode="wait">
                                 <motion.img
                                     key={`photo-${selectedImage}`}
@@ -219,7 +212,7 @@ export default function ProductDetailPage() {
                                     type="button"
                                     onClick={() => setSelectedImage(i)}
                                     className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 overflow-hidden rounded-lg sm:rounded-xl border-2 transition-all duration-300 ${
-                                        selectedImage === i ? 'border-wine luxury-shadow scale-[1.03]' : 'border-transparent opacity-55 hover:opacity-90'
+                                        selectedImage === i ? 'border-forest soft-shadow scale-[1.03]' : 'border-transparent opacity-55 hover:opacity-90'
                                     }`}
                                     aria-label={`View image ${i + 1}`}
                                 >
@@ -236,27 +229,27 @@ export default function ProductDetailPage() {
                         transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
                         className="lg:sticky lg:top-[calc(var(--site-header-h,7rem)+1rem)] lg:self-start min-w-0"
                     >
-                        <p className="type-eyebrow text-wine/75 mb-2 sm:mb-3 capitalize">{product.category}</p>
-                        <h1 className="font-serif text-3xl sm:text-4xl md:text-[2.75rem] font-medium text-charcoal mb-4 sm:mb-5 leading-tight">{product.title}</h1>
+                        <p className="type-eyebrow text-forest/75 mb-2 sm:mb-3 capitalize">{product.category}</p>
+                        <h1 className="font-display text-3xl sm:text-4xl md:text-[2.75rem] font-medium text-ink mb-4 sm:mb-5 leading-tight">{product.title}</h1>
 
                         {product.reviewCount > 0 && (
                             <div className="flex items-center gap-3 mb-6 sm:mb-8">
                                 <div className="flex gap-0.5" aria-label={`${product.rating} out of 5 stars`}>
                                     {Array.from({ length: 5 }).map((_, i) => (
-                                        <Star key={i} size={14} className={i < Math.floor(product.rating) ? 'text-gold fill-gold' : 'text-border'} strokeWidth={0} />
+                                        <Star key={i} size={14} className={i < Math.floor(product.rating) ? 'text-turmeric fill-turmeric' : 'text-border'} strokeWidth={0} />
                                     ))}
                                 </div>
-                                <span className="text-sm text-soft-brown">{product.rating} ({product.reviewCount} reviews)</span>
+                                <span className="text-sm text-slate">{product.rating} ({product.reviewCount} reviews)</span>
                             </div>
                         )}
 
                         <div className="flex flex-wrap items-baseline gap-3 sm:gap-4 mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-border/60">
-                            <span className="font-serif text-2xl sm:text-3xl text-charcoal">{formatPrice(displayPrice)}</span>
+                            <span className="font-display text-2xl sm:text-3xl text-ink">{formatPrice(displayPrice)}</span>
                             {displayOriginalPrice > displayPrice && (
-                                <span className="text-base sm:text-lg text-soft-brown/50 line-through">{formatPrice(displayOriginalPrice)}</span>
+                                <span className="text-base sm:text-lg text-slate/50 line-through">{formatPrice(displayOriginalPrice)}</span>
                             )}
                             {displayDiscount > 0 && (
-                                <span className="px-2 py-0.5 rounded-full bg-wine/10 text-wine text-xs font-medium">
+                                <span className="px-2 py-0.5 rounded-full bg-forest/10 text-forest text-xs font-medium">
                                     {displayDiscount}% off
                                 </span>
                             )}
@@ -264,7 +257,7 @@ export default function ProductDetailPage() {
 
                         {hasVariants && (
                             <div className="mb-6 sm:mb-8">
-                                <p className="type-eyebrow text-soft-brown mb-3">Choose an Option</p>
+                                <p className="type-eyebrow text-slate mb-3">Choose an Option</p>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
                                     {variants.map((v) => {
                                         const active = v.id === activeVariant?.id;
@@ -277,13 +270,13 @@ export default function ProductDetailPage() {
                                                 onClick={() => setSelectedVariantId(v.id)}
                                                 className={`relative text-left px-3.5 py-3 rounded-xl border transition-all duration-200 ${
                                                     active
-                                                        ? 'border-wine bg-wine/5 ring-1 ring-wine'
-                                                        : 'border-border/70 hover:border-wine/40'
+                                                        ? 'border-forest bg-forest/5 ring-1 ring-forest'
+                                                        : 'border-border/70 hover:border-forest/40'
                                                 } ${sold ? 'opacity-45 cursor-not-allowed' : ''}`}
                                                 aria-pressed={active}
                                             >
                                                 {v.discount > 0 && !sold && (
-                                                    <span className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-gold text-ivory text-[10px] font-medium shadow-sm">
+                                                    <span className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-turmeric text-cream text-[10px] font-medium shadow-sm">
                                                         -{v.discount}%
                                                     </span>
                                                 )}
@@ -295,17 +288,17 @@ export default function ProductDetailPage() {
                                                             className="w-8 h-8 rounded-lg object-cover border border-border/50 flex-shrink-0"
                                                         />
                                                     )}
-                                                    <span className={`block text-sm font-medium ${active ? 'text-wine' : 'text-charcoal'}`}>
+                                                    <span className={`block text-sm font-medium ${active ? 'text-forest' : 'text-ink'}`}>
                                                         {v.label}
                                                     </span>
                                                 </span>
                                                 {v.netQuantity && (
-                                                    <span className="block text-xs text-soft-brown/70 mt-0.5">{v.netQuantity}</span>
+                                                    <span className="block text-xs text-slate/70 mt-0.5">{v.netQuantity}</span>
                                                 )}
-                                                <span className="block text-sm font-serif text-charcoal mt-1.5">
+                                                <span className="block text-sm font-display text-ink mt-1.5">
                                                     {formatPrice(v.price)}
                                                     {v.originalPrice > v.price && (
-                                                        <span className="ml-1.5 text-xs text-soft-brown/50 line-through">{formatPrice(v.originalPrice)}</span>
+                                                        <span className="ml-1.5 text-xs text-slate/50 line-through">{formatPrice(v.originalPrice)}</span>
                                                     )}
                                                 </span>
                                                 {sold && <span className="block text-[11px] text-red-600 mt-1">Out of stock</span>}
@@ -325,13 +318,13 @@ export default function ProductDetailPage() {
                                         onClick={() => setActiveTab(tab)}
                                         className={`px-3 sm:px-4 pb-3 type-eyebrow transition-all duration-300 border-b-2 -mb-px whitespace-nowrap ${
                                             activeTab === tab
-                                                ? 'text-wine border-wine font-medium'
-                                                : 'text-soft-brown/60 border-transparent hover:text-soft-brown'
+                                                ? 'text-forest border-forest font-medium'
+                                                : 'text-slate/60 border-transparent hover:text-slate'
                                         }`}
                                     >
                                         {tab}
                                         {tab === 'Reviews' && reviews.length > 0 && (
-                                            <span className="ml-1.5 text-[11px] bg-wine/10 text-wine rounded-full px-1.5 py-0.5">{reviews.length}</span>
+                                            <span className="ml-1.5 text-[11px] bg-forest/10 text-forest rounded-full px-1.5 py-0.5">{reviews.length}</span>
                                         )}
                                     </button>
                                 ))}
@@ -345,7 +338,7 @@ export default function ProductDetailPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.25 }}
-                                        className="text-soft-brown font-light leading-relaxed text-sm sm:text-base"
+                                        className="text-slate font-light leading-relaxed text-sm sm:text-base"
                                     >
                                         {product.description}
                                     </motion.p>
@@ -360,8 +353,8 @@ export default function ProductDetailPage() {
                                         className="space-y-3"
                                     >
                                         {product.features.map((feature) => (
-                                            <li key={feature} className="flex items-center gap-3 text-sm text-soft-brown">
-                                                <span className="w-1.5 h-1.5 bg-wine/50 rounded-full flex-shrink-0" />
+                                            <li key={feature} className="flex items-center gap-3 text-sm text-slate">
+                                                <span className="w-1.5 h-1.5 bg-forest/50 rounded-full flex-shrink-0" />
                                                 {feature}
                                             </li>
                                         ))}
@@ -376,20 +369,20 @@ export default function ProductDetailPage() {
                                         transition={{ duration: 0.25 }}
                                     >
                                         {reviews.length === 0 ? (
-                                            <p className="text-soft-brown/60 text-sm">No reviews yet. Be the first!</p>
+                                            <p className="text-slate/60 text-sm">No reviews yet. Be the first!</p>
                                         ) : (
                                             <div className="space-y-4 max-h-56 overflow-y-auto pr-2">
                                                 {reviews.map((review) => (
                                                     <div key={review.id} className="border-b border-border/40 pb-4 last:border-0">
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <p className="text-sm font-medium text-charcoal">{review.name}</p>
+                                                            <p className="text-sm font-medium text-ink">{review.name}</p>
                                                             <div className="flex gap-0.5">
                                                                 {Array.from({ length: 5 }).map((_, j) => (
-                                                                    <Star key={j} size={11} className={j < review.rating ? 'text-gold fill-gold' : 'text-border'} strokeWidth={0} />
+                                                                    <Star key={j} size={11} className={j < review.rating ? 'text-turmeric fill-turmeric' : 'text-border'} strokeWidth={0} />
                                                                 ))}
                                                             </div>
                                                         </div>
-                                                        <p className="text-soft-brown text-sm leading-relaxed">{review.comment}</p>
+                                                        <p className="text-slate text-sm leading-relaxed">{review.comment}</p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -402,23 +395,23 @@ export default function ProductDetailPage() {
                         {outOfStock ? (
                             <p className="text-sm text-red-600 mb-5 font-medium">Out of stock</p>
                         ) : displayStock <= 5 && (
-                            <p className="text-sm text-wine/80 mb-5 font-medium">Only {displayStock} left in stock</p>
+                            <p className="text-sm text-forest/80 mb-5 font-medium">Only {displayStock} left in stock</p>
                         )}
 
                         <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                             <div className="flex items-center rounded-full border border-border/80 overflow-hidden">
-                                <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3 sm:p-3.5 hover:bg-warm-beige/60 transition-colors" aria-label="Decrease quantity">
+                                <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3 sm:p-3.5 hover:bg-sand/60 transition-colors" aria-label="Decrease quantity">
                                     <Minus size={16} />
                                 </button>
                                 <span className="px-4 sm:px-5 text-sm font-medium" aria-live="polite">{quantity}</span>
-                                <button type="button" onClick={() => setQuantity(Math.min(maxQty, quantity + 1))} disabled={outOfStock} className="p-3 sm:p-3.5 hover:bg-warm-beige/60 transition-colors disabled:opacity-40" aria-label="Increase quantity">
+                                <button type="button" onClick={() => setQuantity(Math.min(maxQty, quantity + 1))} disabled={outOfStock} className="p-3 sm:p-3.5 hover:bg-sand/60 transition-colors disabled:opacity-40" aria-label="Increase quantity">
                                     <Plus size={16} />
                                 </button>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => { toggleWishlist(product); showToast(wished ? 'Removed from wishlist' : 'Added to wishlist', 'success'); }}
-                                className={`p-3 sm:p-3.5 rounded-full border transition-all duration-300 ${wished ? 'border-wine text-wine bg-wine/8' : 'border-border/80 hover:border-wine/40 hover:text-wine'}`}
+                                className={`p-3 sm:p-3.5 rounded-full border transition-all duration-300 ${wished ? 'border-forest text-forest bg-forest/8' : 'border-border/80 hover:border-forest/40 hover:text-forest'}`}
                                 aria-label={wished ? 'Remove from wishlist' : 'Save to wishlist'}
                             >
                                 <Heart size={20} fill={wished ? 'currentColor' : 'none'} />
@@ -429,14 +422,14 @@ export default function ProductDetailPage() {
                             <Button
                                 variant="primary"
                                 size="lg"
-                                className="flex-1 bg-wine hover:bg-wine-light text-ivory"
+                                className="flex-1 bg-forest hover:bg-forest-light text-cream"
                                 disabled={outOfStock}
                                 onClick={handleAddToCart}
                             >
                                 <ShoppingBag size={18} /> Add to Cart
                             </Button>
                             <Button
-                                variant="gold"
+                                variant="turmeric"
                                 size="lg"
                                 className="flex-1"
                                 disabled={outOfStock}
@@ -451,14 +444,14 @@ export default function ProductDetailPage() {
                             <Button
                                 variant="primary"
                                 size="lg"
-                                className="w-full bg-wine hover:bg-wine-light text-ivory"
+                                className="w-full bg-forest hover:bg-forest-light text-cream"
                                 disabled={outOfStock}
                                 onClick={handleAddToCart}
                             >
                                 <ShoppingBag size={18} /> Add to Cart
                             </Button>
                             <Button
-                                variant="gold"
+                                variant="turmeric"
                                 size="lg"
                                 className="w-full"
                                 disabled={outOfStock}
@@ -476,9 +469,9 @@ export default function ProductDetailPage() {
                                     : 'grid-cols-3'
                             }`}>
                                 {trustBadges.map(({ icon: Icon, label }) => (
-                                    <div key={label} className="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-xl bg-warm-beige/40 border border-border/40 text-center">
-                                        <Icon size={16} className="text-wine/70" />
-                                        <span className="type-eyebrow-sm text-soft-brown leading-tight">{label}</span>
+                                    <div key={label} className="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-xl bg-sand/40 border border-border/40 text-center">
+                                        <Icon size={16} className="text-forest/70" />
+                                        <span className="type-eyebrow-sm text-slate leading-tight">{label}</span>
                                     </div>
                                 ))}
                             </div>
@@ -496,22 +489,22 @@ export default function ProductDetailPage() {
                 )}
 
                 <section className="mt-12 sm:mt-16 bg-cream rounded-2xl p-5 sm:p-8 border border-border/40">
-                    <h2 className="font-serif text-xl sm:text-2xl mb-6 text-charcoal">Write a Review</h2>
+                    <h2 className="font-display text-xl sm:text-2xl mb-6 text-ink">Write a Review</h2>
                     {reviewSubmitted ? (
-                        <p className="text-wine/80 font-light">Thank you! Your review has been submitted for approval.</p>
+                        <p className="text-forest/80 font-light">Thank you! Your review has been submitted for approval.</p>
                     ) : (
                         <form onSubmit={handleReviewSubmit} className="space-y-4 max-w-lg">
                             <Input label="Name" value={reviewForm.name} onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })} required />
                             <Input label="Email" type="email" value={reviewForm.email} onChange={(e) => setReviewForm({ ...reviewForm, email: e.target.value })} required />
                             <div>
-                                <label className="block text-xs tracking-[0.15em] uppercase text-soft-brown mb-2">Rating</label>
+                                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-2">Rating</label>
                                 <div className="flex gap-1">
                                     {[1, 2, 3, 4, 5].map((r) => (
                                         <button
                                             key={r}
                                             type="button"
                                             onClick={() => setReviewForm({ ...reviewForm, rating: r })}
-                                            className={reviewForm.rating >= r ? 'text-gold' : 'text-border'}
+                                            className={reviewForm.rating >= r ? 'text-turmeric' : 'text-border'}
                                             aria-label={`Rate ${r} star${r !== 1 ? 's' : ''}`}
                                         >
                                             <Star size={18} fill={reviewForm.rating >= r ? 'currentColor' : 'none'} />
@@ -525,13 +518,13 @@ export default function ProductDetailPage() {
                                 rows={3}
                                 required
                                 minLength={10}
-                                className="w-full px-4 py-3 border border-warm-beige/60 rounded-lg resize-none bg-ivory focus:outline-none focus:ring-1 focus:ring-wine/30 text-charcoal placeholder:text-soft-brown/40 font-light"
+                                className="w-full px-4 py-3 border border-sand/60 rounded-lg resize-none bg-cream focus:outline-none focus:ring-1 focus:ring-forest/30 text-ink placeholder:text-slate/40 font-light"
                                 placeholder="Share your experience…"
                             />
                             {reviewError && (
                                 <p className="text-red-600 text-sm" role="alert">{reviewError}</p>
                             )}
-                            <Button variant="gold" type="submit">Submit Review</Button>
+                            <Button variant="turmeric" type="submit">Submit Review</Button>
                         </form>
                     )}
                 </section>
@@ -554,17 +547,17 @@ export default function ProductDetailPage() {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: 80, opacity: 0 }}
                         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-ivory/95 backdrop-blur-md border-t border-border/60 px-4 py-3 safe-area-pb"
+                        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-md border-t border-border/60 px-4 py-3 safe-area-pb"
                     >
                         <div className="max-w-7xl mx-auto flex items-center gap-3">
                             <div className="min-w-0 flex-1">
-                                <p className="text-xs text-soft-brown line-clamp-1">
+                                <p className="text-xs text-slate line-clamp-1">
                                     {product.title}{activeVariant ? ` — ${activeVariant.label}` : ''}
                                 </p>
-                                <p className="font-serif text-lg text-wine">{formatPrice(displayPrice)}</p>
+                                <p className="font-display text-lg text-forest">{formatPrice(displayPrice)}</p>
                             </div>
                             <Button
-                                variant="gold"
+                                variant="turmeric"
                                 size="md"
                                 disabled={outOfStock}
                                 onClick={handleBuyNow}

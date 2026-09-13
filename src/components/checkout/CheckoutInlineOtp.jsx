@@ -189,8 +189,8 @@ export default function CheckoutInlineOtp({
                 className="mt-4 p-6 rounded-xl border border-emerald/20 bg-emerald/5 flex flex-col items-center text-center"
             >
                 <VerifyAnimation size={64} className="text-emerald mb-3" />
-                <p className="text-sm font-medium text-charcoal">Mobile verified</p>
-                <p className="text-xs text-soft-brown mt-1">{displayPhone}</p>
+                <p className="text-sm font-medium text-ink">Mobile verified</p>
+                <p className="text-xs text-slate mt-1">{displayPhone}</p>
             </motion.div>
         );
     }
@@ -203,13 +203,13 @@ export default function CheckoutInlineOtp({
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
             >
-                <div className="mt-4 p-4 sm:p-5 rounded-xl border border-wine/15 bg-wine/[0.03]">
+                <div className="mt-4 p-4 sm:p-5 rounded-xl border border-forest/15 bg-forest/[0.03]">
                     <div className="flex items-start justify-between gap-3 mb-3">
                         <div>
-                            <p className="text-xs tracking-[0.15em] uppercase text-wine font-medium mb-1">
+                            <p className="text-xs tracking-[0.15em] uppercase text-forest font-medium mb-1">
                                 Mobile verification
                             </p>
-                            <p className="text-sm text-charcoal">
+                            <p className="text-sm text-ink">
                                 {otpSent
                                     ? <>Enter the code sent to <span className="font-medium">{displayPhone}</span></>
                                     : <>Verify <span className="font-medium">{displayPhone}</span> with a one-time SMS code</>}
@@ -219,7 +219,7 @@ export default function CheckoutInlineOtp({
                             <button
                                 type="button"
                                 onClick={onCancel}
-                                className="text-xs text-soft-brown hover:text-wine transition-colors flex-shrink-0"
+                                className="text-xs text-slate hover:text-forest transition-colors flex-shrink-0"
                             >
                                 Change number
                             </button>
@@ -229,9 +229,9 @@ export default function CheckoutInlineOtp({
                     {!otpSent && !sending && (
                         <Button
                             type="button"
-                            variant="gold"
+                            variant="turmeric"
                             size="md"
-                            className="w-full sm:w-auto bg-wine hover:bg-wine-deep text-ivory border-wine mb-3"
+                            className="w-full sm:w-auto bg-forest hover:bg-forest-deep text-cream border-forest mb-3"
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -243,8 +243,8 @@ export default function CheckoutInlineOtp({
                     )}
 
                     {sending && (
-                        <div className="flex items-center gap-2 text-sm text-soft-brown mb-3">
-                            <Loader2 size={16} className="animate-spin text-wine" />
+                        <div className="flex items-center gap-2 text-sm text-slate mb-3">
+                            <Loader2 size={16} className="animate-spin text-forest" />
                             {otpSent ? 'Resending OTP…' : 'Sending OTP…'}
                         </div>
                     )}
@@ -252,7 +252,7 @@ export default function CheckoutInlineOtp({
                     {otpSent && (
                         <div className="space-y-4">
                             <div>
-                                <label htmlFor="checkout-inline-otp" className="block text-xs tracking-[0.12em] uppercase text-soft-brown mb-2">
+                                <label htmlFor="checkout-inline-otp" className="block text-xs tracking-[0.12em] uppercase text-slate mb-2">
                                     6-digit OTP
                                 </label>
                                 <input
@@ -270,7 +270,7 @@ export default function CheckoutInlineOtp({
                                         }
                                     }}
                                     placeholder="000000"
-                                    className="w-full text-center text-xl tracking-[0.35em] px-4 py-3 bg-ivory border border-border rounded-xl focus:outline-none focus:border-wine focus:ring-1 focus:ring-wine/25 font-medium text-charcoal"
+                                    className="w-full text-center text-xl tracking-[0.35em] px-4 py-3 bg-cream border border-border rounded-xl focus:outline-none focus:border-forest focus:ring-1 focus:ring-forest/25 font-medium text-ink"
                                     disabled={verifying}
                                     autoFocus
                                 />
@@ -279,9 +279,9 @@ export default function CheckoutInlineOtp({
                             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                 <Button
                                     type="button"
-                                    variant="gold"
+                                    variant="turmeric"
                                     size="md"
-                                    className="flex-1 bg-wine hover:bg-wine-deep text-ivory border-wine"
+                                    className="flex-1 bg-forest hover:bg-forest-deep text-cream border-forest"
                                     disabled={verifying || otp.length !== 6}
                                     onClick={confirmOtp}
                                 >
@@ -291,7 +291,7 @@ export default function CheckoutInlineOtp({
                                     type="button"
                                     variant="outline"
                                     size="md"
-                                    className="flex-1 border-wine/25 text-wine"
+                                    className="flex-1 border-forest/25 text-forest"
                                     disabled={sending || verifying || resendIn > 0}
                                     onClick={resendOtp}
                                 >
@@ -307,7 +307,7 @@ export default function CheckoutInlineOtp({
                         </div>
                     )}
 
-                    <p className="mt-3 text-[11px] text-soft-brown leading-relaxed">
+                    <p className="mt-3 text-[11px] text-slate leading-relaxed">
                         SMS can take up to a minute. Check spam if you don&apos;t see it.
                     </p>
                 </div>

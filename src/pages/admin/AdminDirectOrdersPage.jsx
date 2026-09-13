@@ -69,7 +69,7 @@ function LineItemRow({ item, index, products, onChange, onRemove, canRemove }) {
                     Line {index + 1}
                 </span>
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-charcoal">{formatPrice(lineTotal)}</span>
+                    <span className="text-sm font-semibold text-ink">{formatPrice(lineTotal)}</span>
                     {canRemove && (
                         <button
                             type="button"
@@ -145,7 +145,7 @@ function DirectOrderDetailPanel({ order, adminToken, onUpdated }) {
 
     return (
         <div className="space-y-5">
-            <div className="rounded-xl border border-admin-border bg-gradient-to-br from-cream/80 to-warm-beige/40 p-5">
+            <div className="rounded-xl border border-admin-border bg-gradient-to-br from-cream/80 to-sand/40 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
@@ -156,26 +156,26 @@ function DirectOrderDetailPanel({ order, adminToken, onUpdated }) {
                         </div>
                         <p className="text-xs text-admin-muted">{paymentLabel(order)}</p>
                     </div>
-                    <p className="font-serif text-3xl text-charcoal">{formatPrice(order.total)}</p>
+                    <p className="font-display text-3xl text-ink">{formatPrice(order.total)}</p>
                 </div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
                 <div className="rounded-lg bg-admin-surface-alt p-3 border border-admin-border">
                     <p className="text-[10px] uppercase tracking-wider text-admin-muted mb-1">Customer</p>
-                    <p className="font-medium text-charcoal">{order.shipping?.name}</p>
+                    <p className="font-medium text-ink">{order.shipping?.name}</p>
                     <p className="text-admin-muted mt-1">{order.shipping?.phone}</p>
                 </div>
                 <div className="rounded-lg bg-admin-surface-alt p-3 border border-admin-border">
                     <p className="text-[10px] uppercase tracking-wider text-admin-muted mb-1">Email</p>
-                    <p className="text-charcoal break-all">{order.email || '—'}</p>
+                    <p className="text-ink break-all">{order.email || '—'}</p>
                 </div>
             </div>
 
             {address && (
                 <div className="rounded-lg bg-admin-surface-alt p-3 border border-admin-border text-sm">
                     <p className="text-[10px] uppercase tracking-wider text-admin-muted mb-1">Address</p>
-                    <p className="text-charcoal leading-relaxed">{address}</p>
+                    <p className="text-ink leading-relaxed">{address}</p>
                 </div>
             )}
 
@@ -203,7 +203,7 @@ function DirectOrderDetailPanel({ order, adminToken, onUpdated }) {
 
             <Link
                 to={`${ADMIN_PATH}/orders?source=direct`}
-                className="text-sm text-wine hover:text-wine-light inline-flex items-center gap-1 font-medium"
+                className="text-sm text-forest hover:text-forest-light inline-flex items-center gap-1 font-medium"
             >
                 Open in all orders <ChevronRight size={14} />
             </Link>
@@ -414,7 +414,7 @@ export default function AdminDirectOrdersPage() {
         <div className="max-w-5xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="font-serif text-3xl text-charcoal mb-1 max-lg:hidden">Direct Orders</h1>
+                    <h1 className="font-display text-3xl text-ink mb-1 max-lg:hidden">Direct Orders</h1>
                     <p className="text-admin-muted text-sm max-w-xl">
                         Fast manual orders. Only name, phone, and items are required. Turn on optional sections when you need them.
                     </p>
@@ -446,8 +446,8 @@ export default function AdminDirectOrdersPage() {
                     onClick={() => setActiveTab('create')}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         activeTab === 'create'
-                            ? 'bg-white text-charcoal shadow-sm border border-admin-border'
-                            : 'text-admin-muted hover:text-charcoal'
+                            ? 'bg-white text-ink shadow-sm border border-admin-border'
+                            : 'text-admin-muted hover:text-ink'
                     }`}
                 >
                     <ClipboardList size={16} />
@@ -461,14 +461,14 @@ export default function AdminDirectOrdersPage() {
                     }}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         activeTab === 'history'
-                            ? 'bg-white text-charcoal shadow-sm border border-admin-border'
-                            : 'text-admin-muted hover:text-charcoal'
+                            ? 'bg-white text-ink shadow-sm border border-admin-border'
+                            : 'text-admin-muted hover:text-ink'
                     }`}
                 >
                     <History size={16} />
                     History
                     {directOrders.length > 0 && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-wine/10 text-wine font-semibold">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-forest/10 text-forest font-semibold">
                             {directOrders.length}
                         </span>
                     )}
@@ -492,11 +492,11 @@ export default function AdminDirectOrdersPage() {
 
                     <section className="rounded-2xl border border-admin-border bg-white shadow-sm p-5 sm:p-6 space-y-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-wine/10 flex items-center justify-center">
-                                <User size={20} className="text-wine" />
+                            <div className="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center">
+                                <User size={20} className="text-forest" />
                             </div>
                             <div>
-                                <h2 className="font-serif text-xl text-charcoal">Customer</h2>
+                                <h2 className="font-display text-xl text-ink">Customer</h2>
                                 <p className="text-xs text-admin-muted">Name and phone are required</p>
                             </div>
                         </div>
@@ -587,18 +587,18 @@ export default function AdminDirectOrdersPage() {
                     <section className="rounded-2xl border border-admin-border bg-white shadow-sm p-5 sm:p-6 space-y-4">
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-wine/10 flex items-center justify-center">
-                                    <Package size={20} className="text-wine" />
+                                <div className="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center">
+                                    <Package size={20} className="text-forest" />
                                 </div>
                                 <div>
-                                    <h2 className="font-serif text-xl text-charcoal">Items</h2>
+                                    <h2 className="font-display text-xl text-ink">Items</h2>
                                     <p className="text-xs text-admin-muted">Custom price allowed per line</p>
                                 </div>
                             </div>
                             <button
                                 type="button"
                                 onClick={addItem}
-                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-wine bg-wine/5 hover:bg-wine/10 border border-wine/20"
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20"
                             >
                                 <Plus size={14} /> Add line
                             </button>
@@ -620,11 +620,11 @@ export default function AdminDirectOrdersPage() {
 
                     <section className="rounded-2xl border border-admin-border bg-white shadow-sm p-5 sm:p-6 space-y-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-wine/10 flex items-center justify-center">
-                                <Settings2 size={20} className="text-wine" />
+                            <div className="w-10 h-10 rounded-xl bg-forest/10 flex items-center justify-center">
+                                <Settings2 size={20} className="text-forest" />
                             </div>
                             <div>
-                                <h2 className="font-serif text-xl text-charcoal">Order setup</h2>
+                                <h2 className="font-display text-xl text-ink">Order setup</h2>
                                 <p className="text-xs text-admin-muted">Payment and starting status</p>
                             </div>
                         </div>
@@ -637,11 +637,11 @@ export default function AdminDirectOrdersPage() {
                                     onClick={() => setForm((f) => ({ ...f, payment: opt.value }))}
                                     className={`rounded-xl border p-3 text-left transition-all ${
                                         form.payment === opt.value
-                                            ? 'border-wine bg-wine/5 ring-2 ring-wine/20'
+                                            ? 'border-forest bg-forest/5 ring-2 ring-forest/20'
                                             : 'border-admin-border bg-admin-surface-alt hover:border-border'
                                     }`}
                                 >
-                                    <p className="text-sm font-semibold text-charcoal">{opt.short}</p>
+                                    <p className="text-sm font-semibold text-ink">{opt.short}</p>
                                     <p className="text-[11px] text-admin-muted mt-0.5">{opt.label}</p>
                                 </button>
                             ))}
@@ -763,7 +763,7 @@ export default function AdminDirectOrdersPage() {
                                         className="mt-0.5 rounded border-border"
                                     />
                                     <span>
-                                        <span className="text-sm font-medium text-charcoal">Send confirmation email</span>
+                                        <span className="text-sm font-medium text-ink">Send confirmation email</span>
                                         <span className="text-xs text-admin-muted block mt-0.5">
                                             Requires email in Address & email section
                                         </span>
@@ -777,7 +777,7 @@ export default function AdminDirectOrdersPage() {
                                         className="mt-0.5 rounded border-border"
                                     />
                                     <span>
-                                        <span className="text-sm font-medium text-charcoal">Deduct catalog stock</span>
+                                        <span className="text-sm font-medium text-ink">Deduct catalog stock</span>
                                         <span className="text-xs text-admin-muted block mt-0.5">
                                             Only for catalog line items
                                         </span>
@@ -806,13 +806,13 @@ export default function AdminDirectOrdersPage() {
                                 </div>
                             )}
                             <div className="flex justify-between items-baseline pt-2 border-t border-admin-border">
-                                <span className="text-sm font-medium text-charcoal">Order total</span>
-                                <span className="font-serif text-2xl text-charcoal">{formatPrice(computedTotal)}</span>
+                                <span className="text-sm font-medium text-ink">Order total</span>
+                                <span className="font-display text-2xl text-ink">{formatPrice(computedTotal)}</span>
                             </div>
                         </div>
                         <Button
                             type="submit"
-                            variant="gold"
+                            variant="turmeric"
                             loading={saving}
                             size="lg"
                             className="sm:min-w-[200px] normal-case tracking-normal shrink-0"
@@ -827,7 +827,7 @@ export default function AdminDirectOrdersPage() {
                 <div className="rounded-2xl border border-admin-border bg-white shadow-sm overflow-hidden">
                     <div className="p-4 sm:p-5 border-b border-admin-border flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                         <div>
-                            <h2 className="font-serif text-xl text-charcoal">Direct order history</h2>
+                            <h2 className="font-display text-xl text-ink">Direct order history</h2>
                             <p className="text-xs text-admin-muted mt-0.5">
                                 {directOrders.length} order{directOrders.length === 1 ? '' : 's'}
                             </p>
@@ -845,12 +845,12 @@ export default function AdminDirectOrdersPage() {
 
                     {loadingOrders ? (
                         <div className="flex justify-center py-20">
-                            <div className="w-8 h-8 border-2 border-wine/30 border-t-wine rounded-full animate-spin" />
+                            <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
                         </div>
                     ) : directOrders.length === 0 ? (
                         <div className="text-center py-16 px-4">
                             <Package size={40} className="text-admin-muted/50 mx-auto mb-3" />
-                            <p className="text-charcoal font-medium">No direct orders yet</p>
+                            <p className="text-ink font-medium">No direct orders yet</p>
                             <p className="text-sm text-admin-muted mt-1 mb-4">Create your first order from the New order tab.</p>
                             <Button variant="outline" size="sm" onClick={() => setActiveTab('create')} className="normal-case tracking-normal">
                                 New order
@@ -877,12 +877,12 @@ export default function AdminDirectOrdersPage() {
                                             className="border-b border-admin-border-light hover:bg-admin-surface-alt cursor-pointer"
                                             onClick={() => setDetailOrder(order)}
                                         >
-                                            <td className="p-4 font-mono text-xs text-charcoal">{shortOrderId(order.id)}</td>
+                                            <td className="p-4 font-mono text-xs text-ink">{shortOrderId(order.id)}</td>
                                             <td className="p-4">
-                                                <p className="font-medium text-charcoal">{order.shipping?.name}</p>
+                                                <p className="font-medium text-ink">{order.shipping?.name}</p>
                                                 <p className="text-xs text-admin-muted">{order.shipping?.phone}</p>
                                             </td>
-                                            <td className="p-4 font-semibold text-charcoal whitespace-nowrap">
+                                            <td className="p-4 font-semibold text-ink whitespace-nowrap">
                                                 {formatPrice(order.total)}
                                             </td>
                                             <td className="p-4 text-xs text-admin-muted whitespace-nowrap">
@@ -895,7 +895,7 @@ export default function AdminDirectOrdersPage() {
                                                 {formatOrderDate(order.createdAt, { time: false })}
                                             </td>
                                             <td className="p-4">
-                                                <ChevronRight size={16} className="text-wine" />
+                                                <ChevronRight size={16} className="text-forest" />
                                             </td>
                                         </tr>
                                     ))}

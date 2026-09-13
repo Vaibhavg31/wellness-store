@@ -27,19 +27,19 @@ function SlideContent({ banner }) {
                 draggable={false}
             />
             {hasCaption && (
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/75 via-charcoal/15 to-transparent flex flex-col justify-end p-6 sm:p-10">
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/15 to-transparent flex flex-col justify-end p-6 sm:p-10">
                     {banner.subtitle && (
-                        <p className="text-ivory/80 text-xs sm:text-sm tracking-[0.15em] uppercase mb-1.5">
+                        <p className="text-cream/80 text-xs sm:text-sm tracking-[0.15em] uppercase mb-1.5">
                             {banner.subtitle}
                         </p>
                     )}
                     {banner.title && (
-                        <h3 className="font-serif text-2xl sm:text-4xl text-ivory mb-3 sm:mb-5 max-w-lg">
+                        <h3 className="font-display text-2xl sm:text-4xl text-cream mb-3 sm:mb-5 max-w-lg">
                             {banner.title}
                         </h3>
                     )}
                     {banner.ctaLabel && (
-                        <span className="inline-flex items-center gap-2 text-xs tracking-[0.15em] uppercase text-charcoal bg-ivory px-5 py-2.5 rounded-sm w-fit font-medium">
+                        <span className="inline-flex items-center gap-2 text-xs tracking-[0.15em] uppercase text-ink bg-cream px-5 py-2.5 rounded-sm w-fit font-medium">
                             {banner.ctaLabel}
                         </span>
                     )}
@@ -96,9 +96,9 @@ export default function BannerSlider() {
         // this section sits in the page. Safe because body has
         // overflow-x: hidden (src/index.css), so the 50vw technique below
         // can't introduce a horizontal scrollbar.
-        <section className="relative w-screen left-1/2 right-1/2 -mx-[50vw] bg-ivory">
+        <section className="relative w-screen left-1/2 right-1/2 -mx-[50vw] bg-cream">
             {loading ? (
-                <div className="h-[46vh] sm:h-[58vh] lg:h-[66vh] bg-warm-beige/60 animate-pulse" />
+                <div className="h-[46vh] sm:h-[58vh] lg:h-[66vh] bg-sand/60 animate-pulse" />
             ) : (
                 <div
                     className="relative h-[46vh] sm:h-[58vh] lg:h-[66vh] min-h-[280px] max-h-[820px] overflow-hidden group"
@@ -139,7 +139,7 @@ export default function BannerSlider() {
                                     type="button"
                                     onClick={() => go(-1)}
                                     aria-label="Previous banner"
-                                    className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-ivory/85 text-charcoal shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-ivory"
+                                    className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-cream/85 text-ink shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-cream"
                                 >
                                     <ChevronLeft size={18} />
                                 </button>
@@ -147,7 +147,7 @@ export default function BannerSlider() {
                                     type="button"
                                     onClick={() => go(1)}
                                     aria-label="Next banner"
-                                    className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-ivory/85 text-charcoal shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-ivory"
+                                    className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-cream/85 text-ink shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-cream"
                                 >
                                     <ChevronRight size={18} />
                                 </button>
@@ -164,7 +164,7 @@ export default function BannerSlider() {
                                         >
                                             <span
                                                 className={`block rounded-full transition-all duration-300 ${
-                                                    i === index ? 'w-6 h-1.5 bg-ivory' : 'w-1.5 h-1.5 bg-ivory/50 hover:bg-ivory/75'
+                                                    i === index ? 'w-6 h-1.5 bg-cream' : 'w-1.5 h-1.5 bg-cream/50 hover:bg-cream/75'
                                                 }`}
                                             />
                                         </button>

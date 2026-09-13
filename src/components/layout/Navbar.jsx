@@ -36,11 +36,11 @@ export default function Navbar() {
     const [accountOpen, setAccountOpen] = useState(false);
     const accountRef = useRef(null);
 
-    // Navbar always uses the same wine styling on every page, including
+    // Navbar always uses the same forest styling on every page, including
     // Home — it used to switch to a white bar at the top of Home only
     // (before scrolling), which looked inconsistent with every other page.
-    const iconBtn = 'relative inline-flex items-center justify-center p-2 sm:p-2.5 rounded-full text-ivory/75 hover:text-blush hover:bg-ivory/10 transition-all duration-500';
-    const linkClass = 'group relative type-nav text-ivory/75 hover:text-blush transition-colors duration-500 py-2';
+    const iconBtn = 'relative inline-flex items-center justify-center p-2 sm:p-2.5 rounded-full text-cream/75 hover:text-turmeric-light hover:bg-cream/10 transition-all duration-500';
+    const linkClass = 'group relative type-nav text-cream/75 hover:text-turmeric-light transition-colors duration-500 py-2';
 
     useEffect(() => {
         setMobileOpen(false);
@@ -85,9 +85,9 @@ export default function Navbar() {
     return (<>
         <div ref={headerRef} className="fixed top-0 left-0 right-0 z-50">
             {/* Announcement bar */}
-            <div className="text-center py-2 px-4 transition-colors duration-500 bg-wine-deep">
-                <p className="type-announce text-ivory/90">
-                    Free delivery above {formatPrice(freeDeliveryThreshold)}&nbsp;&middot;&nbsp;Anti-Tarnish Guarantee
+            <div className="text-center py-2 px-4 transition-colors duration-500 bg-forest-deep">
+                <p className="type-announce text-cream/90">
+                    Free delivery above {formatPrice(freeDeliveryThreshold)}&nbsp;&middot;&nbsp;FSSAI Certified &amp; Lab-Tested Purity
                     {instagramLinked && (
                         <>
                             &nbsp;&middot;&nbsp;
@@ -95,7 +95,7 @@ export default function Navbar() {
                                 href={instagramUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 underline-offset-2 hover:underline text-blush"
+                                className="inline-flex items-center gap-1 underline-offset-2 hover:underline text-turmeric-light"
                             >
                                 <InstagramIcon size={11} className="inline" filled />
                                 @{social.instagramHandle}
@@ -105,12 +105,12 @@ export default function Navbar() {
                 </p>
             </div>
 
-            {/* Main nav — wine bar only, same on every page */}
+            {/* Main nav — forest bar only, same on every page */}
             <header
                 className={`transition-[background,box-shadow,padding,border-color] duration-500 ${
                     isScrolled
-                        ? 'bg-wine/98 py-3 border-b border-ivory/10 shadow-[0_4px_24px_rgba(0,0,0,0.2)]'
-                        : 'bg-wine py-3.5 sm:py-4'
+                        ? 'bg-forest/98 py-3 border-b border-cream/10 shadow-[0_4px_24px_rgba(0,0,0,0.2)]'
+                        : 'bg-forest py-3.5 sm:py-4'
                 }`}
             >
                 <nav
@@ -121,7 +121,7 @@ export default function Navbar() {
 
                     <Link
                         to="/shop"
-                        className="hidden sm:flex lg:hidden flex-shrink-0 px-4 py-2 rounded-full type-eyebrow transition-all duration-500 border border-ivory/25 text-ivory hover:bg-ivory/10"
+                        className="hidden sm:flex lg:hidden flex-shrink-0 px-4 py-2 rounded-full type-eyebrow transition-all duration-500 border border-cream/25 text-cream hover:bg-cream/10"
                     >
                         Shop
                     </Link>
@@ -133,7 +133,7 @@ export default function Navbar() {
                                 <li key={link.href}>
                                     <Link to={link.href} className={linkClass}>
                                         {link.label}
-                                        <span className={`absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-px transition-all duration-500 ease-out bg-blush ${active ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+                                        <span className={`absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-px transition-all duration-500 ease-out bg-turmeric-light ${active ? 'w-full' : 'w-0 group-hover:w-full'}`} />
                                     </Link>
                                 </li>
                             );
@@ -161,7 +161,7 @@ export default function Navbar() {
                         <Link to="/wishlist" className={iconBtn} aria-label={`Wishlist${wishlistCount > 0 ? `, ${wishlistCount} items` : ''}`}>
                             <Heart size={18} strokeWidth={1.25} />
                             {wishlistCount > 0 && (
-                                <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-blush text-wine text-[8px] font-semibold flex items-center justify-center rounded-full">
+                                <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-turmeric-light text-forest text-[8px] font-semibold flex items-center justify-center rounded-full">
                                     {wishlistCount}
                                 </span>
                             )}
@@ -184,7 +184,7 @@ export default function Navbar() {
                                         animate={{ scale: 1, opacity: 1 }}
                                         exit={{ scale: 0.5, opacity: 0 }}
                                         transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                        className="absolute top-1 right-1 min-w-[14px] h-3.5 px-0.5 bg-blush text-wine text-[8px] font-semibold flex items-center justify-center rounded-full"
+                                        className="absolute top-1 right-1 min-w-[14px] h-3.5 px-0.5 bg-turmeric-light text-forest text-[8px] font-semibold flex items-center justify-center rounded-full"
                                     >
                                         {cartCount}
                                     </motion.span>
@@ -217,22 +217,22 @@ export default function Navbar() {
                                         initial={{ opacity: 0, y: 8, scale: 0.96 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                                        className="absolute right-0 top-full mt-2 w-52 bg-ivory rounded-xl luxury-shadow border border-border/40 py-2 z-50"
+                                        className="absolute right-0 top-full mt-2 w-52 bg-cream rounded-xl soft-shadow border border-border/40 py-2 z-50"
                                     >
                                         <div className="px-4 py-2 border-b border-border/40 flex items-center gap-3">
                                             <UserAvatar user={user} size="md" signedIn />
                                             <div className="min-w-0">
-                                                <p className="text-sm font-medium text-charcoal truncate">{user?.name || 'Account'}</p>
-                                                <p className="text-xs text-soft-brown truncate">{user?.email}</p>
+                                                <p className="text-sm font-medium text-ink truncate">{user?.name || 'Account'}</p>
+                                                <p className="text-xs text-slate truncate">{user?.email}</p>
                                             </div>
                                         </div>
-                                        <Link to="/account" onClick={() => setAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal hover:bg-warm-beige/60">
+                                        <Link to="/account" onClick={() => setAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-sand/60">
                                             <User size={16} /> My Account
                                         </Link>
-                                        <Link to="/orders" onClick={() => setAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal hover:bg-warm-beige/60">
+                                        <Link to="/orders" onClick={() => setAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-sand/60">
                                             <Package size={16} /> My Orders
                                         </Link>
-                                        <Link to="/wishlist" onClick={() => setAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal hover:bg-warm-beige/60">
+                                        <Link to="/wishlist" onClick={() => setAccountOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-ink hover:bg-sand/60">
                                             <Heart size={16} /> Wishlist
                                         </Link>
                                         <button
@@ -250,7 +250,7 @@ export default function Navbar() {
 
                         <button
                             onClick={() => setMobileOpen(!mobileOpen)}
-                            className="lg:hidden p-2 sm:p-2.5 rounded-full transition-all duration-500 text-ivory hover:bg-ivory/10"
+                            className="lg:hidden p-2 sm:p-2.5 rounded-full transition-all duration-500 text-cream hover:bg-cream/10"
                             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
                             aria-expanded={mobileOpen}
                         >
@@ -269,7 +269,7 @@ export default function Navbar() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-40 bg-wine-deep/70 backdrop-blur-sm lg:hidden"
+                        className="fixed inset-0 z-40 bg-forest-deep/70 backdrop-blur-sm lg:hidden"
                         onClick={() => setMobileOpen(false)}
                     />
                     <motion.div
@@ -277,11 +277,11 @@ export default function Navbar() {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                        className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm bg-wine luxury-shadow-lg lg:hidden flex flex-col"
+                        className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm bg-forest soft-shadow-lg lg:hidden flex flex-col"
                     >
-                        <div className="flex items-center justify-between p-6 border-b border-ivory/10">
+                        <div className="flex items-center justify-between p-6 border-b border-cream/10">
                             <Logo size="sm" showHover={false} />
-                            <button onClick={() => setMobileOpen(false)} className="p-2 rounded-full text-ivory hover:bg-ivory/10" aria-label="Close menu">
+                            <button onClick={() => setMobileOpen(false)} className="p-2 rounded-full text-cream hover:bg-cream/10" aria-label="Close menu">
                                 <X size={20} strokeWidth={1.25} />
                             </button>
                         </div>
@@ -292,7 +292,7 @@ export default function Navbar() {
                                         <Link
                                             to={link.href}
                                             onClick={() => setMobileOpen(false)}
-                                            className="block font-serif text-2xl font-light text-ivory/80 hover:text-blush transition-colors py-1"
+                                            className="block font-display text-2xl font-light text-cream/80 hover:text-turmeric-light transition-colors py-1"
                                         >
                                             {link.label}
                                         </Link>
@@ -302,7 +302,7 @@ export default function Navbar() {
                                     <button
                                         type="button"
                                         onClick={() => { setMobileOpen(false); setSearchOpen(true); }}
-                                        className="block font-serif text-2xl font-light text-ivory/80 hover:text-blush transition-colors py-1 w-full text-left"
+                                        className="block font-display text-2xl font-light text-cream/80 hover:text-turmeric-light transition-colors py-1 w-full text-left"
                                     >
                                         Search
                                     </button>
@@ -311,7 +311,7 @@ export default function Navbar() {
                                     <Link
                                         to={isAuthenticated ? '/account' : loginUrl()}
                                         onClick={() => setMobileOpen(false)}
-                                        className="block font-serif text-2xl font-light text-ivory/80 hover:text-blush transition-colors py-1"
+                                        className="block font-display text-2xl font-light text-cream/80 hover:text-turmeric-light transition-colors py-1"
                                     >
                                         {isAuthenticated ? 'My Account' : 'Sign In'}
                                     </Link>
@@ -325,20 +325,20 @@ export default function Navbar() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-4 p-4 rounded-2xl bg-ivory/10 border border-ivory/15 hover:bg-ivory/15 transition-colors"
+                                className="flex items-center gap-4 p-4 rounded-2xl bg-cream/10 border border-cream/15 hover:bg-cream/15 transition-colors"
                             >
                                 <span className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] p-[2px] flex-shrink-0">
-                                    <span className="w-full h-full rounded-full bg-wine flex items-center justify-center">
-                                        <InstagramIcon size={20} className="text-ivory" filled />
+                                    <span className="w-full h-full rounded-full bg-forest flex items-center justify-center">
+                                        <InstagramIcon size={20} className="text-cream" filled />
                                     </span>
                                 </span>
                                 <span>
-                                    <span className="block type-eyebrow text-blush/80 mb-0.5">Instagram</span>
-                                    <span className="block font-serif text-lg text-ivory">@{social.instagramHandle}</span>
+                                    <span className="block type-eyebrow text-turmeric-light/80 mb-0.5">Instagram</span>
+                                    <span className="block font-display text-lg text-cream">@{social.instagramHandle}</span>
                                 </span>
                             </a>
                             )}
-                            <p className="type-eyebrow text-ivory/35">
+                            <p className="type-eyebrow text-cream/35">
                                 {content.brandTagline}
                             </p>
                         </div>

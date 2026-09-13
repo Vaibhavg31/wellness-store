@@ -48,9 +48,19 @@ final class BrevoService
 
         try {
             $settings = (new SettingsRepository())->get();
-            return (string) ($settings['brandName'] ?? 'Krivea Jewels');
+            return (string) ($settings['brandName'] ?? 'Wellness Store');
         } catch (\Throwable) {
-            return 'Krivea Jewels';
+            return 'Wellness Store';
+        }
+    }
+
+    private static function brandTagline(): string
+    {
+        try {
+            $settings = (new SettingsRepository())->get();
+            return (string) ($settings['brandTagline'] ?? 'Everyday Wellness, Honestly Made');
+        } catch (\Throwable) {
+            return 'Everyday Wellness, Honestly Made';
         }
     }
 
@@ -146,7 +156,7 @@ final class BrevoService
             'out_for_delivery' => self::orderStatusMail($order, 'out_for_delivery', 'Out for Delivery', 'Your order is on its way!'),
             'packed'     => self::orderStatusMail($order, 'packed', 'Being Packed', 'Your order is being carefully packed.'),
             'shipped'    => self::orderShippedMail($order),
-            'delivered'  => self::orderStatusMail($order, 'delivered', 'Delivered', 'Your order has been delivered. We hope you love your new jewels!'),
+            'delivered'  => self::orderStatusMail($order, 'delivered', 'Delivered', 'Your order has been delivered. We hope you love it!'),
             'cancelled'  => self::orderCancelledMail($order),
             default      => null,
         };
@@ -167,16 +177,17 @@ final class BrevoService
         $payment = self::paymentLabel($order);
         $customer = htmlspecialchars((string) ($order['shipping']['name'] ?? 'Customer'), ENT_QUOTES, 'UTF-8');
         $itemsHtml = self::renderItemsTable($order, false);
-        $adminPath = trim((string) ($_ENV['ADMIN_PATH'] ?? '/krivea-studio'));
+        $adminPath = trim((string) ($_ENV['ADMIN_PATH'] ?? '/wellness-studio'));
         if ($adminPath === '') {
-            $adminPath = '/krivea-studio';
+            $adminPath = '/wellness-studio';
         }
         $adminUrl = htmlspecialchars(self::frontendUrl() . $adminPath . '/orders', ENT_QUOTES, 'UTF-8');
+        $brand = htmlspecialchars(self::senderName(), ENT_QUOTES, 'UTF-8');
 
         $html = self::wrapEmail(
             'New order received',
             <<<HTML
-            <p style="margin:0 0 16px;font-size:15px;color:#4a3f35;">A new order has been placed on Krivea Jewels.</p>
+            <p style="margin:0 0 16px;font-size:15px;color:#4a3f35;">A new order has been placed on {$brand}.</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;background:#faf7f2;border-radius:12px;">
                 <tr><td style="padding:16px 20px;">
                     <p style="margin:0 0 8px;font-size:13px;color:#8b7355;text-transform:uppercase;letter-spacing:0.08em;">Order</p>
@@ -219,7 +230,7 @@ final class BrevoService
         $html = self::orderBody($order, $headline, $intro, 'placed');
 
         return [
-            'subject' => "Order received {$shortId} | Krivea Jewels",
+            'subject' => "Order received {$shortId} | " . self::senderName(),
             'html'    => $html,
             'tags'    => ['order', 'order_placed'],
         ];
@@ -235,12 +246,12 @@ final class BrevoService
         $html = self::orderBody(
             $order,
             'Your order is confirmed!',
-            'Payment received and your order is confirmed. We are preparing your jewels with care.',
+            'Payment received and your order is confirmed. We are preparing it with care.',
             'confirmed',
         );
 
         return [
-            'subject' => "Order confirmed {$shortId} | Krivea Jewels",
+            'subject' => "Order confirmed {$shortId} | " . self::senderName(),
             'html'    => $html,
             'tags'    => ['order', 'order_confirmed'],
         ];
@@ -275,7 +286,7 @@ final class BrevoService
         $html = self::orderBody($order, 'Your order has shipped', $extra, 'shipped', false);
 
         return [
-            'subject' => "Order shipped {$shortId} | Krivea Jewels",
+            'subject' => "Order shipped {$shortId} | " . self::senderName(),
             'html'    => $html,
             'tags'    => ['order', 'order_shipped'],
         ];
@@ -296,7 +307,7 @@ final class BrevoService
         );
 
         return [
-            'subject' => "Order cancelled {$shortId} | Krivea Jewels",
+            'subject' => "Order cancelled {$shortId} | " . self::senderName(),
             'html'    => $html,
             'tags'    => ['order', 'order_cancelled'],
         ];
@@ -491,6 +502,7 @@ final class BrevoService
     private static function wrapEmail(string $title, string $bodyHtml): string
     {
         $brand = htmlspecialchars(self::senderName(), ENT_QUOTES, 'UTF-8');
+        $tagline = htmlspecialchars(self::brandTagline(), ENT_QUOTES, 'UTF-8');
         $year = date('Y');
 
         return <<<HTML
@@ -509,7 +521,7 @@ final class BrevoService
                             <tr>
                                 <td style="padding:28px 32px 12px;text-align:center;border-bottom:1px solid #efe6d8;">
                                     <p style="margin:0;font-size:22px;font-weight:600;color:#2c241c;letter-spacing:0.04em;">{$brand}</p>
-                                    <p style="margin:6px 0 0;font-size:12px;color:#8b7355;letter-spacing:0.12em;text-transform:uppercase;">Wear the Sparkle</p>
+                                    <p style="margin:6px 0 0;font-size:12px;color:#8b7355;letter-spacing:0.12em;text-transform:uppercase;">{$tagline}</p>
                                 </td>
                             </tr>
                             <tr>
@@ -620,7 +632,7 @@ final class BrevoService
         <p>Hi {$safeName},</p>
         <p>Welcome to {$brand}! Please confirm your email address to place orders and receive updates.</p>
         <p style="margin:28px 0;">
-            <a href="{$safeUrl}" style="display:inline-block;padding:14px 28px;background:#6b2d3e;color:#faf7f2;text-decoration:none;border-radius:999px;font-weight:600;">
+            <a href="{$safeUrl}" style="display:inline-block;padding:14px 28px;background:#0F5132;color:#faf7f2;text-decoration:none;border-radius:999px;font-weight:600;">
                 Verify email address
             </a>
         </p>

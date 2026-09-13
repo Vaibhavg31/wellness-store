@@ -22,20 +22,20 @@ export default function OrderLineItems({ items = [], compact = false, plain = fa
                             src={imageUrl(item.image)}
                             alt=""
                             className={compact
-                                ? 'w-10 h-12 object-cover rounded-lg flex-shrink-0 bg-warm-beige'
-                                : 'w-12 h-14 object-cover rounded-lg flex-shrink-0 bg-warm-beige'}
+                                ? 'w-10 h-12 object-cover rounded-lg flex-shrink-0 bg-sand'
+                                : 'w-12 h-14 object-cover rounded-lg flex-shrink-0 bg-sand'}
                         />
                     )}
                     <div className="flex-1 min-w-0">
-                        <p className={compact ? 'text-sm text-charcoal line-clamp-1' : 'text-sm text-charcoal font-medium line-clamp-2'}>
+                        <p className={compact ? 'text-sm text-ink line-clamp-1' : 'text-sm text-ink font-medium line-clamp-2'}>
                             {item.title}
                         </p>
-                        <p className="text-xs text-soft-brown mt-0.5">
+                        <p className="text-xs text-slate mt-0.5">
                             Qty {item.quantity}
                             {!compact && ` · ${formatPrice(item.price)} each`}
                         </p>
                     </div>
-                    <p className="text-sm font-medium text-charcoal flex-shrink-0">
+                    <p className="text-sm font-medium text-ink flex-shrink-0">
                         {formatPrice(item.price * item.quantity)}
                     </p>
                 </li>

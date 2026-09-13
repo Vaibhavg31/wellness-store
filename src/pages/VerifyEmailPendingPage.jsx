@@ -39,13 +39,13 @@ export default function VerifyEmailPendingPage() {
                 <Logo size="md" showHover className="mx-auto mb-8" />
 
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-full bg-wine/10 flex items-center justify-center mx-auto mb-5">
-                        <Mail size={28} className="text-wine" />
+                    <div className="w-16 h-16 rounded-full bg-forest/10 flex items-center justify-center mx-auto mb-5">
+                        <Mail size={28} className="text-forest" />
                     </div>
-                    <h1 className="font-serif text-3xl text-charcoal mb-2">Check your email</h1>
-                    <p className="text-soft-brown text-sm">
+                    <h1 className="font-display text-3xl text-ink mb-2">Check your email</h1>
+                    <p className="text-slate text-sm">
                         We sent a secure magic link to{' '}
-                        <span className="font-medium text-charcoal">{displayEmail || 'your inbox'}</span>.
+                        <span className="font-medium text-ink">{displayEmail || 'your inbox'}</span>.
                         Click the link to verify your email and sign in.
                     </p>
                 </div>
@@ -53,11 +53,11 @@ export default function VerifyEmailPendingPage() {
                 <EmailVerificationBanner email={displayEmail} className="mb-6" />
 
                 <Link to={redirectTo}>
-                    <Button variant="gold" size="lg" className="w-full mb-3">
+                    <Button variant="turmeric" size="lg" className="w-full mb-3">
                         Continue browsing
                     </Button>
                 </Link>
-                <p className="text-center text-xs text-soft-brown">
+                <p className="text-center text-xs text-slate">
                     Didn&apos;t get it? Check spam, or use resend above.
                 </p>
             </motion.div>

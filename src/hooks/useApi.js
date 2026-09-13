@@ -47,10 +47,7 @@ export function useProduct(id) {
             .then((data) => { if (!cancelled) setProduct(data); })
             .catch(() => {
                 if (cancelled) return;
-                const alias = id.startsWith('rims-') ? `krivea-${id.slice(5)}` : null;
-                const fallback =
-                    FALLBACK_PRODUCTS.find((p) => p.id === id) ||
-                    (alias ? FALLBACK_PRODUCTS.find((p) => p.id === alias) : null);
+                const fallback = FALLBACK_PRODUCTS.find((p) => p.id === id);
                 setProduct(fallback ?? null);
                 if (!fallback) setError('Product not found');
             })

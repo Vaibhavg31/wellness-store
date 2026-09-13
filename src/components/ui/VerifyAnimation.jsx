@@ -15,7 +15,7 @@ export default function VerifyAnimation({ size = 80, className = '' }) {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={stroke}
-                    className="text-wine/20"
+                    className="text-forest/20"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{ pathLength: 1, opacity: 1 }}
                     transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -27,7 +27,7 @@ export default function VerifyAnimation({ size = 80, className = '' }) {
                     strokeWidth={stroke * 1.2}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-wine"
+                    className="text-forest"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{ pathLength: 1, opacity: 1 }}
                     transition={{ duration: 0.35, delay: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}

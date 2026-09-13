@@ -1,11 +1,11 @@
 import { forwardRef } from 'react';
 import { cn } from '@/utils/formatPrice';
 const variantStyles = {
-    primary: 'bg-wine text-ivory hover:bg-wine-light',
-    secondary: 'bg-warm-beige text-charcoal hover:bg-cream border border-border',
-    outline: 'border border-wine/30 text-wine hover:bg-wine hover:text-ivory bg-ivory/60',
-    ghost: 'text-charcoal hover:bg-warm-beige/60',
-    gold: 'bg-gold text-charcoal hover:bg-gold-light border border-gold/30 font-semibold',
+    primary: 'bg-forest text-cream hover:bg-forest-light',
+    secondary: 'bg-sand text-ink hover:bg-cream border border-border',
+    outline: 'border border-forest/30 text-forest hover:bg-forest hover:text-cream bg-cream/60',
+    ghost: 'text-ink hover:bg-sand/60',
+    turmeric: 'bg-turmeric text-ink hover:bg-turmeric-light border border-turmeric/30 font-semibold',
 };
 const sizeStyles = {
     sm: 'px-5 py-2.5 text-xs tracking-[0.14em]',

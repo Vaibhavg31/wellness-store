@@ -189,7 +189,7 @@ export default function AdminCouponsPage() {
             <AdminPageHeader
                 title="Coupons"
                 subtitle="Create discount codes: percentage, flat amount, or free delivery"
-                actions={<Button variant="gold" onClick={openNew}><Plus size={16} /> New Coupon</Button>}
+                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> New Coupon</Button>}
             />
 
             <AdminSummaryGrid
@@ -197,8 +197,8 @@ export default function AdminCouponsPage() {
                 stats={[
                     { label: 'Total coupons', value: coupons.length },
                     { label: 'Active now', value: enabledCount, color: 'text-emerald' },
-                    { label: 'Total redemptions', value: totalUses, color: 'text-wine' },
-                    { label: 'Discount given', value: formatPrice(totalDiscountGiven), color: 'text-gold-ink' },
+                    { label: 'Total redemptions', value: totalUses, color: 'text-forest' },
+                    { label: 'Discount given', value: formatPrice(totalDiscountGiven), color: 'text-turmeric-ink' },
                 ]}
             />
 
@@ -242,12 +242,12 @@ export default function AdminCouponsPage() {
                                         <tr key={coupon.id} className="border-b border-admin-border-light hover:bg-admin-surface-alt/60">
                                             <td className="p-4 align-top">
                                                 <div className="flex items-start gap-2">
-                                                    <div className="w-8 h-8 rounded-lg bg-warm-beige/50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                        <Icon size={14} className="text-wine" />
+                                                    <div className="w-8 h-8 rounded-lg bg-sand/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                        <Icon size={14} className="text-forest" />
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="font-mono text-sm font-semibold text-charcoal tracking-wide">{coupon.code}</p>
-                                                        <p className="text-sm text-charcoal mt-0.5">{coupon.title}</p>
+                                                        <p className="font-mono text-sm font-semibold text-ink tracking-wide">{coupon.code}</p>
+                                                        <p className="text-sm text-ink mt-0.5">{coupon.title}</p>
                                                         <div className="flex flex-wrap gap-1.5 mt-2">
                                                             {coupon.showOnWebsite && coupon.isEnabled && (
                                                                 <Badge variant="bestseller">On website</Badge>
@@ -260,7 +260,7 @@ export default function AdminCouponsPage() {
                                                 </div>
                                             </td>
                                             <td className="p-4 align-top">
-                                                <p className="text-charcoal">{discountSummary(coupon)}</p>
+                                                <p className="text-ink">{discountSummary(coupon)}</p>
                                                 {coupon.description && (
                                                     <p className="text-xs text-admin-muted mt-1 line-clamp-2">{coupon.description}</p>
                                                 )}
@@ -277,16 +277,16 @@ export default function AdminCouponsPage() {
                                                 </div>
                                             </td>
                                             <td className="p-4 text-center align-top">
-                                                <p className="font-serif text-lg text-charcoal">{stats.uniqueCustomers || 0}</p>
+                                                <p className="font-display text-lg text-ink">{stats.uniqueCustomers || 0}</p>
                                             </td>
                                             <td className="p-4 text-center align-top">
-                                                <p className="font-serif text-lg text-charcoal">{stats.totalOrders || 0}</p>
+                                                <p className="font-display text-lg text-ink">{stats.totalOrders || 0}</p>
                                             </td>
                                             <td className="p-4 text-center align-top">
-                                                <p className="font-serif text-sm text-charcoal">{formatPrice(stats.totalRevenue || 0)}</p>
+                                                <p className="font-display text-sm text-ink">{formatPrice(stats.totalRevenue || 0)}</p>
                                             </td>
                                             <td className="p-4 text-center align-top">
-                                                <p className="font-serif text-sm text-gold-ink">{formatPrice(stats.totalDiscountGiven || 0)}</p>
+                                                <p className="font-display text-sm text-turmeric-ink">{formatPrice(stats.totalDiscountGiven || 0)}</p>
                                             </td>
                                             <td className="p-4 align-top">
                                                 <Badge variant={coupon.isEnabled ? 'sale' : 'stock'}>
@@ -347,7 +347,7 @@ export default function AdminCouponsPage() {
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                             rows={2}
-                            className="w-full px-4 py-3 border border-warm-beige/60 rounded-lg text-sm"
+                            className="w-full px-4 py-3 border border-sand/60 rounded-lg text-sm"
                             placeholder="Shown to customers on cart page"
                         />
                     </div>
@@ -422,8 +422,8 @@ export default function AdminCouponsPage() {
                         </span>
                     </label>
 
-                    <div className="sticky bottom-0 pt-4 pb-2 bg-ivory border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
-                        <Button variant="gold" className="w-full" onClick={handleSave} disabled={saving}>
+                    <div className="sticky bottom-0 pt-4 pb-2 bg-cream border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
+                        <Button variant="turmeric" className="w-full" onClick={handleSave} disabled={saving}>
                             {saving ? 'Saving…' : editing ? 'Update Coupon' : 'Create Coupon'}
                         </Button>
                     </div>

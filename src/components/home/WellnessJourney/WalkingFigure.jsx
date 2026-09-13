@@ -73,7 +73,7 @@ const WalkingFigure = forwardRef(function WalkingFigure({ activeGlow }, ref) {
             <div className="relative w-1.5 h-[85%] rounded-full bg-white/10 overflow-hidden flex-shrink-0">
                 <div
                     ref={vitalityFillRef}
-                    className="absolute bottom-0 left-0 right-0 rounded-full bg-gradient-to-t from-ivory/40 via-gold to-gold-light"
+                    className="absolute bottom-0 left-0 right-0 rounded-full bg-gradient-to-t from-cream/40 via-turmeric to-turmeric-light"
                     style={{ height: '0%', willChange: 'height' }}
                 />
             </div>

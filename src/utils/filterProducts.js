@@ -1,5 +1,11 @@
+import { matchProducts } from '@/components/home/wellnessRituals';
+
 export function filterProducts(products, filters) {
     let result = [...products];
+    if (filters.goal && filters.goal !== 'all') {
+        const matchedIds = new Set(matchProducts(products, [filters.goal]).map((m) => m.product.id));
+        result = result.filter((p) => matchedIds.has(p.id));
+    }
     if (filters.search.trim()) {
         const query = filters.search.toLowerCase();
         result = result.filter((p) => p.title.toLowerCase().includes(query) ||

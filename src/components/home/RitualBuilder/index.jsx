@@ -86,7 +86,7 @@ export default function RitualBuilder({ products = [] }) {
     };
 
     return (
-        <section className="py-20 md:py-28 bg-ivory" aria-label="Build your ritual">
+        <section className="py-20 md:py-28 bg-cream" aria-label="Build your ritual">
             <div className="max-w-5xl mx-auto px-6 lg:px-12">
                 <SectionTitle
                     subtitle="Personalize"
@@ -100,10 +100,10 @@ export default function RitualBuilder({ products = [] }) {
                         {STEP_LABELS.map((label, i) => (
                             <div key={label} className="flex-1 flex items-center gap-2">
                                 <div className="flex flex-col gap-2 flex-1">
-                                    <span className={cn('text-[11px] uppercase tracking-[0.14em]', i <= step ? 'text-emerald font-medium' : 'text-charcoal/35')}>
+                                    <span className={cn('text-[11px] uppercase tracking-[0.14em]', i <= step ? 'text-emerald font-medium' : 'text-ink/35')}>
                                         {label}
                                     </span>
-                                    <div className="h-1 rounded-full bg-warm-beige overflow-hidden">
+                                    <div className="h-1 rounded-full bg-sand overflow-hidden">
                                         <motion.div
                                             className="h-full bg-emerald rounded-full"
                                             initial={false}
@@ -129,7 +129,7 @@ export default function RitualBuilder({ products = [] }) {
                                     transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                                     className="flex-1"
                                 >
-                                    <p className="text-charcoal/60 mb-6 font-light">
+                                    <p className="text-ink/60 mb-6 font-light">
                                         What do you want your body to be better at? Pick up to {MAX_GOALS}.
                                     </p>
                                     <motion.div
@@ -166,13 +166,13 @@ export default function RitualBuilder({ products = [] }) {
                                                                 transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                                                                 className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald flex items-center justify-center"
                                                             >
-                                                                <Check size={12} className="text-ivory" />
+                                                                <Check size={12} className="text-cream" />
                                                             </motion.span>
                                                         )}
                                                     </AnimatePresence>
-                                                    <Icon size={20} className={selected ? 'text-emerald' : 'text-charcoal/50'} />
-                                                    <p className="mt-3 text-sm font-medium text-charcoal">{goal.label}</p>
-                                                    <p className="mt-1 text-xs text-charcoal/50 leading-snug">{goal.blurb}</p>
+                                                    <Icon size={20} className={selected ? 'text-emerald' : 'text-ink/50'} />
+                                                    <p className="mt-3 text-sm font-medium text-ink">{goal.label}</p>
+                                                    <p className="mt-1 text-xs text-ink/50 leading-snug">{goal.blurb}</p>
                                                 </motion.button>
                                             );
                                         })}
@@ -191,7 +191,7 @@ export default function RitualBuilder({ products = [] }) {
                                     transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                                     className="flex-1"
                                 >
-                                    <p className="text-charcoal/60 mb-6 font-light">When does taking care of yourself actually fit into your day?</p>
+                                    <p className="text-ink/60 mb-6 font-light">When does taking care of yourself actually fit into your day?</p>
                                     <motion.div variants={listVariants} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                         {RHYTHMS.map((rhythm) => {
                                             const Icon = rhythm.icon;
@@ -212,9 +212,9 @@ export default function RitualBuilder({ products = [] }) {
                                                             : 'border-border bg-white hover:border-emerald/40',
                                                     )}
                                                 >
-                                                    <Icon size={22} className={selected ? 'text-emerald' : 'text-charcoal/50'} />
-                                                    <p className="mt-3 text-sm font-medium text-charcoal">{rhythm.label}</p>
-                                                    <p className="mt-1 text-xs text-charcoal/50 leading-snug">{rhythm.blurb}</p>
+                                                    <Icon size={22} className={selected ? 'text-emerald' : 'text-ink/50'} />
+                                                    <p className="mt-3 text-sm font-medium text-ink">{rhythm.label}</p>
+                                                    <p className="mt-1 text-xs text-ink/50 leading-snug">{rhythm.blurb}</p>
                                                 </motion.button>
                                             );
                                         })}
@@ -235,17 +235,17 @@ export default function RitualBuilder({ products = [] }) {
                                 >
                                     <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                                         <div>
-                                            <p className="text-sm font-medium text-charcoal">Your ritual is ready</p>
-                                            <p className="text-xs text-charcoal/50 mt-0.5">Matched from what's currently in stock.</p>
+                                            <p className="text-sm font-medium text-ink">Your ritual is ready</p>
+                                            <p className="text-xs text-ink/50 mt-0.5">Matched from what's currently in stock.</p>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <MatchRing value={allItems.length ? coverage : 0} />
-                                            <span className="text-xs text-charcoal/50 max-w-[7rem] leading-snug">catalog match for your goals</span>
+                                            <span className="text-xs text-ink/50 max-w-[7rem] leading-snug">catalog match for your goals</span>
                                         </div>
                                     </div>
 
                                     {allItems.length === 0 ? (
-                                        <div className="rounded-2xl border border-dashed border-border p-8 text-center text-charcoal/50 text-sm">
+                                        <div className="rounded-2xl border border-dashed border-border p-8 text-center text-ink/50 text-sm">
                                             Go back and pick a focus — we'll build the routine from there.
                                         </div>
                                     ) : (
@@ -261,10 +261,10 @@ export default function RitualBuilder({ products = [] }) {
                                             >
                                                 {timeline.map((slot) => (
                                                     <motion.div key={slot.id} variants={itemVariants} className="flex flex-col items-center text-center">
-                                                        <span className="w-3 h-3 rounded-full bg-gold border-2 border-ivory shadow mb-3" />
-                                                        <p className="text-[11px] uppercase tracking-[0.14em] text-charcoal/45 mb-3">{slot.label}</p>
+                                                        <span className="w-3 h-3 rounded-full bg-turmeric border-2 border-cream shadow mb-3" />
+                                                        <p className="text-[11px] uppercase tracking-[0.14em] text-ink/45 mb-3">{slot.label}</p>
                                                         {slot.items.length === 0 ? (
-                                                            <div className="w-full rounded-xl border border-dashed border-border p-4 text-xs text-charcoal/40">
+                                                            <div className="w-full rounded-xl border border-dashed border-border p-4 text-xs text-ink/40">
                                                                 Nothing extra needed here
                                                             </div>
                                                         ) : (
@@ -278,12 +278,12 @@ export default function RitualBuilder({ products = [] }) {
                                                                         <img
                                                                             src={product.images?.[0]}
                                                                             alt=""
-                                                                            className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-warm-beige"
+                                                                            className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-sand"
                                                                             loading="lazy"
                                                                         />
                                                                         <span className="min-w-0">
-                                                                            <span className="block text-xs font-medium text-charcoal truncate">{product.title}</span>
-                                                                            <span className="block text-xs text-charcoal/50 mt-0.5">{formatPrice(product.price)}</span>
+                                                                            <span className="block text-xs font-medium text-ink truncate">{product.title}</span>
+                                                                            <span className="block text-xs text-ink/50 mt-0.5">{formatPrice(product.price)}</span>
                                                                         </span>
                                                                     </Link>
                                                                 ))}
@@ -304,7 +304,7 @@ export default function RitualBuilder({ products = [] }) {
                                 type="button"
                                 onClick={() => (step === 0 ? undefined : goTo(step - 1))}
                                 className={cn(
-                                    'inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.12em] text-charcoal/60 hover:text-charcoal transition-colors',
+                                    'inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.12em] text-ink/60 hover:text-ink transition-colors',
                                     step === 0 && 'invisible',
                                 )}
                             >
@@ -327,11 +327,11 @@ export default function RitualBuilder({ products = [] }) {
                                     <button
                                         type="button"
                                         onClick={restart}
-                                        className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.12em] text-charcoal/50 hover:text-charcoal transition-colors"
+                                        className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.12em] text-ink/50 hover:text-ink transition-colors"
                                     >
                                         <RotateCcw size={13} /> Start over
                                     </button>
-                                    <Button variant="gold" size="sm" onClick={handleAddRitual} disabled={!allItems.length} className="gap-2">
+                                    <Button variant="turmeric" size="sm" onClick={handleAddRitual} disabled={!allItems.length} className="gap-2">
                                         <ShoppingBag size={15} />
                                         Add ritual to bag
                                     </Button>

@@ -53,19 +53,19 @@ export default function ActiveCoupons({ className = '', variant = 'default' }) {
                     key={coupon.id}
                     type="button"
                     onClick={() => copyAndApply(coupon.code)}
-                    className="text-left w-full p-3.5 rounded-xl border border-border/50 hover:border-wine/40 hover:bg-wine/5 transition-all group bg-cream/50"
+                    className="text-left w-full p-3.5 rounded-xl border border-border/50 hover:border-forest/40 hover:bg-forest/5 transition-all group bg-cream/50"
                 >
                     <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <p className="font-mono text-sm font-semibold text-wine tracking-wider truncate">
+                        <p className="font-mono text-sm font-semibold text-forest tracking-wider truncate">
                             {coupon.code}
                         </p>
-                        <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold/15 text-gold-ink font-medium flex-shrink-0 whitespace-nowrap">
+                        <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-turmeric/15 text-turmeric-ink font-medium flex-shrink-0 whitespace-nowrap">
                             {coupon.label}
                         </span>
                     </div>
-                    <p className="text-sm font-medium text-charcoal leading-snug">{coupon.title}</p>
-                    <p className="text-xs text-soft-brown mt-0.5 leading-relaxed">{couponDescription(coupon)}</p>
-                    <p className="text-[10px] text-soft-brown mt-2 flex items-center gap-1 opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <p className="text-sm font-medium text-ink leading-snug">{coupon.title}</p>
+                    <p className="text-xs text-slate mt-0.5 leading-relaxed">{couponDescription(coupon)}</p>
+                    <p className="text-[10px] text-slate mt-2 flex items-center gap-1 opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         <Copy size={10} className="flex-shrink-0" /> Tap to apply
                     </p>
                 </button>
@@ -79,19 +79,19 @@ export default function ActiveCoupons({ className = '', variant = 'default' }) {
             onClick={() => setDrawerOpen(true)}
             className="w-full flex items-center gap-3 text-left group"
         >
-            <span className="flex-shrink-0 w-9 h-9 rounded-full bg-wine/10 flex items-center justify-center">
-                <Tag size={16} className="text-wine" />
+            <span className="flex-shrink-0 w-9 h-9 rounded-full bg-forest/10 flex items-center justify-center">
+                <Tag size={16} className="text-forest" />
             </span>
             <span className="flex-1 min-w-0">
-                <span className="block font-serif text-base text-charcoal">Available Offers</span>
-                <span className="block text-xs text-soft-brown mt-0.5 truncate">
+                <span className="block font-display text-base text-ink">Available Offers</span>
+                <span className="block text-xs text-slate mt-0.5 truncate">
                     {coupons.length} offer{coupons.length !== 1 ? 's' : ''}
                     {preview ? ` · ${preview.label}` : ''}
                 </span>
             </span>
             <ChevronRight
                 size={18}
-                className="flex-shrink-0 text-soft-brown group-hover:text-wine transition-colors"
+                className="flex-shrink-0 text-slate group-hover:text-forest transition-colors"
             />
         </button>
     );
@@ -110,7 +110,7 @@ export default function ActiveCoupons({ className = '', variant = 'default' }) {
     if (isSidebar) {
         return (
             <>
-                <section className={`bg-ivory rounded-xl border border-border/40 luxury-shadow p-4 sm:p-5 ${className}`}>
+                <section className={`bg-cream rounded-xl border border-border/40 soft-shadow p-4 sm:p-5 ${className}`}>
                     {trigger}
                 </section>
                 {drawer}

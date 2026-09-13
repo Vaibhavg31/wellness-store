@@ -378,9 +378,9 @@ export default function CheckoutPage() {
     if (items.length === 0 && !placed) {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-                <h1 className="font-serif text-3xl mb-4">Nothing to checkout</h1>
-                <p className="text-soft-brown mb-6">Add items to your bag and come back when you&apos;re ready.</p>
-                <Link to="/shop"><Button variant="gold">Continue Shopping</Button></Link>
+                <h1 className="font-display text-3xl mb-4">Nothing to checkout</h1>
+                <p className="text-slate mb-6">Add items to your bag and come back when you&apos;re ready.</p>
+                <Link to="/shop"><Button variant="turmeric">Continue Shopping</Button></Link>
             </div>
         );
     }
@@ -504,12 +504,12 @@ export default function CheckoutPage() {
                     transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                     className="text-center max-w-md"
                 >
-                    <VerifyAnimation size={88} className="mx-auto mb-6 text-wine" />
+                    <VerifyAnimation size={88} className="mx-auto mb-6 text-forest" />
                     <motion.h1
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4, duration: 0.4 }}
-                        className="font-serif text-3xl text-charcoal mb-3"
+                        className="font-display text-3xl text-ink mb-3"
                     >
                         {paidOnline ? 'Payment Successful' : 'Order Confirmed'}
                     </motion.h1>
@@ -517,7 +517,7 @@ export default function CheckoutPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.55 }}
-                        className="text-soft-brown font-light mb-2 leading-relaxed"
+                        className="text-slate font-light mb-2 leading-relaxed"
                     >
                         Thank you, {placed.shipping?.name}. Your order is confirmed.
                     </motion.p>
@@ -525,7 +525,7 @@ export default function CheckoutPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.65 }}
-                        className="text-sm text-charcoal mb-8"
+                        className="text-sm text-ink mb-8"
                     >
                         Order ID: <span className="font-medium">{placed.id}</span>
                     </motion.p>
@@ -535,7 +535,7 @@ export default function CheckoutPage() {
                         transition={{ delay: 0.75 }}
                         className="flex flex-col sm:flex-row gap-3 justify-center"
                     >
-                        <Link to={`/orders/${placed.id}`}><Button variant="gold">Track Your Order</Button></Link>
+                        <Link to={`/orders/${placed.id}`}><Button variant="turmeric">Track Your Order</Button></Link>
                         <Link to="/shop"><Button variant="outline">Continue Shopping</Button></Link>
                     </motion.div>
                 </motion.div>
@@ -556,15 +556,15 @@ export default function CheckoutPage() {
             <div className="max-w-6xl mx-auto">
                 <Link
                     to="/cart"
-                    className="inline-flex items-center gap-2 text-sm text-soft-brown hover:text-wine mb-5 group transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-slate hover:text-forest mb-5 group transition-colors"
                 >
                     <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                     Back to Bag
                 </Link>
 
                 <div className="mb-6 sm:mb-8">
-                    <p className="text-[10px] tracking-[0.3em] uppercase text-wine mb-2">Secure Checkout</p>
-                    <h1 className="font-serif text-3xl md:text-4xl text-charcoal">Complete Your Order</h1>
+                    <p className="text-[10px] tracking-[0.3em] uppercase text-forest mb-2">Secure Checkout</p>
+                    <h1 className="font-display text-3xl md:text-4xl text-ink">Complete Your Order</h1>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 sm:gap-4 mb-10" aria-label="Checkout progress">
@@ -576,23 +576,23 @@ export default function CheckoutPage() {
                                 <div className="flex items-center gap-2">
                                     <motion.span
                                         animate={{
-                                            backgroundColor: done || current ? 'var(--color-wine)' : 'transparent',
+                                            backgroundColor: done || current ? 'var(--color-forest)' : 'transparent',
                                         }}
                                         className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium border transition-colors ${
                                             done || current
-                                                ? 'border-wine text-ivory'
-                                                : 'border-wine/20 text-wine/40 bg-wine/5'
+                                                ? 'border-forest text-cream'
+                                                : 'border-forest/20 text-forest/40 bg-forest/5'
                                         }`}
                                         aria-current={current ? 'step' : undefined}
                                     >
                                         {done ? <CheckCircle size={14} /> : <span>{i + 1}</span>}
                                     </motion.span>
-                                    <span className={`text-xs sm:text-sm transition-colors ${done || current ? 'text-charcoal font-medium' : 'text-soft-brown/50'}`}>
+                                    <span className={`text-xs sm:text-sm transition-colors ${done || current ? 'text-ink font-medium' : 'text-slate/50'}`}>
                                         {label}
                                     </span>
                                 </div>
                                 {i < STEPS.length - 1 && (
-                                    <div className={`w-8 sm:w-16 h-px transition-colors ${done ? 'bg-wine/40' : 'bg-border'}`} />
+                                    <div className={`w-8 sm:w-16 h-px transition-colors ${done ? 'bg-forest/40' : 'bg-border'}`} />
                                 )}
                             </div>
                         );
@@ -608,27 +608,27 @@ export default function CheckoutPage() {
                     )}
                     <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
-                            <p className="text-[10px] tracking-[0.2em] uppercase text-soft-brown">
+                            <p className="text-[10px] tracking-[0.2em] uppercase text-slate">
                                 {items.length} item{items.length !== 1 ? 's' : ''}
                             </p>
-                            <p className="font-serif text-xl text-wine leading-tight">{formatPrice(total)}</p>
+                            <p className="font-display text-xl text-forest leading-tight">{formatPrice(total)}</p>
                         </div>
                         <Button
-                            variant="gold"
+                            variant="turmeric"
                             size="md"
                             type="button"
                             onClick={handlePlaceOrder}
                             disabled={loading || !canPlaceOrder}
-                            className="flex-shrink-0 px-6 shadow-md shadow-wine/15"
+                            className="flex-shrink-0 px-6 shadow-md shadow-forest/15"
                         >
                             {ctaLabel}
                         </Button>
                     </div>
                 </div>
 
-                <div className="mb-6 p-4 rounded-xl bg-wine/5 border border-wine/20 flex items-center gap-3">
+                <div className="mb-6 p-4 rounded-xl bg-forest/5 border border-forest/20 flex items-center gap-3">
                     <UserAvatar user={user} size="md" signedIn />
-                    <p className="text-sm text-charcoal min-w-0">
+                    <p className="text-sm text-ink min-w-0">
                         Signed in as <span className="font-medium">{user?.name || user?.email}</span>
                         {isPhoneVerified && (
                             <motion.span
@@ -655,10 +655,10 @@ export default function CheckoutPage() {
                     }}
                 >
                     <div className="lg:col-span-3 space-y-6 sm:space-y-8 order-2 lg:order-1">
-                        <section className="bg-ivory rounded-2xl p-4 sm:p-6 md:p-8 luxury-shadow">
+                        <section className="bg-cream rounded-2xl p-4 sm:p-6 md:p-8 soft-shadow">
                             <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <User size={18} className="text-wine flex-shrink-0" />
-                                <h2 className="font-serif text-lg sm:text-xl text-charcoal">Contact Details</h2>
+                                <User size={18} className="text-forest flex-shrink-0" />
+                                <h2 className="font-display text-lg sm:text-xl text-ink">Contact Details</h2>
                             </div>
                             <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                                 <Input label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
@@ -705,7 +705,7 @@ export default function CheckoutPage() {
                                                 type="button"
                                                 variant="outline"
                                                 size="md"
-                                                className="flex-shrink-0 mb-0.5 border-wine/30 text-wine whitespace-nowrap"
+                                                className="flex-shrink-0 mb-0.5 border-forest/30 text-forest whitespace-nowrap"
                                                 onClick={openPhoneVerify}
                                             >
                                                 Verify mobile
@@ -722,7 +722,7 @@ export default function CheckoutPage() {
                                             </motion.span>
                                         )}
                                     </div>
-                                    <p className="text-xs text-soft-brown mt-2">
+                                    <p className="text-xs text-slate mt-2">
                                         {isPhoneVerified
                                             ? isAccountPhoneVerified(user, phoneDigits)
                                                 ? 'Your account mobile is verified. No OTP needed for future orders.'
@@ -749,18 +749,18 @@ export default function CheckoutPage() {
                             </div>
                         </section>
 
-                        <section ref={addressSectionRef} className="bg-ivory rounded-2xl p-4 sm:p-6 md:p-8 luxury-shadow scroll-mt-[calc(var(--site-header-h,7rem)+5rem)]">
+                        <section ref={addressSectionRef} className="bg-cream rounded-2xl p-4 sm:p-6 md:p-8 soft-shadow scroll-mt-[calc(var(--site-header-h,7rem)+5rem)]">
                             <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <MapPin size={18} className="text-wine flex-shrink-0" />
-                                <h2 className="font-serif text-lg sm:text-xl text-charcoal">Delivery Address</h2>
+                                <MapPin size={18} className="text-forest flex-shrink-0" />
+                                <h2 className="font-display text-lg sm:text-xl text-ink">Delivery Address</h2>
                             </div>
                             {savedAddresses.length > 0 && (
                                 <div className="mb-5 sm:mb-6">
                                     <div className="flex items-center justify-between gap-2 mb-3">
-                                        <p className="text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-soft-brown">
+                                        <p className="text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-slate">
                                             Saved addresses
                                         </p>
-                                        <span className="text-[10px] sm:text-xs text-soft-brown/70 tabular-nums">
+                                        <span className="text-[10px] sm:text-xs text-slate/70 tabular-nums">
                                             {savedAddresses.length}/{MAX_SAVED_ADDRESSES}
                                         </span>
                                     </div>
@@ -772,8 +772,8 @@ export default function CheckoutPage() {
                                                     key={addr.id}
                                                     className={`relative flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border cursor-pointer transition-all active:scale-[0.98] ${
                                                         selected
-                                                            ? 'border-wine bg-wine/5 shadow-sm shadow-wine/10'
-                                                            : 'border-border hover:border-wine/30 hover:bg-wine/[0.02]'
+                                                            ? 'border-forest bg-forest/5 shadow-sm shadow-forest/10'
+                                                            : 'border-border hover:border-forest/30 hover:bg-forest/[0.02]'
                                                     }`}
                                                 >
                                                     <input
@@ -786,27 +786,27 @@ export default function CheckoutPage() {
                                                     />
                                                     <span
                                                         className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                                                            selected ? 'border-wine bg-wine' : 'border-wine/35 bg-ivory'
+                                                            selected ? 'border-forest bg-forest' : 'border-forest/35 bg-cream'
                                                         }`}
                                                         aria-hidden="true"
                                                     >
-                                                        {selected && <span className="h-2 w-2 rounded-full bg-ivory" />}
+                                                        {selected && <span className="h-2 w-2 rounded-full bg-cream" />}
                                                     </span>
                                                     <div className="min-w-0 flex-1 pr-1">
                                                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                            <p className="text-sm font-medium text-charcoal">
+                                                            <p className="text-sm font-medium text-ink">
                                                                 {addr.label || 'Address'}
                                                             </p>
                                                             {addr.isDefault && (
-                                                                <span className="text-[9px] uppercase tracking-wider text-wine bg-wine/10 px-1.5 py-0.5 rounded-full">
+                                                                <span className="text-[9px] uppercase tracking-wider text-forest bg-forest/10 px-1.5 py-0.5 rounded-full">
                                                                     Default
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <p className="text-[13px] sm:text-xs text-soft-brown mt-1.5 leading-relaxed break-words">
+                                                        <p className="text-[13px] sm:text-xs text-slate mt-1.5 leading-relaxed break-words">
                                                             {addr.address}
                                                             {addr.landmark ? `, ${addr.landmark}` : ''}
-                                                            <span className="text-charcoal/70"> · {addr.city}, {addr.pincode}</span>
+                                                            <span className="text-ink/70"> · {addr.city}, {addr.pincode}</span>
                                                         </p>
                                                     </div>
                                                 </label>
@@ -817,13 +817,13 @@ export default function CheckoutPage() {
                                         <button
                                             type="button"
                                             onClick={enterNewAddress}
-                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-sm py-2.5 px-4 rounded-xl border border-wine/25 text-wine bg-wine/5 hover:bg-wine/10 active:bg-wine/15 transition-colors"
+                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-sm py-2.5 px-4 rounded-xl border border-forest/25 text-forest bg-forest/5 hover:bg-forest/10 active:bg-forest/15 transition-colors"
                                         >
                                             <Plus size={15} />
                                             Enter a new address
                                         </button>
                                         {savedAddresses.length < MAX_SAVED_ADDRESSES && (
-                                            <p className="text-[11px] sm:text-xs text-soft-brown/80 leading-relaxed px-0.5">
+                                            <p className="text-[11px] sm:text-xs text-slate/80 leading-relaxed px-0.5">
                                                 New addresses are saved automatically when you place your order.
                                             </p>
                                         )}
@@ -832,14 +832,14 @@ export default function CheckoutPage() {
                             )}
                             <div className={`${savedAddresses.length > 0 ? 'border-t border-border/50 pt-4 sm:pt-5' : ''}`}>
                                 <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                                    <p className="text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-soft-brown font-medium">
+                                    <p className="text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-slate font-medium">
                                         {selectedAddressId ? 'Selected address' : 'Address details'}
                                     </p>
                                     {hasAddressInput && (
                                         <button
                                             type="button"
                                             onClick={clearAddressFields}
-                                            className="inline-flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border border-border/70 bg-cream/60 text-[11px] sm:text-xs text-soft-brown hover:text-wine hover:border-wine/30 active:bg-wine/5 transition-colors"
+                                            className="inline-flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border border-border/70 bg-cream/60 text-[11px] sm:text-xs text-slate hover:text-forest hover:border-forest/30 active:bg-forest/5 transition-colors"
                                         >
                                             <X size={13} />
                                             Clear
@@ -855,44 +855,44 @@ export default function CheckoutPage() {
                             </div>
                         </section>
 
-                        <section className="bg-ivory rounded-2xl p-5 sm:p-6 md:p-8 luxury-shadow">
+                        <section className="bg-cream rounded-2xl p-5 sm:p-6 md:p-8 soft-shadow">
                             <div className="flex items-center gap-3 mb-6">
-                                <CreditCard size={18} className="text-wine" />
-                                <h2 className="font-serif text-xl text-charcoal">Payment</h2>
+                                <CreditCard size={18} className="text-forest" />
+                                <h2 className="font-display text-xl text-ink">Payment</h2>
                             </div>
                             <div className="space-y-3">
                                 {razorpayAvailable && (
-                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'razorpay' ? 'border-wine bg-wine/5' : 'border-border hover:border-wine/40'}`}>
+                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'razorpay' ? 'border-forest bg-forest/5' : 'border-border hover:border-forest/40'}`}>
                                         <input
                                             type="radio"
                                             name="payment"
                                             value="razorpay"
                                             checked={form.payment === 'razorpay'}
                                             onChange={() => setForm({ ...form, payment: 'razorpay' })}
-                                            className="mt-1 accent-wine"
+                                            className="mt-1 accent-forest"
                                         />
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
-                                                <Wallet size={16} className="text-wine" />
-                                                <p className="font-medium text-charcoal text-sm">Pay Online</p>
+                                                <Wallet size={16} className="text-forest" />
+                                                <p className="font-medium text-ink text-sm">Pay Online</p>
                                             </div>
-                                            <p className="text-xs text-soft-brown mt-0.5">UPI · Cards · Net Banking via Razorpay</p>
+                                            <p className="text-xs text-slate mt-0.5">UPI · Cards · Net Banking via Razorpay</p>
                                         </div>
                                     </label>
                                 )}
                                 {codAvailable && (
-                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'cod' ? 'border-wine bg-wine/5' : 'border-border hover:border-wine/40'}`}>
+                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'cod' ? 'border-forest bg-forest/5' : 'border-border hover:border-forest/40'}`}>
                                         <input
                                             type="radio"
                                             name="payment"
                                             value="cod"
                                             checked={form.payment === 'cod'}
                                             onChange={() => setForm({ ...form, payment: 'cod' })}
-                                            className="mt-1 accent-wine"
+                                            className="mt-1 accent-forest"
                                         />
                                         <div>
-                                            <p className="font-medium text-charcoal text-sm">Cash on Delivery</p>
-                                            <p className="text-xs text-soft-brown mt-0.5">Pay when your order arrives</p>
+                                            <p className="font-medium text-ink text-sm">Cash on Delivery</p>
+                                            <p className="text-xs text-slate mt-0.5">Pay when your order arrives</p>
                                         </div>
                                     </label>
                                 )}
@@ -902,12 +902,12 @@ export default function CheckoutPage() {
                                     </p>
                                 )}
                                 {!razorpayAvailable && codAvailable && content.payments?.onlinePaymentEnabled === false && (
-                                    <p className="text-xs text-soft-brown/70 px-1">
+                                    <p className="text-xs text-slate/70 px-1">
                                         Online payment is turned off in store settings.
                                     </p>
                                 )}
                                 {!razorpayAvailable && codAvailable && content.payments?.onlinePaymentEnabled !== false && !RAZORPAY_ENABLED && (
-                                    <p className="text-xs text-soft-brown/70 px-1">
+                                    <p className="text-xs text-slate/70 px-1">
                                         Online payment will appear here once Razorpay keys are configured.
                                     </p>
                                 )}
@@ -922,11 +922,11 @@ export default function CheckoutPage() {
                                 </p>
                             )}
                             <div className="flex items-center justify-between px-1">
-                                <span className="text-sm text-soft-brown">Total payable</span>
-                                <span className="font-serif text-2xl text-wine">{formatPrice(total)}</span>
+                                <span className="text-sm text-slate">Total payable</span>
+                                <span className="font-display text-2xl text-forest">{formatPrice(total)}</span>
                             </div>
                             <Button
-                                variant="gold"
+                                variant="turmeric"
                                 size="lg"
                                 type="button"
                                 className="w-full"
@@ -941,16 +941,16 @@ export default function CheckoutPage() {
                     <div className="lg:col-span-2 order-1 lg:order-2 space-y-6">
                         <ActiveCoupons variant="sidebar" />
 
-                        <div className="lg:sticky lg:top-[calc(var(--site-header-h,7rem)+1rem)] lg:z-10 bg-ivory rounded-2xl p-5 sm:p-6 md:p-8 luxury-shadow space-y-5">
-                            <h2 className="font-serif text-xl text-charcoal">Order Summary</h2>
+                        <div className="lg:sticky lg:top-[calc(var(--site-header-h,7rem)+1rem)] lg:z-10 bg-cream rounded-2xl p-5 sm:p-6 md:p-8 soft-shadow space-y-5">
+                            <h2 className="font-display text-xl text-ink">Order Summary</h2>
 
                             <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                                 {items.map((item) => (
                                     <div key={item.product.id} className="flex gap-3">
                                         <img src={imageUrl(item.product.images[0])} alt="" className="w-14 h-16 object-cover rounded-lg flex-shrink-0" />
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-charcoal line-clamp-1">{item.product.title}</p>
-                                            <p className="text-xs text-soft-brown">Qty: {item.quantity}</p>
+                                            <p className="text-sm text-ink line-clamp-1">{item.product.title}</p>
+                                            <p className="text-xs text-slate">Qty: {item.quantity}</p>
                                         </div>
                                         <p className="text-sm font-medium">{formatPrice(item.product.price * item.quantity)}</p>
                                     </div>
@@ -959,7 +959,7 @@ export default function CheckoutPage() {
 
                             <div className="border-t border-border/60 pt-4 space-y-2 text-sm">
                                 <CouponInput compact />
-                                <PriceBreakdown totalClassName="text-wine" />
+                                <PriceBreakdown totalClassName="text-forest" />
                             </div>
 
                             {error && (
@@ -974,13 +974,13 @@ export default function CheckoutPage() {
                             )}
 
                             <div className="hidden lg:block">
-                                <Button variant="gold" size="lg" className="w-full" type="button" onClick={handlePlaceOrder} disabled={loading || !canPlaceOrder}>
+                                <Button variant="turmeric" size="lg" className="w-full" type="button" onClick={handlePlaceOrder} disabled={loading || !canPlaceOrder}>
                                     {ctaLabel}
                                 </Button>
                             </div>
 
-                            <div className="hidden lg:flex items-center justify-center gap-2 text-[10px] text-soft-brown">
-                                <Phone size={11} className="text-wine" />
+                            <div className="hidden lg:flex items-center justify-center gap-2 text-[10px] text-slate">
+                                <Phone size={11} className="text-forest" />
                                 Mobile verified once per account
                             </div>
                         </div>

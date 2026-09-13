@@ -98,7 +98,7 @@ export default function ProductSearchSelect({
                         <button
                             type="button"
                             onClick={clearSelection}
-                            className="p-0.5 rounded hover:bg-charcoal/5 text-admin-muted"
+                            className="p-0.5 rounded hover:bg-ink/5 text-admin-muted"
                             aria-label="Clear product"
                         >
                             <X size={14} />
@@ -125,7 +125,7 @@ export default function ProductSearchSelect({
                         <button
                             type="button"
                             onClick={() => setQuery('')}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-charcoal/5 text-admin-muted"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-ink/5 text-admin-muted"
                             aria-label="Clear search"
                         >
                             <X size={14} />
@@ -140,7 +140,7 @@ export default function ProductSearchSelect({
                         type="button"
                         onClick={() => selectProduct('')}
                         className={`w-full px-3 py-2.5 text-left text-sm hover:bg-admin-surface-alt transition-colors ${
-                            !value ? 'bg-wine/5 text-wine font-medium' : 'text-charcoal'
+                            !value ? 'bg-forest/5 text-forest font-medium' : 'text-ink'
                         }`}
                     >
                         {emptyOptionLabel}
@@ -157,7 +157,7 @@ export default function ProductSearchSelect({
                                 type="button"
                                 onClick={() => selectProduct(product.id)}
                                 className={`w-full px-3 py-2.5 text-left text-sm hover:bg-admin-surface-alt transition-colors flex items-center justify-between gap-3 ${
-                                    value === product.id ? 'bg-wine/5 text-wine' : 'text-charcoal'
+                                    value === product.id ? 'bg-forest/5 text-forest' : 'text-ink'
                                 }`}
                             >
                                 <span className="truncate font-medium">{product.title}</span>

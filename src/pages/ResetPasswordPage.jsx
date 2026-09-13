@@ -45,8 +45,8 @@ export default function ResetPasswordPage() {
         return (
             <div className="min-h-screen flex items-center justify-center px-6 bg-cream">
                 <div className="text-center max-w-md">
-                    <h1 className="font-serif text-2xl mb-4">Invalid reset link</h1>
-                    <Link to="/forgot-password" className="text-wine hover:text-wine-light">Request a new link</Link>
+                    <h1 className="font-display text-2xl mb-4">Invalid reset link</h1>
+                    <Link to="/forgot-password" className="text-forest hover:text-forest-light">Request a new link</Link>
                 </div>
             </div>
         );
@@ -56,16 +56,16 @@ export default function ResetPasswordPage() {
         <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-cream">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
                 <Logo size="md" showHover className="mx-auto mb-8" />
-                <h1 className="font-serif text-3xl text-charcoal text-center mb-8">Set new password</h1>
+                <h1 className="font-display text-3xl text-ink text-center mb-8">Set new password</h1>
 
                 {done ? (
-                    <p className="text-center text-charcoal">Password updated. Redirecting to sign in…</p>
+                    <p className="text-center text-ink">Password updated. Redirecting to sign in…</p>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <Input label="New password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
                         <Input label="Confirm password" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={8} autoComplete="new-password" />
                         {error && <p className="text-sm text-red-600 text-center" role="alert">{error}</p>}
-                        <Button variant="gold" size="lg" className="w-full" type="submit" disabled={loading}>
+                        <Button variant="turmeric" size="lg" className="w-full" type="submit" disabled={loading}>
                             {loading ? 'Updating…' : 'Update password'}
                         </Button>
                     </form>
