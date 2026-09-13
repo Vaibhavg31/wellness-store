@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Plus, Pencil, Trash2, Upload, X, FolderOpen, Eye, EyeOff } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Drawer from '@/components/ui/Drawer';
@@ -19,6 +20,7 @@ import {
 
 export default function AdminCategoriesPage() {
     const { adminToken } = useAdminAuth();
+    const { showToast } = useToast();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
@@ -90,8 +92,13 @@ export default function AdminCategoriesPage() {
 
     const handleDelete = async (id) => {
         if (!adminToken || !confirm('Delete this category?')) return;
-        await api.delete(`/api/categories/${id}`, adminToken);
-        fetchCategories();
+        try {
+            await api.delete(`/api/categories/${id}`, adminToken);
+            showToast('Category deleted', 'success');
+            fetchCategories();
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Failed to delete category', 'error');
+        }
     };
 
     const publishedCount = categories.filter((c) => c.isPublished).length;

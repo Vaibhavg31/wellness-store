@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Store, Home, FileText, MessageCircle, Megaphone, Palette,
+    Store, Home, FileText, MessageCircle, Megaphone, Palette, Bell,
 } from 'lucide-react';
 import { api, ApiError } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
@@ -15,7 +15,7 @@ import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
 import {
-    AdminSection, AdminField, AdminTextarea, ImageUploadField,
+    AdminSection, AdminField, AdminTextarea, ImageUploadField, VideoUploadField,
     StringListEditor, BenefitEditor, FaqEditor, SectionToggles,
     ColorField, FontField,
 } from '@/components/admin/ContentEditor';
@@ -43,6 +43,7 @@ const TABS = [
     { id: 'about', label: 'About Page', icon: FileText },
     { id: 'contact', label: 'Contact & FAQ', icon: MessageCircle },
     { id: 'promo', label: 'SEO & Meta', icon: Megaphone },
+    { id: 'popup', label: 'Announcement Popup', icon: Bell },
 ];
 
 // Deliberately distinct, unambiguous names — "Promo Banners" and "Top Promo
@@ -51,6 +52,7 @@ const TABS = [
 // genuinely confusing. Every label below stands on its own.
 const SECTION_LABELS = {
     hero: 'Hero Banner',
+    videoBanner: 'Video Banner',
     brandMarquee: 'Brand Marquee',
     banners: 'Image Banners (Stacked)',
     bannerSlider: 'Banner Slider (Rotating)',
@@ -60,6 +62,11 @@ const SECTION_LABELS = {
     trending: 'Trending Now',
     categories: 'Shop by Category',
     bundles: 'Bundle & Save Offers',
+    ritualBuilder: 'Build Your Ritual (Interactive Quiz)',
+    wellnessJourney: '24 Hours With Your Ritual (Scroll Story)',
+    bodyMap: 'Body Map (Scroll Story)',
+    sourceTrail: 'The Source Trail (Scroll Story)',
+    openingIntro: 'Opening Intro (Before Hero)',
     whyChoose: 'Why Choose Us',
     antiTarnishBanner: 'Anti-Tarnish Banner',
     reviews: 'Customer Reviews',
@@ -212,6 +219,69 @@ export default function AdminContentPage() {
      */
     const renderHomepageSectionContent = (key) => {
         switch (key) {
+            case 'videoBanner':
+                return (
+                    <div className="space-y-4 pt-3">
+                        <p className="text-xs text-admin-muted bg-wine/5 border border-wine/10 rounded-lg px-3 py-2">
+                            A full-width autoplay video banner. Hidden automatically until you upload a video.
+                        </p>
+                        <VideoUploadField
+                            label="Banner Video"
+                            hint="MP4 or WebM, 16:9 landscape recommended, max 20MB. We check the video's resolution before uploading and let you know how well it'll fit."
+                            value={content.videoBanner.videoUrl}
+                            width={content.videoBanner.width}
+                            height={content.videoBanner.height}
+                            onChange={({ url, width, height }) => update('videoBanner', { ...content.videoBanner, videoUrl: url, width, height })}
+                            adminToken={adminToken}
+                        />
+                        <ImageUploadField
+                            label="Poster Image"
+                            hint="Shown while the video loads, and as a static fallback on very slow connections."
+                            value={content.videoBanner.poster}
+                            onChange={(v) => update('videoBanner', { ...content.videoBanner, poster: v })}
+                            adminToken={adminToken}
+                        />
+                        <AdminField label="Fit" hint="Cover fills the banner edge-to-edge (may crop). Contain shows the whole video, letterboxed.">
+                            <div className="grid grid-cols-2 gap-3">
+                                {[
+                                    { value: 'cover', title: 'Cover', desc: 'Fills the frame' },
+                                    { value: 'contain', title: 'Contain', desc: 'Shows full video' },
+                                ].map((opt) => (
+                                    <button
+                                        key={opt.value}
+                                        type="button"
+                                        onClick={() => update('videoBanner', { ...content.videoBanner, fit: opt.value })}
+                                        className={`rounded-xl border p-3 text-left transition-all ${
+                                            content.videoBanner.fit === opt.value
+                                                ? 'border-wine bg-wine/5 ring-2 ring-wine/20'
+                                                : 'border-admin-border bg-admin-surface-alt hover:border-border'
+                                        }`}
+                                    >
+                                        <p className="text-sm font-semibold text-charcoal">{opt.title}</p>
+                                        <p className="text-[11px] text-admin-muted mt-0.5">{opt.desc}</p>
+                                    </button>
+                                ))}
+                            </div>
+                        </AdminField>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            <AdminField label="Title (optional overlay text)">
+                                <Input value={content.videoBanner.title} onChange={(e) => update('videoBanner', { ...content.videoBanner, title: e.target.value })} />
+                            </AdminField>
+                            <AdminField label="Subtitle">
+                                <Input value={content.videoBanner.subtitle} onChange={(e) => update('videoBanner', { ...content.videoBanner, subtitle: e.target.value })} />
+                            </AdminField>
+                        </div>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            <AdminField label="Button Label">
+                                <Input value={content.videoBanner.ctaLabel} onChange={(e) => update('videoBanner', { ...content.videoBanner, ctaLabel: e.target.value })} placeholder="Shop Now" />
+                            </AdminField>
+                            <AdminField label="Button Link">
+                                <Input value={content.videoBanner.ctaHref} onChange={(e) => update('videoBanner', { ...content.videoBanner, ctaHref: e.target.value })} placeholder="/shop" />
+                            </AdminField>
+                        </div>
+                    </div>
+                );
+
             case 'hero':
                 return (
                     <div className="space-y-4 pt-3">
@@ -429,6 +499,41 @@ export default function AdminContentPage() {
                     <p className="text-sm text-admin-muted pt-3">
                         Shows every published bundle offer, managed in{' '}
                         <Link to={`${ADMIN_PATH}/bundles`} className="text-wine font-medium hover:underline">Bundles</Link>. Hidden automatically when there are no bundles to show.
+                    </p>
+                );
+
+            case 'ritualBuilder':
+                return (
+                    <p className="text-sm text-admin-muted pt-3">
+                        A two-question interactive quiz that assembles a personalized routine from your live catalog and lets shoppers add it to their bag in one tap. Goal and product matching is automatic — no extra content to configure here.
+                    </p>
+                );
+
+            case 'wellnessJourney':
+                return (
+                    <p className="text-sm text-admin-muted pt-3">
+                        A scroll-driven walk through a 24-hour day showing where each kind of product fits. Pinned and GSAP-scrubbed on desktop, a lighter stacked story on mobile. No extra content to configure here.
+                    </p>
+                );
+
+            case 'bodyMap':
+                return (
+                    <p className="text-sm text-admin-muted pt-3">
+                        A scroll-driven tour of five zones (heart, gut, joints, muscle, energy) lighting up on a figure as each block scrolls into view, paired with the product that supports it. No extra content to configure here.
+                    </p>
+                );
+
+            case 'sourceTrail':
+                return (
+                    <p className="text-sm text-admin-muted pt-3">
+                        A scroll-through sourcing map tracing real ingredients to their growing regions in India, with a link into the shop for each. No extra content to configure here.
+                    </p>
+                );
+
+            case 'openingIntro':
+                return (
+                    <p className="text-sm text-admin-muted pt-3">
+                        A cinematic figure moment shown before the hero banner, with a parallax 3D layer. No extra content to configure here.
                     </p>
                 );
 
@@ -753,6 +858,105 @@ export default function AdminContentPage() {
                                 </AdminField>
                             </AdminSection>
                         </>
+                    )}
+
+                    {tab === 'popup' && (
+                        <AdminSection
+                            title="Announcement Popup"
+                            description="A site-wide popup shown after the page loads. Off by default — nothing shows until you enable it here."
+                        >
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <button
+                                    type="button"
+                                    onClick={() => update('popup', { ...content.popup, enabled: !content.popup.enabled })}
+                                    className={`relative w-12 h-6 rounded-full transition-colors ${content.popup.enabled ? 'bg-emerald' : 'bg-soft-brown/30'}`}
+                                >
+                                    <span className={`absolute top-0.5 w-5 h-5 bg-ivory rounded-full shadow transition-transform ${content.popup.enabled ? 'left-6' : 'left-0.5'}`} />
+                                </button>
+                                <span className="text-sm text-charcoal">Show announcement popup</span>
+                            </label>
+
+                            <div className="grid sm:grid-cols-2 gap-4">
+                                <AdminField label="Type" hint="Steers which fields below apply.">
+                                    <AdminSelect
+                                        aria-label="Popup type"
+                                        value={content.popup.type}
+                                        onChange={(e) => update('popup', { ...content.popup, type: e.target.value })}
+                                        className="w-full"
+                                        options={[
+                                            { value: 'info', label: 'Info / Announcement' },
+                                            { value: 'coupon', label: 'Coupon' },
+                                            { value: 'festival', label: 'Festival / Sale' },
+                                            { value: 'product', label: 'Product Spotlight' },
+                                        ]}
+                                    />
+                                </AdminField>
+                                <AdminField label="Frequency" hint="How often a visitor sees it after dismissing.">
+                                    <AdminSelect
+                                        aria-label="Popup frequency"
+                                        value={content.popup.frequency}
+                                        onChange={(e) => update('popup', { ...content.popup, frequency: e.target.value })}
+                                        className="w-full"
+                                        options={[
+                                            { value: 'session', label: 'Once per browser session' },
+                                            { value: 'every_visit', label: 'Every visit / page load' },
+                                            { value: 'once', label: 'Once ever (this browser)' },
+                                        ]}
+                                    />
+                                </AdminField>
+                            </div>
+
+                            <AdminField label="Title">
+                                <Input value={content.popup.title} onChange={(e) => update('popup', { ...content.popup, title: e.target.value })} />
+                            </AdminField>
+                            <AdminField label="Message">
+                                <AdminTextarea value={content.popup.message} onChange={(e) => update('popup', { ...content.popup, message: e.target.value })} rows={3} />
+                            </AdminField>
+                            <ImageUploadField
+                                label="Image (optional)"
+                                value={content.popup.image}
+                                onChange={(v) => update('popup', { ...content.popup, image: v })}
+                                adminToken={adminToken}
+                            />
+
+                            {content.popup.type === 'coupon' && (
+                                <AdminField label="Coupon Code">
+                                    <Input value={content.popup.couponCode} onChange={(e) => update('popup', { ...content.popup, couponCode: e.target.value })} placeholder="WELCOME10" />
+                                </AdminField>
+                            )}
+
+                            {content.popup.type === 'product' && (
+                                <AdminField label="Featured Product">
+                                    <AdminSelect
+                                        aria-label="Popup product"
+                                        value={content.popup.productId ?? ''}
+                                        onChange={(e) => update('popup', { ...content.popup, productId: e.target.value || null })}
+                                        className="w-full"
+                                        options={[{ value: '', label: 'None' }, ...products.map((p) => ({ value: p.id, label: p.title }))]}
+                                    />
+                                </AdminField>
+                            )}
+
+                            <div className="grid sm:grid-cols-2 gap-4">
+                                <AdminField label="CTA Button Label">
+                                    <Input value={content.popup.ctaLabel} onChange={(e) => update('popup', { ...content.popup, ctaLabel: e.target.value })} placeholder="Shop Now" />
+                                </AdminField>
+                                <AdminField label="CTA Link">
+                                    <Input value={content.popup.ctaHref} onChange={(e) => update('popup', { ...content.popup, ctaHref: e.target.value })} placeholder="/shop" />
+                                </AdminField>
+                            </div>
+
+                            <AdminField label="Delay (seconds)" hint="How long after the page loads before it appears.">
+                                <Input
+                                    type="number"
+                                    min={0}
+                                    max={60}
+                                    value={content.popup.delaySeconds}
+                                    onChange={(e) => update('popup', { ...content.popup, delaySeconds: Number(e.target.value) || 0 })}
+                                    className="w-32"
+                                />
+                            </AdminField>
+                        </AdminSection>
                     )}
                 </div>
             </div>

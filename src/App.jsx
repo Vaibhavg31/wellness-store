@@ -13,6 +13,7 @@ import ThemeInjector from '@/components/layout/ThemeInjector';
 import NavigationProgress from '@/components/layout/NavigationProgress';
 import InitialAppLoader from '@/components/layout/InitialAppLoader';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
+import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
 import PageLoader from '@/components/layout/PageLoader';
 import { AnimatedPage } from '@/components/layout/PageTransition';
 import MainLayout from '@/layouts/MainLayout';
@@ -87,6 +88,7 @@ export default function App() {
                   <ScrollToTop />
                   <NavigationProgress />
                   <WhatsAppButton />
+                  <AnnouncementPopup />
                   <Routes>
                     <Route element={<MainLayout />}>
                       <Route index element={<SuspensePage message="Opening collection..."><HomePage /></SuspensePage>} />

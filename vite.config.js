@@ -48,6 +48,14 @@ export default defineConfig({
     // Wi-Fi/LAN — e.g. a phone — can reach the dev server via this PC's
     // local IP (see README "Testing on your phone").
     host: true,
+    // Fixed port so this project never collides with, or silently swaps
+    // places with, the other storefronts in the workspace (KriveaJewels,
+    // VG Clothing, modern-interiors) — each has its own dedicated port.
+    // strictPort makes Vite fail fast instead of silently binding the next
+    // free port, which is what let a stale/orphaned dev server from another
+    // project quietly answer requests meant for this one.
+    port: 5173,
+    strictPort: true,
     // Backend JSON stores (orders, rate limits, etc.) must not trigger a dev reload.
     watch: {
       ignored: ['**/backend/data/**'],

@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { formatPrice } from '@/utils/formatPrice';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -65,6 +66,7 @@ function discountSummary(coupon) {
 
 export default function AdminCouponsPage() {
     const { adminToken } = useAdminAuth();
+    const { showToast } = useToast();
     const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
@@ -159,14 +161,23 @@ export default function AdminCouponsPage() {
 
     const handleToggle = async (coupon) => {
         if (!adminToken) return;
-        await api.put(`/api/coupons/${coupon.id}/toggle`, {}, adminToken);
-        fetchCoupons();
+        try {
+            await api.put(`/api/coupons/${coupon.id}/toggle`, {}, adminToken);
+            fetchCoupons();
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Failed to update coupon', 'error');
+        }
     };
 
     const handleDelete = async (id) => {
         if (!adminToken || !confirm('Delete this coupon? Past orders will keep their discount history.')) return;
-        await api.delete(`/api/coupons/${id}`, adminToken);
-        fetchCoupons();
+        try {
+            await api.delete(`/api/coupons/${id}`, adminToken);
+            showToast('Coupon deleted', 'success');
+            fetchCoupons();
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Failed to delete coupon', 'error');
+        }
     };
 
     const enabledCount = coupons.filter((c) => c.isEnabled).length;

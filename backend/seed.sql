@@ -301,19 +301,25 @@ INSERT INTO `site_why_choose_benefits` (`icon`, `title`, `description`, `sort_or
 -- site_section_toggles
 -- ----------------------------------------------------------------------------
 INSERT INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES
-('hero', 1, 1),
-('brandMarquee', 1, 2),
-('categories', 1, 3),
-('featured', 1, 4),
-('trending', 1, 5),
-('bundles', 1, 6),
-('whyChoose', 1, 7),
-('antiTarnishBanner', 1, 8),
-('banners', 1, 9),
-('reviews', 1, 10),
-('instagram', 0, 11),
-('newsletter', 1, 12),
-('promoBanner', 1, 13);
+('openingIntro', 1, 1),
+('hero', 1, 2),
+('videoBanner', 1, 3),
+('brandMarquee', 1, 4),
+('categories', 1, 5),
+('featured', 1, 6),
+('trending', 1, 7),
+('bundles', 1, 8),
+('ritualBuilder', 1, 9),
+('wellnessJourney', 1, 10),
+('bodyMap', 1, 11),
+('sourceTrail', 1, 12),
+('whyChoose', 1, 13),
+('antiTarnishBanner', 1, 14),
+('banners', 1, 15),
+('reviews', 1, 16),
+('instagram', 0, 17),
+('newsletter', 1, 18),
+('promoBanner', 1, 19);
 
 -- ----------------------------------------------------------------------------
 -- site_settings  (single row)
@@ -342,7 +348,13 @@ INSERT INTO `site_settings` (
   `about_vision_title`, `about_vision_text`, `about_values_subtitle`, `about_values_title`,
   `contact_page_subtitle`, `contact_page_title`, `contact_page_description`,
   `footer_tagline`, `footer_description`, `footer_newsletter_title`, `footer_newsletter_description`, `footer_instagram_card_text`,
-  `seo_title`, `seo_description`
+  `seo_title`, `seo_description`,
+  `video_banner_url`, `video_banner_poster`, `video_banner_title`, `video_banner_subtitle`,
+  `video_banner_cta_label`, `video_banner_cta_href`, `video_banner_fit`,
+  `video_banner_width`, `video_banner_height`,
+  `popup_enabled`, `popup_type`, `popup_title`, `popup_message`, `popup_image`,
+  `popup_cta_label`, `popup_cta_href`, `popup_coupon_code`, `popup_product_id`,
+  `popup_delay_seconds`, `popup_frequency`
 ) VALUES (
   1, 'Wellness Store', 'Wellness Store', 'WS', 'Everyday Wellness, Honestly Made', 'Wellness Store is a placeholder wellness/nutrition D2C brand template — swap in your real brand name, copy and imagery.', '', '',
   '#0F5132', '#15803D', '#0A3D25',
@@ -367,7 +379,16 @@ INSERT INTO `site_settings` (
   'Our Vision', 'To become India''s most trusted wellness brand, known for transparency and quality.', 'What Drives Us', 'Mission & Vision',
   'Get in Touch', 'Contact Us', 'We''d love to hear from you. Our team is here to help.',
   'Everyday Wellness, Honestly Made', 'Clean-label supplements and nutrition, honestly sourced and lab tested for purity.', 'Our Wellness Circle', 'Be the first to hear about new products, offers, and wellness tips.', 'Wellness tips, product stories & behind-the-scenes.',
-  'Wellness Store | Clean-Label Supplements & Nutrition', 'Clean-label supplements and nutrition, honestly sourced and lab tested for purity.'
+  'Wellness Store | Clean-Label Supplements & Nutrition', 'Clean-label supplements and nutrition, honestly sourced and lab tested for purity.',
+  -- Placeholder demo clip (CC0, hosted by MDN) so the Video Banner section
+  -- has something to show out of the box — replace with your own video from
+  -- Content Manager -> Homepage -> Video Banner.
+  'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+  'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1600&q=80',
+  'Wellness, Naturally', 'Sample Video Banner', 'Shop Now', '/shop', 'cover', 960, 540,
+  0, 'info', 'Welcome to Wellness Store', 'Sign up for our newsletter and get 10% off your first order.', '',
+  'Shop Now', '/shop', 'WELCOME10', NULL,
+  2, 'session'
 );
 
 COMMIT;

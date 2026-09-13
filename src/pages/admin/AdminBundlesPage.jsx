@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { formatPrice } from '@/utils/formatPrice';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -45,6 +46,7 @@ function previewPricing(items, products) {
 
 export default function AdminBundlesPage() {
     const { adminToken } = useAdminAuth();
+    const { showToast } = useToast();
     const [bundles, setBundles] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -170,14 +172,23 @@ export default function AdminBundlesPage() {
 
     const handleToggle = async (bundle) => {
         if (!adminToken) return;
-        await api.put(`/api/bundles/${bundle.id}/toggle`, {}, adminToken);
-        fetchBundles();
+        try {
+            await api.put(`/api/bundles/${bundle.id}/toggle`, {}, adminToken);
+            fetchBundles();
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Failed to update bundle', 'error');
+        }
     };
 
     const handleDelete = async (id) => {
         if (!adminToken || !confirm('Delete this bundle? This does not affect past orders.')) return;
-        await api.delete(`/api/bundles/${id}`, adminToken);
-        fetchBundles();
+        try {
+            await api.delete(`/api/bundles/${id}`, adminToken);
+            showToast('Bundle deleted', 'success');
+            fetchBundles();
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Failed to delete bundle', 'error');
+        }
     };
 
     const publishedCount = bundles.filter((b) => b.isPublished).length;

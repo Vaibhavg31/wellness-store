@@ -13,10 +13,7 @@ final class Cors
     {
         $allowed = array_filter([
             'http://localhost:5173',
-            'http://localhost:5174',
             'http://localhost:4173',
-            'https://kriveajewels.in',
-            'https://www.kriveajewels.in',
             $_ENV['FRONTEND_URL'] ?? null,
         ]);
 

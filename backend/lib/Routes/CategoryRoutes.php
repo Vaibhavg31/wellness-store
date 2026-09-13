@@ -95,6 +95,19 @@ final class CategoryRoutes
     {
         Auth::requireAdmin();
         try {
+            // Products keep a category_id reference (ON DELETE RESTRICT) so
+            // an in-use category can never be silently deleted out from
+            // under its products — check first and explain why, rather than
+            // letting the admin discover it as a bare 500 with no reason.
+            $productCount = self::repo()->countProducts($id);
+            if ($productCount > 0) {
+                $noun = $productCount === 1 ? 'product' : 'products';
+                Response::error(
+                    "Can't delete this category — {$productCount} {$noun} still use it. Move or delete those products first, or unpublish the category instead.",
+                    409
+                );
+            }
+
             self::repo()->delete($id)
                 ? Response::json(['success' => true])
                 : Response::error('Category not found', 404);

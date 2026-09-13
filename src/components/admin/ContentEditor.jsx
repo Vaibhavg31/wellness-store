@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, Reorder, useDragControls } from 'framer-motion';
-import { Plus, Trash2, Upload, GripVertical, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Upload, GripVertical, ChevronDown, AlertTriangle, CheckCircle2, Film, X } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { api, imageUrl } from '@/services/api';
@@ -72,6 +72,185 @@ export function ImageUploadField({ value, onChange, adminToken, label = 'Image',
                     </label>
                 </div>
             </div>
+        </AdminField>
+    );
+}
+
+const MAX_VIDEO_MB = 20;
+
+/** Classifies a video's pixel aspect ratio against a full-width banner's
+ *  needs, so the admin gets an informed heads-up before uploading instead
+ *  of only discovering a badly-cropped video after it's live. */
+function classifyVideoAspect(w, h) {
+    if (!w || !h) return null;
+    const ratio = w / h;
+    if (ratio >= 1.65) {
+        return { tone: 'good', message: `${w}×${h} — landscape, close to 16:9. A great fit for a full-width banner.` };
+    }
+    if (ratio >= 1.2) {
+        return { tone: 'warn', message: `${w}×${h} is landscape but narrower than 16:9 — it'll be cropped a little top/bottom to fill the banner. For a perfect fit, use a 16:9 video.` };
+    }
+    if (ratio >= 0.85) {
+        return { tone: 'warn', message: `${w}×${h} is close to square — a large part of it will be cropped to fill a wide banner. A landscape (16:9) video is strongly recommended.` };
+    }
+    return { tone: 'bad', message: `${w}×${h} is portrait — most of the frame will be cropped out in a wide banner. Use a landscape video, or switch "Fit" to Contain below to show the whole video letterboxed instead.` };
+}
+
+/**
+ * Video banner upload — reads the file's own resolution client-side (via a
+ * hidden <video>'s loadedmetadata) before it ever uploads, and asks the
+ * admin to confirm once they've seen how well it'll fit a wide banner,
+ * rather than silently accepting a video that'll display badly cropped.
+ */
+export function VideoUploadField({ value, width, height, onChange, adminToken, label = 'Video', hint }) {
+    const [pending, setPending] = useState(null); // { file, previewUrl, width, height }
+    const [uploading, setUploading] = useState(false);
+    const [error, setError] = useState('');
+    const probeRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    useEffect(() => () => {
+        if (pending?.previewUrl) URL.revokeObjectURL(pending.previewUrl);
+    }, [pending]);
+
+    const handleSelect = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setError('');
+
+        if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+            setError(`That file is ${(file.size / (1024 * 1024)).toFixed(1)}MB — max is ${MAX_VIDEO_MB}MB. Trim or compress it and try again.`);
+            e.target.value = '';
+            return;
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        const probe = probeRef.current;
+        if (probe) {
+            probe.src = previewUrl;
+            probe.onloadedmetadata = () => {
+                setPending({ file, previewUrl, width: probe.videoWidth, height: probe.videoHeight });
+            };
+            probe.onerror = () => {
+                setError('Could not read that video file — it may be corrupted or an unsupported codec.');
+                URL.revokeObjectURL(previewUrl);
+            };
+        }
+        e.target.value = '';
+    };
+
+    const cancelPending = () => {
+        if (pending?.previewUrl) URL.revokeObjectURL(pending.previewUrl);
+        setPending(null);
+    };
+
+    const confirmUpload = async () => {
+        if (!pending || !adminToken) return;
+        setUploading(true);
+        setError('');
+        try {
+            const url = await api.uploadVideo(pending.file, adminToken);
+            onChange({ url, width: pending.width, height: pending.height });
+            cancelPending();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Upload failed');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const clearVideo = () => onChange({ url: '', width: null, height: null });
+
+    const pendingAspect = pending ? classifyVideoAspect(pending.width, pending.height) : null;
+    const currentAspect = !pending && value ? classifyVideoAspect(width, height) : null;
+
+    return (
+        <AdminField label={label} hint={hint}>
+            {/* Offscreen probe — never shown, only used to read the file's own
+                pixel dimensions before deciding whether to upload it. */}
+            <video ref={probeRef} className="hidden" muted playsInline />
+
+            {error && (
+                <div className="mb-3 flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs">
+                    <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+                    <span>{error}</span>
+                </div>
+            )}
+
+            {pending ? (
+                <div className="rounded-xl border border-admin-border bg-admin-surface-alt p-3 space-y-3">
+                    <div className="flex gap-3">
+                        <video
+                            src={pending.previewUrl}
+                            className="w-32 h-20 object-cover rounded-lg border border-admin-border bg-black flex-shrink-0"
+                            muted
+                            playsInline
+                            controls
+                        />
+                        <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-charcoal truncate">{pending.file.name}</p>
+                            <p className="text-[11px] text-admin-muted">{(pending.file.size / (1024 * 1024)).toFixed(1)}MB</p>
+                            {pendingAspect && (
+                                <div className={`mt-1.5 flex items-start gap-1.5 text-[11px] ${
+                                    pendingAspect.tone === 'good' ? 'text-emerald' : pendingAspect.tone === 'warn' ? 'text-gold-ink' : 'text-red-600'
+                                }`}>
+                                    {pendingAspect.tone === 'good'
+                                        ? <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
+                                        : <AlertTriangle size={13} className="flex-shrink-0 mt-0.5" />}
+                                    <span>{pendingAspect.message}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button type="button" variant="gold" size="sm" onClick={confirmUpload} disabled={uploading} className="normal-case tracking-normal">
+                            {uploading ? 'Uploading…' : 'Use this video'}
+                        </Button>
+                        <Button type="button" variant="outline" size="sm" onClick={cancelPending} disabled={uploading} className="normal-case tracking-normal">
+                            Choose a different file
+                        </Button>
+                    </div>
+                </div>
+            ) : value ? (
+                <div className="flex gap-4 items-start">
+                    <video
+                        src={imageUrl(value)}
+                        className="w-32 h-20 object-cover rounded-lg border border-admin-border bg-black flex-shrink-0"
+                        muted
+                        playsInline
+                        controls
+                    />
+                    <div className="flex-1 min-w-0 space-y-2">
+                        {currentAspect && (
+                            <div className={`flex items-start gap-1.5 text-[11px] ${
+                                currentAspect.tone === 'good' ? 'text-emerald' : currentAspect.tone === 'warn' ? 'text-gold-ink' : 'text-red-600'
+                            }`}>
+                                {currentAspect.tone === 'good'
+                                    ? <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
+                                    : <AlertTriangle size={13} className="flex-shrink-0 mt-0.5" />}
+                                <span>{currentAspect.message}</span>
+                            </div>
+                        )}
+                        <div className="flex gap-3">
+                            <label className="inline-flex items-center gap-2 text-xs text-wine cursor-pointer hover:text-wine-light">
+                                <Upload size={14} />
+                                Replace video
+                                <input ref={fileInputRef} type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" onChange={handleSelect} />
+                            </label>
+                            <button type="button" onClick={clearVideo} className="inline-flex items-center gap-1.5 text-xs text-red-600 hover:text-red-700">
+                                <X size={14} /> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-wine/30 hover:bg-wine/5 transition-colors">
+                    <Film size={26} className="text-admin-muted/40" />
+                    <span className="text-sm text-admin-muted">Click to upload a banner video</span>
+                    <span className="text-xs text-admin-muted">MP4 or WebM · 16:9 landscape recommended · max {MAX_VIDEO_MB}MB</span>
+                    <input type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" onChange={handleSelect} />
+                </label>
+            )}
         </AdminField>
     );
 }

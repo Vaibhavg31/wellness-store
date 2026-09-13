@@ -142,12 +142,22 @@ export default function AdminMediaPage() {
                     {filtered.map((item) => (
                         <div key={item.id} className="admin-table-shell overflow-hidden group">
                             <div className="aspect-square bg-admin-surface-alt relative">
-                                <img
-                                    src={imageUrl(item.url)}
-                                    alt={item.altText || item.filename}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
-                                />
+                                {item.mimeType?.startsWith('video/') ? (
+                                    <video
+                                        src={imageUrl(item.url)}
+                                        className="w-full h-full object-cover"
+                                        muted
+                                        playsInline
+                                        preload="metadata"
+                                    />
+                                ) : (
+                                    <img
+                                        src={imageUrl(item.url)}
+                                        alt={item.altText || item.filename}
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                    />
+                                )}
                                 <div className="absolute inset-0 bg-dark-chocolate/0 group-hover:bg-dark-chocolate/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                                     <AdminIconButton
                                         onClick={() => copyUrl(item)}

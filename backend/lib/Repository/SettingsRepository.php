@@ -67,7 +67,9 @@ final class SettingsRepository
             ['label' => 'Contact',  'href' => '/contact'],
         ],
         'sections' => [
+            'openingIntro'      => true,
             'hero'              => true,
+            'videoBanner'       => true,
             'brandMarquee'      => true,
             'banners'           => true,
             'bannerSlider'      => true,
@@ -75,6 +77,10 @@ final class SettingsRepository
             'trending'          => true,
             'categories'        => true,
             'bundles'           => true,
+            'ritualBuilder'     => true,
+            'wellnessJourney'   => true,
+            'bodyMap'           => true,
+            'sourceTrail'       => true,
             'whyChoose'         => true,
             'antiTarnishBanner' => true,
             'reviews'           => true,
@@ -107,6 +113,19 @@ final class SettingsRepository
                 ['icon' => 'flask',  'label' => 'Lab Tested'],
                 ['icon' => 'leaf',   'label' => '100% Natural'],
             ],
+        ],
+        // Renders nothing on the storefront until a video is uploaded —
+        // safe to leave the section toggle on by default.
+        'videoBanner' => [
+            'videoUrl'  => '',
+            'poster'    => '',
+            'title'     => '',
+            'subtitle'  => '',
+            'ctaLabel'  => '',
+            'ctaHref'   => '',
+            'fit'       => 'cover', // 'cover' fills the frame (may crop); 'contain' shows the whole video letterboxed
+            'width'     => null,    // detected pixel width of the uploaded video
+            'height'    => null,    // detected pixel height of the uploaded video
         ],
         'marquee' => [
             'items' => [
@@ -183,6 +202,23 @@ final class SettingsRepository
         'seo' => [
             'title'       => 'Wellness Store | Clean-Label Supplements & Nutrition',
             'description' => 'Clean-label supplements and nutrition, honestly sourced and lab tested for purity.',
+        ],
+        // Site-wide on-load announcement popup — off by default; an admin
+        // has to explicitly enable it from Content Manager. `type` steers
+        // which fields the admin form and the storefront modal treat as
+        // relevant ("coupon" shows couponCode, "product" shows productId).
+        'popup' => [
+            'enabled'       => false,
+            'type'          => 'info', // 'info' | 'coupon' | 'festival' | 'product'
+            'title'         => 'Welcome to Wellness Store',
+            'message'       => 'Sign up for our newsletter and get 10% off your first order.',
+            'image'         => '',
+            'ctaLabel'      => 'Shop Now',
+            'ctaHref'       => '/shop',
+            'couponCode'    => 'WELCOME10',
+            'productId'     => null,
+            'delaySeconds'  => 2,
+            'frequency'     => 'session', // 'session' | 'every_visit' | 'once'
         ],
     ];
 
@@ -320,6 +356,20 @@ final class SettingsRepository
                 'orbitImages'       => $this->fetchList('site_hero_orbit_images',  fn($r) => $r['url']),
                 'orbitProductIds'   => $this->fetchList('site_hero_orbit_products', fn($r) => $r['product_id']),
             ],
+            // Falls back to defaults for columns from migration 005 — keeps
+            // this endpoint working on a database that hasn't been migrated
+            // yet, same reasoning as favicon/theme above.
+            'videoBanner' => [
+                'videoUrl' => $row['video_banner_url']    ?? $this->defaults['videoBanner']['videoUrl'],
+                'poster'   => $row['video_banner_poster'] ?? $this->defaults['videoBanner']['poster'],
+                'title'    => $row['video_banner_title']    ?? $this->defaults['videoBanner']['title'],
+                'subtitle' => $row['video_banner_subtitle'] ?? $this->defaults['videoBanner']['subtitle'],
+                'ctaLabel' => $row['video_banner_cta_label'] ?? $this->defaults['videoBanner']['ctaLabel'],
+                'ctaHref'  => $row['video_banner_cta_href']  ?? $this->defaults['videoBanner']['ctaHref'],
+                'fit'      => $row['video_banner_fit'] ?? $this->defaults['videoBanner']['fit'],
+                'width'    => isset($row['video_banner_width'])  ? $i($row['video_banner_width'])  : null,
+                'height'   => isset($row['video_banner_height']) ? $i($row['video_banner_height']) : null,
+            ],
             'marquee' => [
                 'items' => $this->fetchList('site_marquee_items', fn($r) => $r['text']),
             ],
@@ -394,6 +444,19 @@ final class SettingsRepository
                 'title'       => $row['seo_title'],
                 'description' => $row['seo_description'],
             ],
+            'popup' => [
+                'enabled'      => $b($row['popup_enabled'] ?? false),
+                'type'         => $row['popup_type']         ?? $this->defaults['popup']['type'],
+                'title'        => $row['popup_title']        ?? $this->defaults['popup']['title'],
+                'message'      => $row['popup_message']      ?? $this->defaults['popup']['message'],
+                'image'        => $row['popup_image']        ?? $this->defaults['popup']['image'],
+                'ctaLabel'     => $row['popup_cta_label']    ?? $this->defaults['popup']['ctaLabel'],
+                'ctaHref'      => $row['popup_cta_href']     ?? $this->defaults['popup']['ctaHref'],
+                'couponCode'   => $row['popup_coupon_code']  ?? $this->defaults['popup']['couponCode'],
+                'productId'    => $row['popup_product_id']   ?? null,
+                'delaySeconds' => isset($row['popup_delay_seconds']) ? $i($row['popup_delay_seconds']) : $this->defaults['popup']['delaySeconds'],
+                'frequency'    => $row['popup_frequency']    ?? $this->defaults['popup']['frequency'],
+            ],
             'navLinks' => $this->fetchList('site_nav_links',  fn($r) => ['label' => $r['label'], 'href' => $r['href']]),
             'sections'  => $this->fetchSections(),
         ];
@@ -460,6 +523,12 @@ final class SettingsRepository
             footer_tagline, footer_description, footer_newsletter_title,
             footer_newsletter_description, footer_instagram_card_text,
             seo_title, seo_description,
+            video_banner_url, video_banner_poster, video_banner_title, video_banner_subtitle,
+            video_banner_cta_label, video_banner_cta_href, video_banner_fit,
+            video_banner_width, video_banner_height,
+            popup_enabled, popup_type, popup_title, popup_message, popup_image,
+            popup_cta_label, popup_cta_href, popup_coupon_code, popup_product_id,
+            popup_delay_seconds, popup_frequency,
             updated_at
         ) VALUES (
             1,
@@ -491,6 +560,12 @@ final class SettingsRepository
             ?, ?, ?,
             ?, ?, ?,
             ?, ?,
+            ?, ?,
+            ?, ?, ?, ?,
+            ?, ?, ?,
+            ?, ?,
+            ?, ?, ?, ?, ?,
+            ?, ?, ?, ?,
             ?, ?,
             ?
         ) ON DUPLICATE KEY UPDATE
@@ -554,6 +629,16 @@ final class SettingsRepository
             footer_newsletter_description = VALUES(footer_newsletter_description),
             footer_instagram_card_text = VALUES(footer_instagram_card_text),
             seo_title = VALUES(seo_title), seo_description = VALUES(seo_description),
+            video_banner_url = VALUES(video_banner_url), video_banner_poster = VALUES(video_banner_poster),
+            video_banner_title = VALUES(video_banner_title), video_banner_subtitle = VALUES(video_banner_subtitle),
+            video_banner_cta_label = VALUES(video_banner_cta_label), video_banner_cta_href = VALUES(video_banner_cta_href),
+            video_banner_fit = VALUES(video_banner_fit),
+            video_banner_width = VALUES(video_banner_width), video_banner_height = VALUES(video_banner_height),
+            popup_enabled = VALUES(popup_enabled), popup_type = VALUES(popup_type),
+            popup_title = VALUES(popup_title), popup_message = VALUES(popup_message), popup_image = VALUES(popup_image),
+            popup_cta_label = VALUES(popup_cta_label), popup_cta_href = VALUES(popup_cta_href),
+            popup_coupon_code = VALUES(popup_coupon_code), popup_product_id = VALUES(popup_product_id),
+            popup_delay_seconds = VALUES(popup_delay_seconds), popup_frequency = VALUES(popup_frequency),
             updated_at = VALUES(updated_at)';
 
         $c  = $s['contact']  ?? [];
@@ -573,6 +658,8 @@ final class SettingsRepository
         $fo = $s['footer']            ?? [];
         $se = $s['seo']               ?? [];
         $th = $s['theme']             ?? [];
+        $vb = $s['videoBanner']       ?? [];
+        $pu = $s['popup']             ?? [];
         $pc = $h['primaryCta']   ?? [];
         $sc = $h['secondaryCta'] ?? [];
 
@@ -620,6 +707,15 @@ final class SettingsRepository
             $fo['newsletterTitle'] ?? '', $fo['newsletterDescription'] ?? '',
             $fo['instagramCardText'] ?? '',
             $se['title'] ?? '', $se['description'] ?? '',
+            $vb['videoUrl'] ?? '', $vb['poster'] ?? '', $vb['title'] ?? '', $vb['subtitle'] ?? '',
+            $vb['ctaLabel'] ?? '', $vb['ctaHref'] ?? '', $vb['fit'] ?? 'cover',
+            isset($vb['width']) && $vb['width'] !== null ? (int) $vb['width'] : null,
+            isset($vb['height']) && $vb['height'] !== null ? (int) $vb['height'] : null,
+            ($pu['enabled'] ?? false) ? 1 : 0, $pu['type'] ?? 'info',
+            $pu['title'] ?? '', $pu['message'] ?? '', $pu['image'] ?? '',
+            $pu['ctaLabel'] ?? '', $pu['ctaHref'] ?? '', $pu['couponCode'] ?? '',
+            isset($pu['productId']) && $pu['productId'] !== null ? $pu['productId'] : null,
+            (int) ($pu['delaySeconds'] ?? 2), $pu['frequency'] ?? 'session',
             $now,
         ]);
 

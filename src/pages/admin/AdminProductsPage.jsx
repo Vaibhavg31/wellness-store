@@ -59,14 +59,22 @@ export default function AdminProductsPage() {
 
     const handleDelete = async (id) => {
         if (!adminToken || !confirm('Delete this product?')) return;
-        await api.delete(`/api/products/${id}`, adminToken);
-        fetchProducts();
+        try {
+            await api.delete(`/api/products/${id}`, adminToken);
+            fetchProducts();
+        } catch (err) {
+            setLoadError(err instanceof Error ? err.message : 'Failed to delete product');
+        }
     };
 
     const togglePublish = async (product) => {
         if (!adminToken) return;
-        await api.put(`/api/products/${product.id}`, { isPublished: !product.isPublished }, adminToken);
-        fetchProducts();
+        try {
+            await api.put(`/api/products/${product.id}`, { isPublished: !product.isPublished }, adminToken);
+            fetchProducts();
+        } catch (err) {
+            setLoadError(err instanceof Error ? err.message : 'Failed to update product');
+        }
     };
 
     return (

@@ -1,6 +1,9 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import BrandMarquee from '@/components/home/BrandMarquee';
 import HeroCinematic from '@/components/home/HeroCinematic';
+import VideoBanner from '@/components/home/VideoBanner';
 import QuickShop from '@/components/home/QuickShop';
 import Categories from '@/components/home/Categories';
 import BundleShowcase from '@/components/home/BundleShowcase';
@@ -19,6 +22,11 @@ import { FALLBACK_PRODUCTS } from '@/data/fallbackProducts';
 
 const JewelExplorerSection = lazy(() => import('@/components/home/JewelExplorer3D/JewelExplorerSection'));
 const DayInHerSparkle = lazy(() => import('@/components/home/DayInHerSparkle'));
+const RitualBuilder = lazy(() => import('@/components/home/RitualBuilder'));
+const WellnessJourney = lazy(() => import('@/components/home/WellnessJourney'));
+const BodyMap = lazy(() => import('@/components/home/BodyMap'));
+const SourceTrail = lazy(() => import('@/components/home/SourceTrail'));
+const OpeningIntro = lazy(() => import('@/components/home/OpeningIntro'));
 
 function ProductSkeleton() {
     return (
@@ -54,7 +62,13 @@ function FeaturedSkeleton() {
  */
 function buildSectionRenderers({ displayProducts, loading, error }) {
     return {
+        openingIntro: () => (
+            <Suspense key="openingIntro" fallback={<div className="h-[92vh] min-h-[560px] max-h-[920px] bg-[#0F5132] animate-pulse" aria-hidden="true" />}>
+                <OpeningIntro />
+            </Suspense>
+        ),
         hero: () => <HeroCinematic key="hero" products={displayProducts} />,
+        videoBanner: () => <VideoBanner key="videoBanner" />,
         brandMarquee: () => <BrandMarquee key="brandMarquee" />,
         banners: () => <PromoBanners key="banners" />,
         bannerSlider: () => <BannerSlider key="bannerSlider" />,
@@ -82,6 +96,26 @@ function buildSectionRenderers({ displayProducts, loading, error }) {
         trending: () => <TrendingProducts key="trending" />,
         categories: () => <Categories key="categories" />,
         bundles: () => <BundleShowcase key="bundles" />,
+        ritualBuilder: () => (
+            <Suspense key="ritualBuilder" fallback={<div className="h-[32rem] bg-ivory animate-pulse" aria-hidden="true" />}>
+                <RitualBuilder products={displayProducts} />
+            </Suspense>
+        ),
+        wellnessJourney: () => (
+            <Suspense key="wellnessJourney" fallback={<div className="h-[32rem] bg-[#0F5132] animate-pulse" aria-hidden="true" />}>
+                <WellnessJourney products={displayProducts} />
+            </Suspense>
+        ),
+        bodyMap: () => (
+            <Suspense key="bodyMap" fallback={<div className="h-[32rem] bg-[#0A3D25] animate-pulse" aria-hidden="true" />}>
+                <BodyMap products={displayProducts} />
+            </Suspense>
+        ),
+        sourceTrail: () => (
+            <Suspense key="sourceTrail" fallback={<div className="h-[32rem] bg-[#0A3D25] animate-pulse" aria-hidden="true" />}>
+                <SourceTrail products={displayProducts} />
+            </Suspense>
+        ),
         whyChoose: () => <WhyChoose key="whyChoose" />,
         antiTarnishBanner: () => <AntiTarnishBanner key="antiTarnishBanner" />,
         reviews: () => <CustomerReviews key="reviews" />,
@@ -96,6 +130,24 @@ export default function HomePage() {
 
     const displayProducts = products.length > 0 ? products : FALLBACK_PRODUCTS;
     const renderers = buildSectionRenderers({ displayProducts, loading, error });
+
+    // Scroll-pinned sections further down the page (e.g. WellnessJourney)
+    // measure their trigger start/end against document position at mount.
+    // Product data, skeleton→real-content swaps, and lazy image loads all
+    // resize the sections above them *after* that measurement, which drifts
+    // the pin timing without GSAP knowing. Re-measure once loading settles
+    // and once more after everything has painted.
+    useEffect(() => {
+        gsap.registerPlugin(ScrollTrigger);
+        let raf2;
+        const raf1 = requestAnimationFrame(() => {
+            raf2 = requestAnimationFrame(() => ScrollTrigger.refresh());
+        });
+        return () => {
+            cancelAnimationFrame(raf1);
+            cancelAnimationFrame(raf2);
+        };
+    }, [loading, products.length]);
 
     return (
         <>

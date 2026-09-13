@@ -251,27 +251,57 @@ final class ProductRepository extends MysqlRepository
         return $grouped;
     }
 
+    /**
+     * True once we've confirmed `product_variants.image` exists on this
+     * database — checked at most once per request. Lets an install that has
+     * run 001_add_product_variants.sql but not yet
+     * 003_add_variant_image.sql keep saving variants (just without a
+     * per-option photo override) instead of every save failing outright.
+     */
+    private static ?bool $variantImageColumnExists = null;
+
+    private function variantImageColumnExists(): bool
+    {
+        if (self::$variantImageColumnExists === null) {
+            try {
+                $this->pdo()->query('SELECT image FROM product_variants LIMIT 1');
+                self::$variantImageColumnExists = true;
+            } catch (\Throwable) {
+                self::$variantImageColumnExists = false;
+                error_log('[ProductRepository] `product_variants.image` column not found — run backend/migrations/003_add_variant_image.sql. Saving variants without per-option photos in the meantime.');
+            }
+        }
+        return self::$variantImageColumnExists;
+    }
+
     private function replaceVariants(string $productId, array $variants): void
     {
         $this->pdo()->prepare('DELETE FROM product_variants WHERE product_id = ?')->execute([$productId]);
         if (!$variants) {
             return;
         }
-        $insert = $this->pdo()->prepare(
-            'INSERT INTO product_variants
-                (id, product_id, label, net_quantity, image, price, original_price, discount, stock, sku, is_default, sort_order, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-        );
+
+        $hasImageCol = $this->variantImageColumnExists();
+        $cols = 'id, product_id, label, net_quantity, ' . ($hasImageCol ? 'image, ' : '') .
+            'price, original_price, discount, stock, sku, is_default, sort_order, created_at, updated_at';
+        $placeholders = implode(', ', array_fill(0, $hasImageCol ? 14 : 13, '?'));
+        $insert = $this->pdo()->prepare("INSERT INTO product_variants ({$cols}) VALUES ({$placeholders})");
+
         $now = gmdate('Y-m-d H:i:s');
         foreach (array_values($variants) as $i => $v) {
             $price    = (float) ($v['price'] ?? 0);
             $original = (float) ($v['originalPrice'] ?? $price);
-            $insert->execute([
+            $params = [
                 $v['id'] ?? Database::generateId('variant'),
                 $productId,
                 trim((string) ($v['label'] ?? '')) ?: 'Variant ' . ($i + 1),
                 ($v['netQuantity'] ?? '') !== '' ? $v['netQuantity'] : null,
-                ($v['image'] ?? '') !== '' ? $v['image'] : null,
+            ];
+            if ($hasImageCol) {
+                $params[] = ($v['image'] ?? '') !== '' ? $v['image'] : null;
+            }
+            $params = [
+                ...$params,
                 $price,
                 $original,
                 self::calcDiscount($price, $original, isset($v['discount']) ? (float) $v['discount'] : null),
@@ -281,7 +311,8 @@ final class ProductRepository extends MysqlRepository
                 $i,
                 $now,
                 $now,
-            ]);
+            ];
+            $insert->execute($params);
         }
     }
 

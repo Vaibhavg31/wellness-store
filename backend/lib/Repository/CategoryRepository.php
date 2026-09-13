@@ -94,4 +94,13 @@ final class CategoryRepository extends MysqlRepository
             ]);
         }, $stmt->fetchAll());
     }
+
+    /** How many products (published or not) still reference this category —
+     *  the FK constraint blocks deleting the category while this is > 0. */
+    public function countProducts(string $categoryId): int
+    {
+        $stmt = $this->pdo()->prepare('SELECT COUNT(*) FROM products WHERE category_id = ?');
+        $stmt->execute([$categoryId]);
+        return (int) $stmt->fetchColumn();
+    }
 }

@@ -215,6 +215,9 @@ final class Router
         if ($method === 'POST' && $path === '/api/upload/multiple') {
             UploadRoutes::multiple();
         }
+        if ($method === 'POST' && $path === '/api/upload/video') {
+            UploadRoutes::video();
+        }
 
         // ── Media Library ─────────────────────────────────
         if ($method === 'GET' && $path === '/api/media') {

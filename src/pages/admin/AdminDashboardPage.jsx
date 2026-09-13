@@ -38,7 +38,10 @@ export default function AdminDashboardPage() {
     useEffect(() => {
         if (!adminToken) return;
 
-        Promise.all([
+        // allSettled, not all: one endpoint failing (e.g. bundles/coupons on
+        // a database that hasn't run every migration yet) used to zero out
+        // every single stat on the dashboard instead of just its own tile.
+        Promise.allSettled([
             api.get('/api/products/admin/all', adminToken),
             api.get('/api/categories/admin/all', adminToken),
             api.get('/api/reviews/admin/all', adminToken),
@@ -46,24 +49,38 @@ export default function AdminDashboardPage() {
             api.get('/api/orders/admin/all', adminToken),
             api.get('/api/coupons/admin/all', adminToken),
             api.get('/api/bundles/admin/all', adminToken),
-        ]).then(([productList, categories, reviews, feedback, orderData, coupons, bundles]) => {
-            const orderList = Array.isArray(orderData) ? orderData : [];
-            const productArr = Array.isArray(productList) ? productList : [];
-            setProducts(productArr);
-            setOrders(orderList);
+        ]).then((results) => {
+            const value = (r, fallback) => (r.status === 'fulfilled' && r.value !== undefined ? r.value : fallback);
+            const [productRes, categoryRes, reviewRes, feedbackRes, orderRes, couponRes, bundleRes] = results;
+
+            const productArr  = value(productRes, []);
+            const categoryArr = value(categoryRes, []);
+            const reviewArr   = value(reviewRes, []);
+            const feedbackArr = value(feedbackRes, []);
+            const orderList   = value(orderRes, []);
+            const couponArr   = value(couponRes, []);
+            const bundleArr   = value(bundleRes, []);
+
+            setProducts(Array.isArray(productArr) ? productArr : []);
+            setOrders(Array.isArray(orderList) ? orderList : []);
             setStats({
-                products: productArr.length,
-                categories: categories.length,
-                reviews: reviews.length,
-                feedback: feedback.length,
-                orders: orderList.length,
-                coupons: Array.isArray(coupons) ? coupons.filter((c) => c.isEnabled).length : 0,
-                bundles: Array.isArray(bundles) ? bundles.filter((b) => b.isPublished).length : 0,
-                unread: feedback.filter((f) => !f.isRead).length,
-                revenue: sumOrderRevenue(orderList),
+                products: Array.isArray(productArr) ? productArr.length : 0,
+                categories: Array.isArray(categoryArr) ? categoryArr.length : 0,
+                reviews: Array.isArray(reviewArr) ? reviewArr.length : 0,
+                feedback: Array.isArray(feedbackArr) ? feedbackArr.length : 0,
+                orders: Array.isArray(orderList) ? orderList.length : 0,
+                coupons: Array.isArray(couponArr) ? couponArr.filter((c) => c.isEnabled).length : 0,
+                bundles: Array.isArray(bundleArr) ? bundleArr.filter((b) => b.isPublished).length : 0,
+                unread: Array.isArray(feedbackArr) ? feedbackArr.filter((f) => !f.isRead).length : 0,
+                revenue: sumOrderRevenue(Array.isArray(orderList) ? orderList : []),
             });
-        }).catch(() => {
-            /* dashboard stats best-effort */
+
+            results.forEach((r) => {
+                if (r.status === 'rejected') {
+                    // eslint-disable-next-line no-console
+                    console.warn('[AdminDashboard] a stats request failed:', r.reason);
+                }
+            });
         });
     }, [adminToken]);
 

@@ -79,7 +79,9 @@ export const DEFAULT_SITE_CONTENT = {
     // they were built for the original jewelry-brand template and don't fit
     // a wellness/supplements store, so they stay off by default.
     sections: {
+        openingIntro: true,
         hero: true,
+        videoBanner: true,
         brandMarquee: true,
         banners: true,
         bannerSlider: true,
@@ -87,6 +89,10 @@ export const DEFAULT_SITE_CONTENT = {
         trending: true,
         categories: true,
         bundles: true,
+        ritualBuilder: true,
+        wellnessJourney: true,
+        bodyMap: true,
+        sourceTrail: true,
         whyChoose: true,
         antiTarnishBanner: true,
         reviews: true,
@@ -101,6 +107,38 @@ export const DEFAULT_SITE_CONTENT = {
         code: 'WELCOME10',
         suffix: 'for 10% off your first order',
         href: '/shop',
+    },
+
+    // Site-wide on-load announcement popup — off by default, admin-managed
+    // from Content Manager. `type` steers which fields matter: "coupon"
+    // shows couponCode, "product" shows productId, "festival"/"info" are
+    // just title+message+image+CTA.
+    popup: {
+        enabled: false,
+        type: 'info',
+        title: 'Welcome to Wellness Store',
+        message: 'Sign up for our newsletter and get 10% off your first order.',
+        image: '',
+        ctaLabel: 'Shop Now',
+        ctaHref: '/shop',
+        couponCode: 'WELCOME10',
+        productId: null,
+        delaySeconds: 2,
+        frequency: 'session', // 'session' | 'every_visit' | 'once'
+    },
+
+    // Renders nothing on the storefront until a video is uploaded — safe to
+    // leave the section toggle on by default.
+    videoBanner: {
+        videoUrl: '',
+        poster: '',
+        title: '',
+        subtitle: '',
+        ctaLabel: '',
+        ctaHref: '',
+        fit: 'cover',
+        width: null,
+        height: null,
     },
 
     hero: {

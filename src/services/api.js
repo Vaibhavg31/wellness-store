@@ -143,6 +143,32 @@ export const api = {
         const data = await res.json();
         return data.urls;
     },
+    uploadVideo: async (file, token) => {
+        const formData = new FormData();
+        formData.append('video', file);
+        let res;
+        try {
+            res = await fetch(`${API_BASE}/api/upload/video`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` },
+                body: formData,
+            });
+        } catch {
+            throw new ApiError(
+                'Cannot reach the API server. Stop the app and run: npm run dev',
+                0,
+            );
+        }
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({ error: res.statusText }));
+            if (res.status === 401 && token && onUnauthorized) {
+                onUnauthorized();
+            }
+            throw new ApiError(body.error || 'Video upload failed', res.status);
+        }
+        const data = await res.json();
+        return data.url;
+    },
 };
 
 export function imageUrl(path) {

@@ -215,6 +215,26 @@ export default function AdminProductFormPage() {
         }
     };
 
+    // A variant's cover photo doesn't have to already be one of the
+    // product's own gallery images — this uploads a brand-new photo
+    // dedicated to just this one option (e.g. a different color/flavor
+    // never shown elsewhere on the product).
+    const [uploadingVariantPhoto, setUploadingVariantPhoto] = useState(null);
+    const handleVariantPhotoUpload = async (index, e) => {
+        if (!adminToken || !e.target.files?.length) return;
+        setUploadingVariantPhoto(index);
+        setError('');
+        try {
+            const urls = await api.upload(Array.from(e.target.files).slice(0, 1), adminToken);
+            if (urls[0]) updateVariant(index, { image: urls[0] });
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Upload failed');
+        } finally {
+            setUploadingVariantPhoto(null);
+            e.target.value = '';
+        }
+    };
+
     const toggleTag = (tag) => {
         const normalized = normalizeTag(tag);
         if (!normalized) return;
@@ -666,7 +686,36 @@ export default function AdminProductFormPage() {
                                                         <img src={imageUrl(img)} alt="" className="w-full h-full object-cover" />
                                                     </button>
                                                 ))}
+                                                {v.image && !form.images.includes(v.image) && (
+                                                    <button
+                                                        type="button"
+                                                        className="w-11 h-11 rounded-lg overflow-hidden border-2 border-wine shrink-0"
+                                                        title="This option's own uploaded photo"
+                                                    >
+                                                        <img src={imageUrl(v.image)} alt="" className="w-full h-full object-cover" />
+                                                    </button>
+                                                )}
+                                                <label
+                                                    className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed text-xs cursor-pointer transition-colors ${
+                                                        uploadingVariantPhoto === i
+                                                            ? 'border-admin-border text-admin-muted pointer-events-none'
+                                                            : 'border-wine/40 text-wine hover:bg-wine/5'
+                                                    }`}
+                                                >
+                                                    <Upload size={12} />
+                                                    {uploadingVariantPhoto === i ? 'Uploading…' : 'Upload new'}
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={(e) => handleVariantPhotoUpload(i, e)}
+                                                        disabled={uploadingVariantPhoto === i}
+                                                    />
+                                                </label>
                                             </div>
+                                            <p className="text-[11px] text-admin-muted mt-1.5">
+                                                Pick one of the photos above, or upload a photo just for this option (e.g. a different color) — it won't be added to the main gallery.
+                                            </p>
                                         </div>
                                     )}
 

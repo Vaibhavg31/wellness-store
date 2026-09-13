@@ -15,6 +15,9 @@ final class UploadRoutes
     private const ALLOWED_EXT = ['jpg', 'jpeg', 'png', 'webp'];
     private const MAX_SIZE = 5 * 1024 * 1024;
 
+    private const ALLOWED_VIDEO_EXT = ['mp4', 'webm', 'mov'];
+    private const MAX_VIDEO_SIZE = 20 * 1024 * 1024;
+
     public static function single(): void
     {
         Auth::requireAdmin();
@@ -24,6 +27,55 @@ final class UploadRoutes
         }
 
         $url = self::saveFile($_FILES['image']);
+        Response::json(['url' => $url]);
+    }
+
+    /**
+     * A banner video, saved as-is (no processing — PHP has no built-in video
+     * codec support, unlike ImageProcessor for images). The browser detects
+     * and reports the video's own pixel dimensions before upload; that's
+     * validated here only to the extent of trusting the client sends sane
+     * numbers, and is purely informational for the admin UI, never used for
+     * anything security-sensitive.
+     */
+    public static function video(): void
+    {
+        Auth::requireAdmin();
+
+        if (empty($_FILES['video'])) {
+            Response::error('No video uploaded', 400);
+        }
+
+        $file = $_FILES['video'];
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            Response::error(self::uploadErrorMessage($file['error']), 400);
+        }
+        if ($file['size'] > self::MAX_VIDEO_SIZE) {
+            $maxMb = (int) (self::MAX_VIDEO_SIZE / (1024 * 1024));
+            Response::error("Video too large (max {$maxMb}MB). Trim or compress it and try again.", 400);
+        }
+
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, self::ALLOWED_VIDEO_EXT, true)) {
+            Response::error('Only MP4, WebM, and MOV videos are allowed', 400);
+        }
+
+        $filename = 'video-' . time() . '-' . substr(bin2hex(random_bytes(4)), 0, 6) . '.' . $ext;
+        $dest = Database::uploadsDir() . '/' . $filename;
+
+        if (!move_uploaded_file($file['tmp_name'], $dest)) {
+            Response::error('Failed to save file', 500);
+        }
+
+        $url = '/uploads/' . $filename;
+
+        try {
+            $size = @filesize($dest) ?: null;
+            (new MediaRepository())->record($url, $filename, $file['type'] ?: 'video/mp4', $size);
+        } catch (\Throwable) {
+            // ignore — media library entry is best-effort
+        }
+
         Response::json(['url' => $url]);
     }
 
