@@ -228,13 +228,14 @@ const ICON_BTN_VARIANTS = {
     danger: 'text-red-600 hover:bg-red-50',
 };
 
-export function AdminIconButton({ onClick, icon: Icon, variant = 'default', title, size = 16, className }) {
+export function AdminIconButton({ onClick, icon: Icon, variant = 'default', title, size = 16, className, disabled = false }) {
     return (
         <button
             type="button"
             onClick={onClick}
             title={title}
-            className={cn('p-2 rounded-lg transition-colors', ICON_BTN_VARIANTS[variant], className)}
+            disabled={disabled}
+            className={cn('p-2 rounded-lg transition-colors disabled:opacity-30 disabled:pointer-events-none', ICON_BTN_VARIANTS[variant], className)}
         >
             <Icon size={size} />
         </button>

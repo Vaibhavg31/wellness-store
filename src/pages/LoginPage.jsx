@@ -2,14 +2,16 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
-import { Sparkles, ShoppingBag } from 'lucide-react';
+import { Sparkles, ShoppingBag, Shield, Star, Leaf } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import AmbientBlobs from '@/components/ui/AmbientBlobs';
+import ConstellationField from '@/components/ui/ConstellationField';
 import { useAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { useCustomerSession } from '@/hooks/useCustomerSession';
 import { useSiteContent } from '@/contexts/SiteContentContext';
-import { BRAND_NAME, BRAND_TAGLINE } from '@/constants';
+import { BRAND_NAME, BRAND_TAGLINE, BRAND_DESCRIPTION } from '@/constants';
 import { ApiError } from '@/services/api';
 
 const GOOGLE_ENABLED = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -150,42 +152,81 @@ export default function LoginPage() {
         }
     };
 
-    return (
-        <div className="min-h-screen grid lg:grid-cols-2 bg-ink">
-            <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden">
-                <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=1400&q=85" alt="" className="w-full h-full object-cover" aria-hidden="true" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-ink/95 via-forest-deep/80 to-ink/90" />
-                </div>
-                <div className="relative z-10">
-                    <Logo size="md" showHover />
-                </div>
-                <div className="relative z-10 max-w-md">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cream/10 border border-turmeric-light/30 mb-6">
-                        <Sparkles size={12} className="text-turmeric-light" />
-                        <span className="text-[10px] tracking-[0.25em] uppercase text-cream/90">{BRAND_NAME}</span>
-                    </div>
-                    <h2 className="font-display text-4xl text-cream leading-tight mb-4">
-                        {isCheckoutLogin ? (
-                            <>Complete your <span className="italic text-turmeric-light">order</span></>
-                        ) : (
-                            <>Shop <span className="italic text-turmeric-light">wellness</span></>
-                        )}
-                    </h2>
-                    <p className="text-cream/60 font-light leading-relaxed">
-                        {isCheckoutLogin
-                            ? 'Sign in to checkout. We verify your phone when you place the order.'
-                            : BRAND_TAGLINE}
-                    </p>
-                </div>
-                <p className="relative z-10 text-[10px] tracking-wider text-cream/30 uppercase">
-                    FSSAI Certified · Lab Tested · Free Delivery ₹1999+
-                </p>
-            </div>
+    const panelCopy = isAdminAccess
+        ? {
+            heading: <>Run the store<br />from one <span className="text-turmeric-light italic">Studio</span></>,
+            body: `Sign in with your admin Google account to manage products, orders, and storefront content for ${BRAND_NAME}.`,
+        }
+        : isCheckoutLogin
+            ? {
+                heading: <>You&apos;re one step<br />from <span className="text-turmeric-light italic">checkout</span></>,
+                body: 'Sign in to save your address book, track this order, and check out in seconds.',
+            }
+            : {
+                heading: <>Wellness that fits<br />your <span className="text-turmeric-light italic">everyday</span></>,
+                body: BRAND_DESCRIPTION,
+            };
 
-            <div className="flex items-center justify-center px-6 py-16 bg-cream">
-                <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-[420px]">
-                    <Logo size="md" showHover className="mx-auto mb-10 lg:hidden" />
+    return (
+        <div className="relative min-h-screen flex items-center justify-center px-4 py-14 sm:py-20 overflow-hidden bg-forest">
+            <AmbientBlobs variant="dark" />
+            <ConstellationField variant="light" density={0.9} className="opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-forest-deep/40 via-transparent to-forest-deep/60 pointer-events-none" aria-hidden="true" />
+
+            <div className="relative z-10 w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 xl:gap-20 items-center">
+                {/* Decorative brand panel — fills the desktop layout instead of
+                    leaving a lone card adrift on a wide screen; text-only, no
+                    stock photo, so it doesn't slide back into the old split-
+                    screen jewelry-site look. */}
+                <motion.div
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    className="hidden lg:block text-cream"
+                >
+                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cream/10 border border-turmeric-light/25 text-xs tracking-[0.2em] uppercase text-cream/90 mb-8">
+                        <Sparkles size={13} className="text-turmeric-light" /> {BRAND_NAME}
+                    </span>
+                    <h2 className="font-display text-4xl xl:text-[3.25rem] leading-[1.15] font-semibold mb-6">
+                        {panelCopy.heading}
+                    </h2>
+                    <p className="text-cream/65 text-base xl:text-lg leading-relaxed max-w-md mb-10">
+                        {panelCopy.body}
+                    </p>
+                    <div className="flex flex-wrap gap-4 xl:gap-6">
+                        {[
+                            { icon: Shield, label: 'FSSAI Certified' },
+                            { icon: Star, label: '4.9★ Rated' },
+                            { icon: Leaf, label: 'Lab Tested' },
+                        ].map(({ icon: Icon, label }) => (
+                            <div key={label} className="flex items-center gap-2.5 text-cream/80">
+                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-cream/10 border border-cream/15 flex-shrink-0">
+                                    <Icon size={16} className="text-turmeric-light" strokeWidth={1.75} />
+                                </span>
+                                <span className="text-sm font-medium">{label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="relative z-10 w-full max-w-[440px] mx-auto lg:mx-0 bg-cream rounded-3xl soft-shadow-lg border border-cream/10 px-6 py-9 sm:px-10 sm:py-11"
+            >
+                <Logo size="md" showHover className="mx-auto mb-6 lg:hidden" />
+
+                <div className="flex flex-col items-center gap-2 mb-8 lg:hidden">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest/8 text-xs tracking-[0.2em] uppercase text-forest">
+                        <Sparkles size={12} /> {BRAND_NAME}
+                    </span>
+                    {!isCheckoutLogin && !isAdminAccess && (
+                        <p className="text-sm text-slate text-center max-w-[280px]">{BRAND_TAGLINE}</p>
+                    )}
+                </div>
+
+                <div className="w-full">
 
                     <div className="space-y-6">
                         <div className="text-center lg:text-left">
@@ -195,10 +236,10 @@ export default function LoginPage() {
                                     Checkout login
                                 </div>
                             )}
-                            <h1 className="font-display text-3xl text-ink mb-2">
+                            <h1 className="font-display text-3xl sm:text-[2.25rem] text-ink mb-2">
                                 {isCheckoutLogin ? 'Sign in to buy' : isAdminAccess ? 'Studio access' : mode === 'signin' ? 'Sign in' : 'Create account'}
                             </h1>
-                            <p className="text-slate text-sm font-light">
+                            <p className="text-slate text-sm sm:text-base font-light">
                                 {isAdminAccess
                                     ? `Sign in with your admin Google account to open ${BRAND_NAME} Studio`
                                     : mode === 'signup'
@@ -213,14 +254,14 @@ export default function LoginPage() {
                                     <button
                                         type="button"
                                         onClick={() => { setMode('signin'); setError(''); }}
-                                        className={`flex-1 py-2 text-sm rounded-full transition-colors ${mode === 'signin' ? 'bg-forest text-cream' : 'text-slate hover:text-ink'}`}
+                                        className={`flex-1 py-2.5 text-sm sm:text-base rounded-full transition-colors ${mode === 'signin' ? 'bg-forest text-cream' : 'text-slate hover:text-ink'}`}
                                     >
                                         Sign in
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => { setMode('signup'); setError(''); }}
-                                        className={`flex-1 py-2 text-sm rounded-full transition-colors ${mode === 'signup' ? 'bg-forest text-cream' : 'text-slate hover:text-ink'}`}
+                                        className={`flex-1 py-2.5 text-sm sm:text-base rounded-full transition-colors ${mode === 'signup' ? 'bg-forest text-cream' : 'text-slate hover:text-ink'}`}
                                     >
                                         Sign up
                                     </button>
@@ -314,7 +355,7 @@ export default function LoginPage() {
                             </div>
                         )}
 
-                        <p className="text-center text-xs text-slate">
+                        <p className="text-center text-sm text-slate">
                             By signing in you agree to our Terms &amp; Privacy Policy
                         </p>
 
@@ -346,7 +387,20 @@ export default function LoginPage() {
                             </div>
                         )}
                     </div>
-                </motion.div>
+                </div>
+
+                <div className="flex lg:hidden items-center justify-center gap-5 mt-8 pt-6 border-t border-border/40">
+                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-slate uppercase">
+                        <Shield size={13} className="text-forest" /> FSSAI
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-slate uppercase">
+                        <Star size={13} className="text-turmeric" /> 4.9 Rated
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-slate uppercase">
+                        <Leaf size={13} className="text-forest" /> Lab Tested
+                    </span>
+                </div>
+            </motion.div>
             </div>
         </div>
     );

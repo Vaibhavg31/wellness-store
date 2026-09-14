@@ -57,6 +57,8 @@ CREATE TABLE `products` (
   `is_new` tinyint(1) NOT NULL DEFAULT 0,
   `is_best_seller` tinyint(1) NOT NULL DEFAULT 0,
   `is_trending_pinned` tinyint(1) NOT NULL DEFAULT 0,
+  `orbit_featured` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Cycles through the center of the homepage Orbit Ring when true',
+  `orbit_sort_order` int(11) NOT NULL DEFAULT 0 COMMENT 'Display order within the curated Orbit Ring list (lower first)',
   `show_trust_badges` tinyint(1) NOT NULL DEFAULT 1,
   `is_published` tinyint(1) NOT NULL DEFAULT 1,
   `cod_enabled` tinyint(1) NOT NULL DEFAULT 1,
@@ -271,13 +273,20 @@ CREATE TABLE `coupons` (
 CREATE TABLE `users` (
   `id` varchar(64) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `avatar` varchar(2048) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
+  `phone_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `phone_verified_at` datetime(6) DEFAULT NULL,
   `password_hash` varchar(255) DEFAULT NULL COMMENT 'NULL when signed up via Google OAuth only',
   `google_id` varchar(255) DEFAULT NULL,
-  `is_email_verified` tinyint(1) NOT NULL DEFAULT 0,
-  `is_phone_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `email_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `email_verified_at` datetime(6) DEFAULT NULL,
   `role` enum('customer','admin') NOT NULL DEFAULT 'customer',
+  `is_blocked` tinyint(1) NOT NULL DEFAULT 0,
+  `blocked_at` datetime(6) DEFAULT NULL,
+  `last_login` datetime(6) DEFAULT NULL,
+  `last_used_address_id` varchar(64) DEFAULT NULL,
   `created_at` datetime(6) NOT NULL,
   `updated_at` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -408,14 +417,19 @@ CREATE TABLE `reviews` (
   `product_id` varchar(64) NOT NULL,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
+  `user_id` varchar(64) DEFAULT NULL COMMENT 'Reviewer''s account — reviews require sign-in, so this is set on every new review',
   `rating` tinyint(3) UNSIGNED NOT NULL DEFAULT 5,
+  `is_verified_purchase` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'True when the reviewer has a non-cancelled order containing this product',
   `comment` text NOT NULL,
+  `images` text DEFAULT NULL COMMENT 'JSON array of /uploads/... photo paths the reviewer attached',
   `avatar` varchar(2048) DEFAULT NULL,
   `is_approved` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_reviews_user_product` (`user_id`, `product_id`),
   KEY `idx_reviews_product_id` (`product_id`),
   KEY `idx_reviews_is_approved` (`is_approved`),
+  KEY `idx_reviews_user_id` (`user_id`),
   CONSTRAINT `fk_reviews_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Product reviews';
 
@@ -429,12 +443,16 @@ CREATE TABLE `promo_banners` (
   `image` varchar(2048) NOT NULL,
   `cta_label` varchar(100) DEFAULT NULL,
   `cta_href` varchar(500) DEFAULT NULL,
+  `display_target` enum('slider','stacked','both','product') NOT NULL DEFAULT 'both' COMMENT 'slider/stacked/both for homepage sections, product for a single product page',
+  `product_id` varchar(64) DEFAULT NULL COMMENT 'Set together with display_target=product to scope this banner to one product page instead of the homepage',
   `is_enabled` tinyint(1) NOT NULL DEFAULT 1,
   `sort_order` int(11) NOT NULL DEFAULT 99,
   `created_at` datetime(6) NOT NULL,
   `updated_at` datetime(6) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Homepage promotional banners';
+  PRIMARY KEY (`id`),
+  KEY `idx_promo_banners_product_id` (`product_id`),
+  CONSTRAINT `fk_promo_banners_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Homepage and product-page promotional banners';
 
 -- ----------------------------------------------------------------------------
 -- newsletter_subscribers
@@ -704,6 +722,7 @@ CREATE TABLE `site_settings` (
   `popup_product_id` varchar(64) DEFAULT NULL,
   `popup_delay_seconds` int(10) UNSIGNED NOT NULL DEFAULT 2,
   `popup_frequency` varchar(20) NOT NULL DEFAULT 'session' COMMENT '"session" (once per browser session), "every_visit", or "once" (once ever, per browser)',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Single-row site-wide CMS settings';
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Check, X, Trash2, Star, MessageSquare } from 'lucide-react';
-import { api } from '@/services/api';
+import { Check, X, Trash2, Star, MessageSquare, ShieldCheck } from 'lucide-react';
+import { api, imageUrl } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import ProductSearchSelect from '@/components/admin/ProductSearchSelect';
 import {
@@ -212,7 +212,14 @@ export default function AdminReviewsPage() {
                                 {filteredReviews.map((review) => (
                                     <tr key={review.id} className="border-b border-admin-border-light hover:bg-admin-surface-alt/60">
                                         <td className="p-4 align-top">
-                                            <p className="font-medium text-ink">{review.name}</p>
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                <p className="font-medium text-ink">{review.name}</p>
+                                                {review.isVerifiedPurchase && (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald bg-emerald/10 px-1.5 py-0.5 rounded-full" title="Confirmed against a real order">
+                                                        <ShieldCheck size={10} /> Verified
+                                                    </span>
+                                                )}
+                                            </div>
                                             <p className="text-xs text-admin-muted mt-0.5 break-all">{review.email}</p>
                                         </td>
                                         <td className="p-4 align-top">
@@ -221,6 +228,15 @@ export default function AdminReviewsPage() {
                                         </td>
                                         <td className="p-4 align-top">
                                             <p className="text-ink leading-relaxed line-clamp-3">{review.comment}</p>
+                                            {review.images?.length > 0 && (
+                                                <div className="flex gap-1.5 mt-2">
+                                                    {review.images.map((src) => (
+                                                        <a key={src} href={imageUrl(src)} target="_blank" rel="noopener noreferrer" className="block w-10 h-10 rounded-md overflow-hidden border border-admin-border flex-shrink-0">
+                                                            <img src={imageUrl(src)} alt="Review attachment" className="w-full h-full object-cover" />
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="p-4 align-top">
                                             <p className="text-ink line-clamp-2">{getProductLabel(review.productId)}</p>

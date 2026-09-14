@@ -59,14 +59,14 @@ export default function ActiveCoupons({ className = '', variant = 'default' }) {
                         <p className="font-mono text-sm font-semibold text-forest tracking-wider truncate">
                             {coupon.code}
                         </p>
-                        <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-turmeric/15 text-turmeric-ink font-medium flex-shrink-0 whitespace-nowrap">
+                        <span className="text-xs uppercase tracking-wider px-2 py-0.5 rounded-full bg-turmeric/15 text-turmeric-ink font-medium flex-shrink-0 whitespace-nowrap">
                             {coupon.label}
                         </span>
                     </div>
                     <p className="text-sm font-medium text-ink leading-snug">{coupon.title}</p>
-                    <p className="text-xs text-slate mt-0.5 leading-relaxed">{couponDescription(coupon)}</p>
-                    <p className="text-[10px] text-slate mt-2 flex items-center gap-1 opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                        <Copy size={10} className="flex-shrink-0" /> Tap to apply
+                    <p className="text-sm text-slate mt-0.5 leading-relaxed">{couponDescription(coupon)}</p>
+                    <p className="text-xs text-slate mt-2 flex items-center gap-1 opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <Copy size={11} className="flex-shrink-0" /> Tap to apply
                     </p>
                 </button>
             ))}
@@ -84,7 +84,7 @@ export default function ActiveCoupons({ className = '', variant = 'default' }) {
             </span>
             <span className="flex-1 min-w-0">
                 <span className="block font-display text-base text-ink">Available Offers</span>
-                <span className="block text-xs text-slate mt-0.5 truncate">
+                <span className="block text-sm text-slate mt-0.5 truncate">
                     {coupons.length} offer{coupons.length !== 1 ? 's' : ''}
                     {preview ? ` · ${preview.label}` : ''}
                 </span>

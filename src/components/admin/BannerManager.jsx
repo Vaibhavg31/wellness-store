@@ -14,31 +14,37 @@ import {
     AdminStatusPill,
 } from '@/components/admin/AdminUi';
 
-const TARGET_LABELS = { slider: 'Slider only', stacked: 'Stacked only', both: 'Both' };
+const TARGET_LABELS = { slider: 'Slider only', stacked: 'Stacked only', both: 'Both', product: 'This product page' };
 
-function emptyForm(defaultTarget) {
-    return { title: '', subtitle: '', image: '', ctaLabel: '', ctaHref: '', order: 0, isEnabled: true, displayTarget: defaultTarget };
+function emptyForm(defaultTarget, productId) {
+    return { title: '', subtitle: '', image: '', ctaLabel: '', ctaHref: '', order: 0, isEnabled: true, displayTarget: defaultTarget, productId: productId ?? null };
 }
 
 /**
  * Full banner CRUD (upload, edit, reorder, enable/disable) — the same photo
  * library feeds both the "Banner Slider (Rotating)" and "Image Banners
  * (Stacked)" homepage sections, but each banner is independently tagged via
- * displayTarget ('slider' | 'stacked' | 'both') so the two sections can show
- * different photos instead of always repeating the same set.
+ * displayTarget ('slider' | 'stacked' | 'both' | 'product') so the two
+ * homepage sections can show different photos instead of always repeating
+ * the same set, and a 'product' banner never appears anywhere but the one
+ * product page an admin attached it to.
  *
  * @param {'slider'|'stacked'} [filterTarget] When given, only banners tagged
  *   for this target (or 'both') are shown, and new banners default to this
  *   tag — used when this is embedded inside one specific section's row in
  *   Content Manager. Omit to manage every banner regardless of target.
+ * @param {string} [productId] When given, this instance manages ONLY
+ *   'product'-targeted banners scoped to this one product (used embedded in
+ *   the product edit form) — mutually exclusive with filterTarget, and hides
+ *   the "Shows In" picker since the target is implied.
  */
-export default function BannerManager({ filterTarget }) {
+export default function BannerManager({ filterTarget, productId }) {
     const { adminToken } = useAdminAuth();
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState(null);
-    const [form, setForm] = useState(() => emptyForm(filterTarget ?? 'both'));
+    const [form, setForm] = useState(() => emptyForm(productId ? 'product' : (filterTarget ?? 'both'), productId));
     const [uploading, setUploading] = useState(false);
     const [saving, setSaving] = useState(false);
 
@@ -59,13 +65,15 @@ export default function BannerManager({ filterTarget }) {
         fetchBanners();
     }, [adminToken]);
 
-    const visibleBanners = filterTarget
-        ? banners.filter((b) => b.displayTarget === filterTarget || b.displayTarget === 'both')
-        : banners;
+    const visibleBanners = productId
+        ? banners.filter((b) => b.displayTarget === 'product' && b.productId === productId)
+        : filterTarget
+            ? banners.filter((b) => b.displayTarget === filterTarget || b.displayTarget === 'both')
+            : banners.filter((b) => b.displayTarget !== 'product');
 
     const openNew = () => {
         setEditing(null);
-        setForm({ ...emptyForm(filterTarget ?? 'both'), order: visibleBanners.length + 1 });
+        setForm({ ...emptyForm(productId ? 'product' : (filterTarget ?? 'both'), productId), order: visibleBanners.length + 1 });
         setModalOpen(true);
     };
 
@@ -80,6 +88,7 @@ export default function BannerManager({ filterTarget }) {
             order: banner.order,
             isEnabled: banner.isEnabled,
             displayTarget: banner.displayTarget || 'both',
+            productId: banner.productId ?? null,
         });
         setModalOpen(true);
     };
@@ -130,9 +139,11 @@ export default function BannerManager({ filterTarget }) {
         <div>
             <div className="flex items-center justify-between gap-4 mb-4">
                 <p className="text-xs text-admin-muted">
-                    {filterTarget
-                        ? `Showing banners tagged for this section (or "Both"). ${banners.length - visibleBanners.length > 0 ? `${banners.length - visibleBanners.length} more tagged for the other section only.` : ''}`
-                        : 'Images shown here power both Banner Slider (Rotating) and Image Banners (Stacked).'}
+                    {productId
+                        ? 'Shown only on this product’s own page — add as many as you like, they rotate automatically when there’s more than one.'
+                        : filterTarget
+                            ? `Showing banners tagged for this section (or "Both"). ${banners.length - visibleBanners.length > 0 ? `${banners.length - visibleBanners.length} more tagged for the other section or a product page only.` : ''}`
+                            : 'Images shown here power both Banner Slider (Rotating) and Image Banners (Stacked). Product-page banners are managed from each product’s own edit screen.'}
                 </p>
                 <Button variant="turmeric" size="sm" onClick={openNew} className="gap-1.5 flex-shrink-0"><Plus size={14} /> Add Banner</Button>
             </div>
@@ -254,11 +265,16 @@ export default function BannerManager({ filterTarget }) {
                     <Input label="Button label (optional)" value={form.ctaLabel} onChange={(e) => setForm({ ...form, ctaLabel: e.target.value })} placeholder="Shop the Sale" />
                     <Input label="Link (optional)" value={form.ctaHref} onChange={(e) => setForm({ ...form, ctaHref: e.target.value })} placeholder="/shop" />
                     <Input label="Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
+                    {productId ? (
+                        <p className="text-xs text-admin-muted -mt-2">
+                            This banner will only show on this product’s own page.
+                        </p>
+                    ) : (
                     <div>
                         <label className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">Shows In</label>
                         <select
                             value={form.displayTarget}
-                            onChange={(e) => setForm({ ...form, displayTarget: e.target.value })}
+                            onChange={(e) => setForm({ ...form, displayTarget: e.target.value, productId: null })}
                             className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink rounded-lg text-sm focus:outline-none focus:border-turmeric-ink focus:ring-1 focus:ring-turmeric-ink/30"
                         >
                             <option value="both">Both — Slider and Stacked</option>
@@ -266,6 +282,7 @@ export default function BannerManager({ filterTarget }) {
                             <option value="stacked">Image Banners only (stacked)</option>
                         </select>
                     </div>
+                    )}
                     <label className="flex items-center gap-2 text-sm">
                         <input type="checkbox" checked={form.isEnabled} onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })} />
                         Live

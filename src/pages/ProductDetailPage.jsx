@@ -1,35 +1,114 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Heart, Minus, Plus, ShoppingBag, ChevronLeft } from 'lucide-react';
+import { Star, Heart, Minus, Plus, ShoppingBag, ChevronLeft, Sparkles, ShieldCheck, Camera, X, ChevronRight as ChevronRightIcon } from 'lucide-react';
 import { getRelatedProducts } from '@/utils/filterProducts';
 import { formatPrice } from '@/utils/formatPrice';
-import { imageUrl } from '@/services/api';
+import { imageUrl, api } from '@/services/api';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast, showCartToast } from '@/contexts/ToastContext';
-import { useBundles, useProduct, useProducts, useReviews } from '@/hooks/useApi';
+import { useBundles, useProduct, useProducts, useReviews, useBanners } from '@/hooks/useApi';
 import ProductCard from '@/components/product/ProductCard';
 import BundleCard from '@/components/product/BundleCard';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SectionTitle from '@/components/ui/SectionTitle';
-import Input from '@/components/ui/Input';
-import { api } from '@/services/api';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { getProductTrustBadges } from '@/utils/productTrustBadges';
+import { loginUrl } from '@/utils/authRedirect';
 
 const TABS = ['Description', 'Features', 'Reviews'];
+const MAX_REVIEW_IMAGES = 4;
+
+/** Reads a duration straight out of the variant's own label ("1 Month
+ *  Supply", "2 Week Pack") to show a rough per-day cost — no schema change,
+ *  just a nicer way to read a price that already exists. Returns null for
+ *  anything that isn't phrased as a month/week duration. */
+function estimateDailyCost(label, price) {
+    if (!label || !price) return null;
+    const month = label.match(/(\d+)\s*month/i);
+    const week = !month && label.match(/(\d+)\s*week/i);
+    const days = month ? Number(month[1]) * 30 : week ? Number(week[1]) * 7 : null;
+    if (!days) return null;
+    const perDay = price / days;
+    return perDay >= 1 ? Math.round(perDay) : Math.round(perDay * 100) / 100;
+}
+
+/** Full-bleed strip of admin-managed banners for this one product's page —
+ *  a completely separate slot from every homepage banner section. Auto-
+ *  advances only when there's more than one, so a single banner just sits
+ *  still like a plain promo image. */
+function ProductBannerStrip({ banners }) {
+    const [index, setIndex] = useState(0);
+    useEffect(() => {
+        if (banners.length <= 1) return undefined;
+        const id = setInterval(() => setIndex((i) => (i + 1) % banners.length), 5000);
+        return () => clearInterval(id);
+    }, [banners.length]);
+
+    if (banners.length === 0) return null;
+    const banner = banners[index];
+
+    const inner = (
+        <div className="relative w-full aspect-[21/9] sm:aspect-[3/1] overflow-hidden rounded-xl sm:rounded-2xl bg-sand/40">
+            <AnimatePresence mode="wait">
+                <motion.img
+                    key={banner.id}
+                    src={imageUrl(banner.image)}
+                    alt={banner.title || ''}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+            </AnimatePresence>
+            {(banner.title || banner.subtitle || banner.ctaLabel) && (
+                <div className="absolute inset-0 bg-gradient-to-r from-ink/70 via-ink/20 to-transparent flex flex-col justify-center p-4 sm:p-6">
+                    {banner.subtitle && <p className="type-eyebrow-sm text-cream/75 mb-1">{banner.subtitle}</p>}
+                    {banner.title && <p className="font-display text-base sm:text-xl text-cream mb-2 max-w-xs">{banner.title}</p>}
+                    {banner.ctaLabel && (
+                        <span className="inline-flex items-center gap-1 w-fit text-[11px] sm:text-xs uppercase tracking-wide font-medium text-ink bg-cream px-3 py-1.5 rounded-full">
+                            {banner.ctaLabel} <ChevronRightIcon size={12} />
+                        </span>
+                    )}
+                </div>
+            )}
+            {banners.length > 1 && (
+                <div className="absolute bottom-2 sm:bottom-3 right-3 flex gap-1">
+                    {banners.map((b, i) => (
+                        <span key={b.id} className={`block h-1 rounded-full transition-all ${i === index ? 'w-4 bg-cream' : 'w-1 bg-cream/50'}`} />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+
+    return (
+        <div className="mt-3 sm:mt-4">
+            {banner.ctaHref ? (
+                /^https?:\/\//i.test(banner.ctaHref)
+                    ? <a href={banner.ctaHref} target="_blank" rel="noopener noreferrer">{inner}</a>
+                    : <Link to={banner.ctaHref}>{inner}</Link>
+            ) : inner}
+        </div>
+    );
+}
 
 export default function ProductDetailPage() {
     const { id = '' }  = useParams();
     const navigate     = useNavigate();
+    const location     = useLocation();
     const { product, loading } = useProduct(id);
     const { products } = useProducts();
     const { bundles } = useBundles();
     const { reviews, refetch: refetchReviews } = useReviews(id);
+    const { banners: productBanners } = useBanners('product', product?.id);
     const { addToCart }                    = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
+    const { isAuthenticated, token }       = useAuth();
     const { showToast }                    = useToast();
     const { content }                      = useSiteContent();
     const trustBadges                      = getProductTrustBadges(content, product);
@@ -39,8 +118,11 @@ export default function ProductDetailPage() {
     const [quantity, setQuantity]              = useState(1);
     const [activeTab, setActiveTab]            = useState('Description');
     const [reviewError, setReviewError]        = useState('');
-    const [reviewForm, setReviewForm]          = useState({ name: '', email: '', rating: 5, comment: '' });
+    const [reviewForm, setReviewForm]          = useState({ rating: 5, comment: '' });
+    const [reviewImages, setReviewImages]      = useState([]); // [{file, previewUrl}]
+    const [submittingReview, setSubmittingReview] = useState(false);
     const [reviewSubmitted, setReviewSubmitted]= useState(false);
+    const [eligibility, setEligibility]        = useState({ loading: true, eligible: false, reason: null });
     const [showMobileBar, setShowMobileBar]    = useState(false);
     const buyBoxRef = useRef(null);
 
@@ -68,6 +150,28 @@ export default function ProductDetailPage() {
         observer.observe(el);
         return () => observer.disconnect();
     }, [product?.id]);
+
+    // Only a signed-in customer who has actually bought this product can
+    // review it — checked against the account's real order history on the
+    // server, not just inferred client-side, but this fetch is what decides
+    // whether the write-a-review form even appears.
+    useEffect(() => {
+        if (!product?.id) return undefined;
+        if (!isAuthenticated) {
+            setEligibility({ loading: false, eligible: false, reason: 'signed_out' });
+            return undefined;
+        }
+        let cancelled = false;
+        setEligibility((prev) => ({ ...prev, loading: true }));
+        api.get(`/api/reviews/eligibility?productId=${encodeURIComponent(product.id)}`, token)
+            .then((res) => { if (!cancelled) setEligibility({ loading: false, eligible: !!res.eligible, reason: res.reason || null }); })
+            .catch(() => { if (!cancelled) setEligibility({ loading: false, eligible: false, reason: null }); });
+        return () => { cancelled = true; };
+    }, [product?.id, isAuthenticated, token]);
+
+    useEffect(() => () => {
+        reviewImages.forEach((img) => URL.revokeObjectURL(img.previewUrl));
+    }, [reviewImages]);
 
     if (loading) {
         return (
@@ -129,16 +233,48 @@ export default function ProductDetailPage() {
         }
         : product;
 
+    const handleReviewImagePick = (e) => {
+        const files = Array.from(e.target.files || []).slice(0, MAX_REVIEW_IMAGES - reviewImages.length);
+        if (files.length === 0) return;
+        setReviewImages((prev) => [
+            ...prev,
+            ...files.map((file) => ({ file, previewUrl: URL.createObjectURL(file) })),
+        ].slice(0, MAX_REVIEW_IMAGES));
+        e.target.value = '';
+    };
+
+    const removeReviewImage = (previewUrl) => {
+        setReviewImages((prev) => {
+            const target = prev.find((p) => p.previewUrl === previewUrl);
+            if (target) URL.revokeObjectURL(target.previewUrl);
+            return prev.filter((p) => p.previewUrl !== previewUrl);
+        });
+    };
+
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
         setReviewError('');
+        setSubmittingReview(true);
         try {
-            await api.post('/api/reviews', { ...reviewForm, productId: product.id });
+            let images = [];
+            if (reviewImages.length > 0) {
+                images = await api.uploadReviewImages(reviewImages.map((r) => r.file), token);
+            }
+            await api.post('/api/reviews', {
+                productId: product.id,
+                rating: reviewForm.rating,
+                comment: reviewForm.comment,
+                images,
+            }, token);
             setReviewSubmitted(true);
-            setReviewForm({ name: '', email: '', rating: 5, comment: '' });
+            setReviewForm({ rating: 5, comment: '' });
+            setReviewImages([]);
             refetchReviews();
+            setEligibility({ loading: false, eligible: false, reason: 'already_reviewed' });
         } catch (err) {
             setReviewError(err instanceof Error ? err.message : 'Failed to submit review. Please try again.');
+        } finally {
+            setSubmittingReview(false);
         }
     };
 
@@ -220,6 +356,10 @@ export default function ProductDetailPage() {
                                 </button>
                             ))}
                         </div>
+
+                        {/* Admin-managed banner(s) for this product's page only —
+                            separate slot from every homepage banner section. */}
+                        <ProductBannerStrip banners={productBanners} />
                     </motion.div>
 
                     <motion.div
@@ -257,51 +397,66 @@ export default function ProductDetailPage() {
 
                         {hasVariants && (
                             <div className="mb-6 sm:mb-8">
-                                <p className="type-eyebrow text-slate mb-3">Choose an Option</p>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                                <p className="type-eyebrow text-slate mb-3">Choose a Pack</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     {variants.map((v) => {
                                         const active = v.id === activeVariant?.id;
                                         const sold = v.stock <= 0;
+                                        const savings = v.originalPrice > v.price ? v.originalPrice - v.price : 0;
+                                        const perDay = estimateDailyCost(v.label, v.price);
                                         return (
                                             <button
                                                 key={v.id}
                                                 type="button"
                                                 disabled={sold}
                                                 onClick={() => setSelectedVariantId(v.id)}
-                                                className={`relative text-left px-3.5 py-3 rounded-xl border transition-all duration-200 ${
+                                                className={`relative text-left px-4 py-4 rounded-2xl border-2 transition-all duration-200 flex flex-col ${
                                                     active
-                                                        ? 'border-forest bg-forest/5 ring-1 ring-forest'
+                                                        ? 'border-forest bg-forest/5 shadow-md shadow-forest/10'
                                                         : 'border-border/70 hover:border-forest/40'
                                                 } ${sold ? 'opacity-45 cursor-not-allowed' : ''}`}
                                                 aria-pressed={active}
                                             >
-                                                {v.discount > 0 && !sold && (
-                                                    <span className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-turmeric text-cream text-[10px] font-medium shadow-sm">
-                                                        -{v.discount}%
+                                                {v.isDefault && !sold && (
+                                                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-turmeric text-ink text-[10px] font-semibold shadow-sm whitespace-nowrap">
+                                                        <Sparkles size={10} /> RECOMMENDED
                                                     </span>
                                                 )}
-                                                <span className="flex items-center gap-2">
+
+                                                <div className="flex items-center gap-2 mt-1.5">
                                                     {v.image && (
                                                         <img
                                                             src={imageUrl(v.image)}
                                                             alt=""
-                                                            className="w-8 h-8 rounded-lg object-cover border border-border/50 flex-shrink-0"
+                                                            className="w-9 h-9 rounded-lg object-cover border border-border/50 flex-shrink-0"
                                                         />
                                                     )}
-                                                    <span className={`block text-sm font-medium ${active ? 'text-forest' : 'text-ink'}`}>
+                                                    <span className={`block text-sm font-semibold ${active ? 'text-forest' : 'text-ink'}`}>
                                                         {v.label}
                                                     </span>
-                                                </span>
+                                                </div>
                                                 {v.netQuantity && (
-                                                    <span className="block text-xs text-slate/70 mt-0.5">{v.netQuantity}</span>
+                                                    <span className="block text-xs text-slate/70 mt-1">{v.netQuantity}</span>
                                                 )}
-                                                <span className="block text-sm font-display text-ink mt-1.5">
-                                                    {formatPrice(v.price)}
-                                                    {v.originalPrice > v.price && (
-                                                        <span className="ml-1.5 text-xs text-slate/50 line-through">{formatPrice(v.originalPrice)}</span>
+
+                                                <div className="mt-3 pt-3 border-t border-border/40">
+                                                    <div className="flex items-baseline gap-1.5 flex-wrap">
+                                                        <span className="font-display text-lg text-ink">{formatPrice(v.price)}</span>
+                                                        {v.originalPrice > v.price && (
+                                                            <span className="text-xs text-slate/50 line-through">{formatPrice(v.originalPrice)}</span>
+                                                        )}
+                                                        {v.discount > 0 && !sold && (
+                                                            <span className="text-[10px] font-semibold text-turmeric-ink">{v.discount}% off</span>
+                                                        )}
+                                                    </div>
+                                                    {savings > 0 && !sold && (
+                                                        <p className="text-[11px] text-forest font-medium mt-1">Save {formatPrice(savings)} today</p>
                                                     )}
-                                                </span>
-                                                {sold && <span className="block text-[11px] text-red-600 mt-1">Out of stock</span>}
+                                                    {perDay && !sold && (
+                                                        <p className="text-[11px] text-slate/60 mt-0.5">≈ {formatPrice(perDay)}/day</p>
+                                                    )}
+                                                </div>
+                                                {sold && <span className="block text-[11px] text-red-600 mt-2">Out of stock</span>}
                                             </button>
                                         );
                                     })}
@@ -374,15 +529,29 @@ export default function ProductDetailPage() {
                                             <div className="space-y-4 max-h-56 overflow-y-auto pr-2">
                                                 {reviews.map((review) => (
                                                     <div key={review.id} className="border-b border-border/40 pb-4 last:border-0">
-                                                        <div className="flex items-center gap-2 mb-1">
+                                                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                                                             <p className="text-sm font-medium text-ink">{review.name}</p>
                                                             <div className="flex gap-0.5">
                                                                 {Array.from({ length: 5 }).map((_, j) => (
                                                                     <Star key={j} size={11} className={j < review.rating ? 'text-turmeric fill-turmeric' : 'text-border'} strokeWidth={0} />
                                                                 ))}
                                                             </div>
+                                                            {review.isVerifiedPurchase && (
+                                                                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-forest bg-forest/8 px-1.5 py-0.5 rounded-full">
+                                                                    <ShieldCheck size={10} /> Verified Purchase
+                                                                </span>
+                                                            )}
                                                         </div>
                                                         <p className="text-slate text-sm leading-relaxed">{review.comment}</p>
+                                                        {review.images?.length > 0 && (
+                                                            <div className="flex gap-2 mt-2">
+                                                                {review.images.map((src) => (
+                                                                    <a key={src} href={imageUrl(src)} target="_blank" rel="noopener noreferrer" className="block w-14 h-14 rounded-lg overflow-hidden border border-border/50 flex-shrink-0">
+                                                                        <img src={imageUrl(src)} alt="Customer photo" className="w-full h-full object-cover" />
+                                                                    </a>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -490,12 +659,29 @@ export default function ProductDetailPage() {
 
                 <section className="mt-12 sm:mt-16 bg-cream rounded-2xl p-5 sm:p-8 border border-border/40">
                     <h2 className="font-display text-xl sm:text-2xl mb-6 text-ink">Write a Review</h2>
+
                     {reviewSubmitted ? (
                         <p className="text-forest/80 font-light">Thank you! Your review has been submitted for approval.</p>
-                    ) : (
+                    ) : eligibility.loading ? (
+                        <div className="h-24 rounded-xl bg-sand/40 animate-pulse" aria-hidden="true" />
+                    ) : eligibility.reason === 'already_reviewed' ? (
+                        <p className="text-slate font-light">You have already reviewed this product — thank you for sharing your experience!</p>
+                    ) : eligibility.reason === 'signed_out' ? (
+                        <div className="max-w-lg">
+                            <p className="text-slate font-light mb-4">Sign in and purchase this product to write a review — reviews here are only from verified buyers.</p>
+                            <Link to={loginUrl(location.pathname)}>
+                                <Button variant="turmeric">Sign In</Button>
+                            </Link>
+                        </div>
+                    ) : eligibility.reason === 'not_purchased' ? (
+                        <p className="text-slate font-light max-w-lg">
+                            Only customers who have purchased this product can write a review. Once your order for {product.title} is placed, you will be able to share your experience here.
+                        </p>
+                    ) : eligibility.eligible ? (
                         <form onSubmit={handleReviewSubmit} className="space-y-4 max-w-lg">
-                            <Input label="Name" value={reviewForm.name} onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })} required />
-                            <Input label="Email" type="email" value={reviewForm.email} onChange={(e) => setReviewForm({ ...reviewForm, email: e.target.value })} required />
+                            <div className="inline-flex items-center gap-1.5 text-xs text-forest bg-forest/8 px-3 py-1.5 rounded-full mb-1">
+                                <ShieldCheck size={13} /> Verified purchase
+                            </div>
                             <div>
                                 <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-2">Rating</label>
                                 <div className="flex gap-1">
@@ -521,11 +707,44 @@ export default function ProductDetailPage() {
                                 className="w-full px-4 py-3 border border-sand/60 rounded-lg resize-none bg-cream focus:outline-none focus:ring-1 focus:ring-forest/30 text-ink placeholder:text-slate/40 font-light"
                                 placeholder="Share your experience…"
                             />
+
+                            <div>
+                                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-2">
+                                    Add photos <span className="normal-case text-slate/50">(optional, up to {MAX_REVIEW_IMAGES})</span>
+                                </label>
+                                <div className="flex flex-wrap gap-2.5">
+                                    {reviewImages.map((img) => (
+                                        <div key={img.previewUrl} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50">
+                                            <img src={img.previewUrl} alt="" className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeReviewImage(img.previewUrl)}
+                                                className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-ink/70 text-cream hover:bg-ink"
+                                                aria-label="Remove photo"
+                                            >
+                                                <X size={11} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {reviewImages.length < MAX_REVIEW_IMAGES && (
+                                        <label className="w-16 h-16 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 text-slate/50 hover:border-forest/40 hover:text-forest cursor-pointer transition-colors">
+                                            <Camera size={16} />
+                                            <span className="text-[9px]">Add</span>
+                                            <input type="file" accept="image/*" multiple className="hidden" onChange={handleReviewImagePick} />
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+
                             {reviewError && (
                                 <p className="text-red-600 text-sm" role="alert">{reviewError}</p>
                             )}
-                            <Button variant="turmeric" type="submit">Submit Review</Button>
+                            <Button variant="turmeric" type="submit" disabled={submittingReview}>
+                                {submittingReview ? 'Submitting…' : 'Submit Review'}
+                            </Button>
                         </form>
+                    ) : (
+                        <p className="text-slate/60 text-sm">Reviews are open to verified buyers only.</p>
                     )}
                 </section>
 

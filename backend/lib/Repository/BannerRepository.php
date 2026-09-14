@@ -29,6 +29,7 @@ final class BannerRepository extends MysqlRepository
             // Banners (Stacked)" had no way to show different photos; enabling
             // both sections at once would just repeat the same images twice.
             'displayTarget' => $row['display_target'],
+            'productId'     => $row['product_id'],
             'order'         => (int) $row['sort_order'],
             'createdAt'     => $this->toIso($row['created_at']),
             'updatedAt'     => $this->toIso($row['updated_at']),
@@ -46,6 +47,7 @@ final class BannerRepository extends MysqlRepository
             'ctaHref'       => ['col' => 'cta_href',        'type' => 'string'],
             'isEnabled'     => ['col' => 'is_enabled',      'type' => 'bool'],
             'displayTarget' => ['col' => 'display_target',  'type' => 'string'],
+            'productId'     => ['col' => 'product_id',      'type' => 'string'],
             'order'         => ['col' => 'sort_order',      'type' => 'int'],
             'updatedAt'     => ['col' => 'updated_at',      'type' => 'datetime'],
         ];
@@ -67,7 +69,9 @@ final class BannerRepository extends MysqlRepository
     /**
      * @param string|null $target 'slider' or 'stacked' to only return banners
      *   tagged for that display (plus ones tagged 'both'); null returns every
-     *   enabled banner regardless of target.
+     *   enabled banner regardless of target. Use getPublishedForProduct() for
+     *   'product'-targeted banners instead — those are always scoped to one
+     *   product and never fall back to 'both'.
      */
     public function getPublished(?string $target = null): array
     {
@@ -77,7 +81,7 @@ final class BannerRepository extends MysqlRepository
 
         if ($target === null) {
             $stmt = $this->pdo()->query(
-                'SELECT * FROM promo_banners WHERE is_enabled = 1 ORDER BY sort_order ASC, created_at ASC'
+                "SELECT * FROM promo_banners WHERE is_enabled = 1 AND display_target != 'product' ORDER BY sort_order ASC, created_at ASC"
             );
         } else {
             $stmt = $this->pdo()->prepare(
@@ -85,6 +89,20 @@ final class BannerRepository extends MysqlRepository
             );
             $stmt->execute([$target]);
         }
+        return array_map([$this, 'rowToArray'], $stmt->fetchAll());
+    }
+
+    /**
+     * Banners an admin has attached to one specific product's page — a
+     * completely separate slot from the homepage sections above, so a
+     * product banner never leaks onto the homepage and vice versa.
+     */
+    public function getPublishedForProduct(string $productId): array
+    {
+        $stmt = $this->pdo()->prepare(
+            "SELECT * FROM promo_banners WHERE is_enabled = 1 AND display_target = 'product' AND product_id = ? ORDER BY sort_order ASC, created_at ASC"
+        );
+        $stmt->execute([$productId]);
         return array_map([$this, 'rowToArray'], $stmt->fetchAll());
     }
 

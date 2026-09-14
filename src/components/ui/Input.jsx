@@ -21,7 +21,7 @@ const Input = forwardRef(({ className, label, error, id, type, ...props }, ref) 
                     type={isPassword && showPassword ? 'text' : type}
                     className={cn(
                         'w-full px-5 py-3.5 bg-cream/60 border border-border rounded-full',
-                        'text-ink placeholder:text-slate/45',
+                        'text-ink placeholder:text-slate/70',
                         'focus:outline-none focus:border-turmeric focus:ring-1 focus:ring-turmeric/20',
                         'transition-all duration-500 font-light',
                         isPassword && 'pr-12',

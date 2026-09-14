@@ -104,6 +104,8 @@ final class ProductRoutes
                 'isNew'         => (bool) ($body['isNew']        ?? false),
                 'isBestSeller'  => (bool) ($body['isBestSeller'] ?? false),
                 'isTrendingPinned' => (bool) ($body['isTrendingPinned'] ?? false),
+                'orbitFeatured'    => (bool) ($body['orbitFeatured']    ?? false),
+                'orbitSortOrder'   => (int)  ($body['orbitSortOrder']   ?? 0),
                 'showTrustBadges'  => array_key_exists('showTrustBadges', $body) ? (bool) $body['showTrustBadges'] : true,
                 'isPublished'   => (bool) ($body['isPublished']  ?? true),
                 'enable3dPreview' => (bool) ($body['enable3dPreview'] ?? false),
@@ -136,7 +138,7 @@ final class ProductRoutes
 
             $allowed = ['title', 'price', 'originalPrice', 'discount', 'category', 'tags',
                         'rating', 'reviewCount', 'description', 'features', 'badges', 'stock', 'images',
-                        'isNew', 'isBestSeller', 'isTrendingPinned', 'showTrustBadges', 'isPublished', 'enable3dPreview', 'cutoutImages',
+                        'isNew', 'isBestSeller', 'isTrendingPinned', 'orbitFeatured', 'orbitSortOrder', 'showTrustBadges', 'isPublished', 'enable3dPreview', 'cutoutImages',
                         'codEnabled', 'onlinePaymentEnabled', 'variants'];
 
             $changes = array_intersect_key($body, array_flip($allowed));

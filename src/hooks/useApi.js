@@ -75,23 +75,35 @@ export function useTrendingProducts() {
 }
 
 /**
- * @param {'slider'|'stacked'|null} [target] Which homepage display this is
- *   for — a banner only comes back if it's tagged for that target or 'both'.
- *   Omit to get every enabled banner regardless of target.
+ * @param {'slider'|'stacked'|'product'|null} [target] Which display this is
+ *   for — a banner only comes back if it's tagged for that target (or
+ *   'both', except 'product' which is never included in 'both'). Omit to
+ *   get every enabled non-product banner.
+ * @param {string|null} [productId] Required when target is 'product' — scopes
+ *   to banners an admin attached to that one product's page.
  */
-export function useBanners(target = null) {
+export function useBanners(target = null, productId = null) {
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
+        if (target === 'product' && !productId) {
+            setBanners([]);
+            setLoading(false);
+            return undefined;
+        }
         let cancelled = false;
-        const path = target ? `/api/banners?target=${encodeURIComponent(target)}` : '/api/banners';
+        const params = new URLSearchParams();
+        if (target) params.set('target', target);
+        if (target === 'product' && productId) params.set('productId', productId);
+        const query = params.toString();
+        const path = query ? `/api/banners?${query}` : '/api/banners';
         api
             .get(path)
             .then((data) => { if (!cancelled) setBanners(Array.isArray(data) ? data : []); })
             .catch(() => { if (!cancelled) setBanners([]); })
             .finally(() => { if (!cancelled) setLoading(false); });
         return () => { cancelled = true; };
-    }, [target]);
+    }, [target, productId]);
     return { banners, loading };
 }
 

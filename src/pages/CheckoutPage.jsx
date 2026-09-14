@@ -563,31 +563,31 @@ export default function CheckoutPage() {
                 </Link>
 
                 <div className="mb-6 sm:mb-8">
-                    <p className="text-[10px] tracking-[0.3em] uppercase text-forest mb-2">Secure Checkout</p>
-                    <h1 className="font-display text-3xl md:text-4xl text-ink">Complete Your Order</h1>
+                    <p className="text-xs tracking-[0.25em] uppercase text-forest mb-2 font-medium">Secure Checkout</p>
+                    <h1 className="font-display text-3xl sm:text-4xl text-ink">Complete Your Order</h1>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 sm:gap-4 mb-10" aria-label="Checkout progress">
-                    {STEPS.map(({ label }, i) => {
+                    {STEPS.map(({ label, icon: StepIcon }, i) => {
                         const done = i < currentStep;
                         const current = i === currentStep;
                         return (
-                            <div key={label} className="flex items-center gap-2 sm:gap-4">
-                                <div className="flex items-center gap-2">
+                            <div key={label} className="flex items-center gap-2 sm:gap-3">
+                                <div className="flex items-center gap-2 sm:gap-2.5">
                                     <motion.span
                                         animate={{
                                             backgroundColor: done || current ? 'var(--color-forest)' : 'transparent',
                                         }}
-                                        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium border transition-colors ${
+                                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm font-medium border transition-colors ${
                                             done || current
                                                 ? 'border-forest text-cream'
                                                 : 'border-forest/20 text-forest/40 bg-forest/5'
                                         }`}
                                         aria-current={current ? 'step' : undefined}
                                     >
-                                        {done ? <CheckCircle size={14} /> : <span>{i + 1}</span>}
+                                        {done ? <CheckCircle size={16} /> : <StepIcon size={15} strokeWidth={1.75} />}
                                     </motion.span>
-                                    <span className={`text-xs sm:text-sm transition-colors ${done || current ? 'text-ink font-medium' : 'text-slate/50'}`}>
+                                    <span className={`text-sm sm:text-base transition-colors ${done || current ? 'text-ink font-medium' : 'text-slate/50'}`}>
                                         {label}
                                     </span>
                                 </div>
@@ -608,7 +608,7 @@ export default function CheckoutPage() {
                     )}
                     <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
-                            <p className="text-[10px] tracking-[0.2em] uppercase text-slate">
+                            <p className="text-xs tracking-[0.15em] uppercase text-slate">
                                 {items.length} item{items.length !== 1 ? 's' : ''}
                             </p>
                             <p className="font-display text-xl text-forest leading-tight">{formatPrice(total)}</p>
@@ -657,8 +657,10 @@ export default function CheckoutPage() {
                     <div className="lg:col-span-3 space-y-6 sm:space-y-8 order-2 lg:order-1">
                         <section className="bg-cream rounded-2xl p-4 sm:p-6 md:p-8 soft-shadow">
                             <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <User size={18} className="text-forest flex-shrink-0" />
-                                <h2 className="font-display text-lg sm:text-xl text-ink">Contact Details</h2>
+                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-forest/8 flex-shrink-0">
+                                    <User size={17} className="text-forest" strokeWidth={1.75} />
+                                </span>
+                                <h2 className="font-display text-xl sm:text-2xl text-ink">Contact Details</h2>
                             </div>
                             <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                                 <Input label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
@@ -722,7 +724,7 @@ export default function CheckoutPage() {
                                             </motion.span>
                                         )}
                                     </div>
-                                    <p className="text-xs text-slate mt-2">
+                                    <p className="text-sm text-slate mt-2">
                                         {isPhoneVerified
                                             ? isAccountPhoneVerified(user, phoneDigits)
                                                 ? 'Your account mobile is verified. No OTP needed for future orders.'
@@ -751,16 +753,18 @@ export default function CheckoutPage() {
 
                         <section ref={addressSectionRef} className="bg-cream rounded-2xl p-4 sm:p-6 md:p-8 soft-shadow scroll-mt-[calc(var(--site-header-h,7rem)+5rem)]">
                             <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <MapPin size={18} className="text-forest flex-shrink-0" />
-                                <h2 className="font-display text-lg sm:text-xl text-ink">Delivery Address</h2>
+                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-forest/8 flex-shrink-0">
+                                    <MapPin size={17} className="text-forest" strokeWidth={1.75} />
+                                </span>
+                                <h2 className="font-display text-xl sm:text-2xl text-ink">Delivery Address</h2>
                             </div>
                             {savedAddresses.length > 0 && (
                                 <div className="mb-5 sm:mb-6">
                                     <div className="flex items-center justify-between gap-2 mb-3">
-                                        <p className="text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-slate">
+                                        <p className="text-xs sm:text-sm tracking-[0.1em] sm:tracking-[0.12em] uppercase text-slate font-medium">
                                             Saved addresses
                                         </p>
-                                        <span className="text-[10px] sm:text-xs text-slate/70 tabular-nums">
+                                        <span className="text-xs sm:text-sm text-slate/70 tabular-nums">
                                             {savedAddresses.length}/{MAX_SAVED_ADDRESSES}
                                         </span>
                                     </div>
@@ -803,7 +807,7 @@ export default function CheckoutPage() {
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <p className="text-[13px] sm:text-xs text-slate mt-1.5 leading-relaxed break-words">
+                                                        <p className="text-sm text-slate mt-1.5 leading-relaxed break-words">
                                                             {addr.address}
                                                             {addr.landmark ? `, ${addr.landmark}` : ''}
                                                             <span className="text-ink/70"> · {addr.city}, {addr.pincode}</span>
@@ -823,7 +827,7 @@ export default function CheckoutPage() {
                                             Enter a new address
                                         </button>
                                         {savedAddresses.length < MAX_SAVED_ADDRESSES && (
-                                            <p className="text-[11px] sm:text-xs text-slate/80 leading-relaxed px-0.5">
+                                            <p className="text-xs sm:text-sm text-slate/80 leading-relaxed px-0.5">
                                                 New addresses are saved automatically when you place your order.
                                             </p>
                                         )}
@@ -832,14 +836,14 @@ export default function CheckoutPage() {
                             )}
                             <div className={`${savedAddresses.length > 0 ? 'border-t border-border/50 pt-4 sm:pt-5' : ''}`}>
                                 <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                                    <p className="text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-slate font-medium">
+                                    <p className="text-xs sm:text-sm tracking-[0.1em] sm:tracking-[0.12em] uppercase text-slate font-medium">
                                         {selectedAddressId ? 'Selected address' : 'Address details'}
                                     </p>
                                     {hasAddressInput && (
                                         <button
                                             type="button"
                                             onClick={clearAddressFields}
-                                            className="inline-flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border border-border/70 bg-cream/60 text-[11px] sm:text-xs text-slate hover:text-forest hover:border-forest/30 active:bg-forest/5 transition-colors"
+                                            className="inline-flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border border-border/70 bg-cream/60 text-xs sm:text-sm text-slate hover:text-forest hover:border-forest/30 active:bg-forest/5 transition-colors"
                                         >
                                             <X size={13} />
                                             Clear
@@ -856,9 +860,11 @@ export default function CheckoutPage() {
                         </section>
 
                         <section className="bg-cream rounded-2xl p-5 sm:p-6 md:p-8 soft-shadow">
-                            <div className="flex items-center gap-3 mb-6">
-                                <CreditCard size={18} className="text-forest" />
-                                <h2 className="font-display text-xl text-ink">Payment</h2>
+                            <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
+                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-forest/8 flex-shrink-0">
+                                    <CreditCard size={17} className="text-forest" strokeWidth={1.75} />
+                                </span>
+                                <h2 className="font-display text-xl sm:text-2xl text-ink">Payment</h2>
                             </div>
                             <div className="space-y-3">
                                 {razorpayAvailable && (
@@ -874,9 +880,9 @@ export default function CheckoutPage() {
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
                                                 <Wallet size={16} className="text-forest" />
-                                                <p className="font-medium text-ink text-sm">Pay Online</p>
+                                                <p className="font-medium text-ink text-sm sm:text-base">Pay Online</p>
                                             </div>
-                                            <p className="text-xs text-slate mt-0.5">UPI · Cards · Net Banking via Razorpay</p>
+                                            <p className="text-sm text-slate mt-0.5">UPI · Cards · Net Banking via Razorpay</p>
                                         </div>
                                     </label>
                                 )}
@@ -891,8 +897,8 @@ export default function CheckoutPage() {
                                             className="mt-1 accent-forest"
                                         />
                                         <div>
-                                            <p className="font-medium text-ink text-sm">Cash on Delivery</p>
-                                            <p className="text-xs text-slate mt-0.5">Pay when your order arrives</p>
+                                            <p className="font-medium text-ink text-sm sm:text-base">Cash on Delivery</p>
+                                            <p className="text-sm text-slate mt-0.5">Pay when your order arrives</p>
                                         </div>
                                     </label>
                                 )}
@@ -942,17 +948,17 @@ export default function CheckoutPage() {
                         <ActiveCoupons variant="sidebar" />
 
                         <div className="lg:sticky lg:top-[calc(var(--site-header-h,7rem)+1rem)] lg:z-10 bg-cream rounded-2xl p-5 sm:p-6 md:p-8 soft-shadow space-y-5">
-                            <h2 className="font-display text-xl text-ink">Order Summary</h2>
+                            <h2 className="font-display text-xl sm:text-2xl text-ink">Order Summary</h2>
 
                             <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                                 {items.map((item) => (
                                     <div key={item.product.id} className="flex gap-3">
                                         <img src={imageUrl(item.product.images[0])} alt="" className="w-14 h-16 object-cover rounded-lg flex-shrink-0" />
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-ink line-clamp-1">{item.product.title}</p>
-                                            <p className="text-xs text-slate">Qty: {item.quantity}</p>
+                                            <p className="text-sm sm:text-[15px] text-ink line-clamp-1">{item.product.title}</p>
+                                            <p className="text-sm text-slate">Qty: {item.quantity}</p>
                                         </div>
-                                        <p className="text-sm font-medium">{formatPrice(item.product.price * item.quantity)}</p>
+                                        <p className="text-sm sm:text-[15px] font-medium">{formatPrice(item.product.price * item.quantity)}</p>
                                     </div>
                                 ))}
                             </div>
@@ -979,8 +985,8 @@ export default function CheckoutPage() {
                                 </Button>
                             </div>
 
-                            <div className="hidden lg:flex items-center justify-center gap-2 text-[10px] text-slate">
-                                <Phone size={11} className="text-forest" />
+                            <div className="hidden lg:flex items-center justify-center gap-2 text-xs text-slate">
+                                <Phone size={12} className="text-forest" />
                                 Mobile verified once per account
                             </div>
                         </div>

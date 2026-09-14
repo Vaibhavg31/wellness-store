@@ -27,6 +27,12 @@
      blush-pink of the old cosmetics/jewelry palette. */
   --color-sage-light:    #DCEEE1;
 
+  /* Secondary accent — warm terracotta, used only for the odd decorative
+     blob / mega-menu tile so backgrounds don't read as one flat mint wash
+     everywhere. Never used for CTAs (turmeric owns that job). */
+  --color-clay:          #C2703D;
+  --color-clay-light:    #E8C4A0;
+
   /* Surfaces */
   --color-cream:         #FBF9F4;  /* page background */
   --color-sand:          #F3EEE3;  /* section tint bands */
@@ -334,6 +340,83 @@
 
   .animate-drift-ambient-slow {
     animation: drift-ambient-slow 24s ease-in-out infinite;
+  }
+
+  /* ── Organic blob shape (bubbles) ──────────────────────────────────────
+     Border-radius morph, not a circle — reads as an amoeba/water-drop
+     rather than a hard geometric ring, so it doesn't slide back into the
+     "gold ring blob" jewelry look. Paired with a slow rotate for drift. */
+  @keyframes blob-morph {
+    0%, 100% { border-radius: 42% 58% 65% 35% / 45% 40% 60% 55%; transform: rotate(0deg) scale(1); }
+    33%       { border-radius: 62% 38% 45% 55% / 60% 45% 55% 40%; transform: rotate(6deg) scale(1.04); }
+    66%       { border-radius: 40% 60% 55% 45% / 35% 60% 40% 65%; transform: rotate(-5deg) scale(0.97); }
+  }
+
+  .animate-blob-morph {
+    animation: blob-morph 16s ease-in-out infinite;
+  }
+
+  .animate-blob-morph-slow {
+    animation: blob-morph 24s ease-in-out infinite reverse;
+  }
+
+  /* ── Floating bubble drift (used by AmbientBlobs) ──────────────────── */
+  @keyframes bubble-float {
+    0%   { transform: translateY(0) translateX(0) scale(1); }
+    50%  { transform: translateY(-18px) translateX(8px) scale(1.05); }
+    100% { transform: translateY(0) translateX(0) scale(1); }
+  }
+
+  .animate-bubble-float {
+    animation: bubble-float 9s ease-in-out infinite;
+  }
+
+  /* ── Ticker / marquee row (navbar strip, video banner overlay) ──────── */
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  .animate-ticker {
+    animation: ticker 28s linear infinite;
+  }
+
+  /* ── Ken Burns slow zoom for hero/banner slide imagery ───────────────── */
+  @keyframes ken-burns {
+    0%   { transform: scale(1) translate3d(0,0,0); }
+    100% { transform: scale(1.12) translate3d(-1%, -1%, 0); }
+  }
+
+  .animate-ken-burns {
+    animation: ken-burns 9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* ── Floating glass navbar shell ──────────────────────────────────────
+     Pill/rounded chrome instead of an edge-to-edge solid bar — silhouette
+     alone reads differently from a standard flush top nav. */
+  .glass-navbar {
+    background: rgba(10, 61, 37, 0.72);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+  }
+
+  /* ── Faint dot-grid texture — an alternative section backdrop to a flat
+     wash, used behind shop/cart headers so panels don't feel like empty
+     cards on cream. */
+  .bg-dot-grid {
+    background-image: radial-gradient(rgba(15, 81, 50, 0.14) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /* ── Card lift on hover — shared hover physicality for cards across
+     shop / wishlist / cart so they feel touchable, not flat template tiles. */
+  .card-lift {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+  }
+
+  .card-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(15, 81, 50, 0.12), 0 2px 8px rgba(28, 26, 22, 0.05);
   }
 
   /* Scroll-reveal helper (driven by JS IntersectionObserver) */

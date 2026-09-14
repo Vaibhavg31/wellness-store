@@ -107,6 +107,47 @@ final class UploadRoutes
     }
 
     /**
+     * Photo reviews — any signed-in customer, not just admins, which is why
+     * this doesn't just reuse multiple() above (that one is intentionally
+     * admin-only). Capped smaller than the admin uploader on both count and
+     * per-file size: this is public-facing input from anyone with an
+     * account, not a trusted back-office tool.
+     */
+    private const MAX_REVIEW_IMAGES = 4;
+    private const MAX_REVIEW_IMAGE_SIZE = 3 * 1024 * 1024;
+
+    public static function reviewImages(): void
+    {
+        Auth::requireCustomer();
+
+        if (empty($_FILES['images'])) {
+            Response::error('No images uploaded', 400);
+        }
+
+        $files = self::normalizeFileList($_FILES['images']);
+        $count = count($files);
+
+        if ($count === 0) {
+            Response::error('No images uploaded', 400);
+        }
+
+        if ($count > self::MAX_REVIEW_IMAGES) {
+            Response::error('Maximum ' . self::MAX_REVIEW_IMAGES . ' photos per review', 400);
+        }
+
+        $urls = [];
+        foreach ($files as $file) {
+            if ($file['size'] > self::MAX_REVIEW_IMAGE_SIZE) {
+                $maxMb = (int) (self::MAX_REVIEW_IMAGE_SIZE / (1024 * 1024));
+                Response::error("Each photo must be under {$maxMb}MB", 400);
+            }
+            $urls[] = self::saveFile($file);
+        }
+
+        Response::json(['urls' => $urls]);
+    }
+
+    /**
      * PHP uses a flat structure for one uploaded file and arrays for multiple files
      * with the same field name. Normalize both into a list of file arrays.
      *

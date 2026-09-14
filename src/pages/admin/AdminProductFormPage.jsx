@@ -4,6 +4,7 @@ import {
     AlertCircle,
     Boxes,
     CreditCard,
+    Eraser,
     ImageIcon,
     Layers,
     ListChecks,
@@ -15,9 +16,11 @@ import {
     Tag,
     Trash2,
     Upload,
+    Wand2,
     X,
 } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
+import BannerManager from '@/components/admin/BannerManager';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { formatPrice } from '@/utils/formatPrice';
@@ -77,10 +80,13 @@ const emptyProduct = {
     features: [''],
     stock: '',
     images: [],
+    cutoutImages: [],
     variants: [],
     isNew: false,
     isBestSeller: false,
     isTrendingPinned: false,
+    orbitFeatured: false,
+    orbitSortOrder: 0,
     isPublished: true,
     codEnabled: true,
     onlinePaymentEnabled: true,
@@ -147,6 +153,7 @@ export default function AdminProductFormPage() {
                     features: p.features.length ? p.features : [''],
                     stock: p.stock,
                     images: p.images,
+                    cutoutImages: p.cutoutImages ?? [],
                     variants: (p.variants ?? []).map((v) => makeVariant({
                         id: v.id,
                         label: v.label,
@@ -161,6 +168,8 @@ export default function AdminProductFormPage() {
                     isNew: p.isNew,
                     isBestSeller: p.isBestSeller,
                     isTrendingPinned: p.isTrendingPinned,
+                    orbitFeatured: p.orbitFeatured ?? false,
+                    orbitSortOrder: p.orbitSortOrder ?? 0,
                     isPublished: p.isPublished,
                     codEnabled: p.codEnabled !== false,
                     onlinePaymentEnabled: p.onlinePaymentEnabled !== false,
@@ -232,6 +241,46 @@ export default function AdminProductFormPage() {
             setUploadingVariantPhoto(null);
             e.target.value = '';
         }
+    };
+
+    // "Cutout" images — background-removed versions of the gallery photos
+    // above. Storefront spots that show the product inside a small round
+    // container (the homepage Orbit Ring "dabbi") prefer these when present,
+    // since a transparent PNG sits inside a circular frame cleanly while a
+    // white-background studio shot shows a hard square edge behind the
+    // circle. Processing runs entirely in the admin's own browser — nothing
+    // is sent anywhere until the result is uploaded like any other photo.
+    const [cutoutSourceIndex, setCutoutSourceIndex] = useState(null); // index into form.images currently processing
+    const [cutoutProgress, setCutoutProgress] = useState(null); // { label, ratio } | null
+
+    const handleRemoveBackground = async (sourceImg, index) => {
+        if (!adminToken) return;
+        setCutoutSourceIndex(index);
+        setCutoutProgress({ label: 'Starting…', ratio: 0 });
+        setError('');
+        try {
+            // Dynamically imported: this pulls in the (fairly large) in-browser
+            // ONNX/WASM background-removal engine, which the product form
+            // otherwise has no reason to load just to show/edit a product.
+            const { removeImageBackground, blobToFile } = await import('@/utils/removeBackground');
+            const blob = await removeImageBackground(imageUrl(sourceImg), (label, ratio) => {
+                setCutoutProgress({ label, ratio });
+            });
+            const file = blobToFile(blob, `cutout-${Date.now()}.png`);
+            const urls = await api.upload([file], adminToken);
+            if (urls[0]) {
+                setForm((prev) => ({ ...prev, cutoutImages: [...prev.cutoutImages, urls[0]] }));
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Background removal failed — try a different photo.');
+        } finally {
+            setCutoutSourceIndex(null);
+            setCutoutProgress(null);
+        }
+    };
+
+    const removeCutoutImage = (i) => {
+        setForm((prev) => ({ ...prev, cutoutImages: prev.cutoutImages.filter((_, j) => j !== i) }));
     };
 
     const toggleTag = (tag) => {
@@ -439,11 +488,13 @@ export default function AdminProductFormPage() {
                 features: form.features.filter((f) => f.trim()),
                 discount: computedDiscount,
                 variants: cleanVariants,
-                // Deliberately NOT sending enable3dPreview/cutoutImages: this form has
-                // no UI for either, and previously sent enable3DPreview:false and
-                // cutoutImages:[] unconditionally on every save — silently wiping any
-                // product's 3D-preview flag and cutout images on every single edit.
-                // Omitting the keys lets the backend leave existing values untouched.
+                cutoutImages: form.cutoutImages,
+                // Still deliberately NOT sending enable3dPreview: this form has no
+                // UI for it, and previously sent enable3DPreview:false unconditionally
+                // on every save — silently wiping any product's 3D-preview flag on
+                // every single edit. Omitting the key lets the backend leave it
+                // untouched. cutoutImages, above, now has real UI (below) so it's
+                // safe — and necessary — to send explicitly like every other field.
             };
 
             if (isNew) {
@@ -822,8 +873,67 @@ export default function AdminProductFormPage() {
                                             Set as cover
                                         </button>
                                     )}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveBackground(img, i)}
+                                        disabled={cutoutSourceIndex !== null}
+                                        title="Remove background — creates a transparent cutout for round product containers"
+                                        className="absolute top-1.5 left-1.5 p-1.5 rounded-lg bg-white/90 text-forest opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        aria-label="Remove background"
+                                    >
+                                        {cutoutSourceIndex === i ? (
+                                            <Wand2 size={12} className="animate-pulse" />
+                                        ) : (
+                                            <Eraser size={12} />
+                                        )}
+                                    </button>
                                 </div>
                             ))}
+                        </div>
+                    )}
+
+                    {cutoutProgress && (
+                        <div className="mt-3 rounded-lg border border-forest/20 bg-forest/5 p-3">
+                            <div className="flex items-center justify-between text-xs text-forest font-medium mb-1.5">
+                                <span className="inline-flex items-center gap-1.5"><Wand2 size={12} /> {cutoutProgress.label}</span>
+                                <span>{Math.round(cutoutProgress.ratio * 100)}%</span>
+                            </div>
+                            <div className="h-1.5 rounded-full bg-forest/15 overflow-hidden">
+                                <div
+                                    className="h-full bg-forest rounded-full transition-[width] duration-200"
+                                    style={{ width: `${Math.max(4, Math.round(cutoutProgress.ratio * 100))}%` }}
+                                />
+                            </div>
+                            <p className="text-[11px] text-admin-muted mt-1.5">
+                                First use on this device downloads a one-time AI model (up to ~40MB) — every removal after that is quick.
+                            </p>
+                        </div>
+                    )}
+
+                    {form.cutoutImages.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-admin-border-light">
+                            <p className="text-xs font-medium text-admin-muted mb-2.5 flex items-center gap-1.5">
+                                <Eraser size={12} /> Background-removed cutouts
+                                <span className="text-admin-muted/70 font-normal">— used automatically in round product containers (e.g. the homepage Orbit Ring)</span>
+                            </p>
+                            <div
+                                className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3"
+                                style={{ backgroundImage: 'linear-gradient(45deg, #0000000d 25%, transparent 25%), linear-gradient(-45deg, #0000000d 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0000000d 75%), linear-gradient(-45deg, transparent 75%, #0000000d 75%)', backgroundSize: '16px 16px', backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0px' }}
+                            >
+                                {form.cutoutImages.map((img, i) => (
+                                    <div key={img} className="relative group aspect-square rounded-xl overflow-hidden border border-admin-border">
+                                        <img src={imageUrl(img)} alt="" className="w-full h-full object-contain p-1" />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeCutoutImage(i)}
+                                            className="absolute top-1.5 right-1.5 p-1.5 rounded-lg bg-red-500 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm"
+                                            aria-label="Remove cutout"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </FormSection>
@@ -972,6 +1082,18 @@ export default function AdminProductFormPage() {
                                 <span>
                                     <span className="text-sm font-medium text-ink">Pin to Trending</span>
                                     <span className="text-xs text-admin-muted block mt-0.5">Force into the homepage &quot;Trending Now&quot; row, ahead of real sales data</span>
+                                </span>
+                            </label>
+                            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-admin-border p-3 bg-admin-surface-alt">
+                                <input
+                                    type="checkbox"
+                                    checked={form.orbitFeatured}
+                                    onChange={(e) => update('orbitFeatured', e.target.checked)}
+                                    className="mt-0.5 rounded border-border"
+                                />
+                                <span>
+                                    <span className="text-sm font-medium text-ink">Feature in Orbit Ring</span>
+                                    <span className="text-xs text-admin-muted block mt-0.5">Shows on the homepage &quot;Orbit Ring&quot; — only products checked here (or added from Content → Homepage → Orbit Ring) ever appear there. Manage display order from that same screen.</span>
                                 </span>
                             </label>
                         </div>
@@ -1130,6 +1252,21 @@ export default function AdminProductFormPage() {
                             </label>
                         </div>
                     </OptionalSection>
+                </FormSection>
+
+                <FormSection>
+                    <SectionHeader
+                        icon={ImageIcon}
+                        title="Product page banners"
+                        description="Promo images shown only on this product's own page — separate from the homepage banner sections"
+                    />
+                    {isNew ? (
+                        <p className="text-sm text-admin-muted bg-admin-surface-alt border border-admin-border-light rounded-xl p-4">
+                            Save this product first — page banners are attached to a real product id.
+                        </p>
+                    ) : (
+                        <BannerManager productId={id} />
+                    )}
                 </FormSection>
 
                 <div className="sm:sticky sm:bottom-4 z-10 rounded-2xl border border-admin-border bg-white shadow-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">

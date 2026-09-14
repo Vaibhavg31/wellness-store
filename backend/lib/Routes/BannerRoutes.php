@@ -22,6 +22,15 @@ final class BannerRoutes
     {
         try {
             $target = isset($_GET['target']) ? (string) $_GET['target'] : null;
+
+            if ($target === 'product') {
+                $productId = isset($_GET['productId']) ? trim((string) $_GET['productId']) : '';
+                if ($productId === '') {
+                    Response::json([]);
+                }
+                Response::json(self::repo()->getPublishedForProduct($productId));
+            }
+
             Response::json(self::repo()->getPublished($target));
         } catch (\Exception) {
             Response::error('Failed to fetch banners', 500);
@@ -48,8 +57,13 @@ final class BannerRoutes
             }
 
             $displayTarget = (string) ($body['displayTarget'] ?? 'both');
-            if (!in_array($displayTarget, ['slider', 'stacked', 'both'], true)) {
+            if (!in_array($displayTarget, ['slider', 'stacked', 'both', 'product'], true)) {
                 $displayTarget = 'both';
+            }
+
+            $productId = trim((string) ($body['productId'] ?? ''));
+            if ($displayTarget === 'product' && $productId === '') {
+                Response::error('Pick a product for a product-page banner', 400);
             }
 
             $banner = [
@@ -60,6 +74,11 @@ final class BannerRoutes
                 'ctaHref'       => $body['ctaHref']  ?? '',
                 'isEnabled'     => (bool) ($body['isEnabled'] ?? true),
                 'displayTarget' => $displayTarget,
+                // Only 'product' banners are ever scoped to a product — a
+                // stray productId submitted alongside another target is
+                // dropped rather than silently stored, so it can never leak
+                // that banner onto a product page nobody chose.
+                'productId'     => $displayTarget === 'product' ? $productId : null,
                 'order'         => (int)  ($body['order']     ?? 99),
             ];
 
@@ -74,11 +93,24 @@ final class BannerRoutes
         Auth::requireAdmin();
         try {
             $body    = Request::body();
-            $allowed = ['title', 'subtitle', 'image', 'ctaLabel', 'ctaHref', 'isEnabled', 'displayTarget', 'order'];
+            $allowed = ['title', 'subtitle', 'image', 'ctaLabel', 'ctaHref', 'isEnabled', 'displayTarget', 'productId', 'order'];
             $changes = array_intersect_key($body, array_flip($allowed));
 
-            if (isset($changes['displayTarget']) && !in_array($changes['displayTarget'], ['slider', 'stacked', 'both'], true)) {
+            if (isset($changes['displayTarget']) && !in_array($changes['displayTarget'], ['slider', 'stacked', 'both', 'product'], true)) {
                 unset($changes['displayTarget']);
+            }
+
+            if (($changes['displayTarget'] ?? null) === 'product') {
+                $productId = trim((string) ($changes['productId'] ?? ''));
+                if ($productId === '') {
+                    Response::error('Pick a product for a product-page banner', 400);
+                }
+                $changes['productId'] = $productId;
+            } elseif (array_key_exists('displayTarget', $changes)) {
+                // Switching away from 'product' clears the scoping — leaving
+                // a stale productId around would silently re-target this
+                // banner back to that product the next time it's edited.
+                $changes['productId'] = null;
             }
 
             $updated = self::repo()->update($id, $changes);

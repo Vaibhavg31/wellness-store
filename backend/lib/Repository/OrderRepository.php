@@ -415,6 +415,25 @@ final class OrderRepository extends MysqlRepository
         return $this->mapRowsBatched($stmt->fetchAll());
     }
 
+    /**
+     * Gate for "only people who bought this can review it" — true once this
+     * user has any non-cancelled order containing this product, whether it
+     * has shipped yet or not (requiring "delivered" would lock reviewing out
+     * for weeks on a slow shipment; a cancelled order was never fulfilled at
+     * all, so that one's excluded).
+     */
+    public function hasUserPurchasedProduct(string $userId, string $productId): bool
+    {
+        $stmt = $this->pdo()->prepare(
+            'SELECT 1 FROM order_items oi
+             INNER JOIN orders o ON o.id = oi.order_id
+             WHERE o.user_id = ? AND oi.product_id = ? AND o.status != ?
+             LIMIT 1'
+        );
+        $stmt->execute([$userId, $productId, 'cancelled']);
+        return (bool) $stmt->fetchColumn();
+    }
+
     public function getForUser(string $userId, string $email): array
     {
         $pdo   = $this->pdo();

@@ -42,7 +42,7 @@ export default function CouponInput({ compact = false }) {
                             <CheckCircle size={16} className="flex-shrink-0" />
                             <span className="font-mono text-sm font-semibold tracking-wide">{couponCode}</span>
                         </div>
-                        <p className="text-xs text-slate mt-1 leading-relaxed">
+                        <p className="text-sm text-slate mt-1 leading-relaxed">
                             {autoAppliedCoupon ? 'Applied automatically at checkout' : (couponDetails.title || couponMessage)}
                         </p>
                     </div>

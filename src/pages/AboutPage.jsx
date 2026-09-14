@@ -2,10 +2,16 @@ import Logo from '@/components/ui/Logo';
 import SectionTitle from '@/components/ui/SectionTitle';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { imageUrl } from '@/services/api';
+import { DEFAULT_SITE_CONTENT } from '@/data/defaultContent';
 
 export default function AboutPage() {
     const { content } = useSiteContent();
     const about = content.about;
+    // An admin can save this field empty (this store's own settings do,
+    // right now) — imageUrl('') resolves to '', which renders a real,
+    // visibly-broken <img src="">, not just a missing picture. Falls back
+    // to the bundled default rather than showing that.
+    const storyImageSrc = about.storyImage ? imageUrl(about.storyImage) : DEFAULT_SITE_CONTENT.about.storyImage;
 
     return (
         <div className="pb-20 px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4">
@@ -24,7 +30,7 @@ export default function AboutPage() {
             <section className="py-16 px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
                     <img
-                        src={imageUrl(about.storyImage)}
+                        src={storyImageSrc}
                         alt={`${content.brandName} craftsmanship`}
                         loading="lazy"
                         className="w-full aspect-[4/5] object-cover rounded-2xl border border-border/30"

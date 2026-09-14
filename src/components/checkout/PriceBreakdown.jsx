@@ -15,7 +15,7 @@ export default function PriceBreakdown({ showUpsell = true, totalClassName = 'te
     } = useCart();
 
     return (
-        <div className="space-y-3 text-sm">
+        <div className="space-y-3 text-sm sm:text-[15px]">
             <div className="flex justify-between">
                 <span className="text-slate">Subtotal</span>
                 <span className="font-medium">{formatPrice(subtotal)}</span>
@@ -34,7 +34,7 @@ export default function PriceBreakdown({ showUpsell = true, totalClassName = 'te
             </div>
             {showUpsell && showFreeDeliveryUpsell && (
                 <div className="rounded-lg bg-sand/60 border border-border/40 px-3 py-2.5 space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-ink">
+                    <div className="flex items-center gap-2 text-sm text-ink">
                         <Truck size={13} className="text-turmeric-ink flex-shrink-0" />
                         <span>
                             Add <span className="font-medium">{formatPrice(amountUntilFreeDelivery)}</span> more for free delivery
@@ -48,8 +48,8 @@ export default function PriceBreakdown({ showUpsell = true, totalClassName = 'te
                     </div>
                 </div>
             )}
-            <div className="border-t border-border/60 pt-4 flex justify-between font-display text-lg">
-                <span>Total</span>
+            <div className="border-t border-border/60 pt-4 flex justify-between items-baseline font-display text-xl">
+                <span className="text-base font-sans text-ink">Total</span>
                 <span className={totalClassName}>{formatPrice(total)}</span>
             </div>
         </div>

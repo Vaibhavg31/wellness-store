@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import Marquee from '@/components/ui/Marquee';
+import AmbientBlobs from '@/components/ui/AmbientBlobs';
+import ConstellationField from '@/components/ui/ConstellationField';
 import { useSiteContent } from '@/contexts/SiteContentContext';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { imageUrl } from '@/services/api';
 
 const VIDEO_MIME = { mp4: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime' };
@@ -14,24 +18,27 @@ function guessVideoType(url) {
     return VIDEO_MIME[ext] || 'video/mp4';
 }
 
-/** Full-width autoplay video banner. Renders nothing until the admin
- *  uploads a video — safe to leave the homepage section toggle on by
- *  default. */
+const TICKER_ITEMS = [
+    'PURE INGREDIENTS', 'LAB-TESTED PURITY', 'FSSAI CERTIFIED', 'NO SHORTCUTS', 'HONESTLY MADE',
+];
+
+/**
+ * Full-bleed "motion banner" — a scrolling ticker band running over either
+ * a real admin-uploaded video, or (before one is uploaded) a living
+ * animated backdrop of drifting blobs + a constellation field, so the
+ * section never ships as an empty gap on a fresh install. This is the
+ * "video running type banner" the redesign asked for.
+ */
 export default function VideoBanner() {
     const { content } = useSiteContent();
     const banner = content.videoBanner;
     const videoRef = useRef(null);
     const [muted, setMuted] = useState(true);
-    const [reducedMotion, setReducedMotion] = useState(false);
+    const reducedMotion = useReducedMotion();
+    const hasVideo = Boolean(banner?.videoUrl);
 
-    useEffect(() => {
-        setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    }, []);
-
-    if (!banner?.videoUrl) return null;
-
-    const aspectRatio = banner.width && banner.height ? `${banner.width} / ${banner.height}` : '16 / 9';
-    const hasOverlayText = Boolean(banner.title || banner.subtitle || banner.ctaLabel);
+    const aspectRatio = banner?.width && banner?.height ? `${banner.width} / ${banner.height}` : undefined;
+    const hasOverlayText = Boolean(banner?.title || banner?.subtitle || banner?.ctaLabel);
 
     const toggleMute = () => {
         setMuted((m) => {
@@ -42,18 +49,9 @@ export default function VideoBanner() {
     };
 
     return (
-        <section className="relative w-full overflow-hidden bg-ink" aria-label={banner.title || 'Video banner'}>
-            <div className="relative w-full" style={{ aspectRatio, maxHeight: '85vh' }}>
-                {reducedMotion ? (
-                    banner.poster && (
-                        <img
-                            src={imageUrl(banner.poster)}
-                            alt=""
-                            className="absolute inset-0 w-full h-full"
-                            style={{ objectFit: banner.fit === 'contain' ? 'contain' : 'cover' }}
-                        />
-                    )
-                ) : (
+        <section className="relative w-screen left-1/2 right-1/2 -mx-[50vw] overflow-hidden bg-ink" aria-label={banner?.title || 'Motion banner'}>
+            <div className="relative w-full min-h-[52vh] sm:min-h-[60vh]" style={{ aspectRatio, maxHeight: '85vh' }}>
+                {hasVideo && !reducedMotion ? (
                     <video
                         ref={videoRef}
                         className="absolute inset-0 w-full h-full"
@@ -67,39 +65,63 @@ export default function VideoBanner() {
                     >
                         <source src={imageUrl(banner.videoUrl)} type={guessVideoType(banner.videoUrl)} />
                     </video>
-                )}
-
-                {hasOverlayText && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" aria-hidden="true" />
-                )}
-
-                {hasOverlayText && (
-                    <div className="absolute inset-0 flex flex-col items-start justify-end p-6 sm:p-10 lg:p-14">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: '-60px' }}
-                            transition={{ duration: 0.7 }}
-                            className="max-w-xl"
-                        >
-                            {banner.subtitle && (
-                                <p className="type-eyebrow text-cream/70 mb-2">{banner.subtitle}</p>
-                            )}
-                            {banner.title && (
-                                <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl text-cream font-medium leading-tight mb-5">
-                                    {banner.title}
-                                </h2>
-                            )}
-                            {banner.ctaLabel && (
-                                <Link to={banner.ctaHref || '/shop'}>
-                                    <Button variant="turmeric" size="lg">{banner.ctaLabel}</Button>
-                                </Link>
-                            )}
-                        </motion.div>
+                ) : hasVideo && banner.poster ? (
+                    <img
+                        src={imageUrl(banner.poster)}
+                        alt=""
+                        className="absolute inset-0 w-full h-full"
+                        style={{ objectFit: banner.fit === 'contain' ? 'contain' : 'cover' }}
+                    />
+                ) : (
+                    // Living fallback backdrop — bubbles + a drifting particle
+                    // network standing in for footage until a real video exists.
+                    <div className="absolute inset-0 bg-section-emerald">
+                        <AmbientBlobs variant="dark" />
+                        <ConstellationField variant="light" density={1.1} className="opacity-70" />
                     </div>
                 )}
 
-                {!reducedMotion && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/10" aria-hidden="true" />
+
+                {/* Scrolling ticker band — the "running" motion element */}
+                <div className="absolute top-0 inset-x-0 border-b border-cream/10 bg-black/20 backdrop-blur-[2px]">
+                    <Marquee
+                        speed={22}
+                        className="py-2.5"
+                        items={TICKER_ITEMS.map((t) => (
+                            <span key={t} className="inline-flex items-center gap-2 type-eyebrow text-cream/80">
+                                <Sparkles size={11} className="text-turmeric-light" />
+                                {t}
+                            </span>
+                        ))}
+                    />
+                </div>
+
+                <div className="absolute inset-0 flex flex-col items-start justify-end p-6 sm:p-10 lg:p-14">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-60px' }}
+                        transition={{ duration: 0.7 }}
+                        className="max-w-xl"
+                    >
+                        <p className="type-eyebrow text-turmeric-light/90 mb-2">
+                            {hasOverlayText && banner.subtitle ? banner.subtitle : 'In Motion'}
+                        </p>
+                        <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl text-cream font-medium leading-tight mb-5">
+                            {hasOverlayText && banner.title ? banner.title : (
+                                <>Wellness that shows its work</>
+                            )}
+                        </h2>
+                        <Link to={(hasOverlayText && banner.ctaHref) || '/shop'}>
+                            <Button variant="turmeric" size="lg">
+                                {(hasOverlayText && banner.ctaLabel) || 'Shop the Collection'}
+                            </Button>
+                        </Link>
+                    </motion.div>
+                </div>
+
+                {hasVideo && !reducedMotion && (
                     <button
                         type="button"
                         onClick={toggleMute}

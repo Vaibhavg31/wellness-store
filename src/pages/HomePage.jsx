@@ -16,6 +16,7 @@ import Newsletter from '@/components/home/Newsletter';
 import TrendingProducts from '@/components/home/TrendingProducts';
 import PromoBanners from '@/components/home/PromoBanners';
 import BannerSlider from '@/components/home/BannerSlider';
+import OrbitShowcase from '@/components/home/OrbitShowcase';
 import { useProducts } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { FALLBACK_PRODUCTS } from '@/data/fallbackProducts';
@@ -131,11 +132,20 @@ export default function HomePage() {
         };
     }, [loading, products.length]);
 
+    // OrbitShowcase isn't one of the admin-toggleable sections (it's a new,
+    // fixed-position feature, not a CMS field) — it's spliced in right after
+    // the hero however the admin has the rest of the page ordered, rather
+    // than always landing at a fixed index that could put it somewhere odd.
+    const orderedKeys = Object.keys(sections).filter((key) => sections[key] !== false && renderers[key]);
+
     return (
         <>
-            {Object.keys(sections)
-                .filter((key) => sections[key] !== false && renderers[key])
-                .map((key) => renderers[key]())}
+            {orderedKeys.map((key) => (
+                <span key={key} style={{ display: 'contents' }}>
+                    {renderers[key]()}
+                    {key === 'hero' && <OrbitShowcase products={displayProducts} />}
+                </span>
+            ))}
         </>
     );
 }

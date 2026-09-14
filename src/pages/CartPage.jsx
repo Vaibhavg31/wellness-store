@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Minus, Plus, Trash2, ShoppingBag, Shield, User, Gift } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Minus, Plus, Trash2, ShoppingBag, Shield, User, Gift, MapPin, CreditCard, Check } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -12,6 +13,49 @@ import CouponInput from '@/components/checkout/CouponInput';
 import ActiveCoupons from '@/components/checkout/ActiveCoupons';
 import PriceBreakdown from '@/components/checkout/PriceBreakdown';
 import { loginUrl } from '@/utils/authRedirect';
+
+const CHECKOUT_STEPS = [
+    { label: 'Bag', icon: ShoppingBag },
+    { label: 'Address', icon: MapPin },
+    { label: 'Payment', icon: CreditCard },
+];
+
+/** Purely visual progress strip — orients the shopper inside the checkout
+ * flow instead of dropping them straight into a bare line-item list. */
+function CheckoutSteps({ activeIndex = 0 }) {
+    return (
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8" aria-hidden="true">
+            {CHECKOUT_STEPS.map((step, i) => {
+                const Icon = step.icon;
+                const done = i < activeIndex;
+                const active = i === activeIndex;
+                return (
+                    <div key={step.label} className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex items-center gap-2">
+                            <span
+                                className={`flex items-center justify-center w-8 h-8 rounded-full border transition-colors ${
+                                    active
+                                        ? 'bg-forest border-forest text-cream'
+                                        : done
+                                            ? 'bg-forest/10 border-forest/30 text-forest'
+                                            : 'bg-cream border-border/60 text-slate/60'
+                                }`}
+                            >
+                                {done ? <Check size={14} /> : <Icon size={14} strokeWidth={1.75} />}
+                            </span>
+                            <span className={`type-eyebrow-sm hidden sm:inline ${active ? 'text-ink' : 'text-slate/60'}`}>
+                                {step.label}
+                            </span>
+                        </div>
+                        {i < CHECKOUT_STEPS.length - 1 && (
+                            <span className={`w-6 sm:w-10 h-px ${done ? 'bg-forest/40' : 'bg-border'}`} />
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
 
 export default function CartPage() {
     const { items, updateQuantity, removeFromCart, removeBundleFromCart, syncPrices } = useCart();
@@ -79,6 +123,8 @@ export default function CartPage() {
     return (
         <div className="pb-20 px-4 sm:px-6 lg:px-8 bg-cream min-h-screen pt-2 sm:pt-4">
             <div className="max-w-5xl mx-auto">
+                <CheckoutSteps activeIndex={0} />
+
                 <SectionTitle
                     subtitle="Your Selection"
                     title="Shopping Bag"
@@ -108,12 +154,17 @@ export default function CartPage() {
 
                 <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 lg:items-start">
                     <div className="lg:col-span-2 space-y-3">
+                        <AnimatePresence mode="popLayout" initial={false}>
                         {entries.map((entry) => {
                             if (entry.type === 'bundle') {
                                 const bundleTotal = entry.items.reduce((s, i) => s + i.product.price * i.quantity, 0);
                                 const bundleOriginal = entry.items.reduce((s, i) => s + i.product.originalPrice * i.quantity, 0);
                                 return (
-                                    <div
+                                    <motion.div
+                                        layout
+                                        initial={{ opacity: 0, y: 12 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, x: -24, scale: 0.97, transition: { duration: 0.25 } }}
                                         key={`bundle-${entry.bundleId}`}
                                         className="p-4 sm:p-5 bg-cream rounded-xl border border-turmeric/40 soft-shadow"
                                     >
@@ -169,15 +220,19 @@ export default function CartPage() {
                                                 <span className="font-display text-base text-forest">{formatPrice(bundleTotal)}</span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 );
                             }
 
                             const { item } = entry;
                             return (
-                                <div
+                                <motion.div
+                                    layout
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, x: -24, scale: 0.97, transition: { duration: 0.25 } }}
                                     key={item.product.variantId ? `${item.product.id}::${item.product.variantId}` : item.product.id}
-                                    className="flex gap-4 p-4 sm:p-5 bg-cream rounded-xl border border-border/40 soft-shadow"
+                                    className="flex gap-4 p-4 sm:p-5 bg-cream rounded-xl border border-border/40 soft-shadow card-lift"
                                 >
                                     <Link to={`/product/${item.product.id}`} className="flex-shrink-0">
                                         <img
@@ -234,9 +289,10 @@ export default function CartPage() {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
                             );
                         })}
+                        </AnimatePresence>
                     </div>
 
                     <div className="lg:col-span-1 space-y-5">

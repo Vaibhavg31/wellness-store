@@ -14,6 +14,7 @@ import { prepareSiteContentForSave } from '@/utils/prepareSiteContentForSave';
 import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
+import OrbitRingManager from '@/components/admin/OrbitRingManager';
 import {
     AdminSection, AdminField, AdminTextarea, ImageUploadField, VideoUploadField,
     StringListEditor, BenefitEditor, FaqEditor, SectionToggles,
@@ -685,14 +686,20 @@ export default function AdminContentPage() {
                     )}
 
                     {tab === 'homepage' && (
-                        <AdminSection title="Homepage Sections" description="Drag a row to reorder it, use the switch to show/hide it, and click a section's name to open its content editor right here. Reordering and show/hide save immediately — no need to press Save for those.">
-                            <SectionToggles
-                                sections={content.sections}
-                                labels={SECTION_LABELS}
-                                onChange={handleSectionsChange}
-                                renderContent={renderHomepageSectionContent}
-                            />
-                        </AdminSection>
+                        <>
+                            <AdminSection title="Homepage Sections" description="Drag a row to reorder it, use the switch to show/hide it, and click a section's name to open its content editor right here. Reordering and show/hide save immediately — no need to press Save for those.">
+                                <SectionToggles
+                                    sections={content.sections}
+                                    labels={SECTION_LABELS}
+                                    onChange={handleSectionsChange}
+                                    renderContent={renderHomepageSectionContent}
+                                />
+                            </AdminSection>
+
+                            <AdminSection title="Orbit Ring — Featured Products" description="Curates the center + ring of the homepage 'Your Wellness Orbit' section. Changes here save immediately — no need to press Save.">
+                                <OrbitRingManager />
+                            </AdminSection>
+                        </>
                     )}
 
                     {tab === 'about' && (

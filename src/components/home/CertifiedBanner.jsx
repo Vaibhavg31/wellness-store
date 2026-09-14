@@ -3,6 +3,7 @@ import { Shield, ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { imageUrl } from '@/services/api';
+import { DEFAULT_SITE_CONTENT } from '@/data/defaultContent';
 
 /**
  * Renamed from AntiTarnishBanner — the rendered copy ("Purity You Can
@@ -12,6 +13,12 @@ import { imageUrl } from '@/services/api';
 export default function CertifiedBanner() {
     const { content } = useSiteContent();
     const banner = content.certifiedBanner;
+    // This install's own settings save this field empty — same bug as
+    // AboutPage's story image: imageUrl('') is '', which renders a real,
+    // visibly-broken <img src="">, not just a missing picture (confirmed on
+    // this exact section — "Purity You Can Verify" was rendering with no
+    // image at all on desktop). Falls back to the bundled default instead.
+    const bannerImageSrc = banner.image ? imageUrl(banner.image) : DEFAULT_SITE_CONTENT.certifiedBanner.image;
 
     return (
         <section className="py-16 md:py-20 px-6 lg:px-8">
@@ -42,7 +49,7 @@ export default function CertifiedBanner() {
                         </div>
                         <div className="hidden lg:block">
                             <img
-                                src={imageUrl(banner.image)}
+                                src={bannerImageSrc}
                                 alt={banner.title}
                                 loading="lazy"
                                 className="w-full aspect-[4/3] object-cover rounded-2xl border border-cream/10 shadow-2xl"

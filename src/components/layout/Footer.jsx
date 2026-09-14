@@ -70,7 +70,12 @@ export default function Footer() {
 
             <div className="relative max-w-7xl mx-auto px-6 lg:px-12 pt-28 pb-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 lg:gap-10">
-                    <div className="lg:col-span-4">
+                    <motion.div
+                        initial={reducedMotion ? false : { opacity: 0, y: 28 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="lg:col-span-4">
                         <Logo size="xl" showHover className="mb-8" />
                         <p className="text-sm font-light leading-relaxed text-cream/60 max-w-xs mb-2">
                             {footer.tagline}
@@ -80,25 +85,29 @@ export default function Footer() {
                         </p>
                         <div className="flex gap-3 mt-10">
                             {instagramLinked && (
-                            <a
+                            <motion.a
+                                whileHover={reducedMotion ? {} : { scale: 1.1, y: -3 }}
+                                whileTap={{ scale: 0.92 }}
                                 href={instagramUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-3 rounded-full border border-cream/15 text-cream/55 hover:border-turmeric-light hover:text-turmeric-light hover:bg-turmeric-light/10 transition-all duration-500"
+                                className="p-3 rounded-full border border-cream/15 text-cream/55 hover:border-turmeric-light hover:text-turmeric-light hover:bg-turmeric-light/10 transition-colors duration-500"
                                 aria-label="Instagram"
                             >
                                 {socialIcons.instagram}
-                            </a>
+                            </motion.a>
                             )}
-                            <a
+                            <motion.a
+                                whileHover={reducedMotion ? {} : { scale: 1.1, y: -3 }}
+                                whileTap={{ scale: 0.92 }}
                                 href={getWhatsAppUrl()}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-3 rounded-full border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white hover:border-[#25D366] transition-all duration-500"
+                                className="p-3 rounded-full border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white hover:border-[#25D366] transition-colors duration-500"
                                 aria-label="WhatsApp"
                             >
                                 {socialIcons.whatsapp}
-                            </a>
+                            </motion.a>
                         </div>
 
                         {instagramLinked && (
@@ -125,42 +134,60 @@ export default function Footer() {
                             </span>
                         </a>
                         )}
-                    </div>
+                    </motion.div>
 
-                    <div className="lg:col-span-2">
+                    <motion.div
+                        initial={reducedMotion ? false : { opacity: 0, y: 28 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.6, delay: 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="lg:col-span-2"
+                    >
                         <h4 className="type-eyebrow text-turmeric-light/70 mb-7">Explore</h4>
                         <ul className="space-y-3.5">
                             {(content.navLinks ?? []).map((item) => (
                                 <li key={item.href}>
-                                    <Link to={item.href} className="text-sm font-light text-cream/50 hover:text-turmeric-light transition-colors duration-500">
+                                    <Link to={item.href} className="inline-block text-sm font-light text-cream/50 hover:text-turmeric-light hover:translate-x-1 transition-[color,transform] duration-300">
                                         {item.label}
                                     </Link>
                                 </li>
                             ))}
                         </ul>
-                    </div>
+                    </motion.div>
 
-                    <div className="lg:col-span-3">
+                    <motion.div
+                        initial={reducedMotion ? false : { opacity: 0, y: 28 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.6, delay: 0.16, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="lg:col-span-3"
+                    >
                         <h4 className="type-eyebrow text-turmeric-light/70 mb-7">Collections</h4>
                         <ul className="space-y-3.5">
                             {collectionLinks.map((cat) => (
                                 <li key={cat.id}>
-                                    <Link to={`/category/${cat.id}`} className="text-sm font-light text-cream/50 hover:text-turmeric-light transition-colors duration-500">
+                                    <Link to={`/category/${cat.id}`} className="inline-block text-sm font-light text-cream/50 hover:text-turmeric-light hover:translate-x-1 transition-[color,transform] duration-300">
                                         {cat.label}
                                     </Link>
                                 </li>
                             ))}
                             {hasMoreCollections && (
                                 <li>
-                                    <Link to="/shop" className="text-sm font-light text-turmeric-light/80 hover:text-turmeric-light transition-colors duration-500">
+                                    <Link to="/shop" className="inline-block text-sm font-light text-turmeric-light/80 hover:text-turmeric-light hover:translate-x-1 transition-[color,transform] duration-300">
                                         View all collections
                                     </Link>
                                 </li>
                             )}
                         </ul>
-                    </div>
+                    </motion.div>
 
-                    <div className="lg:col-span-3">
+                    <motion.div
+                        initial={reducedMotion ? false : { opacity: 0, y: 28 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.6, delay: 0.24, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="lg:col-span-3"
+                    >
                         <h4 className="type-eyebrow text-turmeric-light/70 mb-7">
                             {footer.newsletterTitle}
                         </h4>
@@ -179,7 +206,7 @@ export default function Footer() {
                                     placeholder="Your email address"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="bg-forest-deep/40 border-cream/15 text-cream placeholder:text-cream/30 rounded-full"
+                                    className="bg-forest-deep/40 border-cream/15 text-cream placeholder:text-cream/55 rounded-full"
                                     required
                                 />
                                 <Button variant="turmeric" size="sm" className="w-full" type="submit" disabled={loading}>
@@ -187,7 +214,7 @@ export default function Footer() {
                                 </Button>
                             </form>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
 
                 <motion.div

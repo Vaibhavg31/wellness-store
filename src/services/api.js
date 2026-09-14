@@ -143,6 +143,36 @@ export const api = {
         const data = await res.json();
         return data.urls;
     },
+    /** Customer-facing photo-review uploader — same shape as upload() above,
+     *  but a different endpoint (Auth::requireCustomer, not requireAdmin)
+     *  with tighter server-side count/size limits since this accepts input
+     *  from any signed-in shopper, not just the back office. */
+    uploadReviewImages: async (files, token) => {
+        const formData = new FormData();
+        files.forEach((f) => formData.append('images', f));
+        let res;
+        try {
+            res = await fetch(`${API_BASE}/api/upload/review-images`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` },
+                body: formData,
+            });
+        } catch {
+            throw new ApiError(
+                'Cannot reach the API server. Stop the app and run: npm run dev',
+                0,
+            );
+        }
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({ error: res.statusText }));
+            if (res.status === 401 && token && onUnauthorized) {
+                onUnauthorized();
+            }
+            throw new ApiError(body.error || 'Photo upload failed', res.status);
+        }
+        const data = await res.json();
+        return data.urls;
+    },
     uploadVideo: async (file, token) => {
         const formData = new FormData();
         formData.append('video', file);

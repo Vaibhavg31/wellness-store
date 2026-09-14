@@ -1,7 +1,34 @@
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ADMIN_PATH } from '@/contexts/AuthContext';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
+
+const FIELD_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+
+/** True while any text field on the page has focus — the bubble hides for
+ * that stretch instead of sitting on top of whatever field the visitor is
+ * about to type into (confirmed overlapping the Contact form's message
+ * field and, before a size/position pass, the checkout sign-in gate's
+ * total). A fixed corner widget can't know a page's layout in advance, so
+ * rather than chase every page that happens to end near the fold, it gets
+ * out of the way for the one moment that actually matters: someone using a
+ * field near it. */
+function useFieldFocused() {
+    const [focused, setFocused] = useState(false);
+    useEffect(() => {
+        const isField = (el) => el instanceof HTMLElement && FIELD_TAGS.has(el.tagName);
+        const onFocusIn = (e) => { if (isField(e.target)) setFocused(true); };
+        const onFocusOut = (e) => { if (isField(e.target)) setFocused(false); };
+        document.addEventListener('focusin', onFocusIn);
+        document.addEventListener('focusout', onFocusOut);
+        return () => {
+            document.removeEventListener('focusin', onFocusIn);
+            document.removeEventListener('focusout', onFocusOut);
+        };
+    }, []);
+    return focused;
+}
 
 function WhatsAppIcon({ size = 28 }) {
     return (
@@ -15,10 +42,22 @@ export default function WhatsAppButton() {
     const location = useLocation();
     const isAdmin = location.pathname.startsWith(ADMIN_PATH);
     const { getWhatsAppUrl } = useWhatsApp();
+    const fieldFocused = useFieldFocused();
+
+    // Decoupled from the focus-hide toggle on purpose: the 1.2s delay is
+    // only for the very first appearance, not something that should replay
+    // (or, worse, apply in reverse) every time a field blurs and this
+    // button comes back.
+    const [ready, setReady] = useState(false);
+    useEffect(() => {
+        const timer = setTimeout(() => setReady(true), 1200);
+        return () => clearTimeout(timer);
+    }, []);
 
     if (isAdmin) return null;
 
     const href = getWhatsAppUrl();
+    const show = ready && !fieldFocused;
 
     return (
         <motion.a
@@ -26,12 +65,14 @@ export default function WhatsAppButton() {
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            animate={{ opacity: show ? 1 : 0, scale: show ? 1 : 0.75, y: show ? 0 : 16 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            style={{ pointerEvents: show ? 'auto' : 'none' }}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
-            className="fixed z-[45] bottom-5 right-4 sm:bottom-6 sm:right-6 flex items-center gap-2 group safe-area-pb"
+            className="fixed z-[45] bottom-4 right-3 sm:bottom-6 sm:right-6 flex items-center gap-2 group safe-area-pb"
             aria-label="Chat on WhatsApp"
+            aria-hidden={!show}
         >
             {/* Pulse ring */}
             <span
@@ -40,8 +81,8 @@ export default function WhatsAppButton() {
                 aria-hidden="true"
             />
 
-            <span className="relative flex items-center justify-center w-14 h-14 sm:w-[3.75rem] sm:h-[3.75rem] rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 hover:bg-[#20BD5A] transition-colors">
-                <WhatsAppIcon size={26} />
+            <span className="relative flex items-center justify-center w-12 h-12 sm:w-[3.75rem] sm:h-[3.75rem] rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 hover:bg-[#20BD5A] transition-colors">
+                <WhatsAppIcon size={22} />
             </span>
 
             <span className="hidden sm:flex absolute right-full mr-3 px-3 py-1.5 rounded-lg bg-ink text-cream text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">

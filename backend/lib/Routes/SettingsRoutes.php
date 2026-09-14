@@ -39,7 +39,8 @@ final class SettingsRoutes
             $body    = Request::body();
             $updated = self::repo()->set($body);
             Response::json($updated);
-        } catch (\Exception) {
+        } catch (\Exception $e) {
+            error_log('[Settings Update] ' . $e->getMessage());
             Response::error('Failed to update settings', 500);
         }
     }

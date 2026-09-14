@@ -3,6 +3,7 @@ import { Shield, Droplets, Heart, BadgeCheck, Sparkles, Sun, MessageCircle } fro
 import SectionTitle from '@/components/ui/SectionTitle';
 import Button from '@/components/ui/Button';
 import InstagramIcon from '@/components/ui/InstagramIcon';
+import AmbientBlobs from '@/components/ui/AmbientBlobs';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
 import { hasInstagramUrl } from '@/utils/socialLinks';
@@ -27,8 +28,9 @@ export default function WhyChoose() {
     const { getWhatsAppUrl } = useWhatsApp();
 
     return (
-        <section className="py-14 md:py-20 px-4 sm:px-6 lg:px-8 bg-cream">
-            <div className="max-w-6xl mx-auto">
+        <section className="relative overflow-hidden py-14 md:py-20 px-4 sm:px-6 lg:px-8 bg-cream">
+            <AmbientBlobs variant="forest" className="opacity-50" />
+            <div className="relative max-w-6xl mx-auto">
                 <SectionTitle
                     subtitle={section.subtitle}
                     title={section.title}

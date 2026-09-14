@@ -65,6 +65,7 @@ function ProductCard({ product, compact = false, index = 0 }) {
                 className="group flex flex-col h-full"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -4, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }}
                 transition={{ delay: Math.min(index * 0.04, 0.32), duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
                 <div className="relative overflow-hidden bg-sand/60 rounded-lg border border-border/40 mb-2 transition-all duration-300 group-hover:border-forest/25 group-hover:shadow-md">
@@ -148,6 +149,7 @@ function ProductCard({ product, compact = false, index = 0 }) {
             className="group h-full flex flex-col"
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -4, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >

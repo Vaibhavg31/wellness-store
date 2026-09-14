@@ -13,7 +13,7 @@ import ProductSearchBar from '@/components/search/ProductSearchBar';
 const itemVariants = {
     hidden: { opacity: 0, y: 12 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] } },
-    exit: { opacity: 0, x: -24, scale: 0.98, transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] } },
+    exit: { opacity: 0, y: -8, scale: 0.92, transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] } },
 };
 
 function WishlistItem({ product, onRemove, onAddToCart, onMoveToCart }) {
@@ -40,78 +40,79 @@ function WishlistItem({ product, onRemove, onAddToCart, onMoveToCart }) {
             initial="hidden"
             animate={removing ? 'exit' : 'visible'}
             exit="exit"
-            className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-5 bg-cream rounded-xl border border-border/40 items-start sm:items-center"
+            className="group flex flex-col bg-cream rounded-2xl border border-border/40 overflow-hidden card-lift"
         >
-            <Link to={`/product/${product.id}`} className="flex-shrink-0 overflow-hidden rounded-lg">
-                <motion.img
-                    whileHover={{ scale: 1.03 }}
-                    transition={{ duration: 0.4 }}
-                    src={imageUrl(product.images[0])}
-                    alt={product.title}
-                    className="w-24 h-28 object-cover"
-                />
-            </Link>
-
-            <div className="flex-1 min-w-0">
-                <Link to={`/product/${product.id}`}>
-                    <h3 className="font-display text-lg text-ink hover:text-forest transition-colors line-clamp-2">
-                        {product.title}
-                    </h3>
+            <div className="relative">
+                <Link to={`/product/${product.id}`} className="block aspect-[4/5] overflow-hidden bg-sand/60">
+                    <motion.img
+                        whileHover={{ scale: 1.04 }}
+                        transition={{ duration: 0.5 }}
+                        src={imageUrl(product.images[0])}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                    />
                 </Link>
-                <p className="text-sm text-slate capitalize mt-1">{product.category}</p>
-                <p className="font-display text-lg text-ink mt-2">{formatPrice(product.price)}</p>
-            </div>
-
-            <div className="flex flex-wrap gap-2 w-full sm:w-auto items-center">
-                <Button
-                    variant="turmeric"
-                    size="sm"
-                    onClick={handleAdd}
-                    className="gap-1.5 min-w-[110px] transition-all"
-                >
-                    <AnimatePresence mode="wait">
-                        {added ? (
-                            <motion.span
-                                key="added"
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="inline-flex items-center gap-1"
-                            >
-                                <Check size={14} /> Added
-                            </motion.span>
-                        ) : (
-                            <motion.span
-                                key="add"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="inline-flex items-center gap-1"
-                            >
-                                <ShoppingBag size={14} /> Add to Bag
-                            </motion.span>
-                        )}
-                    </AnimatePresence>
-                </Button>
-
-                <Button variant="outline" size="sm" onClick={() => onMoveToCart(product)}>
-                    Move to Bag
-                </Button>
-
                 <motion.button
                     whileTap={{ scale: 0.88 }}
                     onClick={handleRemove}
                     disabled={removing}
-                    className="p-2.5 rounded-full text-slate hover:text-forest hover:bg-forest/5 transition-colors"
+                    className="absolute top-2.5 right-2.5 p-2 rounded-full bg-cream/90 backdrop-blur-sm shadow-sm text-forest hover:bg-cream transition-colors"
                     aria-label="Remove from wishlist"
                 >
                     <motion.div
                         animate={removing ? { scale: [1, 1.2, 0], opacity: [1, 0.6, 0] } : { scale: 1, opacity: 1 }}
                         transition={{ duration: 0.28 }}
                     >
-                        <Heart size={18} fill="currentColor" className="text-forest" />
+                        <Heart size={15} fill="currentColor" />
                     </motion.div>
                 </motion.button>
+            </div>
+
+            <div className="flex-1 flex flex-col p-4 space-y-1">
+                <p className="type-eyebrow-sm text-forest/65 capitalize">{product.category}</p>
+                <Link to={`/product/${product.id}`}>
+                    <h3 className="font-display text-sm sm:text-base text-ink hover:text-forest transition-colors line-clamp-2 leading-snug">
+                        {product.title}
+                    </h3>
+                </Link>
+                <p className="font-display text-base text-ink pt-1">{formatPrice(product.price)}</p>
+
+                <div className="flex flex-col gap-2 pt-3 mt-auto">
+                    <Button
+                        variant="turmeric"
+                        size="sm"
+                        onClick={handleAdd}
+                        className="gap-1.5 w-full transition-all"
+                    >
+                        <AnimatePresence mode="wait">
+                            {added ? (
+                                <motion.span
+                                    key="added"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="inline-flex items-center gap-1"
+                                >
+                                    <Check size={14} /> Added
+                                </motion.span>
+                            ) : (
+                                <motion.span
+                                    key="add"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="inline-flex items-center gap-1"
+                                >
+                                    <ShoppingBag size={14} /> Add to Bag
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
+                    </Button>
+
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => onMoveToCart(product)}>
+                        Move to Bag
+                    </Button>
+                </div>
             </div>
         </motion.div>
     );
@@ -210,7 +211,7 @@ export default function WishlistPage() {
                     <p className="text-center text-slate py-12 text-sm">No items match your search.</p>
                 ) : (
                 <LayoutGroup>
-                    <motion.div layout className="space-y-4">
+                    <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
                         <AnimatePresence mode="popLayout">
                             {filteredItems.map((product) => (
                                 <WishlistItem

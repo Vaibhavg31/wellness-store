@@ -170,6 +170,9 @@ final class Router
         if ($method === 'GET' && $path === '/api/reviews/admin/all') {
             ReviewRoutes::listAdmin();
         }
+        if ($method === 'GET' && $path === '/api/reviews/eligibility') {
+            ReviewRoutes::eligibility();
+        }
         if ($method === 'POST' && $path === '/api/reviews') {
             ReviewRoutes::submit();
         }
@@ -217,6 +220,9 @@ final class Router
         }
         if ($method === 'POST' && $path === '/api/upload/video') {
             UploadRoutes::video();
+        }
+        if ($method === 'POST' && $path === '/api/upload/review-images') {
+            UploadRoutes::reviewImages();
         }
 
         // ── Media Library ─────────────────────────────────

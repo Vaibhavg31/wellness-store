@@ -11,7 +11,13 @@ export default function MainLayout() {
     <div className="min-h-screen flex flex-col">
       <PromoBanner />
       <Navbar />
-      <main className="flex-1 pt-[var(--site-header-h,7rem)]">
+      {/* A little extra breathing room before the footer on short pages —
+          the actual fix for the fixed WhatsApp bubble covering page content
+          (confirmed on the checkout sign-in gate and the Contact form) is
+          in WhatsAppButton itself: a smaller footprint plus hiding while a
+          field has focus, since this padding can't move content that's
+          already above it out from under a viewport-fixed element. */}
+      <main className="flex-1 pt-[var(--site-header-h,7rem)] pb-16">
         <PageTransition />
       </main>
       <Footer />

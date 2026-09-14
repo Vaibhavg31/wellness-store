@@ -5,6 +5,40 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { imageUrl } from '@/services/api';
 import { useBanners } from '@/hooks/useApi';
 
+/**
+ * Shown until an admin configures real promotional banners in Content
+ * Manager — a fresh install otherwise ships with an empty (invisible)
+ * slider section, which is exactly the "big banner slider" the storefront
+ * is supposed to lead with. Real API banners always take priority once any
+ * exist.
+ */
+const FALLBACK_BANNERS = [
+    {
+        id: 'fallback-1',
+        image: 'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=1600&q=80',
+        subtitle: 'New Season',
+        title: 'Fuel every workout, honestly',
+        ctaLabel: 'Shop Protein',
+        ctaHref: '/shop?category=protein',
+    },
+    {
+        id: 'fallback-2',
+        image: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=1600&q=80',
+        subtitle: 'Everyday Defence',
+        title: 'Immunity that keeps up with your day',
+        ctaLabel: 'Shop Vitamins',
+        ctaHref: '/shop?category=vitamins',
+    },
+    {
+        id: 'fallback-3',
+        image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=1600&q=80',
+        subtitle: 'Rooted in Tradition',
+        title: 'Ayurvedic herbs, lab-tested for today',
+        ctaLabel: 'Shop Herbal',
+        ctaHref: '/shop?category=herbal',
+    },
+];
+
 const AUTOPLAY_MS = 5500;
 const SWIPE_DISTANCE = 60;
 const SWIPE_VELOCITY = 400;
@@ -64,7 +98,8 @@ function SlideContent({ banner }) {
 }
 
 export default function BannerSlider() {
-    const { banners, loading } = useBanners('slider');
+    const { banners: apiBanners, loading } = useBanners('slider');
+    const banners = apiBanners.length > 0 ? apiBanners : FALLBACK_BANNERS;
     const [[index, direction], setSlide] = useState([0, 1]);
     const [paused, setPaused] = useState(false);
     const count = banners.length;
@@ -87,8 +122,6 @@ export default function BannerSlider() {
         const timer = setInterval(() => go(1), AUTOPLAY_MS);
         return () => clearInterval(timer);
     }, [count, paused, go]);
-
-    if (!loading && count === 0) return null;
 
     return (
         // Full-bleed: breaks out of the normal centered/padded page column to
