@@ -32,7 +32,7 @@ export default function Navbar() {
     const isScrolled = useScrollPosition();
     const location = useLocation();
     const headerRef = useRef(null);
-    const { itemCount: cartCount, cartPulse } = useCart();
+    const { itemCount: cartCount, cartPulse, openCartDrawer } = useCart();
     const { itemCount: wishlistCount } = useWishlist();
     const { user, isAuthenticated } = useAuth();
     const { signOut, isSigningOut } = useCustomerSession();
@@ -275,7 +275,12 @@ export default function Navbar() {
                                 )}
                             </Link>
 
-                            <Link to="/cart" className={iconBtn} aria-label={`Cart${cartCount > 0 ? `, ${cartCount} items` : ''}`}>
+                            <button
+                                type="button"
+                                onClick={openCartDrawer}
+                                className={iconBtn}
+                                aria-label={`Cart${cartCount > 0 ? `, ${cartCount} items` : ''}`}
+                            >
                                 <motion.span
                                     key={cartPulse}
                                     animate={cartPulse > 0 ? { scale: [1, 1.18, 1] } : { scale: 1 }}
@@ -298,7 +303,7 @@ export default function Navbar() {
                                         </motion.span>
                                     )}
                                 </AnimatePresence>
-                            </Link>
+                            </button>
 
                             <div className="relative hidden sm:block" ref={accountRef}>
                                 {isAuthenticated ? (

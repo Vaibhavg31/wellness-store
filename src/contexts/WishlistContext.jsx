@@ -2,7 +2,7 @@ import { createContext, useContext, useCallback, useMemo, } from 'react';
 import { useLocalStorage } from '@/hooks';
 const WishlistContext = createContext(null);
 export function WishlistProvider({ children }) {
-    const [items, setItems] = useLocalStorage('krivea-wishlist', []);
+    const [items, setItems] = useLocalStorage('wellness-wishlist', []);
     const addToWishlist = useCallback((product) => {
         setItems((prev) => {
             if (prev.some((p) => p.id === product.id))

@@ -1,8 +1,8 @@
-# Wellness Store (template)
+# Wellness Store
 
-A wellness / nutrition D2C e-commerce template (Kapiva / OZiva style) with **React (JavaScript)** frontend and **PHP** backend. Adapted from the Krivea Jewels commerce template — schema and branding are wellness-specific; see `backend/schema.sql` and `backend/seed.sql`.
+A wellness / nutrition D2C e-commerce storefront (Kapiva / OZiva style) with **React (JavaScript)** frontend and **PHP** backend — see `backend/schema.sql` and `backend/seed.sql` for the full data model.
 
-> **Status:** database schema, seed data, and config are wellness-ready. The PHP repository layer and React UI copy still reference some jewelry-specific fields/branding from the original template and will be adapted in follow-up work.
+> **Status:** schema, backend, and UI are wellness-native end to end.
 
 ## Tech Stack
 
@@ -93,7 +93,7 @@ dist/                  # Built frontend (after npm run build)
 
 ```bash
 npm install
-# Set VITE_API_URL=https://api.kriveajewels.in in config.json first
+# Set VITE_API_URL=https://api.yourdomain.com in config.json first
 # (leave it empty instead if the API is served from the same domain)
 npm run build
 ```
@@ -118,12 +118,12 @@ the repo, then edit these values for production directly on the server:
 ```
 APP_ENV=production
 JWT_SECRET=your-random-secret        # generate a NEW one, don't reuse dev's
-ADMIN_USERNAME=krivea_admin
+ADMIN_USERNAME=wellness_admin
 ADMIN_PASSWORD_HASH=<bcrypt hash>
 ADMIN_DEV_PASSWORD=                  # leave blank in production
 GOOGLE_CLIENT_ID=your-google-client-id
-FRONTEND_URL=https://kriveajewels.in
-VITE_API_URL=https://api.kriveajewels.in   # or leave empty if same-domain
+FRONTEND_URL=https://yourdomain.com
+VITE_API_URL=https://api.yourdomain.com    # or leave empty if same-domain
 DB_HOST / DB_NAME / DB_USER / DB_PASS      # your production database
 RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET      # live keys, not test keys
 SKIP_EMAIL_VERIFY=false

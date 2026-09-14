@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
-use Krivea\Routes\AuthRoutes;
-use Krivea\Routes\BannerRoutes;
-use Krivea\Routes\BundleRoutes;
-use Krivea\Routes\CategoryRoutes;
-use Krivea\Routes\CouponRoutes;
-use Krivea\Routes\FeedbackRoutes;
-use Krivea\Routes\MediaRoutes;
-use Krivea\Routes\NewsletterRoutes;
-use Krivea\Routes\OrderRoutes;
-use Krivea\Routes\ProductRoutes;
-use Krivea\Routes\ReviewRoutes;
-use Krivea\Routes\SettingsRoutes;
-use Krivea\Routes\UploadRoutes;
-use Krivea\Routes\UserRoutes;
+use Wellness\Routes\AuthRoutes;
+use Wellness\Routes\BannerRoutes;
+use Wellness\Routes\BundleRoutes;
+use Wellness\Routes\CategoryRoutes;
+use Wellness\Routes\CouponRoutes;
+use Wellness\Routes\FeedbackRoutes;
+use Wellness\Routes\MediaRoutes;
+use Wellness\Routes\NewsletterRoutes;
+use Wellness\Routes\OrderRoutes;
+use Wellness\Routes\ProductRoutes;
+use Wellness\Routes\ReviewRoutes;
+use Wellness\Routes\SettingsRoutes;
+use Wellness\Routes\UploadRoutes;
+use Wellness\Routes\UserRoutes;
 
 /**
  * Simple HTTP router — maps URLs to route handlers.

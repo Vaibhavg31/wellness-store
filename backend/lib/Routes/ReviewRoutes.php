@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
-use Krivea\Auth;
-use Krivea\Database;
-use Krivea\Repository\OrderRepository;
-use Krivea\Repository\ReviewRepository;
-use Krivea\Repository\UserRepository;
-use Krivea\Request;
-use Krivea\Response;
+use Wellness\Auth;
+use Wellness\Database;
+use Wellness\Repository\OrderRepository;
+use Wellness\Repository\ReviewRepository;
+use Wellness\Repository\UserRepository;
+use Wellness\Request;
+use Wellness\Response;
 
 final class ReviewRoutes
 {

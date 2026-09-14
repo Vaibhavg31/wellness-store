@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
-use Krivea\Repository\UserRepository;
+use Wellness\Repository\UserRepository;
 
 /**
  * Saved address book — max 3 per user, tracks last-used for checkout prefill.

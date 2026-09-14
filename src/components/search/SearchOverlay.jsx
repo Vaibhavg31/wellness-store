@@ -104,7 +104,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
             <div className="flex items-center gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-border/50 bg-cream/30">
               <div className="flex items-center flex-1 gap-3 px-4 py-3 rounded-full bg-cream border border-border/70 focus-within:border-turmeric/50 focus-within:ring-2 focus-within:ring-turmeric/10 transition-all duration-300">
                 <Search size={18} className="text-slate flex-shrink-0" strokeWidth={1.25}/>
-                <input ref={inputRef} type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search necklaces, rings, bracelets..." className="flex-1 bg-transparent text-sm sm:text-base font-light text-ink placeholder:text-slate/45 focus:outline-none min-w-0" aria-label="Search products"/>
+                <input ref={inputRef} type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search protein, vitamins, wellness essentials..." className="flex-1 bg-transparent text-sm sm:text-base font-light text-ink placeholder:text-slate/45 focus:outline-none min-w-0" aria-label="Search products"/>
                 {query && (<button onClick={() => setQuery('')} className="p-1 rounded-full hover:bg-sand/60 text-slate transition-colors" aria-label="Clear search">
                     <X size={14}/>
                   </button>)}

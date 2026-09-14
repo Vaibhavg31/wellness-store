@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
 use Google\Client as GoogleClient;
-use Krivea\Auth;
-use Krivea\Database;
-use Krivea\EmailService;
-use Krivea\Msg91Service;
-use Krivea\OtpConfig;
-use Krivea\OtpLogger;
-use Krivea\RateLimiter;
-use Krivea\Repository\UserRepository;
-use Krivea\Request;
-use Krivea\Response;
-use Krivea\ServicesConfig;
+use Wellness\Auth;
+use Wellness\Database;
+use Wellness\EmailService;
+use Wellness\Msg91Service;
+use Wellness\OtpConfig;
+use Wellness\OtpLogger;
+use Wellness\RateLimiter;
+use Wellness\Repository\UserRepository;
+use Wellness\Request;
+use Wellness\Response;
+use Wellness\ServicesConfig;
 
 final class AuthRoutes
 {

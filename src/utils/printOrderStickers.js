@@ -411,7 +411,7 @@ export function buildStickerPrintHtml(orders, { autoPrint = false } = {}) {
 </html>`;
 }
 
-const PRINT_FRAME_ID = 'krivea-shipping-label-print-frame';
+const PRINT_FRAME_ID = 'wellness-shipping-label-print-frame';
 
 function removePrintFrame() {
     const existing = document.getElementById(PRINT_FRAME_ID);

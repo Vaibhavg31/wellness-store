@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Repository;
+namespace Wellness\Repository;
 
-use Krivea\Database;
+use Wellness\Database;
 
 /**
  * Customer accounts — backed by `users` + `user_addresses` tables.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /**
  * Thin Razorpay Orders API client (no SDK dependency).

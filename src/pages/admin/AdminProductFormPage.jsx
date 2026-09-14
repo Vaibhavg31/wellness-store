@@ -552,7 +552,7 @@ export default function AdminProductFormPage() {
                                 value={form.title}
                                 onChange={(e) => update('title', e.target.value)}
                                 className={fieldClass}
-                                placeholder="e.g. Celestial Pearl Cascade Necklace"
+                                placeholder="e.g. Plant Protein Isolate"
                                 required
                             />
                         </div>

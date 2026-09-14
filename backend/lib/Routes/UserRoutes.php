@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
-use Krivea\AddressBookHelper;
-use Krivea\AddressHelper;
-use Krivea\Auth;
-use Krivea\ExportHelper;
-use Krivea\OrderRevenue;
-use Krivea\Repository\OrderRepository;
-use Krivea\Repository\UserRepository;
-use Krivea\Request;
-use Krivea\Response;
+use Wellness\AddressBookHelper;
+use Wellness\AddressHelper;
+use Wellness\Auth;
+use Wellness\ExportHelper;
+use Wellness\OrderRevenue;
+use Wellness\Repository\OrderRepository;
+use Wellness\Repository\UserRepository;
+use Wellness\Request;
+use Wellness\Response;
 
 final class UserRoutes
 {

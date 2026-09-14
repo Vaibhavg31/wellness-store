@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /**
  * JSON response helpers — keeps every endpoint consistent.

@@ -2,15 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
-use Krivea\Repository\CouponRepository;
-use Krivea\Repository\OrderRepository;
-use Krivea\Repository\SettingsRepository;
+use Wellness\Repository\CouponRepository;
+use Wellness\Repository\OrderRepository;
+use Wellness\Repository\SettingsRepository;
 
 final class CouponService
 {
     public const TYPES = ['percent', 'flat', 'free_delivery'];
+
+    /**
+     * 'everyone' — no restriction (default, matches every coupon created
+     *   before this feature existed).
+     * 'new_customers' — only a signed-in customer with zero non-cancelled
+     *   past orders; a guest (no account yet) is given the benefit of the
+     *   doubt, same as every other per-user rule in eligibilityError().
+     * 'returning_customers' — the repeat-customer discount this feature was
+     *   built for: only a signed-in customer with at least minPreviousOrders
+     *   non-cancelled past orders. A guest is never eligible here, since
+     *   there's no order history to check without an account.
+     */
+    public const AUDIENCES = ['everyone', 'new_customers', 'returning_customers'];
 
     private CouponRepository $coupons;
     private OrderRepository $orders;
@@ -244,6 +257,51 @@ final class CouponService
                     return 'You have already used this coupon';
                 }
             }
+        }
+
+        $audienceError = $this->audienceError($coupon, $userId);
+        if ($audienceError !== null) {
+            return $audienceError;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $coupon
+     */
+    private function audienceError(array $coupon, ?string $userId): ?string
+    {
+        $audience = (string) ($coupon['audience'] ?? 'everyone');
+        if ($audience === 'everyone') {
+            return null;
+        }
+
+        $signedIn = $userId !== null && $userId !== '';
+
+        if ($audience === 'new_customers') {
+            // No account yet -> can't have a prior order -> eligible. Only a
+            // signed-in customer who already has one is turned away.
+            if ($signedIn && $this->orders->countNonCancelledOrders($userId) > 0) {
+                return 'This offer is for new customers only';
+            }
+            return null;
+        }
+
+        if ($audience === 'returning_customers') {
+            // The inverse: no account (or no order history) means there's
+            // nothing to verify a "repeat" status against, so it's a no —
+            // never silently granted the way maxUsesPerUser is for guests.
+            if (!$signedIn) {
+                return 'Sign in to use this offer — it\'s for returning customers';
+            }
+            $minOrders = max(1, (int) ($coupon['minPreviousOrders'] ?? 1));
+            if ($this->orders->countNonCancelledOrders($userId) < $minOrders) {
+                return $minOrders > 1
+                    ? "This offer unlocks after {$minOrders} orders with us"
+                    : 'This offer is for returning customers only';
+            }
+            return null;
         }
 
         return null;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /**
  * Resize and compress uploaded images for web delivery.

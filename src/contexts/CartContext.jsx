@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 
 const CartContext = createContext(null);
-const AUTO_SKIP_KEY = 'krivea-auto-coupon-skipped';
+const AUTO_SKIP_KEY = 'wellness-auto-coupon-skipped';
 
 function maxQtyFor(product, requested) {
     const stock = typeof product?.stock === 'number' ? product.stock : Infinity;
@@ -62,11 +62,12 @@ function bundleItemUnitPrice(bundle, productId) {
 }
 
 export function CartProvider({ children }) {
-    const [items, setItems] = useLocalStorage('krivea-cart', []);
-    const [couponCode, setCouponCode] = useLocalStorage('krivea-coupon', '');
+    const [items, setItems] = useLocalStorage('wellness-cart', []);
+    const [couponCode, setCouponCode] = useLocalStorage('wellness-coupon', '');
     const [couponState, setCouponState] = useState(null);
     const [couponLoading, setCouponLoading] = useState(false);
     const [cartPulse, setCartPulse] = useState(0);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [autoApplied, setAutoApplied] = useState(false);
     const manualCouponRef = useRef(false);
     const autoApplySkipRef = useRef(sessionStorage.getItem(AUTO_SKIP_KEY) === '1');
@@ -78,6 +79,9 @@ export function CartProvider({ children }) {
     const { token } = useAuth();
     const deliveryFeeAmount = content.delivery?.fee ?? DELIVERY_FEE;
     const freeThreshold = content.delivery?.freeThreshold ?? FREE_DELIVERY_THRESHOLD;
+
+    const openCartDrawer = useCallback(() => setIsDrawerOpen(true), []);
+    const closeCartDrawer = useCallback(() => setIsDrawerOpen(false), []);
 
     const clearAutoSkip = useCallback(() => {
         autoApplySkipRef.current = false;
@@ -372,6 +376,9 @@ export function CartProvider({ children }) {
         syncPrices,
         itemCount,
         cartPulse,
+        isDrawerOpen,
+        openCartDrawer,
+        closeCartDrawer,
         subtotal,
         deliveryFee,
         baseDeliveryFee,
@@ -401,6 +408,9 @@ export function CartProvider({ children }) {
         syncPrices,
         itemCount,
         cartPulse,
+        isDrawerOpen,
+        openCartDrawer,
+        closeCartDrawer,
         subtotal,
         deliveryFee,
         baseDeliveryFee,

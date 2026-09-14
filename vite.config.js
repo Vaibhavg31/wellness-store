@@ -49,8 +49,8 @@ export default defineConfig({
     // local IP (see README "Testing on your phone").
     host: true,
     // Fixed port so this project never collides with, or silently swaps
-    // places with, the other storefronts in the workspace (KriveaJewels,
-    // VG Clothing, modern-interiors) — each has its own dedicated port.
+    // places with, another storefront running locally in the same
+    // workspace — each project has its own dedicated port.
     // strictPort makes Vite fail fast instead of silently binding the next
     // free port, which is what let a stale/orphaned dev server from another
     // project quietly answer requests meant for this one.

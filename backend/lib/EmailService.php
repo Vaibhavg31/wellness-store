@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
-use Krivea\Repository\SettingsRepository;
+use Wellness\Repository\SettingsRepository;
 
 /**
  * All transactional email via Brevo REST API (auth, orders, password reset).

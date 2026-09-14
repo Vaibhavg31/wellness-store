@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /**
  * Environment profile — production-like behaviour while running locally (npm run dev).

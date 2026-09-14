@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Repository;
+namespace Wellness\Repository;
 
 /**
  * Generic CRUD contract for all data repositories.

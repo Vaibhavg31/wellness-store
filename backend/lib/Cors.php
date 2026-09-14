@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /**
  * CORS handling — mirrors the Express allowedOrigins list.

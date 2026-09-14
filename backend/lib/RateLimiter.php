@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /**
  * MySQL-backed rate limiter — replaces JSON flat-file storage.

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
-use Krivea\Auth;
-use Krivea\CouponService;
-use Krivea\Database;
-use Krivea\Repository\CouponRepository;
-use Krivea\Request;
-use Krivea\Response;
+use Wellness\Auth;
+use Wellness\CouponService;
+use Wellness\Database;
+use Wellness\Repository\CouponRepository;
+use Wellness\Request;
+use Wellness\Response;
 
 final class CouponRoutes
 {
@@ -125,6 +125,11 @@ final class CouponRoutes
                 Response::error('Invalid coupon type', 400);
             }
 
+            $audience = (string) ($body['audience'] ?? 'everyone');
+            if (!in_array($audience, CouponService::AUDIENCES, true)) {
+                Response::error('Invalid coupon audience', 400);
+            }
+
             if (self::repo()->codeExists($code)) {
                 Response::error('A coupon with this code already exists', 409);
             }
@@ -145,6 +150,8 @@ final class CouponRoutes
                 'isEnabled'       => (bool) ($body['isEnabled'] ?? true),
                 'showOnWebsite'   => (bool) ($body['showOnWebsite'] ?? true),
                 'autoApply'       => (bool) ($body['autoApply'] ?? false),
+                'audience'        => $audience,
+                'minPreviousOrders' => max(1, (int) ($body['minPreviousOrders'] ?? 1)),
                 'startsAt'        => trim((string) ($body['startsAt'] ?? '')),
                 'expiresAt'       => trim((string) ($body['expiresAt'] ?? '')),
                 'createdAt'       => $now,
@@ -170,7 +177,8 @@ final class CouponRoutes
             $allowed = [
                 'code', 'title', 'description', 'type', 'value',
                 'minOrderAmount', 'maxDiscount', 'maxUses', 'maxUsesPerUser',
-                'isEnabled', 'showOnWebsite', 'autoApply', 'startsAt', 'expiresAt',
+                'isEnabled', 'showOnWebsite', 'autoApply', 'audience', 'minPreviousOrders',
+                'startsAt', 'expiresAt',
             ];
             $changes = array_intersect_key($body, array_flip($allowed));
 
@@ -187,6 +195,13 @@ final class CouponRoutes
 
             if (isset($changes['type']) && !in_array($changes['type'], CouponService::TYPES, true)) {
                 Response::error('Invalid coupon type', 400);
+            }
+
+            if (isset($changes['audience']) && !in_array($changes['audience'], CouponService::AUDIENCES, true)) {
+                Response::error('Invalid coupon audience', 400);
+            }
+            if (isset($changes['minPreviousOrders'])) {
+                $changes['minPreviousOrders'] = max(1, (int) $changes['minPreviousOrders']);
             }
 
             $changes['updatedAt'] = gmdate('c');

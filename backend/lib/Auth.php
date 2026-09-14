@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -14,7 +14,7 @@ final class Auth
 {
     private static function secret(): string
     {
-        return $_ENV['JWT_SECRET'] ?? 'krivea-dev-secret-change-in-production';
+        return $_ENV['JWT_SECRET'] ?? 'wellness-dev-secret-change-in-production';
     }
 
     /** @param array{role: string, userId?: string, email?: string} $payload */
@@ -108,7 +108,7 @@ final class Auth
 
     public static function rejectIfBlocked(string $userId): void
     {
-        if ((new \Krivea\Repository\UserRepository())->isBlocked($userId)) {
+        if ((new \Wellness\Repository\UserRepository())->isBlocked($userId)) {
             Response::error('Your account has been blocked. Please contact support.', 403);
         }
     }

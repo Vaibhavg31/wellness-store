@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /**
  * MSG91 OTP — server-side send/verify (no widget captcha) + widget token validation.

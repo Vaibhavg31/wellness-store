@@ -232,8 +232,8 @@ export default function AdminCategoriesPage() {
                 admin
             >
                 <div className="space-y-4">
-                    <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="necklace" />
-                    <Input label="Label" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Necklaces" />
+                    <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="protein" />
+                    <Input label="Label" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Protein & Fitness" />
                     <div>
                         <label className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">Category Image</label>
                         {form.image ? (

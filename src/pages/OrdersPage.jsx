@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, Package, Sparkles } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Package, RotateCcw, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
@@ -9,6 +9,10 @@ import { loginUrl } from '@/utils/authRedirect';
 import Button from '@/components/ui/Button';
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import OrderJourney from '@/components/orders/OrderJourney';
+import { useCart } from '@/contexts/CartContext';
+import { useProducts } from '@/hooks/useApi';
+import { useToast } from '@/contexts/ToastContext';
+import { reorderItems, reorderSummaryMessage } from '@/utils/reorder';
 import {
     formatOrderDate,
     isTerminalStatus,
@@ -22,6 +26,20 @@ function OrderCard({ order, index }) {
     const firstItem = order.items?.[0];
     const itemCount = order.items?.length || 0;
     const active = !isTerminalStatus(order.status);
+    const { addToCart } = useCart();
+    const { products } = useProducts();
+    const { showToast } = useToast();
+    const [reordering, setReordering] = useState(false);
+
+    const handleBuyAgain = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (reordering) return;
+        setReordering(true);
+        const result = reorderItems(order, products, addToCart);
+        showToast(reorderSummaryMessage(result), result.addedCount > 0 ? 'success' : 'error');
+        setReordering(false);
+    };
 
     return (
         <motion.div
@@ -77,18 +95,28 @@ function OrderCard({ order, index }) {
                         </div>
                     )}
 
-                    <div className="flex items-center justify-between pt-3 border-t border-border/30">
+                    <div className="flex items-center justify-between gap-3 pt-3 border-t border-border/30">
                         <p className="text-xs text-slate">{paymentLabel(order)}</p>
-                        <span className="inline-flex items-center gap-1 text-sm text-forest font-medium group-hover:gap-2 transition-all">
-                            Track order <ChevronRight size={16} />
-                        </span>
+                        <div className="flex items-center gap-4 flex-shrink-0">
+                            <button
+                                type="button"
+                                onClick={handleBuyAgain}
+                                disabled={reordering}
+                                className="inline-flex items-center gap-1.5 text-sm text-turmeric-ink font-medium hover:text-turmeric-light transition-colors disabled:opacity-50"
+                            >
+                                <RotateCcw size={14} /> Buy Again
+                            </button>
+                            <span className="inline-flex items-center gap-1 text-sm text-forest font-medium group-hover:gap-2 transition-all">
+                                Track order <ChevronRight size={16} />
+                            </span>
+                        </div>
                     </div>
                 </div>
 
                 {status === 'delivered' && (
                     <div className="px-5 py-2.5 bg-gradient-to-r from-turmeric/10 to-forest/5 border-t border-turmeric/20 text-xs text-turmeric-ink flex items-center gap-2">
                         <Sparkles size={12} />
-                        Delivered. We hope you love your pieces
+                        Delivered. We hope it's working wonders for you
                     </div>
                 )}
             </Link>
@@ -150,7 +178,7 @@ export default function OrdersPage() {
                     <p className="text-slate">
                         {activeCount > 0
                             ? `${activeCount} order${activeCount === 1 ? '' : 's'} on the way. Follow each journey below`
-                            : 'Every piece has a story. Here are yours'}
+                            : 'Every order, all in one place'}
                     </p>
                 </div>
 

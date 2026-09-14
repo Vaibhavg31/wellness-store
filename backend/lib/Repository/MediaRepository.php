@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Repository;
+namespace Wellness\Repository;
 
-use Krivea\Database;
+use Wellness\Database;
 
 /**
  * Catalog of files uploaded through the admin panel (media_library table).

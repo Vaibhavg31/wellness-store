@@ -10,7 +10,7 @@ export default function PromoBanner() {
     const ref = useRef(null);
     const [dismissed, setDismissed] = useState(() => {
         try {
-            return sessionStorage.getItem('krivea-promo-dismissed') === '1';
+            return sessionStorage.getItem('wellness-promo-dismissed') === '1';
         } catch {
             return false;
         }
@@ -71,7 +71,7 @@ export default function PromoBanner() {
     const dismiss = () => {
         setDismissed(true);
         try {
-            sessionStorage.setItem('krivea-promo-dismissed', '1');
+            sessionStorage.setItem('wellness-promo-dismissed', '1');
         } catch { /* ignore */ }
     };
 

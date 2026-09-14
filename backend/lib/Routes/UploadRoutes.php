@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
-use Krivea\Auth;
-use Krivea\Database;
-use Krivea\ImageProcessor;
-use Krivea\Repository\MediaRepository;
-use Krivea\Response;
+use Wellness\Auth;
+use Wellness\Database;
+use Wellness\ImageProcessor;
+use Wellness\Repository\MediaRepository;
+use Wellness\Response;
 
 final class UploadRoutes
 {

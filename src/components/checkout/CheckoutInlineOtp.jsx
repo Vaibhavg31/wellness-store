@@ -16,7 +16,7 @@ function formatDisplayPhone(phone) {
 }
 
 function sentKey(phoneDigits) {
-    return `krivea-otp-sent-${phoneDigits}`;
+    return `wellness-otp-sent-${phoneDigits}`;
 }
 
 /**
@@ -165,7 +165,7 @@ export default function CheckoutInlineOtp({
 
             try {
                 sessionStorage.removeItem(otpSentStorageKey);
-                sessionStorage.removeItem('krivea-checkout-otp-flow');
+                sessionStorage.removeItem('wellness-checkout-otp-flow');
             } catch {
                 /* ignore */
             }

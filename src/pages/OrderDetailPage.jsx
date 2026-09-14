@@ -8,6 +8,7 @@ import {
     MessageCircle,
     Package,
     Phone,
+    RotateCcw,
     Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +21,9 @@ import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import OrderJourney from '@/components/orders/OrderJourney';
 import OrderLineItems from '@/components/orders/OrderLineItems';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
+import { useCart } from '@/contexts/CartContext';
+import { useProducts } from '@/hooks/useApi';
+import { reorderItems, reorderSummaryMessage } from '@/utils/reorder';
 import {
     formatOrderDate,
     normalizeStatus,
@@ -33,9 +37,12 @@ export default function OrderDetailPage() {
     const { token, isAuthenticated } = useAuth();
     const { showToast } = useToast();
     const { getWhatsAppUrl } = useWhatsApp();
+    const { addToCart } = useCart();
+    const { products } = useProducts();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [reordering, setReordering] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated || !token || !id) {
@@ -53,6 +60,14 @@ export default function OrderDetailPage() {
         navigator.clipboard.writeText(order.id).then(() => {
             showToast('Order ID copied');
         });
+    };
+
+    const handleBuyAgain = () => {
+        if (reordering || !order) return;
+        setReordering(true);
+        const result = reorderItems(order, products, addToCart);
+        showToast(reorderSummaryMessage(result), result.addedCount > 0 ? 'success' : 'error');
+        setReordering(false);
     };
 
     if (!isAuthenticated) {
@@ -132,7 +147,17 @@ export default function OrderDetailPage() {
 
                 <div className="grid gap-4 mb-8">
                     <section className="bg-cream rounded-2xl border border-border/40 p-5 sm:p-6">
-                        <p className="text-xs tracking-[0.2em] uppercase text-slate mb-4">Items</p>
+                        <div className="flex items-center justify-between gap-3 mb-4">
+                            <p className="text-xs tracking-[0.2em] uppercase text-slate">Items</p>
+                            <button
+                                type="button"
+                                onClick={handleBuyAgain}
+                                disabled={reordering}
+                                className="inline-flex items-center gap-1.5 text-sm text-turmeric-ink font-medium hover:text-turmeric-light transition-colors disabled:opacity-50"
+                            >
+                                <RotateCcw size={14} /> Buy Again
+                            </button>
+                        </div>
                         <OrderLineItems items={order.items} />
                         <div className="mt-4 pt-4 border-t border-border/30 space-y-2 text-sm">
                             <div className="flex justify-between text-slate">

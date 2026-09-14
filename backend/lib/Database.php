@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /**
  * MySQL PDO connection holder — replaces the JSON flat-file Database.

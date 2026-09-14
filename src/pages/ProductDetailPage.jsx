@@ -12,6 +12,8 @@ import { useToast, showCartToast } from '@/contexts/ToastContext';
 import { useBundles, useProduct, useProducts, useReviews, useBanners } from '@/hooks/useApi';
 import ProductCard from '@/components/product/ProductCard';
 import BundleCard from '@/components/product/BundleCard';
+import RecentlyViewed from '@/components/product/RecentlyViewed';
+import { recordProductView } from '@/hooks/useRecentlyViewed';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import SectionTitle from '@/components/ui/SectionTitle';
@@ -139,6 +141,13 @@ export default function ProductDetailPage() {
         setQuantity(1);
         setSelectedImage(0);
     }, [selectedVariantId]);
+
+    // Recorded once per product (not per variant change) — "recently viewed"
+    // tracks that the shopper looked at this product, not every click while
+    // comparing pack sizes on the same page.
+    useEffect(() => {
+        if (product?.id) recordProductView(product.id);
+    }, [product?.id]);
 
     useEffect(() => {
         const el = buyBoxRef.current;
@@ -756,6 +765,8 @@ export default function ProductDetailPage() {
                         </div>
                     </section>
                 )}
+
+                <RecentlyViewed excludeId={product.id} className="mt-16 sm:mt-20" />
             </div>
 
             {/* Sticky mobile buy bar */}

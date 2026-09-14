@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
-use Krivea\AddressBookHelper;
-use Krivea\Auth;
-use Krivea\EmailService;
-use Krivea\CouponService;
-use Krivea\Database;
-use Krivea\ExportHelper;
-use Krivea\OrderRevenue;
-use Krivea\OtpConfig;
-use Krivea\RazorpayService;
-use Krivea\Repository\BundleRepository;
-use Krivea\Repository\CouponRepository;
-use Krivea\Repository\OrderRepository;
-use Krivea\Repository\ProductRepository;
-use Krivea\Repository\SettingsRepository;
-use Krivea\Repository\UserRepository;
-use Krivea\Request;
-use Krivea\Response;
-use Krivea\Routes\AuthRoutes;
-use Krivea\ServicesConfig;
+use Wellness\AddressBookHelper;
+use Wellness\Auth;
+use Wellness\EmailService;
+use Wellness\CouponService;
+use Wellness\Database;
+use Wellness\ExportHelper;
+use Wellness\OrderRevenue;
+use Wellness\OtpConfig;
+use Wellness\RazorpayService;
+use Wellness\Repository\BundleRepository;
+use Wellness\Repository\CouponRepository;
+use Wellness\Repository\OrderRepository;
+use Wellness\Repository\ProductRepository;
+use Wellness\Repository\SettingsRepository;
+use Wellness\Repository\UserRepository;
+use Wellness\Request;
+use Wellness\Response;
+use Wellness\Routes\AuthRoutes;
+use Wellness\ServicesConfig;
 
 final class OrderRoutes
 {
@@ -1000,12 +1000,6 @@ final class OrderRoutes
             }
 
             $product = $productRepo->getPublicById($productId);
-            if (!$product && str_starts_with($productId, 'rims-')) {
-                $product = $productRepo->getPublicById('krivea-' . substr($productId, 5));
-                if ($product) {
-                    $productId = $product['id'];
-                }
-            }
 
             if (!$product) {
                 throw new \InvalidArgumentException("Product unavailable: {$productId}");
@@ -1133,12 +1127,6 @@ final class OrderRoutes
 
             if (!$isCustom && $productId !== '') {
                 $product = $productRepo->getById($productId);
-                if (!$product && str_starts_with($productId, 'rims-')) {
-                    $product = $productRepo->getById('krivea-' . substr($productId, 5));
-                    if ($product) {
-                        $productId = $product['id'];
-                    }
-                }
                 if ($image === '' && $product && is_array($product['images'] ?? null) && isset($product['images'][0])) {
                     $image = (string) $product['images'][0];
                 }

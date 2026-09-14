@@ -1,8 +1,8 @@
 -- ============================================================================
 -- WELLNESS STORE — DATABASE SCHEMA
 -- ============================================================================
--- Adapted from the Krivea Jewels commerce schema, redesigned for a
--- wellness / supplements / nutrition D2C brand (Kapiva / OZiva style).
+-- A schema built for a wellness / supplements / nutrition D2C brand
+-- (Kapiva / OZiva style).
 --
 -- Import: mysql -u root wellness_store < backend/schema.sql
 -- (or paste into phpMyAdmin on an empty `wellness_store` database)
@@ -259,6 +259,8 @@ CREATE TABLE `coupons` (
   `is_enabled` tinyint(1) NOT NULL DEFAULT 1,
   `show_on_website` tinyint(1) NOT NULL DEFAULT 1,
   `auto_apply` tinyint(1) NOT NULL DEFAULT 0,
+  `audience` enum('everyone','new_customers','returning_customers') NOT NULL DEFAULT 'everyone' COMMENT 'Who this coupon is open to -- checked against the signed-in customer''s past order history',
+  `min_previous_orders` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'Only meaningful when audience = returning_customers -- how many non-cancelled past orders the customer must already have',
   `starts_at` datetime(6) DEFAULT NULL,
   `expires_at` datetime(6) DEFAULT NULL,
   `created_at` datetime(6) NOT NULL,

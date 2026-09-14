@@ -10,13 +10,22 @@ function migrateKey(oldKey, newKey) {
     localStorage.removeItem(oldKey);
 }
 
+// Two rebrands' worth of history: this template started as "rims", was
+// adapted into "Krivea Jewels", and is now this wellness store — each
+// storage key below has carried an open DevTools tab straight back to
+// whichever brand it was named for, so the migration chain runs one more
+// hop rather than just renaming the constants and stranding anyone with an
+// existing session under the old key.
 migrateKey('rims-auth-token', 'krivea-auth-token');
 migrateKey('rims-auth-user',  'krivea-auth-user');
 migrateKey('rims-admin-token','krivea-admin-token');
+migrateKey('krivea-auth-token', 'wellness-auth-token');
+migrateKey('krivea-auth-user',  'wellness-auth-user');
+migrateKey('krivea-admin-token','wellness-admin-token');
 
-const TOKEN_KEY       = 'krivea-auth-token';
-const USER_KEY        = 'krivea-auth-user';
-const ADMIN_TOKEN_KEY = 'krivea-admin-token';
+const TOKEN_KEY       = 'wellness-auth-token';
+const USER_KEY        = 'wellness-auth-user';
+const ADMIN_TOKEN_KEY = 'wellness-admin-token';
 
 export const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || '/wellness-studio';
 

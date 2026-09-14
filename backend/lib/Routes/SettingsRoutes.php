@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
-use Krivea\Auth;
-use Krivea\Repository\SettingsRepository;
-use Krivea\Request;
-use Krivea\Response;
+use Wellness\Auth;
+use Wellness\Repository\SettingsRepository;
+use Wellness\Request;
+use Wellness\Response;
 
 final class SettingsRoutes
 {

@@ -38,11 +38,11 @@ if (!ob_start('ob_gzhandler')) {
 
 require $base . '/vendor/autoload.php';
 
-use Krivea\ConfigLoader;
-use Krivea\Cors;
-use Krivea\Database;
-use Krivea\RateLimiter;
-use Krivea\Router;
+use Wellness\ConfigLoader;
+use Wellness\Cors;
+use Wellness\Database;
+use Wellness\RateLimiter;
+use Wellness\Router;
 
 // Single app-wide config file — normally at the repo root (config.json
 // itself explains why), but if you deploy backend/ as a standalone unit

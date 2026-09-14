@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
-use Krivea\Auth;
-use Krivea\Repository\BannerRepository;
-use Krivea\Request;
-use Krivea\Response;
+use Wellness\Auth;
+use Wellness\Repository\BannerRepository;
+use Wellness\Request;
+use Wellness\Response;
 
 final class BannerRoutes
 {

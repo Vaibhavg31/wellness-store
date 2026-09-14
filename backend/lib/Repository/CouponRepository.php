@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Repository;
+namespace Wellness\Repository;
 
 final class CouponRepository extends MysqlRepository
 {
@@ -25,6 +25,8 @@ final class CouponRepository extends MysqlRepository
             'isEnabled'        => $this->bool($row['is_enabled']),
             'showOnWebsite'    => $this->bool($row['show_on_website']),
             'autoApply'        => $this->bool($row['auto_apply']),
+            'audience'         => $row['audience'] ?? 'everyone',
+            'minPreviousOrders' => (int) ($row['min_previous_orders'] ?? 1),
             'startsAt'         => $this->toIso($row['starts_at']),
             'expiresAt'        => $this->toIso($row['expires_at']),
             'createdAt'        => $this->toIso($row['created_at']),
@@ -48,6 +50,8 @@ final class CouponRepository extends MysqlRepository
             'isEnabled'      => ['col' => 'is_enabled',        'type' => 'bool'],
             'showOnWebsite'  => ['col' => 'show_on_website',   'type' => 'bool'],
             'autoApply'      => ['col' => 'auto_apply',        'type' => 'bool'],
+            'audience'         => ['col' => 'audience',            'type' => 'string'],
+            'minPreviousOrders' => ['col' => 'min_previous_orders', 'type' => 'int'],
             'startsAt'       => ['col' => 'starts_at',         'type' => 'datetime'],
             'expiresAt'      => ['col' => 'expires_at',        'type' => 'datetime'],
             'createdAt'      => ['col' => 'created_at',        'type' => 'datetime'],

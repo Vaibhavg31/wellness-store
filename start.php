@@ -38,11 +38,11 @@ if (!ob_start('ob_gzhandler')) {
 
 require $base . '/vendor/autoload.php';
 
-use Krivea\ConfigLoader;
-use Krivea\Cors;
-use Krivea\Database;
-use Krivea\RateLimiter;
-use Krivea\Router;
+use Wellness\ConfigLoader;
+use Wellness\Cors;
+use Wellness\Database;
+use Wellness\RateLimiter;
+use Wellness\Router;
 
 // Single app-wide config file at the repo root (see config.json itself for
 // the full explanation) — used by both this PHP backend and vite.config.js.

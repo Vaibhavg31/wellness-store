@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Repository;
+namespace Wellness\Repository;
 
 final class FeedbackRepository extends MysqlRepository
 {

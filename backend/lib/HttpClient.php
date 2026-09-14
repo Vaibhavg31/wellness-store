@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
 /** Minimal HTTP client — uses cURL when available, otherwise streams. */
 final class HttpClient

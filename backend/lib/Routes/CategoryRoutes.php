@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Routes;
+namespace Wellness\Routes;
 
-use Krivea\Auth;
-use Krivea\Database;
-use Krivea\Repository\CategoryRepository;
-use Krivea\Request;
-use Krivea\Response;
+use Wellness\Auth;
+use Wellness\Database;
+use Wellness\Repository\CategoryRepository;
+use Wellness\Request;
+use Wellness\Response;
 
 final class CategoryRoutes
 {

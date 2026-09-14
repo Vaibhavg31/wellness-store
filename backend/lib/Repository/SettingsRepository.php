@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Repository;
+namespace Wellness\Repository;
 
-use Krivea\Database;
+use Wellness\Database;
 
 /**
  * Site settings & CMS content — backed by site_settings + 10 child tables.

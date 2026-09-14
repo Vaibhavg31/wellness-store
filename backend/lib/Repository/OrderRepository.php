@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Krivea\Repository;
+namespace Wellness\Repository;
 
-use Krivea\Database;
+use Wellness\Database;
 
 /**
  * Orders — backed by `orders` + child tables:
@@ -432,6 +432,24 @@ final class OrderRepository extends MysqlRepository
         );
         $stmt->execute([$userId, $productId, 'cancelled']);
         return (bool) $stmt->fetchColumn();
+    }
+
+    /**
+     * Cheap COUNT-only query for "is this a repeat customer, and how many
+     * times over" — used by coupon audience targeting (see CouponService),
+     * which runs on every cart-total change, not just once per account-page
+     * load like computeStatsForUser() below. Deliberately not built on top
+     * of that method: it hydrates every past order's full items/shipping
+     * just to count them, which is wasted work on this much hotter path.
+     */
+    public function countNonCancelledOrders(string $userId): int
+    {
+        if ($userId === '') {
+            return 0;
+        }
+        $stmt = $this->pdo()->prepare('SELECT COUNT(*) FROM orders WHERE user_id = ? AND status != ?');
+        $stmt->execute([$userId, 'cancelled']);
+        return (int) $stmt->fetchColumn();
     }
 
     public function getForUser(string $userId, string $email): array

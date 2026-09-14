@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import {
     Plus, Pencil, Trash2, Tag, ToggleLeft, ToggleRight,
-    Percent, IndianRupee, Truck,
+    Percent, IndianRupee, Truck, Users, UserPlus, Repeat,
 } from 'lucide-react';
 import { api } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
@@ -35,9 +35,17 @@ const EMPTY_FORM = {
     isEnabled: true,
     showOnWebsite: true,
     autoApply: false,
+    audience: 'everyone',
+    minPreviousOrders: 1,
     startsAt: '',
     expiresAt: '',
 };
+
+const AUDIENCE_OPTIONS = [
+    { value: 'everyone', label: 'Everyone', icon: Users },
+    { value: 'new_customers', label: 'New customers', icon: UserPlus },
+    { value: 'returning_customers', label: 'Returning customers', icon: Repeat },
+];
 
 function typeLabel(type) {
     if (type === 'free_delivery') return 'Free Delivery';
@@ -124,6 +132,8 @@ export default function AdminCouponsPage() {
             isEnabled: coupon.isEnabled !== false,
             showOnWebsite: coupon.showOnWebsite !== false,
             autoApply: coupon.autoApply === true,
+            audience: coupon.audience || 'everyone',
+            minPreviousOrders: coupon.minPreviousOrders || 1,
             startsAt: coupon.startsAt ? coupon.startsAt.slice(0, 16) : '',
             expiresAt: coupon.expiresAt ? coupon.expiresAt.slice(0, 16) : '',
         });
@@ -142,6 +152,7 @@ export default function AdminCouponsPage() {
                 maxDiscount: Number(form.maxDiscount),
                 maxUses: Number(form.maxUses),
                 maxUsesPerUser: Number(form.maxUsesPerUser),
+                minPreviousOrders: Math.max(1, Number(form.minPreviousOrders) || 1),
                 startsAt: form.startsAt ? new Date(form.startsAt).toISOString() : '',
                 expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : '',
             };
@@ -254,6 +265,15 @@ export default function AdminCouponsPage() {
                                                             )}
                                                             {coupon.autoApply && coupon.isEnabled && (
                                                                 <Badge variant="new">Auto apply</Badge>
+                                                            )}
+                                                            {coupon.audience && coupon.audience !== 'everyone' && (
+                                                                <Badge variant="default">
+                                                                    {coupon.audience === 'returning_customers'
+                                                                        ? (coupon.minPreviousOrders > 1
+                                                                            ? `${coupon.minPreviousOrders}+ orders`
+                                                                            : 'Returning customers')
+                                                                        : 'New customers'}
+                                                                </Badge>
                                                             )}
                                                         </div>
                                                     </div>
@@ -392,6 +412,47 @@ export default function AdminCouponsPage() {
                     <div className="grid sm:grid-cols-2 gap-4">
                         <Input label="Total Uses Limit" type="number" value={form.maxUses} onChange={(e) => setForm({ ...form, maxUses: Number(e.target.value) })} placeholder="0 = unlimited" />
                         <Input label="Uses Per Customer" type="number" value={form.maxUsesPerUser} onChange={(e) => setForm({ ...form, maxUsesPerUser: Number(e.target.value) })} placeholder="0 = unlimited" />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">Who can use this</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {AUDIENCE_OPTIONS.map(({ value, label, icon: AIcon }) => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => setForm({ ...form, audience: value })}
+                                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs text-center transition-colors ${form.audience === value ? 'border-emerald bg-emerald/10 text-emerald' : 'border-border hover:border-emerald/40'}`}
+                                >
+                                    <AIcon size={16} />
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                        {form.audience === 'returning_customers' && (
+                            <div className="mt-3">
+                                <Input
+                                    label="Minimum past orders required"
+                                    type="number"
+                                    min="1"
+                                    value={form.minPreviousOrders}
+                                    onChange={(e) => setForm({ ...form, minPreviousOrders: Number(e.target.value) })}
+                                />
+                                <p className="text-xs text-admin-muted mt-1.5">
+                                    1 = anyone who has ordered before. Raise it to reward customers further into their journey with you — e.g. 3 targets their 4th order onward.
+                                </p>
+                            </div>
+                        )}
+                        {form.audience === 'new_customers' && (
+                            <p className="text-xs text-admin-muted mt-2">
+                                Only offered to a signed-in customer with no past orders yet. A shopper who hasn&apos;t made an account at all is still shown this offer — there&apos;s no history to check them against.
+                            </p>
+                        )}
+                        {form.audience === 'returning_customers' && form.autoApply && (
+                            <p className="text-xs text-turmeric-ink mt-2 bg-turmeric/10 border border-turmeric/20 rounded-lg px-3 py-2">
+                                With auto-apply on, this appears by itself in the cart the moment a qualifying repeat customer signs in — no code to remember or share.
+                            </p>
+                        )}
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Krivea;
+namespace Wellness;
 
-use Krivea\Repository\SettingsRepository;
+use Wellness\Repository\SettingsRepository;
 
 /**
  * Store-wide service toggles from settings.json (admin Settings page).
