@@ -1,48 +1,84 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chikit | Coming Soon</title>
+  <meta name="description" content="Chikit — the future of Ayurvedic wellness. Preparing for launch." />
+  <meta name="theme-color" content="#0c2318" />
 
-    <!-- Primary meta -->
-    <meta name="description" content="Krivea Jewels. Wear the Sparkle. Premium anti-tarnish luxury jewellery. Necklaces, rings, bracelets &amp; earrings crafted to shine." />
-    <meta name="theme-color" content="#5A0009" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Chikit | Coming Soon" />
+  <meta property="og:description" content="The future of Ayurvedic wellness is almost here. Stay tuned." />
+  <meta property="og:site_name" content="Chikit" />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Krivea Jewels. Wear the Sparkle." />
-    <meta property="og:description" content="Premium anti-tarnish luxury jewellery crafted for the modern woman. Shop necklaces, rings, bracelets and earrings." />
-    <meta property="og:image" content="/og-image.png" />
-    <meta property="og:site_name" content="Krivea Jewels" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
-    <!-- Twitter card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Krivea Jewels. Wear the Sparkle." />
-    <meta name="twitter:description" content="Premium anti-tarnish luxury jewellery. Shop the Krivea collection." />
-    <meta name="twitter:image" content="/og-image.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
 
-    <!-- Fonts: Cormorant Garamond (display) + Inter (body) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" />
-    </noscript>
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-    <title>Krivea Jewels | Premium Anti-Tarnish Luxury Jewellery</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+  <main class="stage">
+    <div class="botanicals" aria-hidden="true">
+      <svg class="leaf leaf--a" viewBox="0 0 200 200"><path d="M100 10c40 20 70 60 70 100s-40 70-70 80c-30-10-70-40-70-80S60 30 100 10z" /></svg>
+      <svg class="leaf leaf--b" viewBox="0 0 200 200"><path d="M100 10c40 20 70 60 70 100s-40 70-70 80c-30-10-70-40-70-80S60 30 100 10z" /></svg>
+      <svg class="sprig leaf--c" viewBox="0 0 120 220">
+        <path d="M60 210V20" />
+        <path d="M60 40 L20 20 M60 60 L100 38 M60 80 L18 62 M60 100 L102 80 M60 120 L20 104" />
+      </svg>
+      <svg class="root leaf--d" viewBox="0 0 220 140">
+        <path d="M10 70c30-40 70-55 100-40s30 55 60 45 40-40 40-40" />
+      </svg>
+    </div>
+
+    <header class="brandmark">
+      <p class="domain reveal" style="--d:0">chikit.in</p>
+      <h1 class="wordmark reveal" style="--d:1">CHIKIT</h1>
+    </header>
+
+    <section class="status">
+      <p class="eyebrow reveal" style="--d:2">Preparing for Launch</p>
+      <h2 class="headline reveal" style="--d:3">Coming&nbsp;Soon</h2>
+
+      <div class="progress reveal" style="--d:4">
+        <div class="progress__track">
+          <div class="progress__fill" id="progressFill"></div>
+          <div class="progress__glow" id="progressGlow"></div>
+        </div>
+        <span class="progress__value" id="progressValue">0%</span>
+      </div>
+
+      <p class="tagline reveal" style="--d:5">
+        The future of Ayurvedic wellness is almost here.<br />
+        Stay tuned.
+      </p>
+
+      <form class="notify reveal" id="notifyForm" style="--d:6" novalidate>
+        <label for="notifyEmail" class="sr-only">Email address</label>
+        <input
+          type="email"
+          id="notifyEmail"
+          name="email"
+          placeholder="Enter your email for launch updates"
+          autocomplete="email"
+          required
+        />
+        <button type="submit">Notify Me</button>
+      </form>
+      <p class="notify__message" id="notifyMessage" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script src="/assets/script.js" defer></script>
+</body>
 </html>

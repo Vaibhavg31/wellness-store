@@ -1,158 +1,70 @@
-# Wellness Store (template)
+# Chikit — Coming Soon
 
-A wellness / nutrition D2C e-commerce template (Kapiva / OZiva style) with **React (JavaScript)** frontend and **PHP** backend. Adapted from the Krivea Jewels commerce template — schema and branding are wellness-specific; see `backend/schema.sql` and `backend/seed.sql`.
+Static, dependency-free landing page for **chikit.in** (Ayurvedic wellness brand).
+No build step required — plain HTML/CSS/JS in `index.html` + `assets/`.
 
-> **Status:** database schema, seed data, and config are wellness-ready. The PHP repository layer and React UI copy still reference some jewelry-specific fields/branding from the original template and will be adapted in follow-up work.
+> The full Chikit store (React + backend) will be rebuilt on this branch step by
+> step. The previous full storefront template lives on the
+> `archive/full-wellness-store` branch for reference. This branch (`master`)
+> starts from the coming-soon page only.
 
-## Tech Stack
+## Run locally
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | React 19, JavaScript (JSX), Vite, Tailwind CSS v4 |
-| **Backend** | PHP 8.1+, JSON file storage (MySQL-ready repository layer) |
-| **Auth** | JWT, Google OAuth, Email verification (Brevo), Phone OTP (MSG91) |
-
-## Getting Started (Local Development)
-
-### Prerequisites
-
-- Node.js 18+ (only for building the frontend)
-- PHP 8.1+
-- Composer
-
-### Setup
+Just open `index.html` in a browser, or serve it:
 
 ```bash
-npm install
-cd backend && composer install && cd ..
-npm run dev:all
+npx serve .
 ```
 
-All configuration — database, secrets, API keys, feature flags — lives in
-one file: **`config.json`** at the repo root. It's committed with working
-local-dev values already filled in, so the command above works immediately;
-open `config.json` and edit values in place for your own setup or to deploy.
-See the comments at the top of that file for how PHP and Vite both read it,
-and what needs a dev-server restart vs. what applies immediately.
-
-- Storefront: http://localhost:5173
-- PHP API: http://localhost:8000
-- Admin panel: http://localhost:5173/wellness-studio
-
-### Default Admin Login
-
-Set `ADMIN_USERNAME` and `ADMIN_PASSWORD_HASH` in `config.json`.  
-Generate a bcrypt hash: `php -r "echo password_hash('yourpassword', PASSWORD_BCRYPT) . PHP_EOL;"`
-
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | React dev server |
-| `npm run dev:server` | PHP API (port 8000) |
-| `npm run dev:all` | Both together |
-| `npm run build` | Build frontend → `dist/` folder |
-
-## Project Structure
+## Structure
 
 ```
-backend/               # PHP API (upload to server)
-├── lib/               # PHP classes
-│   └── Repository/    # Data repository layer (JSON now, DB-ready)
-├── public/            # Web entry point (index.php)
-├── data/              # JSON database files
-└── uploads/           # Product images
-
-src/                   # React source (JavaScript .jsx / .js)
-├── components/
-├── pages/
-├── contexts/
-└── services/
-
-dist/                  # Built frontend (after npm run build)
+index.html          # page markup
+assets/style.css     # layout, theme, animations
+assets/script.js      # bokeh particle background, progress bar, notify form
+assets/favicon.svg
+.github/workflows/deploy.yml   # CI: pushes this folder to S3 + invalidates CloudFront
 ```
 
-## Shared Hosting Deployment
+## Deploying to AWS (free tier)
 
-### 1. Build frontend on your computer
+This repo ships a GitHub Actions workflow (`.github/workflows/deploy.yml`) that
+syncs this folder straight to an S3 bucket on every push to `master`, and
+optionally invalidates a CloudFront distribution. It does **not** run yet —
+it needs AWS credentials and a bucket, which aren't set up here.
 
-```bash
-npm install
-# Set VITE_API_URL=https://api.kriveajewels.in in config.json first
-# (leave it empty instead if the API is served from the same domain)
-npm run build
-```
+### One-time AWS setup (do this in your AWS account)
 
-Upload everything inside `dist/` to your main domain `public_html/`.
+1. **S3 bucket** — create a bucket (e.g. `chikit-site`), enable **Static
+   website hosting**, set `index.html` as the index document.
+2. **Bucket policy** — allow public read (or, better, keep it private and
+   front it with CloudFront using an Origin Access Control).
+3. **CloudFront (recommended)** — create a distribution pointing at the S3
+   bucket, attach your `chikit.in` domain + an ACM certificate (free), and
+   point your domain's DNS at the CloudFront distribution.
+4. **IAM user for CI** — create an IAM user (or OIDC role) with permission
+   to `s3:PutObject`/`s3:DeleteObject`/`s3:ListBucket` on the bucket and
+   `cloudfront:CreateInvalidation` on the distribution. Generate an access
+   key for it.
 
-### 2. Upload PHP backend
+### Wire it up to this repo
 
-Upload `backend/` to your server. Point the API document root to `backend/public/`.
+Add these as **GitHub repo secrets** (Settings → Secrets and variables →
+Actions):
 
-Make `backend/data/` and `backend/uploads/` writable. Run:
+| Secret | Value |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | from the IAM user above |
+| `AWS_SECRET_ACCESS_KEY` | from the IAM user above |
+| `AWS_REGION` | e.g. `ap-south-1` |
+| `AWS_S3_BUCKET` | your bucket name, e.g. `chikit-site` |
+| `AWS_CLOUDFRONT_DISTRIBUTION_ID` | optional — leave unset to skip the invalidation step |
 
-```bash
-cd backend && composer install --no-dev
-```
+Once those secrets exist, every push to `master` deploys automatically.
+Nothing else in this repo needs to change.
 
-### 3. Configuration
+## Not included (on purpose)
 
-Everything lives in `config.json` at the repo root — deploy it as part of
-the repo, then edit these values for production directly on the server:
-
-```
-APP_ENV=production
-JWT_SECRET=your-random-secret        # generate a NEW one, don't reuse dev's
-ADMIN_USERNAME=krivea_admin
-ADMIN_PASSWORD_HASH=<bcrypt hash>
-ADMIN_DEV_PASSWORD=                  # leave blank in production
-GOOGLE_CLIENT_ID=your-google-client-id
-FRONTEND_URL=https://kriveajewels.in
-VITE_API_URL=https://api.kriveajewels.in   # or leave empty if same-domain
-DB_HOST / DB_NAME / DB_USER / DB_PASS      # your production database
-RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET      # live keys, not test keys
-SKIP_EMAIL_VERIFY=false
-SKIP_PHONE_VERIFY=false
-VITE_SKIP_PHONE_VERIFY=false
-```
-
-See the comments inside `config.json` for what every variable does.
-
-### 4. React SPA routing (Apache)
-
-Add to `public_html/.htaccess` if pages show 404 on refresh:
-
-```apache
-RewriteEngine On
-RewriteBase /
-RewriteRule ^index\.html$ - [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.html [L]
-```
-
-## Admin Panel
-
-Access at `/wellness-studio` (not linked on the public site).
-
-## Phone OTP (checkout)
-
-Checkout verifies the customer's mobile with **MSG91 SendOTP server API** (`/api/auth/send-phone-otp`, `confirm-phone-otp`, `resend-phone-otp`). No browser widget or captcha.
-
-### Quick check
-
-```bash
-npm run dev:otp    # production-like OTP (real SMS, production rate limits)
-curl -s http://localhost:8000/api/health | jq '.otp'
-```
-
-Look at `otp.serverOutboundIp` and whitelist that IP in **MSG91 Dashboard → Authkey → IP Security**. Error **418** means verify/retry (or send) is blocked until the IP is added.
-
-### Dev modes
-
-| Goal | `config.json` |
-|------|--------|
-| Real OTP (like production) | `SKIP_PHONE_VERIFY=false`, `VITE_SKIP_PHONE_VERIFY=false`, `MSG91_OTP_MODE=production` |
-| Skip OTP locally | `SKIP_PHONE_VERIFY=true`, `VITE_SKIP_PHONE_VERIFY=true`, or `MSG91_OTP_MODE=skip` |
-
-Audit log: `backend/data/otp-logs.json` (last 200 events). Dev endpoint: `GET /api/auth/otp-logs` (customer JWT).
+No backend pipeline yet. The PHP backend (and its planned migration to
+Node) stays parked on `archive/full-wellness-store` until the store rebuild
+begins — this branch is frontend-only, coming-soon page only.

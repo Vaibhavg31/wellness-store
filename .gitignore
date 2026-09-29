@@ -1,37 +1,6 @@
-# ── Frontend ─────────────────────────────────────────────
 node_modules/
 dist/
-
-# ── Secrets & environment ─────────────────────────────────
-# config.json is intentionally NOT ignored — this is a private repo and the
-# team has chosen to commit the single app-wide config file (see config.json
-# itself). Nothing to list here unless someone creates a personal local
-# override file in the future.
-
-# ── PHP backend ───────────────────────────────────────────
-# Composer dependencies — run: php composer.phar install
-backend/vendor/
-# Composer binary (large ~2MB, download from getcomposer.org)
-backend/composer.phar
-
-# ── Legacy JSON flat-file data (replaced by MySQL) ────────
-backend/data/
-
-# ── User-uploaded media (server-specific, not for git) ────
-backend/uploads/*
-!backend/uploads/.gitkeep
-
-# ── Logs & caches ─────────────────────────────────────────
-*.log
-backend/storage/
-
-# ── OS & editor artifacts ─────────────────────────────────
 .DS_Store
 Thumbs.db
-desktop.ini
-*.swp
-*.swo
-.idea/
-
-# ── Claude Code local session artifacts ───────────────────
-.claude/
+*.log
+.env
