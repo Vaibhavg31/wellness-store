@@ -77,12 +77,14 @@ export const DEFAULT_SITE_CONTENT = {
 
     sections: {
         hero: true,
+        spotlightOrbit: true,
         videoBanner: true,
         brandMarquee: true,
         banners: true,
         bannerSlider: true,
         featured: true,
         trending: true,
+        atelier3d: true,
         categories: true,
         bundles: true,
         ritualBuilder: true,

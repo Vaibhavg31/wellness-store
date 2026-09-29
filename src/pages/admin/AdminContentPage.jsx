@@ -53,12 +53,14 @@ const TABS = [
 // genuinely confusing. Every label below stands on its own.
 const SECTION_LABELS = {
     hero: 'Hero Banner',
+    spotlightOrbit: 'Product Spotlight (Card Orbit)',
     videoBanner: 'Video Banner',
     brandMarquee: 'Brand Marquee',
     banners: 'Image Banners (Stacked)',
     bannerSlider: 'Banner Slider (Rotating)',
     featured: 'Featured Collection',
     trending: 'Trending Now',
+    atelier3d: 'Interactive 3D Preview',
     categories: 'Shop by Category',
     bundles: 'Bundle & Save Offers',
     ritualBuilder: 'Build Your Ritual (Interactive Quiz)',

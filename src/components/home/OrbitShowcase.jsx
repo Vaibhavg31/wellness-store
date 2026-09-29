@@ -361,7 +361,7 @@ export default function OrbitShowcase({ products = [] }) {
                                     <button
                                         type="button"
                                         onClick={handleCenterAdd}
-                                        className={`relative mt-3 pointer-events-auto inline-flex items-center gap-1.5 px-4 py-2 rounded-full type-eyebrow-sm font-medium transition-colors shadow-md ${
+                                        className={`relative mt-3 pointer-events-auto inline-flex items-center gap-1.5 px-4 py-2 rounded-full type-eyebrow-sm font-medium transition-colors shadow-md whitespace-nowrap w-max ${
                                             justAdded ? 'bg-emerald text-cream' : 'bg-forest text-cream hover:bg-forest-light'
                                         }`}
                                     >

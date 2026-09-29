@@ -249,15 +249,20 @@ export default function HeroCinematic({ products = [] }) {
                 )}
             </div>
 
-            {/* Trust row — a glass card straddling the slide/page boundary,
-                instead of a full-width strip sitting flush beneath it. */}
-            <div className="relative z-10 px-5 sm:px-8 lg:px-12">
+            {/* Trust row — sits fully in the cream area below the slide.
+                Previously pulled up with a negative margin to "straddle" the
+                slide/page boundary, which read as broken rather than
+                deliberate: the white card cut across the slide's own bottom
+                edge (right where the dot indicators live), landing high-
+                contrast on top of whatever busy photo was in that slide
+                instead of looking like an intentional overlap. */}
+            <div className="relative z-10 px-5 sm:px-8 lg:px-12 pt-6 sm:pt-8">
                 <motion.div
                     variants={container}
                     initial={reducedMotion ? 'show' : 'hidden'}
                     whileInView="show"
                     viewport={{ once: true, margin: '-40px' }}
-                    className="max-w-5xl mx-auto -mt-8 sm:-mt-10 relative bg-cream rounded-2xl sm:rounded-full soft-shadow-lg border border-border/40 px-6 py-5 sm:px-10 sm:py-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3"
+                    className="max-w-5xl mx-auto relative bg-cream rounded-2xl sm:rounded-full soft-shadow-lg border border-border/40 px-6 py-5 sm:px-10 sm:py-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3"
                 >
                     {(hero.trustBadges ?? []).map(({ icon, label }) => {
                         const Icon = TRUST_ICONS[icon] ?? Sparkles;

@@ -136,14 +136,21 @@ export default function Navbar() {
                 />
             </div>
 
-            {/* Floating glass pill on scroll-up, docks flat once scrolled — a
-                different silhouette from a permanently flush solid bar. */}
+            {/* Floating glass pill at the top of the page — translucent and
+                blurred, meant to sit over the hero. Docks flat AND switches
+                to a fully opaque solid fill once scrolled: the translucent
+                version looked fine over the hero's own controlled imagery,
+                but once the page has scrolled past it, that same see-through
+                pill sits over whatever's directly beneath it — a product
+                photo, a colorful section — and picks up all of that through
+                the blur, reading as broken rather than "glassy". Solid once
+                scrolled removes that dependency on what's underneath. */}
             <div className={`transition-[padding] duration-500 ${isScrolled ? 'pt-0' : 'pt-2 sm:pt-3'}`}>
                 <header
-                    className={`mx-auto transition-[background,box-shadow,border-radius,max-width,padding] duration-500 glass-navbar ${
+                    className={`mx-auto transition-[background-color,box-shadow,border-radius,max-width,padding,backdrop-filter] duration-500 ${
                         isScrolled
-                            ? 'max-w-none rounded-none py-2.5 border-b border-cream/10 shadow-[0_4px_24px_rgba(0,0,0,0.25)]'
-                            : 'max-w-[min(96%,90rem)] rounded-2xl sm:rounded-full py-3 sm:py-3.5 border border-cream/10 shadow-[0_8px_32px_rgba(0,0,0,0.18)]'
+                            ? 'max-w-none rounded-none py-2.5 border-b border-cream/10 shadow-[0_4px_24px_rgba(0,0,0,0.25)] bg-forest-deep'
+                            : 'max-w-[min(96%,90rem)] rounded-2xl sm:rounded-full py-3 sm:py-3.5 border border-cream/10 shadow-[0_8px_32px_rgba(0,0,0,0.18)] glass-navbar'
                     }`}
                 >
                     <nav
