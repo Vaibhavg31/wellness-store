@@ -1,10 +1,12 @@
 :root {
-  --ink: #f6ecf2;
-  --ink-dim: rgba(246, 236, 242, 0.68);
-  --accent-deep: #3c1636;
-  --accent: #9a4f89;
-  --accent-bright: #e6b8da;
-  --bg-deep: #0c0710;
+  --cream: #fbe6cf;
+  --cream-deep: #f4d3ab;
+  --ink: #3c1636;
+  --ink-dim: rgba(60, 22, 54, 0.62);
+  --plum-deep: #3c1636;
+  --plum: #7a3468;
+  --plum-bright: #a8578f;
+  --gold: #c98a4b;
 }
 
 * {
@@ -19,7 +21,7 @@ body {
 body {
   margin: 0;
   min-height: 100svh;
-  background: var(--bg-deep);
+  background: var(--cream);
   color: var(--ink);
   font-family: "Jost", sans-serif;
   overflow-x: hidden;
@@ -27,32 +29,15 @@ body {
   isolation: isolate;
 }
 
-/* ---------- background photo ---------- */
+/* ---------- animated background (cream aurora + drifting dust) ---------- */
 
-.bg {
+#scene {
   position: fixed;
   inset: 0;
   z-index: -3;
-  overflow: hidden;
-}
-
-.bg img {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 58% 32%;
-  transform: scale(1.03);
-}
-
-.bg__overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 70% 60% at 50% 42%, rgba(20, 8, 18, 0.2), rgba(14, 6, 13, 0.52) 100%),
-    linear-gradient(180deg, rgba(16, 6, 15, 0.58) 0%, rgba(12, 6, 12, 0.12) 22%, rgba(12, 6, 12, 0.14) 55%, rgba(14, 5, 13, 0.74) 100%),
-    linear-gradient(200deg, rgba(58, 20, 48, 0.22), rgba(8, 15, 11, 0.28));
+  pointer-events: none;
 }
 
 .grain {
@@ -60,20 +45,71 @@ body {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.045;
-  mix-blend-mode: overlay;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ---------- bokeh particles (subtle, layered over photo) ---------- */
+/* ---------- botanical silhouettes ---------- */
 
-#scene {
+.botanicals {
   position: fixed;
   inset: 0;
   z-index: -2;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
+}
+
+.leaf,
+.sprig {
+  position: absolute;
+  fill: none;
+  stroke: rgba(122, 52, 104, 0.14);
+  stroke-width: 1.4;
+}
+
+.leaf {
+  fill: rgba(122, 52, 104, 0.07);
+  stroke: none;
+}
+
+.leaf--a {
+  width: 42vmin;
+  height: 42vmin;
+  left: -12vmin;
+  bottom: -10vmin;
+  animation: driftA 26s ease-in-out infinite;
+}
+
+.leaf--b {
+  width: 32vmin;
+  height: 32vmin;
+  right: -10vmin;
+  top: -8vmin;
+  transform: rotate(140deg);
+  animation: driftB 30s ease-in-out infinite;
+}
+
+.leaf--c {
+  width: 16vmin;
+  height: 28vmin;
+  right: 6vmin;
+  bottom: -2vmin;
+  animation: driftC 22s ease-in-out infinite;
+}
+
+@keyframes driftA {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(1.5vmin, -2vmin) rotate(3deg); }
+}
+
+@keyframes driftB {
+  0%, 100% { transform: translate(0, 0) rotate(140deg); }
+  50% { transform: translate(-1.5vmin, 2vmin) rotate(146deg); }
+}
+
+@keyframes driftC {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-1vmin, -2.5vmin) rotate(-2deg); }
 }
 
 /* ---------- layout ---------- */
@@ -117,9 +153,8 @@ body {
   font-size: 0.72rem;
   letter-spacing: 0.55em;
   text-transform: uppercase;
-  color: var(--accent-bright);
-  font-weight: 400;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+  color: var(--plum);
+  font-weight: 500;
 }
 
 .wordmark-row {
@@ -132,49 +167,48 @@ body {
   width: clamp(2rem, 5.5vw, 3.1rem);
   height: clamp(2rem, 5.5vw, 3.1rem);
   fill: none;
-  stroke: var(--accent-bright);
+  stroke: var(--plum-deep);
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
   flex-shrink: 0;
   animation: iconGlow 4.5s ease-in-out infinite;
 }
 
 @keyframes iconGlow {
-  0%, 100% { filter: drop-shadow(0 2px 10px rgba(230, 184, 218, 0.15)); }
-  50% { filter: drop-shadow(0 2px 18px rgba(230, 184, 218, 0.5)); }
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(168, 87, 143, 0)); }
+  50% { filter: drop-shadow(0 0 10px rgba(168, 87, 143, 0.45)); }
 }
 
 .wordmark {
   margin: 0;
   font-family: "Cormorant Garamond", serif;
-  font-weight: 500;
+  font-weight: 600;
   font-size: clamp(3rem, 10vw, 7rem);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   line-height: 1;
-  background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 55%, var(--accent-deep) 100%);
+  background: linear-gradient(180deg, var(--plum) 0%, var(--plum-deep) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 4px 30px rgba(0, 0, 0, 0.45));
   padding-bottom: 0.1em;
 }
 
 .divider {
   display: block;
   width: 3.5rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
+  height: 2px;
+  background: var(--plum-deep);
   position: relative;
   overflow: hidden;
+  border-radius: 2px;
 }
 
 .divider::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, #fff, transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
   transform: translateX(-100%);
   animation: dividerShine 3.6s ease-in-out 1.4s infinite;
 }
@@ -186,12 +220,11 @@ body {
 
 .subtitle {
   margin: 0;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--ink-dim);
-  font-weight: 400;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+  color: var(--plum);
+  font-weight: 500;
 }
 
 .status {
@@ -208,8 +241,7 @@ body {
   letter-spacing: 0.5em;
   text-transform: uppercase;
   color: var(--ink-dim);
-  font-weight: 400;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+  font-weight: 500;
 }
 
 .headline {
@@ -220,12 +252,12 @@ body {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* ---------- progress bar ---------- */
+/* ---------- progress bar / loader ---------- */
 
 .progress {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -234,13 +266,29 @@ body {
   margin-top: 0.2rem;
 }
 
+.progress__aura {
+  position: absolute;
+  inset: -30px -16px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse 65% 100% at 50% 50%, rgba(168, 87, 143, 0.45) 0%, rgba(168, 87, 143, 0.18) 45%, transparent 78%);
+  filter: blur(2px);
+  animation: auraPulse 3.4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes auraPulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
 .progress__track {
   position: relative;
   width: 100%;
   height: 4px;
   border-radius: 999px;
-  background: rgba(246, 236, 242, 0.16);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  background: rgba(60, 22, 54, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(60, 22, 54, 0.08);
   overflow-x: hidden;
   overflow-y: visible;
 }
@@ -250,9 +298,9 @@ body {
   inset: 0;
   width: 0%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 100%);
+  background: linear-gradient(90deg, var(--plum-bright) 0%, var(--plum-deep) 100%);
   transition: width 2.1s cubic-bezier(0.65, 0, 0.35, 1);
-  box-shadow: 0 0 12px rgba(230, 184, 218, 0.4);
+  box-shadow: 0 0 10px rgba(122, 52, 104, 0.35);
 }
 
 .progress__dot {
@@ -263,15 +311,15 @@ body {
   height: 9px;
   border-radius: 50%;
   transform: translate(50%, -50%);
-  background: var(--accent-bright);
-  box-shadow: 0 0 0 0 rgba(230, 184, 218, 0.55);
+  background: var(--plum-deep);
+  box-shadow: 0 0 0 0 rgba(122, 52, 104, 0.55);
   animation: pulseDot 2s ease-out infinite;
 }
 
 @keyframes pulseDot {
-  0% { box-shadow: 0 0 0 0 rgba(230, 184, 218, 0.55); }
-  70% { box-shadow: 0 0 0 8px rgba(230, 184, 218, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(230, 184, 218, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(122, 52, 104, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(122, 52, 104, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(122, 52, 104, 0); }
 }
 
 .progress__glow {
@@ -280,7 +328,7 @@ body {
   bottom: 0;
   width: 50px;
   left: -50px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
   filter: blur(2px);
   animation: shimmer 2.8s ease-in-out infinite;
   animation-delay: 2.2s;
@@ -295,8 +343,8 @@ body {
 .progress__value {
   font-size: 0.72rem;
   letter-spacing: 0.3em;
-  color: var(--accent-bright);
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  color: var(--plum);
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -305,21 +353,15 @@ body {
 .tagline {
   margin: 0;
   color: var(--ink-dim);
-  font-weight: 300;
+  font-weight: 400;
   font-size: clamp(0.9rem, 1.8vw, 1.08rem);
   line-height: 1.6;
   letter-spacing: 0.02em;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
 }
 
 /* ---------- responsive ---------- */
 
 @media (max-width: 640px) {
-  .bg img {
-    object-position: 68% 58%;
-    transform: scale(1.08);
-  }
-
   .stage {
     padding: 5vh 5.5vw;
     gap: clamp(1.2rem, 4vh, 2.2rem);
@@ -328,7 +370,7 @@ body {
 
 @media (max-width: 380px) {
   .wordmark {
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
   }
 
   .subtitle {
@@ -359,10 +401,6 @@ body {
     gap: 0.7rem;
   }
 
-  .divider {
-    margin-left: 0;
-  }
-
   .wordmark {
     font-size: clamp(2.2rem, 6.5vw, 3.6rem);
   }
@@ -385,8 +423,11 @@ body {
   .reveal,
   .progress__glow,
   .progress__dot,
+  .progress__aura,
   .leaf-icon,
-  .divider::after {
+  .divider::after,
+  .leaf,
+  .sprig {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

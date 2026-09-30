@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chikit | Coming Soon</title>
   <meta name="description" content="Chikit — Ayurveda and Wellness. The future of Ayurvedic wellness is almost here." />
-  <meta name="theme-color" content="#0c1f16" />
+  <meta name="theme-color" content="#f8e2c4" />
 
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Chikit | Coming Soon" />
   <meta property="og:description" content="Ayurveda and Wellness. The future of Ayurvedic wellness is almost here. Stay tuned." />
-  <meta property="og:image" content="/assets/images/chikit-hero.jpg" />
   <meta property="og:site_name" content="Chikit" />
 
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
@@ -22,15 +21,20 @@
     rel="stylesheet"
   />
 
-  <link rel="preload" as="image" href="/assets/images/chikit-hero.jpg" fetchpriority="high" />
   <link rel="stylesheet" href="/assets/style.css" />
 </head>
 <body>
-  <div class="bg" aria-hidden="true">
-    <img src="/assets/images/chikit-hero.jpg" alt="" fetchpriority="high" />
-    <div class="bg__overlay"></div>
-  </div>
   <canvas id="scene" aria-hidden="true"></canvas>
+
+  <div class="botanicals" aria-hidden="true">
+    <svg class="leaf leaf--a" viewBox="0 0 200 200"><path d="M100 10c40 20 70 60 70 100s-40 70-70 80c-30-10-70-40-70-80S60 30 100 10z" /></svg>
+    <svg class="leaf leaf--b" viewBox="0 0 200 200"><path d="M100 10c40 20 70 60 70 100s-40 70-70 80c-30-10-70-40-70-80S60 30 100 10z" /></svg>
+    <svg class="sprig leaf--c" viewBox="0 0 120 220">
+      <path d="M60 210V20" />
+      <path d="M60 40 L20 20 M60 60 L100 38 M60 80 L18 62 M60 100 L102 80 M60 120 L20 104" />
+    </svg>
+  </div>
+
   <div class="grain" aria-hidden="true"></div>
 
   <main class="stage">
@@ -54,6 +58,7 @@
       <h2 class="headline reveal" style="--d:5">Coming&nbsp;Soon</h2>
 
       <div class="progress reveal" style="--d:6">
+        <div class="progress__aura" aria-hidden="true"></div>
         <div class="progress__track">
           <div class="progress__fill" id="progressFill">
             <span class="progress__dot"></span>
