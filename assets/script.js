@@ -2,6 +2,7 @@
   "use strict";
 
   const PROGRESS_TARGET = 62;
+  const PROGRESS_DURATION_MS = 2100;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- progress bar ---------- */
@@ -10,18 +11,25 @@
   const value = document.getElementById("progressValue");
 
   if (fill && value) {
-    let current = 0;
-    const animateValue = () => {
-      current += Math.max(1, Math.round((PROGRESS_TARGET - current) * 0.08));
-      if (current >= PROGRESS_TARGET) current = PROGRESS_TARGET;
+    const start = performance.now() + 900;
+
+    const tick = (now) => {
+      const elapsed = now - start;
+      if (elapsed < 0) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      const t = Math.min(1, elapsed / PROGRESS_DURATION_MS);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const current = Math.round(eased * PROGRESS_TARGET);
       value.textContent = `${current}%`;
-      if (current < PROGRESS_TARGET) requestAnimationFrame(animateValue);
+      if (t < 1) requestAnimationFrame(tick);
     };
 
     window.setTimeout(() => {
       fill.style.width = `${PROGRESS_TARGET}%`;
-      requestAnimationFrame(animateValue);
     }, 900);
+    requestAnimationFrame(tick);
   }
 
   /* ---------- notify form ---------- */
@@ -49,7 +57,7 @@
     });
   }
 
-  /* ---------- bokeh particles ---------- */
+  /* ---------- bokeh dust overlay (sits above the photo) ---------- */
 
   if (reduceMotion) return;
 
@@ -57,7 +65,7 @@
   const ctx = canvas.getContext("2d");
   let width, height, particles;
 
-  const PARTICLE_COUNT = window.innerWidth < 640 ? 22 : 42;
+  const PARTICLE_COUNT = window.innerWidth < 640 ? 16 : 30;
 
   function resize() {
     width = canvas.width = window.innerWidth * devicePixelRatio;
@@ -70,10 +78,10 @@
     return {
       x: Math.random() * width,
       y: Math.random() * height,
-      r: (Math.random() * 1.8 + 0.4) * devicePixelRatio,
-      speed: (Math.random() * 0.18 + 0.04) * devicePixelRatio,
-      drift: (Math.random() - 0.5) * 0.12 * devicePixelRatio,
-      alpha: Math.random() * 0.35 + 0.08,
+      r: (Math.random() * 1.6 + 0.5) * devicePixelRatio,
+      speed: (Math.random() * 0.16 + 0.03) * devicePixelRatio,
+      drift: (Math.random() - 0.5) * 0.1 * devicePixelRatio,
+      alpha: Math.random() * 0.3 + 0.06,
       twinkle: Math.random() * Math.PI * 2,
     };
   }
@@ -85,38 +93,18 @@
 
   function draw() {
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = "#050f0a";
-    ctx.fillRect(0, 0, width, height);
-
-    const grad1 = ctx.createRadialGradient(width * 0.5, height * 0.05, 0, width * 0.5, height * 0.05, width * 0.6);
-    grad1.addColorStop(0, "rgba(240, 205, 133, 0.14)");
-    grad1.addColorStop(1, "rgba(240, 205, 133, 0)");
-    ctx.fillStyle = grad1;
-    ctx.fillRect(0, 0, width, height);
-
-    const grad2 = ctx.createRadialGradient(width * 0.15, height, 0, width * 0.15, height, width * 0.7);
-    grad2.addColorStop(0, "rgba(22, 49, 31, 0.9)");
-    grad2.addColorStop(1, "rgba(7, 23, 17, 0)");
-    ctx.fillStyle = grad2;
-    ctx.fillRect(0, 0, width, height);
-
-    const grad3 = ctx.createRadialGradient(width * 0.85, height, 0, width * 0.85, height, width * 0.7);
-    grad3.addColorStop(0, "rgba(13, 42, 29, 0.9)");
-    grad3.addColorStop(1, "rgba(7, 23, 17, 0)");
-    ctx.fillStyle = grad3;
-    ctx.fillRect(0, 0, width, height);
 
     for (const p of particles) {
       p.y -= p.speed;
       p.x += Math.sin(p.twinkle) * p.drift;
-      p.twinkle += 0.01;
+      p.twinkle += 0.008;
       if (p.y < -10) {
         p.y = height + 10;
         p.x = Math.random() * width;
       }
 
       ctx.beginPath();
-      ctx.fillStyle = `rgba(240, 205, 133, ${p.alpha * (0.7 + 0.3 * Math.sin(p.twinkle))})`;
+      ctx.fillStyle = `rgba(243, 217, 153, ${p.alpha * (0.7 + 0.3 * Math.sin(p.twinkle))})`;
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
     }
