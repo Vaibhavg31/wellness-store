@@ -1,9 +1,10 @@
 :root {
-  --ink: #f3ecd9;
-  --ink-dim: rgba(243, 236, 217, 0.66);
-  --gold: #d4af6a;
-  --gold-bright: #f3d999;
-  --bg-deep: #071711;
+  --ink: #f6ecf2;
+  --ink-dim: rgba(246, 236, 242, 0.68);
+  --accent-deep: #3c1636;
+  --accent: #9a4f89;
+  --accent-bright: #e6b8da;
+  --bg-deep: #0c0710;
 }
 
 * {
@@ -49,9 +50,9 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 50% 42%, rgba(4, 12, 8, 0.18), rgba(4, 12, 8, 0.5) 100%),
-    linear-gradient(180deg, rgba(3, 10, 7, 0.55) 0%, rgba(3, 10, 7, 0.1) 22%, rgba(3, 10, 7, 0.12) 55%, rgba(3, 10, 7, 0.72) 100%),
-    linear-gradient(180deg, rgba(5, 16, 11, 0.35), rgba(5, 16, 11, 0.35));
+    radial-gradient(ellipse 70% 60% at 50% 42%, rgba(20, 8, 18, 0.2), rgba(14, 6, 13, 0.52) 100%),
+    linear-gradient(180deg, rgba(16, 6, 15, 0.58) 0%, rgba(12, 6, 12, 0.12) 22%, rgba(12, 6, 12, 0.14) 55%, rgba(14, 5, 13, 0.74) 100%),
+    linear-gradient(200deg, rgba(58, 20, 48, 0.22), rgba(8, 15, 11, 0.28));
 }
 
 .grain {
@@ -86,8 +87,8 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 8vh 6vw 10vh;
-  gap: clamp(2.2rem, 6vh, 3.6rem);
+  padding: 6vh 6vw;
+  gap: clamp(1.6rem, 5vh, 3.2rem);
 }
 
 .reveal {
@@ -108,7 +109,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.65rem;
 }
 
 .domain {
@@ -116,7 +117,7 @@ body {
   font-size: 0.72rem;
   letter-spacing: 0.55em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--accent-bright);
   font-weight: 400;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
 }
@@ -131,33 +132,62 @@ body {
   width: clamp(2rem, 5.5vw, 3.1rem);
   height: clamp(2rem, 5.5vw, 3.1rem);
   fill: none;
-  stroke: var(--gold-bright);
+  stroke: var(--accent-bright);
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
   filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
   flex-shrink: 0;
+  animation: iconGlow 4.5s ease-in-out infinite;
+}
+
+@keyframes iconGlow {
+  0%, 100% { filter: drop-shadow(0 2px 10px rgba(230, 184, 218, 0.15)); }
+  50% { filter: drop-shadow(0 2px 18px rgba(230, 184, 218, 0.5)); }
 }
 
 .wordmark {
   margin: 0;
   font-family: "Cormorant Garamond", serif;
   font-weight: 500;
-  font-size: clamp(3.2rem, 11vw, 7.2rem);
+  font-size: clamp(3rem, 10vw, 7rem);
   letter-spacing: 0.14em;
   line-height: 1;
-  background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 55%, #a9803f 100%);
+  background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 55%, var(--accent-deep) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 4px 30px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 4px 30px rgba(0, 0, 0, 0.45));
   padding-bottom: 0.1em;
+}
+
+.divider {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.divider::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  transform: translateX(-100%);
+  animation: dividerShine 3.6s ease-in-out 1.4s infinite;
+}
+
+@keyframes dividerShine {
+  0%, 40% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
 }
 
 .subtitle {
   margin: 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.42em;
+  font-size: 0.76rem;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
   color: var(--ink-dim);
   font-weight: 400;
@@ -168,13 +198,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.3rem;
+  gap: 1.15rem;
   max-width: 40rem;
 }
 
 .eyebrow {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   letter-spacing: 0.5em;
   text-transform: uppercase;
   color: var(--ink-dim);
@@ -186,8 +216,8 @@ body {
   margin: 0;
   font-family: "Jost", sans-serif;
   font-weight: 600;
-  font-size: clamp(2.1rem, 6vw, 3.6rem);
-  letter-spacing: 0.22em;
+  font-size: clamp(1.9rem, 5.5vw, 3.4rem);
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink);
   text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
@@ -199,9 +229,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
-  width: min(360px, 70vw);
-  margin-top: 0.4rem;
+  gap: 0.55rem;
+  width: min(340px, 65vw);
+  margin-top: 0.2rem;
 }
 
 .progress__track {
@@ -209,7 +239,7 @@ body {
   width: 100%;
   height: 4px;
   border-radius: 999px;
-  background: rgba(243, 236, 217, 0.16);
+  background: rgba(246, 236, 242, 0.16);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
   overflow: visible;
 }
@@ -219,10 +249,10 @@ body {
   inset: 0;
   width: 0%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-bright) 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 100%);
   transition: width 2.1s cubic-bezier(0.65, 0, 0.35, 1);
   overflow: visible;
-  box-shadow: 0 0 12px rgba(243, 217, 153, 0.35);
+  box-shadow: 0 0 12px rgba(230, 184, 218, 0.4);
 }
 
 .progress__dot {
@@ -233,15 +263,15 @@ body {
   height: 9px;
   border-radius: 50%;
   transform: translate(50%, -50%);
-  background: var(--gold-bright);
-  box-shadow: 0 0 0 0 rgba(243, 217, 153, 0.55);
+  background: var(--accent-bright);
+  box-shadow: 0 0 0 0 rgba(230, 184, 218, 0.55);
   animation: pulseDot 2s ease-out infinite;
 }
 
 @keyframes pulseDot {
-  0% { box-shadow: 0 0 0 0 rgba(243, 217, 153, 0.55); }
-  70% { box-shadow: 0 0 0 8px rgba(243, 217, 153, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(243, 217, 153, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(230, 184, 218, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(230, 184, 218, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(230, 184, 218, 0); }
 }
 
 .progress__glow {
@@ -265,7 +295,7 @@ body {
 .progress__value {
   font-size: 0.72rem;
   letter-spacing: 0.3em;
-  color: var(--gold-bright);
+  color: var(--accent-bright);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   font-variant-numeric: tabular-nums;
 }
@@ -276,28 +306,28 @@ body {
   margin: 0;
   color: var(--ink-dim);
   font-weight: 300;
-  font-size: clamp(0.95rem, 2vw, 1.1rem);
-  line-height: 1.7;
+  font-size: clamp(0.9rem, 1.8vw, 1.08rem);
+  line-height: 1.6;
   letter-spacing: 0.02em;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
 }
 
 .notify {
-  margin-top: 0.6rem;
+  margin-top: 0.4rem;
   display: flex;
   width: min(420px, 90vw);
-  border: 1px solid rgba(212, 175, 106, 0.45);
+  border: 1px solid rgba(230, 184, 218, 0.4);
   border-radius: 999px;
   padding: 0.3rem;
-  background: rgba(5, 16, 11, 0.4);
+  background: rgba(12, 6, 11, 0.4);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .notify:focus-within {
-  border-color: var(--gold-bright);
-  box-shadow: 0 0 0 3px rgba(212, 175, 106, 0.16);
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 3px rgba(230, 184, 218, 0.16);
 }
 
 .notify input {
@@ -309,38 +339,38 @@ body {
   color: var(--ink);
   font-family: "Jost", sans-serif;
   font-size: 0.88rem;
-  padding: 0.7rem 1.1rem;
+  padding: 0.65rem 1.1rem;
 }
 
 .notify input::placeholder {
-  color: rgba(243, 236, 217, 0.45);
+  color: rgba(246, 236, 242, 0.45);
 }
 
 .notify button {
   flex-shrink: 0;
   border: none;
   border-radius: 999px;
-  padding: 0.7rem 1.4rem;
+  padding: 0.65rem 1.4rem;
   font-family: "Jost", sans-serif;
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--bg-deep);
-  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color: #1c0a19;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
   cursor: pointer;
   transition: transform 0.25s ease, filter 0.25s ease;
 }
 
 .notify button:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.1);
   transform: translateY(-1px);
 }
 
 .notify__message {
-  min-height: 1.2em;
+  min-height: 1.1em;
   margin: 0;
   font-size: 0.8rem;
-  color: var(--gold-bright);
+  color: var(--accent-bright);
   opacity: 0;
   transition: opacity 0.4s ease;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
@@ -368,8 +398,8 @@ body {
   }
 
   .stage {
-    padding: 7vh 5.5vw 9vh;
-    gap: 2.4rem;
+    padding: 5vh 5.5vw;
+    gap: clamp(1.2rem, 4vh, 2.2rem);
   }
 
   .notify {
@@ -389,25 +419,75 @@ body {
   }
 
   .subtitle {
-    letter-spacing: 0.32em;
+    letter-spacing: 0.3em;
   }
 }
 
-@media (orientation: landscape) and (max-height: 480px) {
+/* Short/landscape viewports: split into two columns instead of shrinking
+   everything into an unreadable, scrolling stack. */
+@media (orientation: landscape) and (max-height: 520px) {
   .stage {
-    gap: 1.4rem;
-    padding: 4vh 6vw;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(2rem, 6vw, 4.5rem);
+    padding: 3vh 5vw;
+    text-align: left;
+  }
+
+  .brandmark {
+    align-items: flex-start;
+    flex-shrink: 0;
+  }
+
+  .status {
+    align-items: flex-start;
+    text-align: left;
+    gap: 0.7rem;
+  }
+
+  .divider {
+    margin-left: 0;
   }
 
   .wordmark {
-    font-size: clamp(2.4rem, 8vw, 4rem);
+    font-size: clamp(2.2rem, 6.5vw, 3.6rem);
+  }
+
+  .progress {
+    align-items: flex-start;
+    width: min(280px, 32vw);
+  }
+
+  .tagline br {
+    display: none;
+  }
+
+  .tagline {
+    font-size: 0.82rem;
+  }
+
+  .notify {
+    width: min(400px, 42vw);
+  }
+
+  .notify input {
+    font-size: 0.8rem;
+    padding: 0.6rem 0.9rem;
+  }
+
+  .notify button {
+    padding: 0.6rem 1.1rem;
+    font-size: 0.72rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .progress__glow,
-  .progress__dot {
+  .progress__dot,
+  .leaf-icon,
+  .divider::after {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

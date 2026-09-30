@@ -104,7 +104,7 @@
       }
 
       ctx.beginPath();
-      ctx.fillStyle = `rgba(243, 217, 153, ${p.alpha * (0.7 + 0.3 * Math.sin(p.twinkle))})`;
+      ctx.fillStyle = `rgba(230, 184, 218, ${p.alpha * (0.7 + 0.3 * Math.sin(p.twinkle))})`;
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
     }
