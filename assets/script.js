@@ -32,31 +32,6 @@
     requestAnimationFrame(tick);
   }
 
-  /* ---------- notify form ---------- */
-
-  const form = document.getElementById("notifyForm");
-  const message = document.getElementById("notifyMessage");
-
-  if (form && message) {
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const email = /** @type {HTMLInputElement} */ (document.getElementById("notifyEmail")).value.trim();
-      if (!email) return;
-
-      try {
-        const stored = JSON.parse(localStorage.getItem("chikit_notify_list") || "[]");
-        if (!stored.includes(email)) stored.push(email);
-        localStorage.setItem("chikit_notify_list", JSON.stringify(stored));
-      } catch (_) {
-        /* localStorage unavailable — still show confirmation */
-      }
-
-      message.textContent = "Thank you — we'll let you know the moment Chikit launches.";
-      message.classList.add("visible");
-      form.reset();
-    });
-  }
-
   /* ---------- bokeh dust overlay (sits above the photo) ---------- */
 
   if (reduceMotion) return;
