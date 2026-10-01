@@ -266,19 +266,18 @@ body {
 
 .progress__glow {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50px;
-  left: -50px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
-  filter: blur(2px);
+  top: -4px;
+  bottom: -4px;
+  width: 36px;
+  left: -60px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  filter: blur(7px);
   animation: shimmer 2.8s ease-in-out infinite;
   animation-delay: 2.2s;
-  border-radius: 999px;
 }
 
 @keyframes shimmer {
-  0% { left: -50px; }
+  0% { left: -60px; }
   55%, 100% { left: 110%; }
 }
 
