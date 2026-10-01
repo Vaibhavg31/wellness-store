@@ -1,14 +1,26 @@
 (() => {
   "use strict";
 
-  const PROGRESS_TARGET = 62;
+  const PROGRESS_START_DATE = new Date("2026-09-29T00:00:00+05:30");
+  const PROGRESS_LAUNCH_DATE = new Date("2026-10-30T00:00:00+05:30");
+  const PROGRESS_FLOOR = 8;
+  const PROGRESS_CEILING = 96;
   const PROGRESS_DURATION_MS = 2100;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---------- progress bar ---------- */
+  function computeProgressTarget() {
+    const now = Date.now();
+    const total = PROGRESS_LAUNCH_DATE - PROGRESS_START_DATE;
+    const elapsed = now - PROGRESS_START_DATE.getTime();
+    const raw = (elapsed / total) * 100;
+    return Math.min(PROGRESS_CEILING, Math.max(PROGRESS_FLOOR, Math.round(raw)));
+  }
+
+  /* ---------- progress bar (tracks real days remaining to launch) ---------- */
 
   const fill = document.getElementById("progressFill");
   const value = document.getElementById("progressValue");
+  const PROGRESS_TARGET = computeProgressTarget();
 
   if (fill && value) {
     const start = performance.now() + 900;
