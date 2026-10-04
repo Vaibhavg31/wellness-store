@@ -17,12 +17,13 @@ A D2C Ayurveda/wellness e-commerce storefront with a **React (JavaScript)** fron
 ### Prerequisites
 
 - Node.js 18+
-- MySQL (via XAMPP or a standalone install) — database `wellness_store`, loaded from `backend/schema.sql` + `backend/seed.sql`
+- MySQL 5.7+/MariaDB 10.4+ (XAMPP works) — start it first. The database is created for you by the import file below.
 
 ### Setup
 
 ```bash
 npm install
+npm run db:setup     # creates the database and loads the starter shop (see below)
 npm run dev
 ```
 
@@ -37,7 +38,31 @@ needs a dev-server restart vs. what applies immediately.
 
 - Storefront: http://localhost:5173
 - API: http://localhost:8000
-- Admin panel: http://localhost:5173/wellness-studio
+- Admin panel: http://localhost:5173/chikit-studio (the path is `ADMIN_PATH` in `config.json`)
+
+### Database
+
+Everything the shop needs is in **one file: [`database/chikit.sql`](database/chikit.sql)** — all 40 tables plus starter
+content (7 categories, 10 products with full details, bundles, coupons `WELCOME10` / `WELCOMEBACK10`, banners, sample
+reviews and every homepage/site setting). It contains **no customer data** (no users, orders, addresses, subscribers or
+logs), so it is safe to share. Import it any one of these ways — they give the same result:
+
+| Way | How |
+|---|---|
+| **npm** (easiest) | `npm run db:setup` — uses the connection in `config.json` (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME`) |
+| **phpMyAdmin** | Open phpMyAdmin → **Import** → choose `database/chikit.sql` → **Go** (no need to create a database first) |
+| **Terminal** | `mysql -u root -p < database/chikit.sql` |
+
+It is safe to run again: tables are only created if missing and rows are only inserted if absent, so existing data is never
+overwritten or deleted. The database is named `wellness_store` (matches `DB_NAME` in `config.json`; `npm run db:setup`
+will create whatever name you put there instead).
+
+**Troubleshooting** — *"Could not connect to MySQL … not running"*: start MySQL (XAMPP Control Panel → MySQL → Start).
+*"Access denied"*: fix `DB_USER` / `DB_PASS` in `config.json`.
+
+**Updating the file after you change the shop** — the file is a snapshot. To refresh it from your own database, dump the
+tables again with `mysqldump` (leave out the private tables listed above), or re-export through phpMyAdmin → Export.
+Schema changes also go in `backend/migrations/` (numbered, safe to re-run) and `backend/schema.sql`.
 
 ## Testing on Your Phone (same Wi-Fi)
 
@@ -85,7 +110,8 @@ backend-node/          # Node/Express API
 ├── MIGRATION.md         # How this backend was ported from the original PHP version
 └── uploads/              # Product/review/banner images
 
-backend/                # Database only — schema.sql, seed.sql, migrations/
+database/               # chikit.sql — the one-file import: full structure + starter shop content
+backend/                # schema.sql (structure reference) and numbered migrations/
                          # (no application code; MySQL is shared infrastructure)
 
 src/                    # React source (JavaScript .jsx / .js)

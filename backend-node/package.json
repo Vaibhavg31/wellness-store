@@ -6,7 +6,8 @@
   "description": "Node/Express port of backend/ (PHP). Parallel build against the SAME MySQL database — not wired into the live site. See MIGRATION.md.",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "db:setup": "node scripts/setup-db.mjs"
   },
   "dependencies": {
     "express": "^4.21.2",
