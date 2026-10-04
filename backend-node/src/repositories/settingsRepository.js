@@ -51,7 +51,7 @@ const DEFAULTS = {
         { label: 'Contact', href: '/contact' },
     ],
     sections: {
-        hero: true, videoBanner: true, brandMarquee: true, bannerSlider: true, categoryShelves: true, banners: true,
+        bannerSlider: true, hero: true, categoryShelves: true, brandMarquee: true, videoBanner: true, banners: true,
         featured: true, trending: true, categories: true, bundles: true,
         whyChoose: true, certifiedBanner: true,
         reviews: true, instagram: true, newsletter: true, promoBanner: true,

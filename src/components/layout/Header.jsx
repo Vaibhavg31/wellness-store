@@ -61,7 +61,7 @@ export default function Header() {
 
                 <CategoryNav />
 
-                <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
+                <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
                     <button type="button" className={iconButton} onClick={() => setSearchOpen(true)} aria-label="Search">
                         <Search size={20} />
                     </button>

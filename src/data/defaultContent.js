@@ -76,11 +76,11 @@ export const DEFAULT_SITE_CONTENT = {
     navLinks: NAV_LINKS,
 
     sections: {
-        hero: true,
-        videoBanner: true,
-        brandMarquee: true,
         bannerSlider: true,
+        hero: true,
         categoryShelves: true,
+        brandMarquee: true,
+        videoBanner: true,
         banners: true,
         featured: true,
         trending: true,
