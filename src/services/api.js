@@ -201,10 +201,22 @@ export const api = {
     },
 };
 
-export function imageUrl(path) {
+/**
+ * Resolves an image path to a URL. Pass `width` to request a right-sized
+ * rendition from the Unsplash CDN (other hosts are returned unchanged).
+ */
+export function imageUrl(path, width) {
     if (!path) return '';
-    if (path.startsWith('http'))
+    if (path.startsWith('http')) {
+        if (width && path.includes('images.unsplash.com')) {
+            const url = new URL(path);
+            url.searchParams.set('w', String(width));
+            url.searchParams.set('q', '75');
+            url.searchParams.set('auto', 'format');
+            return url.toString();
+        }
         return path;
+    }
     return `${API_BASE}${path}`;
 }
 

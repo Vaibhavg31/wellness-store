@@ -70,4 +70,17 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['@imgly/background-removal'],
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        // Fewer, larger shared chunks: avoids a request waterfall of tiny per-icon files.
+        codeSplitting: {
+          groups: [
+            { name: 'react-vendor', test: /node_modules[\/](react|react-dom|react-router|react-router-dom|scheduler)[\/]/ },
+            { name: 'icons', test: /node_modules[\/]lucide-react[\/]/ },
+          ],
+        },
+      },
+    },
+  },
 })

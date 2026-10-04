@@ -8,7 +8,7 @@ import { imageUrl } from '@/services/api';
 
 const BADGE_ICONS = { shield: ShieldCheck, star: Star, sparkles: Leaf };
 
-export default function Hero({ products }) {
+export default function Hero({ products, loading = false }) {
     const { content } = useSiteContent();
     const hero = content.hero;
 
@@ -56,9 +56,10 @@ export default function Hero({ products }) {
 
                 <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
                     <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-primary-tint" aria-hidden="true" />
-                    {image && (
+                    {loading && <div className="skeleton aspect-[9/10] w-full rounded-xl" aria-hidden="true" />}
+                    {!loading && image && (
                         <img
-                            src={imageUrl(image)}
+                            src={imageUrl(image, 800)}
                             alt={featured?.title ?? ''}
                             width="720"
                             height="800"
@@ -67,7 +68,7 @@ export default function Hero({ products }) {
                             className="aspect-[9/10] w-full rounded-xl object-cover shadow-lg"
                         />
                     )}
-                    {featured && (
+                    {!loading && featured && (
                         <Link
                             to={`/product/${featured.id}`}
                             className="absolute -bottom-5 left-4 right-4 flex items-center justify-between gap-4 rounded-lg bg-surface p-4 shadow-md transition-shadow hover:shadow-lg sm:left-auto sm:right-6 sm:w-72"

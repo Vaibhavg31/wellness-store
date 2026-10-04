@@ -39,14 +39,14 @@ export default function VideoBanner() {
                         muted
                         playsInline
                         preload="metadata"
-                        poster={banner.poster ? imageUrl(banner.poster) : undefined}
+                        poster={banner.poster ? imageUrl(banner.poster, 1200) : undefined}
                         aria-label={banner.title || 'Promotional video'}
                     >
                         <source src={imageUrl(banner.videoUrl)} type={videoType(banner.videoUrl)} />
                     </video>
 
                     {hasText && (
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 to-transparent p-5 text-white sm:p-10">
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 via-ink/40 to-transparent p-5 text-white sm:p-10">
                             {banner.subtitle && <p className="eyebrow !text-accent-hover">{banner.subtitle}</p>}
                             {banner.title && <p className="mt-1 max-w-xl font-display text-h2 text-white">{banner.title}</p>}
                             {banner.ctaLabel && banner.ctaHref && (

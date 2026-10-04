@@ -21,7 +21,7 @@ export default function ProductGallery({ images, title, tags = [] }) {
             <div className="relative aspect-square overflow-hidden rounded-xl bg-canvas-alt">
                 <img
                     key={selected}
-                    src={imageUrl(images[selected])}
+                    src={imageUrl(images[selected], 900)}
                     alt={title}
                     width="800"
                     height="800"
@@ -47,7 +47,7 @@ export default function ProductGallery({ images, title, tags = [] }) {
                                 aria-current={selected === i}
                                 className={cn('size-16 overflow-hidden rounded-md border-2 transition-[border-color,opacity] sm:size-20', selected === i ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100')}
                             >
-                                <img src={imageUrl(img)} alt="" width="80" height="80" loading="lazy" className="size-full object-cover" />
+                                <img src={imageUrl(img, 160)} alt="" width="80" height="80" loading="lazy" className="size-full object-cover" />
                             </button>
                         </li>
                     ))}

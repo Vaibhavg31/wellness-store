@@ -89,13 +89,32 @@ backend/                # Database only — schema.sql, seed.sql, migrations/
                          # (no application code; MySQL is shared infrastructure)
 
 src/                    # React source (JavaScript .jsx / .js)
+├── styles/
+│   ├── tokens.css      # THE design tokens: colours, type scale, radius, shadows, motion
+│   ├── fonts.css       # Self-hosted Lora + Poppins (latin subsets in public/fonts)
+│   ├── base.css        # Element defaults, focus ring, reveal + reduced-motion rules
+│   └── admin.css       # Admin panel chrome (uses the same tokens)
 ├── components/
-├── pages/
-├── contexts/
-└── services/
+│   ├── ui/             # Design-system primitives (Button, Input, Badge, Modal, Drawer, Logo, ...)
+│   ├── layout/         # Header, Footer, announcement bar, search, account menu, WhatsApp button
+│   ├── home/ shop/ product/ cart/ checkout/ orders/ auth/ account/   # Feature components
+│   └── admin/          # Admin-only components
+├── layouts/            # MainLayout (storefront shell)
+├── pages/              # Route pages (storefront, auth, admin/)
+├── contexts/ hooks/ services/ utils/ data/ constants/       # State, data layer, helpers
+public/brand/           # Official Chikit logo (webp renditions of the supplied artwork)
+CHIKIT/                 # Original brand source files (.ai/.eps/.pdf/.cdr/.png)
 
 dist/                   # Built frontend (after npm run build)
 ```
+
+## Design system
+
+All colours, fonts, spacing, radii, shadows and motion live in `src/styles/tokens.css`.
+Components use the generated Tailwind utilities (`bg-primary`, `text-ink`, `rounded-lg`,
+`shadow-md`, ...) and never hardcode a value. The brand anchor is **#602460**, sampled from the
+official logo. Gold (`accent`) is a fill colour only: pair it with `ink` text, never white.
+Use the logo only through `components/ui/Logo.jsx`, always on a light surface.
 
 ## Deployment
 

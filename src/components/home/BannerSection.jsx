@@ -19,7 +19,7 @@ export function Banner({ banner, priority = false }) {
     return (
         <BannerLink href={banner.ctaHref} className="group relative block overflow-hidden rounded-xl bg-canvas-alt">
             <img
-                src={imageUrl(banner.image)}
+                src={imageUrl(banner.image, 1200)}
                 alt={banner.title || 'Promotional banner'}
                 width="1440"
                 height="560"

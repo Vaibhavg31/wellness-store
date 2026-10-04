@@ -20,7 +20,7 @@ export default function CategoryGrid() {
                         <Reveal as="li" key={cat.slug} delay={i * 50}>
                             <Link to={`/category/${cat.slug}`} className="group block">
                                 <div className="aspect-square overflow-hidden rounded-lg bg-surface">
-                                    <img src={imageUrl(cat.image)} alt="" width="400" height="400" loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                    <img src={imageUrl(cat.image, 400)} alt="" width="400" height="400" loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                 </div>
                                 <p className="mt-3 text-center font-display text-h4 transition-colors group-hover:text-primary">{cat.label}</p>
                             </Link>

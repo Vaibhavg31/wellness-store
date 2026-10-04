@@ -23,7 +23,7 @@ export default function InstagramGallery() {
                     {images.map((src, i) => (
                         <li key={src}>
                             <Tile {...tileProps} className="group relative block aspect-square overflow-hidden rounded-md bg-surface" {...(linked ? { 'aria-label': `Open Instagram, photo ${i + 1}` } : {})}>
-                                <img src={imageUrl(src)} alt="" width="300" height="300" loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <img src={imageUrl(src, 300)} alt="" width="300" height="300" loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                 {linked && (
                                     <span className="absolute inset-0 grid place-items-center bg-primary-deep/60 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                                         <InstagramIcon size={24} />

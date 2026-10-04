@@ -16,7 +16,7 @@ export default function MainLayout() {
             <AnnouncementBar />
             <Header />
             <CartDrawer />
-            <main id="main" className="flex-1">
+            <main id="main" className="min-h-[100dvh] flex-1">
                 <PageTransition />
             </main>
             <Footer />

@@ -1,6 +1,5 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { CartProvider } from '@/contexts/CartContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import { AuthProvider, ADMIN_PATH } from '@/contexts/AuthContext';
@@ -13,11 +12,9 @@ import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
 import PageLoader from '@/components/layout/PageLoader';
 import MainLayout from '@/layouts/MainLayout';
-
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+import HomePage from '@/pages/HomePage';
 
 // Storefront pages
-const HomePage = lazy(() => import('@/pages/HomePage'));
 const ShopPage = lazy(() => import('@/pages/ShopPage'));
 const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
 const CategoryPage = lazy(() => import('@/pages/CategoryPage'));
@@ -108,16 +105,8 @@ const lazyElement = (Page) => (
     </Suspense>
 );
 
-function AppProviders({ children }) {
-    if (GOOGLE_CLIENT_ID) {
-        return <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{children}</GoogleOAuthProvider>;
-    }
-    return children;
-}
-
 export default function App() {
     return (
-        <AppProviders>
             <AuthProvider>
                 <SignOutTransitionProvider>
                     <SiteContentProvider>
@@ -130,7 +119,7 @@ export default function App() {
                                         <AnnouncementPopup />
                                         <Routes>
                                             <Route element={<MainLayout />}>
-                                                <Route index element={lazyElement(HomePage)} />
+                                                <Route index element={<HomePage />} />
                                                 {STOREFRONT_ROUTES.map(({ path, Page }) => (
                                                     <Route key={path} path={path} element={lazyElement(Page)} />
                                                 ))}
@@ -159,6 +148,5 @@ export default function App() {
                     </SiteContentProvider>
                 </SignOutTransitionProvider>
             </AuthProvider>
-        </AppProviders>
     );
 }

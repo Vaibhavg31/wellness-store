@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { ShoppingBag, Shield, Star, Leaf } from 'lucide-react';
 import AuthShell from '@/components/auth/AuthShell';
 import Input from '@/components/ui/Input';
@@ -11,7 +11,8 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
 import { BRAND_NAME, BRAND_DESCRIPTION } from '@/constants';
 import { ApiError } from '@/services/api';
 
-const GOOGLE_ENABLED = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const GOOGLE_ENABLED = !!GOOGLE_CLIENT_ID;
 
 function getSafeRedirect(path) {
     if (!path || !path.startsWith('/') || path.startsWith('//') || path.startsWith('/login')) {
@@ -20,7 +21,7 @@ function getSafeRedirect(path) {
     return path;
 }
 
-export default function LoginPage() {
+function LoginScreen() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const redirectTo = getSafeRedirect(searchParams.get('redirect'));
@@ -286,5 +287,15 @@ export default function LoginPage() {
                 )}
             </div>
         </AuthShell>
+    );
+}
+
+/** Google's sign-in script is only loaded here, not on every storefront page. */
+export default function LoginPage() {
+    if (!GOOGLE_CLIENT_ID) return <LoginScreen />;
+    return (
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+            <LoginScreen />
+        </GoogleOAuthProvider>
     );
 }

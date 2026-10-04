@@ -28,7 +28,7 @@ export default function Logo({ size = 'md', className, linkToHome = false, prior
             alt="Chikit — Ayurveda and Wellness"
             decoding="async"
             fetchPriority={priority ? 'high' : undefined}
-            className={cn('w-auto object-contain', sizes[size], className)}
+            className={cn('aspect-[975/320] w-auto object-contain', sizes[size], className)}
             draggable={false}
         />
     );

@@ -55,7 +55,7 @@ function ProductCard({ product, priority = false }) {
             <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-canvas-alt">
                 <Link to={href} tabIndex={-1} aria-hidden="true" className="block size-full">
                     <img
-                        src={imageUrl(primary)}
+                        src={imageUrl(primary, 480)}
                         alt=""
                         width="480"
                         height="600"
@@ -64,7 +64,7 @@ function ProductCard({ product, priority = false }) {
                         className={cn('size-full object-cover transition-[transform,opacity] duration-500 group-hover:scale-105', secondary && 'group-hover:opacity-0')}
                     />
                     {secondary && (
-                        <img src={imageUrl(secondary)} alt="" width="480" height="600" loading="lazy" decoding="async" className="absolute inset-0 size-full scale-105 object-cover opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-100 group-hover:opacity-100" />
+                        <img src={imageUrl(secondary, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" className="absolute inset-0 size-full scale-105 object-cover opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-100 group-hover:opacity-100" />
                     )}
                 </Link>
 

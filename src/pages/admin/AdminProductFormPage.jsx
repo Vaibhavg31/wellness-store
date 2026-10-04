@@ -85,8 +85,6 @@ const emptyProduct = {
     isNew: false,
     isBestSeller: false,
     isTrendingPinned: false,
-    orbitFeatured: false,
-    orbitSortOrder: 0,
     isPublished: true,
     codEnabled: true,
     onlinePaymentEnabled: true,
@@ -168,8 +166,6 @@ export default function AdminProductFormPage() {
                     isNew: p.isNew,
                     isBestSeller: p.isBestSeller,
                     isTrendingPinned: p.isTrendingPinned,
-                    orbitFeatured: p.orbitFeatured ?? false,
-                    orbitSortOrder: p.orbitSortOrder ?? 0,
                     isPublished: p.isPublished,
                     codEnabled: p.codEnabled !== false,
                     onlinePaymentEnabled: p.onlinePaymentEnabled !== false,
@@ -1082,18 +1078,6 @@ export default function AdminProductFormPage() {
                                 <span>
                                     <span className="text-sm font-medium text-ink">Pin to Trending</span>
                                     <span className="text-xs text-admin-muted block mt-0.5">Force into the homepage &quot;Trending Now&quot; row, ahead of real sales data</span>
-                                </span>
-                            </label>
-                            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-admin-border p-3 bg-admin-surface-alt">
-                                <input
-                                    type="checkbox"
-                                    checked={form.orbitFeatured}
-                                    onChange={(e) => update('orbitFeatured', e.target.checked)}
-                                    className="mt-0.5 rounded border-line"
-                                />
-                                <span>
-                                    <span className="text-sm font-medium text-ink">Feature in Orbit Ring</span>
-                                    <span className="text-xs text-admin-muted block mt-0.5">Shows on the homepage &quot;Orbit Ring&quot; — only products checked here (or added from Content → Homepage → Orbit Ring) ever appear there. Manage display order from that same screen.</span>
                                 </span>
                             </label>
                         </div>

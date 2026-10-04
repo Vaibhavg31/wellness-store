@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Store, Home, FileText, MessageCircle, Megaphone, Palette, Bell,
+    Store, Home, FileText, MessageCircle, Megaphone, Bell,
 } from 'lucide-react';
 import { api, ApiError } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
@@ -14,32 +14,13 @@ import { prepareSiteContentForSave } from '@/utils/prepareSiteContentForSave';
 import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
-import OrbitRingManager from '@/components/admin/OrbitRingManager';
 import {
     AdminSection, AdminField, AdminTextarea, ImageUploadField, VideoUploadField,
     StringListEditor, BenefitEditor, FaqEditor, SectionToggles,
-    ColorField, FontField,
 } from '@/components/admin/ContentEditor';
-
-const HEADING_FONT_OPTIONS = [
-    { value: '"Lora", Georgia, serif', label: 'Lora (default)' },
-    { value: '"Manrope", system-ui, sans-serif', label: 'Manrope' },
-    { value: '"Sora", system-ui, sans-serif', label: 'Sora' },
-    { value: '"Space Grotesk", system-ui, sans-serif', label: 'Space Grotesk' },
-    { value: 'Georgia, serif', label: 'Georgia (serif)' },
-];
-
-const BODY_FONT_OPTIONS = [
-    { value: '"Poppins", system-ui, sans-serif', label: 'Poppins (default)' },
-    { value: '"Inter", system-ui, sans-serif', label: 'Inter' },
-    { value: '"Lato", system-ui, sans-serif', label: 'Lato' },
-    { value: '"Nunito Sans", system-ui, sans-serif', label: 'Nunito Sans' },
-    { value: 'system-ui, sans-serif', label: 'System default' },
-];
 
 const TABS = [
     { id: 'brand', label: 'Brand & Store', icon: Store },
-    { id: 'branding', label: 'Branding & Theme', icon: Palette },
     { id: 'homepage', label: 'Homepage', icon: Home },
     { id: 'about', label: 'About Page', icon: FileText },
     { id: 'contact', label: 'Contact & FAQ', icon: MessageCircle },
@@ -61,10 +42,6 @@ const SECTION_LABELS = {
     trending: 'Trending Now',
     categories: 'Shop by Category',
     bundles: 'Bundle & Save Offers',
-    ritualBuilder: 'Build Your Ritual (Interactive Quiz)',
-    wellnessJourney: '24 Hours With Your Ritual (Scroll Story)',
-    bodyMap: 'Body Map (Scroll Story)',
-    sourceTrail: 'The Source Trail (Scroll Story)',
     whyChoose: 'Why Choose Us',
     certifiedBanner: 'Certified Banner (FSSAI/GMP)',
     reviews: 'Customer Reviews',
@@ -486,34 +463,6 @@ export default function AdminContentPage() {
                     </p>
                 );
 
-            case 'ritualBuilder':
-                return (
-                    <p className="text-sm text-admin-muted pt-3">
-                        A two-question interactive quiz that assembles a personalized routine from your live catalog and lets shoppers add it to their bag in one tap. Goal and product matching is automatic — no extra content to configure here.
-                    </p>
-                );
-
-            case 'wellnessJourney':
-                return (
-                    <p className="text-sm text-admin-muted pt-3">
-                        A scroll-driven walk through a 24-hour day showing where each kind of product fits. Pinned and GSAP-scrubbed on desktop, a lighter stacked story on mobile. No extra content to configure here.
-                    </p>
-                );
-
-            case 'bodyMap':
-                return (
-                    <p className="text-sm text-admin-muted pt-3">
-                        A scroll-driven tour of five zones (heart, gut, joints, muscle, energy) lighting up on a figure as each block scrolls into view, paired with the product that supports it. No extra content to configure here.
-                    </p>
-                );
-
-            case 'sourceTrail':
-                return (
-                    <p className="text-sm text-admin-muted pt-3">
-                        A scroll-through sourcing map tracing real ingredients to their growing regions in India, with a link into the shop for each. No extra content to configure here.
-                    </p>
-                );
-
             case 'reviews':
                 return (
                     <p className="text-sm text-admin-muted pt-3">
@@ -656,35 +605,6 @@ export default function AdminContentPage() {
                         </>
                     )}
 
-                    {tab === 'branding' && (
-                        <>
-                            <AdminSection title="Logo & Favicon" description="Appears in the header, footer, and browser tab across the entire site">
-                                <ImageUploadField label="Site Logo" value={content.logo} onChange={(v) => update('logo', v)} adminToken={adminToken} />
-                                <ImageUploadField label="Favicon" hint="Small square image shown in the browser tab. Recommended: 512×512 PNG." value={content.favicon} onChange={(v) => update('favicon', v)} adminToken={adminToken} />
-                            </AdminSection>
-
-                            <AdminSection title="Color Palette" description="Applied globally — buttons, headers, links, badges, and backgrounds update everywhere on the site immediately">
-                                <div className="grid sm:grid-cols-2 gap-x-6">
-                                    <ColorField label="Primary Color" hint="Buttons, navigation, headings" value={content.theme.primaryColor} onChange={(v) => update('theme', { ...content.theme, primaryColor: v })} />
-                                    <ColorField label="Primary — Light" hint="Hover states" value={content.theme.primaryLight} onChange={(v) => update('theme', { ...content.theme, primaryLight: v })} />
-                                    <ColorField label="Primary — Dark" hint="Footer, deep backgrounds" value={content.theme.primaryDark} onChange={(v) => update('theme', { ...content.theme, primaryDark: v })} />
-                                    <ColorField label="Accent Color" hint="Badges, price highlights" value={content.theme.accentColor} onChange={(v) => update('theme', { ...content.theme, accentColor: v })} />
-                                    <ColorField label="Accent — Light" hint="Hover fills" value={content.theme.accentLight} onChange={(v) => update('theme', { ...content.theme, accentLight: v })} />
-                                    <ColorField label="Sage / Background Tint" hint="Gentle backgrounds and decorative blobs" value={content.theme.tintColor} onChange={(v) => update('theme', { ...content.theme, tintColor: v })} />
-                                    <ColorField label="Background Color" hint="Page background" value={content.theme.backgroundColor} onChange={(v) => update('theme', { ...content.theme, backgroundColor: v })} />
-                                    <ColorField label="Text Color" hint="Body text" value={content.theme.textColor} onChange={(v) => update('theme', { ...content.theme, textColor: v })} />
-                                </div>
-                            </AdminSection>
-
-                            <AdminSection title="Typography" description="Fonts used across the entire site">
-                                <div className="grid sm:grid-cols-2 gap-x-6">
-                                    <FontField label="Heading Font" value={content.theme.fontHeading} onChange={(v) => update('theme', { ...content.theme, fontHeading: v })} options={HEADING_FONT_OPTIONS} />
-                                    <FontField label="Body Font" value={content.theme.fontBody} onChange={(v) => update('theme', { ...content.theme, fontBody: v })} options={BODY_FONT_OPTIONS} />
-                                </div>
-                            </AdminSection>
-                        </>
-                    )}
-
                     {tab === 'homepage' && (
                         <>
                             <AdminSection title="Homepage Sections" description="Drag a row to reorder it, use the switch to show/hide it, and click a section's name to open its content editor right here. Reordering and show/hide save immediately — no need to press Save for those.">
@@ -696,9 +616,6 @@ export default function AdminContentPage() {
                                 />
                             </AdminSection>
 
-                            <AdminSection title="Orbit Ring — Featured Products" description="Curates the center + ring of the homepage 'Your Wellness Orbit' section. Changes here save immediately — no need to press Save.">
-                                <OrbitRingManager />
-                            </AdminSection>
                         </>
                     )}
 

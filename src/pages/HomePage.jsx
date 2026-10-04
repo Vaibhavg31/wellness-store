@@ -19,7 +19,7 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
  */
 function buildSections({ products, loading, trending, featured }) {
     return {
-        hero: () => <Hero products={products} />,
+        hero: () => <Hero products={products} loading={loading} />,
         brandMarquee: () => <TrustStrip />,
         videoBanner: () => <VideoBanner />,
         banners: () => <PromoBanners />,

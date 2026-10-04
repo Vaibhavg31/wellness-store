@@ -431,7 +431,9 @@ export function FaqEditor({ faqs = [], onChange }) {
  * (e.g. it just pulls from Products or another admin page).
  */
 export function SectionToggles({ sections, onChange, labels, renderContent }) {
-    const keys = Object.keys(sections).length ? Object.keys(sections) : Object.keys(labels);
+    // Only sections the storefront still renders — settings saved for retired sections are ignored.
+    const known = Object.keys(sections).filter((k) => k in labels);
+    const keys = known.length ? known : Object.keys(labels);
     const [expandedKeys, setExpandedKeys] = useState(() => new Set());
 
     const handleReorder = (nextKeys) => {

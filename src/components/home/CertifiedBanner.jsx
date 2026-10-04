@@ -20,7 +20,7 @@ export default function CertifiedBanner() {
                     <Link to={banner.ctaHref || '/about'} className="mt-7 inline-block"><Button size="lg">{banner.ctaLabel}</Button></Link>
                 </div>
                 {banner.image && (
-                    <img src={imageUrl(banner.image)} alt="" width="700" height="460" loading="lazy" decoding="async" className="aspect-[3/2] w-full rounded-lg object-cover" />
+                    <img src={imageUrl(banner.image, 700)} alt="" width="700" height="460" loading="lazy" decoding="async" className="aspect-[3/2] w-full rounded-lg object-cover" />
                 )}
             </div>
         </section>
