@@ -78,7 +78,7 @@ export default function VerifyEmailPage() {
     }, [token, email, verifyKey, login]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-cream">
+        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-canvas">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -89,15 +89,15 @@ export default function VerifyEmailPage() {
                 {status === 'loading' && (
                     <>
                         <h1 className="font-display text-3xl text-ink mb-3">Verifying your email…</h1>
-                        <p className="text-slate text-sm">Please wait a moment.</p>
+                        <p className="text-muted text-sm">Please wait a moment.</p>
                     </>
                 )}
 
                 {status === 'success' && (
                     <>
-                        <CheckCircle size={48} className="text-emerald mx-auto mb-4" />
+                        <CheckCircle size={48} className="text-primary mx-auto mb-4" />
                         <h1 className="font-display text-3xl text-ink mb-3">You&apos;re signed in</h1>
-                        <p className="text-slate text-sm mb-8">{message}</p>
+                        <p className="text-muted text-sm mb-8">{message}</p>
                         <Button
                             variant="turmeric"
                             size="lg"
@@ -112,11 +112,11 @@ export default function VerifyEmailPage() {
 
                 {(status === 'error' || status === 'invalid') && (
                     <>
-                        <XCircle size={48} className="text-forest mx-auto mb-4" />
+                        <XCircle size={48} className="text-primary mx-auto mb-4" />
                         <h1 className="font-display text-3xl text-ink mb-3">
                             {status === 'invalid' ? 'Invalid link' : 'Verification failed'}
                         </h1>
-                        <p className="text-slate text-sm mb-8">
+                        <p className="text-muted text-sm mb-8">
                             {status === 'invalid'
                                 ? 'This verification link is missing required information.'
                                 : message}
@@ -128,7 +128,7 @@ export default function VerifyEmailPage() {
                             >
                                 <Button variant="turmeric" size="lg" className="w-full">Request a new link</Button>
                             </Link>
-                            <Link to="/login" className="block text-sm text-forest hover:text-forest-light">
+                            <Link to="/login" className="block text-sm text-primary hover:text-primary-hover">
                                 Back to sign in
                             </Link>
                         </div>

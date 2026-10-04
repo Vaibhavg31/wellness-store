@@ -38,7 +38,7 @@ export default function EmailVerificationBanner({ className = '', compact = fals
                 <Button variant="outline" size="sm" type="button" onClick={handleResend} disabled={loading}>
                     {loading ? 'Sending…' : 'Resend email'}
                 </Button>
-                {message && <p className="text-xs text-emerald mt-2">{message}</p>}
+                {message && <p className="text-xs text-primary mt-2">{message}</p>}
                 {error && <p className="text-xs text-red-600 mt-2" role="alert">{error}</p>}
             </div>
         );
@@ -51,7 +51,7 @@ export default function EmailVerificationBanner({ className = '', compact = fals
             </div>
             <div className="flex-1 min-w-0">
                 <h3 className="font-display text-lg text-ink mb-1">Verify your email</h3>
-                <p className="text-sm text-slate mb-3">
+                <p className="text-sm text-muted mb-3">
                     We sent a magic link to <span className="font-medium text-ink">{email}</span>.
                     Click it to verify and sign in.
                 </p>
@@ -65,7 +65,7 @@ export default function EmailVerificationBanner({ className = '', compact = fals
                         'Resend verification email'
                     )}
                 </Button>
-                {message && <p className="text-xs text-emerald mt-2">{message}</p>}
+                {message && <p className="text-xs text-primary mt-2">{message}</p>}
                 {error && <p className="text-xs text-red-600 mt-2" role="alert">{error}</p>}
             </div>
         </div>

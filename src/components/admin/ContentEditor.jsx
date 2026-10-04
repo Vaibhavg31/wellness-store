@@ -7,7 +7,7 @@ import { api, imageUrl } from '@/services/api';
 
 export function AdminSection({ title, description, children }) {
     return (
-        <div className="bg-cream rounded-2xl soft-shadow p-6 mb-6">
+        <div className="bg-canvas rounded-2xl shadow-sm p-6 mb-6">
             <h3 className="font-display text-xl text-ink mb-1">{title}</h3>
             {description && <p className="text-sm text-admin-muted mb-5">{description}</p>}
             {children}
@@ -34,7 +34,7 @@ export function AdminTextarea({ value, onChange, rows = 3, placeholder }) {
             onChange={onChange}
             rows={rows}
             placeholder={placeholder}
-            className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink placeholder:text-admin-muted/50 focus:outline-none focus:border-turmeric-ink focus:ring-1 focus:ring-turmeric-ink/30 transition-all font-light resize-none rounded-lg text-sm"
+            className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink placeholder:text-admin-muted/50 focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30 transition-all font-light resize-none rounded-lg text-sm"
         />
     );
 }
@@ -65,7 +65,7 @@ export function ImageUploadField({ value, onChange, adminToken, label = 'Image',
                 )}
                 <div className="flex-1 space-y-2">
                     <Input value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder="Image URL or upload" />
-                    <label className="inline-flex items-center gap-2 text-xs text-forest cursor-pointer hover:text-forest-light">
+                    <label className="inline-flex items-center gap-2 text-xs text-primary cursor-pointer hover:text-primary-hover">
                         <Upload size={14} />
                         {uploading ? 'Uploading...' : 'Upload image'}
                         <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
@@ -192,7 +192,7 @@ export function VideoUploadField({ value, width, height, onChange, adminToken, l
                             <p className="text-[11px] text-admin-muted">{(pending.file.size / (1024 * 1024)).toFixed(1)}MB</p>
                             {pendingAspect && (
                                 <div className={`mt-1.5 flex items-start gap-1.5 text-[11px] ${
-                                    pendingAspect.tone === 'good' ? 'text-emerald' : pendingAspect.tone === 'warn' ? 'text-turmeric-ink' : 'text-red-600'
+                                    pendingAspect.tone === 'good' ? 'text-primary' : pendingAspect.tone === 'warn' ? 'text-accent-ink' : 'text-red-600'
                                 }`}>
                                     {pendingAspect.tone === 'good'
                                         ? <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
@@ -223,7 +223,7 @@ export function VideoUploadField({ value, width, height, onChange, adminToken, l
                     <div className="flex-1 min-w-0 space-y-2">
                         {currentAspect && (
                             <div className={`flex items-start gap-1.5 text-[11px] ${
-                                currentAspect.tone === 'good' ? 'text-emerald' : currentAspect.tone === 'warn' ? 'text-turmeric-ink' : 'text-red-600'
+                                currentAspect.tone === 'good' ? 'text-primary' : currentAspect.tone === 'warn' ? 'text-accent-ink' : 'text-red-600'
                             }`}>
                                 {currentAspect.tone === 'good'
                                     ? <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
@@ -232,7 +232,7 @@ export function VideoUploadField({ value, width, height, onChange, adminToken, l
                             </div>
                         )}
                         <div className="flex gap-3">
-                            <label className="inline-flex items-center gap-2 text-xs text-forest cursor-pointer hover:text-forest-light">
+                            <label className="inline-flex items-center gap-2 text-xs text-primary cursor-pointer hover:text-primary-hover">
                                 <Upload size={14} />
                                 Replace video
                                 <input ref={fileInputRef} type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" onChange={handleSelect} />
@@ -244,7 +244,7 @@ export function VideoUploadField({ value, width, height, onChange, adminToken, l
                     </div>
                 </div>
             ) : (
-                <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-forest/30 hover:bg-forest/5 transition-colors">
+                <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors">
                     <Film size={26} className="text-admin-muted/40" />
                     <span className="text-sm text-admin-muted">Click to upload a banner video</span>
                     <span className="text-xs text-admin-muted">MP4 or WebM · 16:9 landscape recommended · max {MAX_VIDEO_MB}MB</span>
@@ -278,7 +278,7 @@ export function FontField({ label, hint, value, onChange, options }) {
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink focus:outline-none focus:border-turmeric-ink focus:ring-1 focus:ring-turmeric-ink/30 transition-all rounded-lg text-sm"
+                className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30 transition-all rounded-lg text-sm"
                 style={{ fontFamily: value }}
             >
                 {options.map((opt) => (
@@ -359,7 +359,7 @@ export function BenefitEditor({ benefits = [], onChange }) {
                         <select
                             value={b.icon}
                             onChange={(e) => update(i, 'icon', e.target.value)}
-                            className="px-3 py-2 bg-cream border border-sand/60 rounded-lg text-sm"
+                            className="px-3 py-2 bg-canvas border border-sand/60 rounded-lg text-sm"
                         >
                             {icons.map((ic) => (
                                 <option key={ic} value={ic}>{ic}</option>
@@ -454,7 +454,7 @@ export function SectionToggles({ sections, onChange, labels, renderContent }) {
             axis="y"
             values={keys}
             onReorder={handleReorder}
-            className="divide-y divide-border/30 rounded-xl border border-admin-border overflow-hidden"
+            className="divide-y divide-line/30 rounded-xl border border-admin-border overflow-hidden"
         >
             {keys.map((key) => (
                 <SectionAccordionRow
@@ -484,14 +484,14 @@ function SectionAccordionRow({ itemKey, label, enabled, onToggle, expanded, onTo
             dragListener={false}
             dragControls={dragControls}
             whileDrag={{ scale: 1.015, boxShadow: '0 10px 28px rgba(35,20,20,0.14)', cursor: 'grabbing' }}
-            className="relative bg-cream"
+            className="relative bg-canvas"
             style={{ touchAction: 'none' }}
         >
             <div className="flex items-center justify-between gap-3 p-4 hover:bg-admin-surface-alt">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                     <span
                         onPointerDown={(e) => dragControls.start(e)}
-                        className="text-admin-muted/60 hover:text-forest cursor-grab active:cursor-grabbing p-1 -m-1 touch-none flex-shrink-0"
+                        className="text-admin-muted/60 hover:text-primary cursor-grab active:cursor-grabbing p-1 -m-1 touch-none flex-shrink-0"
                         aria-label={`Drag to reorder ${label}`}
                         role="button"
                         tabIndex={-1}
@@ -517,10 +517,10 @@ function SectionAccordionRow({ itemKey, label, enabled, onToggle, expanded, onTo
                 <button
                     type="button"
                     onClick={onToggle}
-                    className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${enabled ? 'bg-emerald' : 'bg-slate/30'}`}
+                    className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${enabled ? 'bg-primary' : 'bg-muted/30'}`}
                     aria-label={enabled ? 'Disable section' : 'Enable section'}
                 >
-                    <span className={`absolute top-0.5 w-5 h-5 bg-cream rounded-full shadow transition-transform ${enabled ? 'left-6' : 'left-0.5'}`} />
+                    <span className={`absolute top-0.5 w-5 h-5 bg-canvas rounded-full shadow transition-transform ${enabled ? 'left-6' : 'left-0.5'}`} />
                 </button>
             </div>
 

@@ -88,8 +88,8 @@ export default function AdminFeedbackPage() {
                 columns={3}
                 stats={[
                     { label: 'Total messages', value: feedback.length },
-                    { label: 'Unread', value: unreadCount, color: 'text-turmeric-ink', sub: unreadCount > 0 ? 'Needs attention' : undefined },
-                    { label: 'Read', value: readCount, color: 'text-emerald' },
+                    { label: 'Unread', value: unreadCount, color: 'text-accent-ink', sub: unreadCount > 0 ? 'Needs attention' : undefined },
+                    { label: 'Read', value: readCount, color: 'text-primary' },
                 ]}
             />
 
@@ -144,7 +144,7 @@ export default function AdminFeedbackPage() {
                                 {filteredFeedback.map((item) => (
                                     <tr
                                         key={item.id}
-                                        className={`border-b border-admin-border-light hover:bg-admin-surface-alt/60 ${!item.isRead ? 'bg-turmeric/5' : ''}`}
+                                        className={`border-b border-admin-border-light hover:bg-admin-surface-alt/60 ${!item.isRead ? 'bg-accent/5' : ''}`}
                                     >
                                         <td className="p-4 align-top">
                                             <p className="font-medium text-ink">{item.name}</p>
@@ -179,7 +179,7 @@ export default function AdminFeedbackPage() {
                                                     <button
                                                         type="button"
                                                         onClick={() => markRead(item.id)}
-                                                        className="text-xs px-3 py-1.5 bg-emerald/10 text-emerald rounded-full hover:bg-emerald/20 font-medium"
+                                                        className="text-xs px-3 py-1.5 bg-primary/10 text-primary rounded-full hover:bg-primary/20 font-medium"
                                                     >
                                                         Mark read
                                                     </button>

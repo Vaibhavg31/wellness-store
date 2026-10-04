@@ -35,20 +35,20 @@ function CheckoutSteps({ activeIndex = 0 }) {
                             <span
                                 className={`flex items-center justify-center w-8 h-8 rounded-full border transition-colors ${
                                     active
-                                        ? 'bg-forest border-forest text-cream'
+                                        ? 'bg-primary border-primary text-canvas'
                                         : done
-                                            ? 'bg-forest/10 border-forest/30 text-forest'
-                                            : 'bg-cream border-border/60 text-slate/60'
+                                            ? 'bg-primary/10 border-primary/30 text-primary'
+                                            : 'bg-canvas border-line/60 text-muted/60'
                                 }`}
                             >
                                 {done ? <Check size={14} /> : <Icon size={14} strokeWidth={1.75} />}
                             </span>
-                            <span className={`type-eyebrow-sm hidden sm:inline ${active ? 'text-ink' : 'text-slate/60'}`}>
+                            <span className={`eyebrow hidden sm:inline ${active ? 'text-ink' : 'text-muted/60'}`}>
                                 {step.label}
                             </span>
                         </div>
                         {i < CHECKOUT_STEPS.length - 1 && (
-                            <span className={`w-6 sm:w-10 h-px ${done ? 'bg-forest/40' : 'bg-border'}`} />
+                            <span className={`w-6 sm:w-10 h-px ${done ? 'bg-primary/40' : 'bg-line'}`} />
                         )}
                     </div>
                 );
@@ -106,10 +106,10 @@ export default function CartPage() {
             <div className="min-h-[70vh] flex items-center justify-center px-6">
                 <div className="text-center max-w-md">
                     <div className="w-20 h-20 rounded-full bg-sand/60 flex items-center justify-center mx-auto mb-8">
-                        <ShoppingBag size={32} className="text-emerald/40" strokeWidth={1} />
+                        <ShoppingBag size={32} className="text-primary/40" strokeWidth={1} />
                     </div>
                     <h1 className="font-display text-3xl md:text-4xl font-light text-ink mb-4">Your Bag is Empty</h1>
-                    <p className="text-slate font-light mb-10 leading-relaxed">
+                    <p className="text-muted font-light mb-10 leading-relaxed">
                         Browse freely and add items. No sign-in needed until checkout.
                     </p>
                     <Link to="/shop">
@@ -121,7 +121,7 @@ export default function CartPage() {
     }
 
     return (
-        <div className="pb-20 px-4 sm:px-6 lg:px-8 bg-cream min-h-screen pt-2 sm:pt-4">
+        <div className="pb-20 px-4 sm:px-6 lg:px-8 bg-canvas min-h-screen pt-2 sm:pt-4">
             <div className="max-w-5xl mx-auto">
                 <CheckoutSteps activeIndex={0} />
 
@@ -133,16 +133,16 @@ export default function CartPage() {
                 />
 
                 {isAuthenticated ? (
-                    <div className="mb-6 px-4 py-3.5 rounded-xl bg-turmeric-light/20 border border-turmeric-light/40 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-forest/10 flex items-center justify-center flex-shrink-0">
-                            <User size={15} className="text-forest" />
+                    <div className="mb-6 px-4 py-3.5 rounded-xl bg-accent-hover/20 border border-accent-hover/40 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <User size={15} className="text-primary" />
                         </div>
                         <p className="text-sm text-ink">
                             Hello, <span className="font-medium">{user?.name || user?.email}</span> — your bag is ready for checkout.
                         </p>
                     </div>
                 ) : (
-                    <div className="mb-6 p-4 rounded-xl bg-cream border border-border/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="mb-6 p-4 rounded-xl bg-canvas border border-line/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <p className="text-sm text-ink">
                             Shopping as guest. Sign in only when you&apos;re ready to place your order.
                         </p>
@@ -166,12 +166,12 @@ export default function CartPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, x: -24, scale: 0.97, transition: { duration: 0.25 } }}
                                         key={`bundle-${entry.bundleId}`}
-                                        className="p-4 sm:p-5 bg-cream rounded-xl border border-turmeric/40 soft-shadow"
+                                        className="p-4 sm:p-5 bg-canvas rounded-xl border border-accent/40 shadow-sm"
                                     >
                                         <div className="flex items-center justify-between gap-3 mb-3">
                                             <div className="flex items-center gap-2 min-w-0">
-                                                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-turmeric/15 flex items-center justify-center">
-                                                    <Gift size={13} className="text-turmeric-ink" />
+                                                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-accent/15 flex items-center justify-center">
+                                                    <Gift size={13} className="text-accent-ink" />
                                                 </span>
                                                 <p className="font-display text-base sm:text-lg text-ink truncate">
                                                     Bundle: {entry.bundleTitle}
@@ -179,7 +179,7 @@ export default function CartPage() {
                                             </div>
                                             <button
                                                 onClick={() => handleRemoveBundle(entry.bundleId, entry.bundleTitle)}
-                                                className="p-1.5 rounded-lg text-slate hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0"
+                                                className="p-1.5 rounded-lg text-muted hover:text-red-500 hover:bg-red-50 transition-colors flex-shrink-0"
                                                 aria-label="Remove bundle"
                                             >
                                                 <Trash2 size={15} />
@@ -199,10 +199,10 @@ export default function CartPage() {
                                                         className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
                                                     />
                                                     <div className="min-w-0 flex-1">
-                                                        <p className="text-sm text-ink group-hover:text-emerald transition-colors truncate">
+                                                        <p className="text-sm text-ink group-hover:text-primary transition-colors truncate">
                                                             {item.product.title}
                                                         </p>
-                                                        <p className="text-xs text-slate">Qty {item.quantity}</p>
+                                                        <p className="text-xs text-muted">Qty {item.quantity}</p>
                                                     </div>
                                                     <span className="text-sm text-ink flex-shrink-0">
                                                         {formatPrice(item.product.price * item.quantity)}
@@ -211,13 +211,13 @@ export default function CartPage() {
                                             ))}
                                         </div>
 
-                                        <div className="mt-3 pt-3 border-t border-border/40 flex items-center justify-between">
-                                            <span className="text-xs text-slate">Bundle price</span>
+                                        <div className="mt-3 pt-3 border-t border-line/40 flex items-center justify-between">
+                                            <span className="text-xs text-muted">Bundle price</span>
                                             <div className="flex items-baseline gap-2">
                                                 {bundleOriginal > bundleTotal && (
-                                                    <span className="text-xs text-slate/50 line-through">{formatPrice(bundleOriginal)}</span>
+                                                    <span className="text-xs text-muted/50 line-through">{formatPrice(bundleOriginal)}</span>
                                                 )}
-                                                <span className="font-display text-base text-forest">{formatPrice(bundleTotal)}</span>
+                                                <span className="font-display text-base text-primary">{formatPrice(bundleTotal)}</span>
                                             </div>
                                         </div>
                                     </motion.div>
@@ -232,7 +232,7 @@ export default function CartPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, x: -24, scale: 0.97, transition: { duration: 0.25 } }}
                                     key={item.product.variantId ? `${item.product.id}::${item.product.variantId}` : item.product.id}
-                                    className="flex gap-4 p-4 sm:p-5 bg-cream rounded-xl border border-border/40 soft-shadow card-lift"
+                                    className="flex gap-4 p-4 sm:p-5 bg-canvas rounded-xl border border-line/40 shadow-sm card-lift"
                                 >
                                     <Link to={`/product/${item.product.id}`} className="flex-shrink-0">
                                         <img
@@ -245,11 +245,11 @@ export default function CartPage() {
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="min-w-0">
                                                 <Link to={`/product/${item.product.id}`}>
-                                                    <h3 className="font-display text-base sm:text-lg text-ink hover:text-emerald transition-colors line-clamp-2 leading-snug">
+                                                    <h3 className="font-display text-base sm:text-lg text-ink hover:text-primary transition-colors line-clamp-2 leading-snug">
                                                         {item.product.title}
                                                     </h3>
                                                 </Link>
-                                                <p className="text-xs text-slate capitalize mt-1 tracking-wide">
+                                                <p className="text-xs text-muted capitalize mt-1 tracking-wide">
                                                     {item.product.category}
                                                 </p>
                                             </div>
@@ -259,7 +259,7 @@ export default function CartPage() {
                                                 </span>
                                                 <button
                                                     onClick={() => handleRemove(item.product.id, item.product.title, item.product.variantId)}
-                                                    className="p-1.5 rounded-lg text-slate hover:text-red-500 hover:bg-red-50 transition-colors"
+                                                    className="p-1.5 rounded-lg text-muted hover:text-red-500 hover:bg-red-50 transition-colors"
                                                     aria-label="Remove item"
                                                 >
                                                     <Trash2 size={15} />
@@ -267,7 +267,7 @@ export default function CartPage() {
                                             </div>
                                         </div>
                                         <div className="mt-3 flex items-center">
-                                            <div className="inline-flex items-center rounded-full border border-border/60 bg-cream/50 overflow-hidden">
+                                            <div className="inline-flex items-center rounded-full border border-line/60 bg-canvas/50 overflow-hidden">
                                                 <button
                                                     onClick={() => updateQuantity(item.product.id, item.quantity - 1, { variantId: item.product.variantId })}
                                                     className="p-2 hover:bg-sand/60 transition-colors"
@@ -298,7 +298,7 @@ export default function CartPage() {
                     <div className="lg:col-span-1 space-y-5">
                         <ActiveCoupons variant="sidebar" />
 
-                        <div className="sticky top-[calc(var(--site-header-h,7rem)+1rem)] z-10 p-5 sm:p-6 bg-cream rounded-xl border border-border/40 soft-shadow space-y-5">
+                        <div className="sticky top-[calc(var(--site-header-h,7rem)+1rem)] z-10 p-5 sm:p-6 bg-canvas rounded-xl border border-line/40 shadow-sm space-y-5">
                             <h3 className="font-display text-xl text-ink">Price Details</h3>
 
                             <CouponInput compact />
@@ -311,14 +311,14 @@ export default function CartPage() {
                                 </Button>
                             </Link>
 
-                            <div className="flex items-center justify-center gap-2 text-[10px] tracking-wide text-slate">
-                                <Shield size={12} className="text-emerald" />
+                            <div className="flex items-center justify-center gap-2 text-[10px] tracking-wide text-muted">
+                                <Shield size={12} className="text-primary" />
                                 Secure checkout · COD available
                             </div>
 
                             <Link
                                 to="/shop"
-                                className="block text-center text-sm text-slate hover:text-emerald transition-colors"
+                                className="block text-center text-sm text-muted hover:text-primary transition-colors"
                             >
                                 Continue Shopping
                             </Link>

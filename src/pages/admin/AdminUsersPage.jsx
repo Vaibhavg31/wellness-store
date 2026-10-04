@@ -110,7 +110,7 @@ function UserProfileSection({ user }) {
                             </span>
                         )}
                         {user.phoneVerified && (
-                            <span className="inline-flex items-center gap-1 text-xs text-emerald bg-emerald/10 px-2 py-0.5 rounded-full">
+                            <span className="inline-flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                                 <CheckCircle2 size={12} />
                                 Phone verified
                             </span>
@@ -145,7 +145,7 @@ function UserStatsSection({ user }) {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {stats.map((s) => (
-                <div key={s.label} className="rounded-xl bg-cream border border-admin-border px-3 py-3 text-center">
+                <div key={s.label} className="rounded-xl bg-canvas border border-admin-border px-3 py-3 text-center">
                     <p className="text-[10px] uppercase tracking-wider text-admin-muted">{s.label}</p>
                     <p className="font-display text-xl text-ink mt-0.5">{s.value}</p>
                 </div>
@@ -199,7 +199,7 @@ function UserOrdersSection({ orders, onSelectOrder }) {
                                     <OrderStatusBadge status={order.status} />
                                 </td>
                                 <td className="p-3">
-                                    <ChevronRight size={14} className="text-forest" />
+                                    <ChevronRight size={14} className="text-primary" />
                                 </td>
                             </tr>
                         ))}
@@ -572,7 +572,7 @@ export default function AdminUsersPage() {
                                                 {user.phone || '—'}
                                             </p>
                                             {user.phoneVerified ? (
-                                                <span className="text-[10px] text-emerald">Verified</span>
+                                                <span className="text-[10px] text-primary">Verified</span>
                                             ) : (
                                                 <span className="text-[10px] text-admin-muted flex items-center gap-0.5">
                                                     <XCircle size={10} /> Not verified
@@ -588,7 +588,7 @@ export default function AdminUsersPage() {
                                             <button
                                                 type="button"
                                                 onClick={(e) => { e.stopPropagation(); openUserDetail(user); }}
-                                                className="text-forest hover:text-forest-light text-xs font-medium inline-flex items-center gap-0.5"
+                                                className="text-primary hover:text-primary-hover text-xs font-medium inline-flex items-center gap-0.5"
                                             >
                                                 View <ChevronRight size={14} />
                                             </button>
@@ -626,7 +626,7 @@ export default function AdminUsersPage() {
             >
                 {detailLoading ? (
                     <div className="flex items-center justify-center py-20">
-                        <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" />
                     </div>
                 ) : selectedOrder ? (
                     <OrderDetailView order={selectedOrder} onBack={() => setSelectedOrder(null)} />
@@ -671,7 +671,7 @@ export default function AdminUsersPage() {
                                         size="sm"
                                         onClick={() => toggleBlock(detailUser, false)}
                                         disabled={blocking}
-                                        className="gap-2 text-emerald border-emerald/30 hover:bg-emerald/5"
+                                        className="gap-2 text-primary border-primary/30 hover:bg-primary/5"
                                     >
                                         <ShieldOff size={14} />
                                         Unblock user

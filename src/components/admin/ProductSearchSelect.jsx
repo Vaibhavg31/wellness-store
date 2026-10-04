@@ -140,7 +140,7 @@ export default function ProductSearchSelect({
                         type="button"
                         onClick={() => selectProduct('')}
                         className={`w-full px-3 py-2.5 text-left text-sm hover:bg-admin-surface-alt transition-colors ${
-                            !value ? 'bg-forest/5 text-forest font-medium' : 'text-ink'
+                            !value ? 'bg-primary/5 text-primary font-medium' : 'text-ink'
                         }`}
                     >
                         {emptyOptionLabel}
@@ -157,7 +157,7 @@ export default function ProductSearchSelect({
                                 type="button"
                                 onClick={() => selectProduct(product.id)}
                                 className={`w-full px-3 py-2.5 text-left text-sm hover:bg-admin-surface-alt transition-colors flex items-center justify-between gap-3 ${
-                                    value === product.id ? 'bg-forest/5 text-forest' : 'text-ink'
+                                    value === product.id ? 'bg-primary/5 text-primary' : 'text-ink'
                                 }`}
                             >
                                 <span className="truncate font-medium">{product.title}</span>

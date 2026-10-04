@@ -1,0 +1,95 @@
+/*
+ * Chikit design tokens — the single source of truth for colour, type, radius,
+ * shadow and motion. Components use the generated utilities (bg-primary,
+ * text-ink, rounded-lg, shadow-md …) and never hardcode a value.
+ *
+ * Brand anchor: #602460, sampled from the official logo.
+ * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): primary/white 10.9, ink/canvas 15,
+ * muted/canvas 6.0, accent-ink/canvas 5.6, white/danger 6.5, white/success 5.1.
+ * Gold (accent) is a FILL colour only: pair it with ink text, never white.
+ */
+@theme {
+  /* Primary — brand plum */
+  --color-primary:        #602460;  /* buttons, links, headings accents, logo colour */
+  --color-primary-hover:  #4E1C4E;  /* hover */
+  --color-primary-deep:   #431A43;  /* active / pressed, footer rule */
+  --color-primary-tint:   #F1E4F2;  /* selected, soft badges, icon wells */
+  --color-primary-soft:   #F9F2F9;  /* faint hover wash */
+
+  /* Accent — turmeric gold (fills, highlights, ratings) */
+  --color-accent:         #C08A3E;
+  --color-accent-hover:   #D8A860;
+  --color-accent-ink:     #8A5A1E;  /* gold as text on light backgrounds */
+  --color-accent-tint:    #FBF1E1;
+
+  /* Neutrals — warm, plum-tinted */
+  --color-canvas:         #FDF9F4;  /* page background */
+  --color-canvas-alt:     #F6EEE5;  /* alternate section band */
+  --color-surface:        #FFFFFF;  /* cards, inputs, drawers */
+  --color-ink:            #241720;  /* body + headings */
+  --color-muted:          #6B5D68;  /* secondary text */
+  --color-subtle:         #8F8089;  /* placeholders, disabled text (not for content) */
+  --color-line:           #ECD9C4;  /* decorative hairlines */
+  --color-line-strong:    #9A8794;  /* input borders (3:1 on white) */
+
+  /* Status */
+  --color-success:        #2E7D4F;
+  --color-success-tint:   #E6F3EB;
+  --color-warning:        #B26A00;
+  --color-warning-tint:   #FCF0DC;
+  --color-danger:         #B3261E;
+  --color-danger-tint:    #FBE9E7;
+  --color-info:           #1F5FA8;
+  --color-info-tint:      #E4EEF9;
+
+  /* Disabled */
+  --color-disabled:       #EFE6EC;
+
+  /* Admin chrome (internal, neutral) */
+  --color-admin-bg:           #F3EEE8;
+  --color-admin-surface:      #FFFFFF;
+  --color-admin-surface-alt:  #F9F6F3;
+  --color-admin-border:       #E5DDD6;
+  --color-admin-border-light: #EDE8E2;
+  --color-admin-muted:        #6B6560;
+
+  /* Typography */
+  --font-display: "Lora", Georgia, serif;
+  --font-sans:    "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-caption:  0.75rem;   --text-caption--line-height: 1.5;
+  --text-small:    0.875rem;  --text-small--line-height: 1.55;
+  --text-body:     1rem;      --text-body--line-height: 1.7;
+  --text-lead:     1.125rem;  --text-lead--line-height: 1.7;
+  --text-h4:       1.25rem;   --text-h4--line-height: 1.35;
+  --text-h3:       clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);   --text-h3--line-height: 1.3;
+  --text-h2:       clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);     --text-h2--line-height: 1.2;
+  --text-h1:       clamp(2.25rem, 1.6rem + 3vw, 3.75rem);      --text-h1--line-height: 1.1;
+
+  /* Radius */
+  --radius-xs:  0.25rem;
+  --radius-sm:  0.5rem;
+  --radius-md:  0.75rem;
+  --radius-lg:  1rem;
+  --radius-xl:  1.5rem;
+
+  /* Shadows (plum-tinted, soft) */
+  --shadow-xs: 0 1px 2px rgb(67 26 67 / 0.06);
+  --shadow-sm: 0 2px 6px rgb(67 26 67 / 0.07);
+  --shadow-md: 0 8px 24px rgb(67 26 67 / 0.09);
+  --shadow-lg: 0 20px 48px rgb(67 26 67 / 0.14);
+
+  /* Motion */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-up: fade-up 0.6s var(--ease-out-soft) both;
+  --animate-fade-in: fade-in 0.3s ease-out both;
+  --animate-slide-in-right: slide-in-right 0.3s var(--ease-out-soft) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-draw-check: draw-check 0.5s 0.15s ease-out forwards;
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: none; } }
+  @keyframes draw-check { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+}

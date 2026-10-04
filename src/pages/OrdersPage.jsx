@@ -49,14 +49,14 @@ function OrderCard({ order, index }) {
         >
             <Link
                 to={`/orders/${order.id}`}
-                className="group block bg-cream rounded-2xl border border-border/40 overflow-hidden hover:border-forest/20 hover:soft-shadow-hover transition-all duration-300"
+                className="group block bg-canvas rounded-2xl border border-line/40 overflow-hidden hover:border-primary/20 hover:shadow-md transition-all duration-300"
             >
                 <div className="p-5 sm:p-6">
                     <div className="flex items-start justify-between gap-4 mb-4">
                         <div>
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-slate mb-1">Order</p>
+                            <p className="text-[10px] uppercase tracking-[0.2em] text-muted mb-1">Order</p>
                             <p className="font-mono text-sm text-ink">{shortOrderId(order.id)}</p>
-                            <p className="text-xs text-slate mt-1">{formatOrderDate(order.createdAt)}</p>
+                            <p className="text-xs text-muted mt-1">{formatOrderDate(order.createdAt)}</p>
                         </div>
                         <OrderStatusBadge status={order.status} audience="user" />
                     </div>
@@ -70,18 +70,18 @@ function OrderCard({ order, index }) {
                                     className="w-16 h-20 object-cover rounded-xl bg-sand"
                                 />
                                 {itemCount > 1 && (
-                                    <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-forest text-cream text-[10px] flex items-center justify-center font-medium">
+                                    <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-canvas text-[10px] flex items-center justify-center font-medium">
                                         +{itemCount - 1}
                                     </span>
                                 )}
                             </div>
                         )}
                         <div className="flex-1 min-w-0">
-                            <p className="text-ink font-medium line-clamp-2 group-hover:text-forest transition-colors">
+                            <p className="text-ink font-medium line-clamp-2 group-hover:text-primary transition-colors">
                                 {firstItem?.title || 'Your order'}
                             </p>
                             {itemCount > 1 && (
-                                <p className="text-xs text-slate mt-1">
+                                <p className="text-xs text-muted mt-1">
                                     + {itemCount - 1} more piece{itemCount - 1 === 1 ? '' : 's'}
                                 </p>
                             )}
@@ -95,18 +95,18 @@ function OrderCard({ order, index }) {
                         </div>
                     )}
 
-                    <div className="flex items-center justify-between gap-3 pt-3 border-t border-border/30">
-                        <p className="text-xs text-slate">{paymentLabel(order)}</p>
+                    <div className="flex items-center justify-between gap-3 pt-3 border-t border-line/30">
+                        <p className="text-xs text-muted">{paymentLabel(order)}</p>
                         <div className="flex items-center gap-4 flex-shrink-0">
                             <button
                                 type="button"
                                 onClick={handleBuyAgain}
                                 disabled={reordering}
-                                className="inline-flex items-center gap-1.5 text-sm text-turmeric-ink font-medium hover:text-turmeric-light transition-colors disabled:opacity-50"
+                                className="inline-flex items-center gap-1.5 text-sm text-accent-ink font-medium hover:text-accent-hover transition-colors disabled:opacity-50"
                             >
                                 <RotateCcw size={14} /> Buy Again
                             </button>
-                            <span className="inline-flex items-center gap-1 text-sm text-forest font-medium group-hover:gap-2 transition-all">
+                            <span className="inline-flex items-center gap-1 text-sm text-primary font-medium group-hover:gap-2 transition-all">
                                 Track order <ChevronRight size={16} />
                             </span>
                         </div>
@@ -114,7 +114,7 @@ function OrderCard({ order, index }) {
                 </div>
 
                 {status === 'delivered' && (
-                    <div className="px-5 py-2.5 bg-gradient-to-r from-turmeric/10 to-forest/5 border-t border-turmeric/20 text-xs text-turmeric-ink flex items-center gap-2">
+                    <div className="px-5 py-2.5 bg-gradient-to-r from-accent/10 to-primary/5 border-t border-accent/20 text-xs text-accent-ink flex items-center gap-2">
                         <Sparkles size={12} />
                         Delivered. We hope it's working wonders for you
                     </div>
@@ -154,9 +154,9 @@ export default function OrdersPage() {
     if (!isAuthenticated) {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-                <Package size={40} className="text-forest/30 mb-4" />
+                <Package size={40} className="text-primary/30 mb-4" />
                 <h1 className="font-display text-3xl mb-3">Your Orders</h1>
-                <p className="text-slate mb-6 max-w-sm">
+                <p className="text-muted mb-6 max-w-sm">
                     Sign in to track your orders from our warehouse to your doorstep.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -168,14 +168,14 @@ export default function OrdersPage() {
     }
 
     return (
-        <div className="pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-cream pt-4 sm:pt-8">
+        <div className="pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-canvas pt-4 sm:pt-8">
             <div className="max-w-3xl mx-auto">
                 <div className="mb-8">
-                    <Link to="/account" className="inline-flex items-center gap-1.5 text-sm text-slate hover:text-forest mb-4 transition-colors">
+                    <Link to="/account" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary mb-4 transition-colors">
                         <ArrowLeft size={16} /> Back to account
                     </Link>
                     <h1 className="font-display text-3xl md:text-4xl text-ink mb-2">Your Orders</h1>
-                    <p className="text-slate">
+                    <p className="text-muted">
                         {activeCount > 0
                             ? `${activeCount} order${activeCount === 1 ? '' : 's'} on the way. Follow each journey below`
                             : 'Every order, all in one place'}
@@ -196,8 +196,8 @@ export default function OrdersPage() {
                                 onClick={() => setFilter(f.key)}
                                 className={`px-4 py-1.5 rounded-full text-sm transition-colors ${
                                     filter === f.key
-                                        ? 'bg-forest text-cream'
-                                        : 'bg-cream border border-border/40 text-slate hover:text-ink'
+                                        ? 'bg-primary text-canvas'
+                                        : 'bg-canvas border border-line/40 text-muted hover:text-ink'
                                 }`}
                             >
                                 {f.label}
@@ -208,15 +208,15 @@ export default function OrdersPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" />
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="bg-cream rounded-2xl p-12 text-center border border-border/40">
-                        <Package size={36} className="text-forest/20 mx-auto mb-4" />
+                    <div className="bg-canvas rounded-2xl p-12 text-center border border-line/40">
+                        <Package size={36} className="text-primary/20 mx-auto mb-4" />
                         <p className="text-ink font-medium mb-2">
                             {filter === 'all' ? 'No orders yet' : `No ${filter} orders`}
                         </p>
-                        <p className="text-slate text-sm mb-6">
+                        <p className="text-muted text-sm mb-6">
                             {filter === 'all'
                                 ? 'When you place an order, you\'ll see a live journey here.'
                                 : 'Try a different filter to see other orders.'}

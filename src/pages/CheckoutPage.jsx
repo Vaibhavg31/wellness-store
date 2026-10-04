@@ -379,7 +379,7 @@ export default function CheckoutPage() {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
                 <h1 className="font-display text-3xl mb-4">Nothing to checkout</h1>
-                <p className="text-slate mb-6">Add items to your bag and come back when you&apos;re ready.</p>
+                <p className="text-muted mb-6">Add items to your bag and come back when you&apos;re ready.</p>
                 <Link to="/shop"><Button variant="turmeric">Continue Shopping</Button></Link>
             </div>
         );
@@ -504,7 +504,7 @@ export default function CheckoutPage() {
                     transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                     className="text-center max-w-md"
                 >
-                    <VerifyAnimation size={88} className="mx-auto mb-6 text-forest" />
+                    <VerifyAnimation size={88} className="mx-auto mb-6 text-primary" />
                     <motion.h1
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -517,7 +517,7 @@ export default function CheckoutPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.55 }}
-                        className="text-slate font-light mb-2 leading-relaxed"
+                        className="text-muted font-light mb-2 leading-relaxed"
                     >
                         Thank you, {placed.shipping?.name}. Your order is confirmed.
                     </motion.p>
@@ -552,18 +552,18 @@ export default function CheckoutPage() {
     const currentStep = addressComplete ? 2 : phoneReady ? 1 : 0;
 
     return (
-        <div className="pb-12 lg:pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-cream pt-2 sm:pt-4">
+        <div className="pb-12 lg:pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-canvas pt-2 sm:pt-4">
             <div className="max-w-6xl mx-auto">
                 <Link
                     to="/cart"
-                    className="inline-flex items-center gap-2 text-sm text-slate hover:text-forest mb-5 group transition-colors"
+                    className="inline-flex items-center gap-2 text-sm text-muted hover:text-primary mb-5 group transition-colors"
                 >
                     <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                     Back to Bag
                 </Link>
 
                 <div className="mb-6 sm:mb-8">
-                    <p className="text-xs tracking-[0.25em] uppercase text-forest mb-2 font-medium">Secure Checkout</p>
+                    <p className="text-xs tracking-[0.25em] uppercase text-primary mb-2 font-medium">Secure Checkout</p>
                     <h1 className="font-display text-3xl sm:text-4xl text-ink">Complete Your Order</h1>
                 </div>
 
@@ -580,19 +580,19 @@ export default function CheckoutPage() {
                                         }}
                                         className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm font-medium border transition-colors ${
                                             done || current
-                                                ? 'border-forest text-cream'
-                                                : 'border-forest/20 text-forest/40 bg-forest/5'
+                                                ? 'border-primary text-canvas'
+                                                : 'border-primary/20 text-primary/40 bg-primary/5'
                                         }`}
                                         aria-current={current ? 'step' : undefined}
                                     >
                                         {done ? <CheckCircle size={16} /> : <StepIcon size={15} strokeWidth={1.75} />}
                                     </motion.span>
-                                    <span className={`text-sm sm:text-base transition-colors ${done || current ? 'text-ink font-medium' : 'text-slate/50'}`}>
+                                    <span className={`text-sm sm:text-base transition-colors ${done || current ? 'text-ink font-medium' : 'text-muted/50'}`}>
                                         {label}
                                     </span>
                                 </div>
                                 {i < STEPS.length - 1 && (
-                                    <div className={`w-8 sm:w-16 h-px transition-colors ${done ? 'bg-forest/40' : 'bg-border'}`} />
+                                    <div className={`w-8 sm:w-16 h-px transition-colors ${done ? 'bg-primary/40' : 'bg-line'}`} />
                                 )}
                             </div>
                         );
@@ -600,7 +600,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Mobile / tablet — single sticky CTA (no duplicate bottom bar) */}
-                <div className="lg:hidden sticky top-[var(--site-header-h,7rem)] z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 mb-6 bg-cream/95 backdrop-blur-md border-b border-border/40 space-y-2">
+                <div className="lg:hidden sticky top-[var(--site-header-h,7rem)] z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 mb-6 bg-canvas/95 backdrop-blur-md border-b border-line/40 space-y-2">
                     {error && (
                         <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2" role="alert">
                             {error}
@@ -608,10 +608,10 @@ export default function CheckoutPage() {
                     )}
                     <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
-                            <p className="text-xs tracking-[0.15em] uppercase text-slate">
+                            <p className="text-xs tracking-[0.15em] uppercase text-muted">
                                 {items.length} item{items.length !== 1 ? 's' : ''}
                             </p>
-                            <p className="font-display text-xl text-forest leading-tight">{formatPrice(total)}</p>
+                            <p className="font-display text-xl text-primary leading-tight">{formatPrice(total)}</p>
                         </div>
                         <Button
                             variant="turmeric"
@@ -619,14 +619,14 @@ export default function CheckoutPage() {
                             type="button"
                             onClick={handlePlaceOrder}
                             disabled={loading || !canPlaceOrder}
-                            className="flex-shrink-0 px-6 shadow-md shadow-forest/15"
+                            className="flex-shrink-0 px-6 shadow-md shadow-primary/15"
                         >
                             {ctaLabel}
                         </Button>
                     </div>
                 </div>
 
-                <div className="mb-6 p-4 rounded-xl bg-forest/5 border border-forest/20 flex items-center gap-3">
+                <div className="mb-6 p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-center gap-3">
                     <UserAvatar user={user} size="md" signedIn />
                     <p className="text-sm text-ink min-w-0">
                         Signed in as <span className="font-medium">{user?.name || user?.email}</span>
@@ -634,7 +634,7 @@ export default function CheckoutPage() {
                             <motion.span
                                 initial={{ opacity: 0, x: -4 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="text-emerald-700 inline-flex items-center gap-1 ml-1"
+                                className="text-primary-700 inline-flex items-center gap-1 ml-1"
                             >
                                 <CheckCircle size={12} /> Verified
                             </motion.span>
@@ -655,10 +655,10 @@ export default function CheckoutPage() {
                     }}
                 >
                     <div className="lg:col-span-3 space-y-6 sm:space-y-8 order-2 lg:order-1">
-                        <section className="bg-cream rounded-2xl p-4 sm:p-6 md:p-8 soft-shadow">
+                        <section className="bg-canvas rounded-2xl p-4 sm:p-6 md:p-8 shadow-sm">
                             <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-forest/8 flex-shrink-0">
-                                    <User size={17} className="text-forest" strokeWidth={1.75} />
+                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/8 flex-shrink-0">
+                                    <User size={17} className="text-primary" strokeWidth={1.75} />
                                 </span>
                                 <h2 className="font-display text-xl sm:text-2xl text-ink">Contact Details</h2>
                             </div>
@@ -707,7 +707,7 @@ export default function CheckoutPage() {
                                                 type="button"
                                                 variant="outline"
                                                 size="md"
-                                                className="flex-shrink-0 mb-0.5 border-forest/30 text-forest whitespace-nowrap"
+                                                className="flex-shrink-0 mb-0.5 border-primary/30 text-primary whitespace-nowrap"
                                                 onClick={openPhoneVerify}
                                             >
                                                 Verify mobile
@@ -717,14 +717,14 @@ export default function CheckoutPage() {
                                             <motion.span
                                                 initial={{ opacity: 0, scale: 0.9 }}
                                                 animate={{ opacity: 1, scale: 1 }}
-                                                className="flex-shrink-0 mb-3 inline-flex items-center gap-1 text-xs text-emerald-700 font-medium"
+                                                className="flex-shrink-0 mb-3 inline-flex items-center gap-1 text-xs text-primary-700 font-medium"
                                             >
                                                 <CheckCircle size={14} />
                                                 Verified
                                             </motion.span>
                                         )}
                                     </div>
-                                    <p className="text-sm text-slate mt-2">
+                                    <p className="text-sm text-muted mt-2">
                                         {isPhoneVerified
                                             ? isAccountPhoneVerified(user, phoneDigits)
                                                 ? 'Your account mobile is verified. No OTP needed for future orders.'
@@ -751,20 +751,20 @@ export default function CheckoutPage() {
                             </div>
                         </section>
 
-                        <section ref={addressSectionRef} className="bg-cream rounded-2xl p-4 sm:p-6 md:p-8 soft-shadow scroll-mt-[calc(var(--site-header-h,7rem)+5rem)]">
+                        <section ref={addressSectionRef} className="bg-canvas rounded-2xl p-4 sm:p-6 md:p-8 shadow-sm scroll-mt-[calc(var(--site-header-h,7rem)+5rem)]">
                             <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-forest/8 flex-shrink-0">
-                                    <MapPin size={17} className="text-forest" strokeWidth={1.75} />
+                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/8 flex-shrink-0">
+                                    <MapPin size={17} className="text-primary" strokeWidth={1.75} />
                                 </span>
                                 <h2 className="font-display text-xl sm:text-2xl text-ink">Delivery Address</h2>
                             </div>
                             {savedAddresses.length > 0 && (
                                 <div className="mb-5 sm:mb-6">
                                     <div className="flex items-center justify-between gap-2 mb-3">
-                                        <p className="text-xs sm:text-sm tracking-[0.1em] sm:tracking-[0.12em] uppercase text-slate font-medium">
+                                        <p className="text-xs sm:text-sm tracking-[0.1em] sm:tracking-[0.12em] uppercase text-muted font-medium">
                                             Saved addresses
                                         </p>
-                                        <span className="text-xs sm:text-sm text-slate/70 tabular-nums">
+                                        <span className="text-xs sm:text-sm text-muted/70 tabular-nums">
                                             {savedAddresses.length}/{MAX_SAVED_ADDRESSES}
                                         </span>
                                     </div>
@@ -776,8 +776,8 @@ export default function CheckoutPage() {
                                                     key={addr.id}
                                                     className={`relative flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border cursor-pointer transition-all active:scale-[0.98] ${
                                                         selected
-                                                            ? 'border-forest bg-forest/5 shadow-sm shadow-forest/10'
-                                                            : 'border-border hover:border-forest/30 hover:bg-forest/[0.02]'
+                                                            ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
+                                                            : 'border-line hover:border-primary/30 hover:bg-primary/[0.02]'
                                                     }`}
                                                 >
                                                     <input
@@ -790,11 +790,11 @@ export default function CheckoutPage() {
                                                     />
                                                     <span
                                                         className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                                                            selected ? 'border-forest bg-forest' : 'border-forest/35 bg-cream'
+                                                            selected ? 'border-primary bg-primary' : 'border-primary/35 bg-canvas'
                                                         }`}
                                                         aria-hidden="true"
                                                     >
-                                                        {selected && <span className="h-2 w-2 rounded-full bg-cream" />}
+                                                        {selected && <span className="h-2 w-2 rounded-full bg-canvas" />}
                                                     </span>
                                                     <div className="min-w-0 flex-1 pr-1">
                                                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -802,12 +802,12 @@ export default function CheckoutPage() {
                                                                 {addr.label || 'Address'}
                                                             </p>
                                                             {addr.isDefault && (
-                                                                <span className="text-[9px] uppercase tracking-wider text-forest bg-forest/10 px-1.5 py-0.5 rounded-full">
+                                                                <span className="text-[9px] uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
                                                                     Default
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <p className="text-sm text-slate mt-1.5 leading-relaxed break-words">
+                                                        <p className="text-sm text-muted mt-1.5 leading-relaxed break-words">
                                                             {addr.address}
                                                             {addr.landmark ? `, ${addr.landmark}` : ''}
                                                             <span className="text-ink/70"> · {addr.city}, {addr.pincode}</span>
@@ -821,29 +821,29 @@ export default function CheckoutPage() {
                                         <button
                                             type="button"
                                             onClick={enterNewAddress}
-                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-sm py-2.5 px-4 rounded-xl border border-forest/25 text-forest bg-forest/5 hover:bg-forest/10 active:bg-forest/15 transition-colors"
+                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-sm py-2.5 px-4 rounded-xl border border-primary/25 text-primary bg-primary/5 hover:bg-primary/10 active:bg-primary/15 transition-colors"
                                         >
                                             <Plus size={15} />
                                             Enter a new address
                                         </button>
                                         {savedAddresses.length < MAX_SAVED_ADDRESSES && (
-                                            <p className="text-xs sm:text-sm text-slate/80 leading-relaxed px-0.5">
+                                            <p className="text-xs sm:text-sm text-muted/80 leading-relaxed px-0.5">
                                                 New addresses are saved automatically when you place your order.
                                             </p>
                                         )}
                                     </div>
                                 </div>
                             )}
-                            <div className={`${savedAddresses.length > 0 ? 'border-t border-border/50 pt-4 sm:pt-5' : ''}`}>
+                            <div className={`${savedAddresses.length > 0 ? 'border-t border-line/50 pt-4 sm:pt-5' : ''}`}>
                                 <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                                    <p className="text-xs sm:text-sm tracking-[0.1em] sm:tracking-[0.12em] uppercase text-slate font-medium">
+                                    <p className="text-xs sm:text-sm tracking-[0.1em] sm:tracking-[0.12em] uppercase text-muted font-medium">
                                         {selectedAddressId ? 'Selected address' : 'Address details'}
                                     </p>
                                     {hasAddressInput && (
                                         <button
                                             type="button"
                                             onClick={clearAddressFields}
-                                            className="inline-flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border border-border/70 bg-cream/60 text-xs sm:text-sm text-slate hover:text-forest hover:border-forest/30 active:bg-forest/5 transition-colors"
+                                            className="inline-flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border border-line/70 bg-canvas/60 text-xs sm:text-sm text-muted hover:text-primary hover:border-primary/30 active:bg-primary/5 transition-colors"
                                         >
                                             <X size={13} />
                                             Clear
@@ -859,16 +859,16 @@ export default function CheckoutPage() {
                             </div>
                         </section>
 
-                        <section className="bg-cream rounded-2xl p-5 sm:p-6 md:p-8 soft-shadow">
+                        <section className="bg-canvas rounded-2xl p-5 sm:p-6 md:p-8 shadow-sm">
                             <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-forest/8 flex-shrink-0">
-                                    <CreditCard size={17} className="text-forest" strokeWidth={1.75} />
+                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/8 flex-shrink-0">
+                                    <CreditCard size={17} className="text-primary" strokeWidth={1.75} />
                                 </span>
                                 <h2 className="font-display text-xl sm:text-2xl text-ink">Payment</h2>
                             </div>
                             <div className="space-y-3">
                                 {razorpayAvailable && (
-                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'razorpay' ? 'border-forest bg-forest/5' : 'border-border hover:border-forest/40'}`}>
+                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'razorpay' ? 'border-primary bg-primary/5' : 'border-line hover:border-primary/40'}`}>
                                         <input
                                             type="radio"
                                             name="payment"
@@ -879,15 +879,15 @@ export default function CheckoutPage() {
                                         />
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
-                                                <Wallet size={16} className="text-forest" />
+                                                <Wallet size={16} className="text-primary" />
                                                 <p className="font-medium text-ink text-sm sm:text-base">Pay Online</p>
                                             </div>
-                                            <p className="text-sm text-slate mt-0.5">UPI · Cards · Net Banking via Razorpay</p>
+                                            <p className="text-sm text-muted mt-0.5">UPI · Cards · Net Banking via Razorpay</p>
                                         </div>
                                     </label>
                                 )}
                                 {codAvailable && (
-                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'cod' ? 'border-forest bg-forest/5' : 'border-border hover:border-forest/40'}`}>
+                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'cod' ? 'border-primary bg-primary/5' : 'border-line hover:border-primary/40'}`}>
                                         <input
                                             type="radio"
                                             name="payment"
@@ -898,7 +898,7 @@ export default function CheckoutPage() {
                                         />
                                         <div>
                                             <p className="font-medium text-ink text-sm sm:text-base">Cash on Delivery</p>
-                                            <p className="text-sm text-slate mt-0.5">Pay when your order arrives</p>
+                                            <p className="text-sm text-muted mt-0.5">Pay when your order arrives</p>
                                         </div>
                                     </label>
                                 )}
@@ -908,12 +908,12 @@ export default function CheckoutPage() {
                                     </p>
                                 )}
                                 {!razorpayAvailable && codAvailable && content.payments?.onlinePaymentEnabled === false && (
-                                    <p className="text-xs text-slate/70 px-1">
+                                    <p className="text-xs text-muted/70 px-1">
                                         Online payment is turned off in store settings.
                                     </p>
                                 )}
                                 {!razorpayAvailable && codAvailable && content.payments?.onlinePaymentEnabled !== false && !RAZORPAY_ENABLED && (
-                                    <p className="text-xs text-slate/70 px-1">
+                                    <p className="text-xs text-muted/70 px-1">
                                         Online payment will appear here once Razorpay keys are configured.
                                     </p>
                                 )}
@@ -928,8 +928,8 @@ export default function CheckoutPage() {
                                 </p>
                             )}
                             <div className="flex items-center justify-between px-1">
-                                <span className="text-sm text-slate">Total payable</span>
-                                <span className="font-display text-2xl text-forest">{formatPrice(total)}</span>
+                                <span className="text-sm text-muted">Total payable</span>
+                                <span className="font-display text-2xl text-primary">{formatPrice(total)}</span>
                             </div>
                             <Button
                                 variant="turmeric"
@@ -947,7 +947,7 @@ export default function CheckoutPage() {
                     <div className="lg:col-span-2 order-1 lg:order-2 space-y-6">
                         <ActiveCoupons variant="sidebar" />
 
-                        <div className="lg:sticky lg:top-[calc(var(--site-header-h,7rem)+1rem)] lg:z-10 bg-cream rounded-2xl p-5 sm:p-6 md:p-8 soft-shadow space-y-5">
+                        <div className="lg:sticky lg:top-[calc(var(--site-header-h,7rem)+1rem)] lg:z-10 bg-canvas rounded-2xl p-5 sm:p-6 md:p-8 shadow-sm space-y-5">
                             <h2 className="font-display text-xl sm:text-2xl text-ink">Order Summary</h2>
 
                             <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
@@ -956,16 +956,16 @@ export default function CheckoutPage() {
                                         <img src={imageUrl(item.product.images[0])} alt="" className="w-14 h-16 object-cover rounded-lg flex-shrink-0" />
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm sm:text-[15px] text-ink line-clamp-1">{item.product.title}</p>
-                                            <p className="text-sm text-slate">Qty: {item.quantity}</p>
+                                            <p className="text-sm text-muted">Qty: {item.quantity}</p>
                                         </div>
                                         <p className="text-sm sm:text-[15px] font-medium">{formatPrice(item.product.price * item.quantity)}</p>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="border-t border-border/60 pt-4 space-y-2 text-sm">
+                            <div className="border-t border-line/60 pt-4 space-y-2 text-sm">
                                 <CouponInput compact />
-                                <PriceBreakdown totalClassName="text-forest" />
+                                <PriceBreakdown totalClassName="text-primary" />
                             </div>
 
                             {error && (
@@ -985,8 +985,8 @@ export default function CheckoutPage() {
                                 </Button>
                             </div>
 
-                            <div className="hidden lg:flex items-center justify-center gap-2 text-xs text-slate">
-                                <Phone size={12} className="text-forest" />
+                            <div className="hidden lg:flex items-center justify-center gap-2 text-xs text-muted">
+                                <Phone size={12} className="text-primary" />
                                 Mobile verified once per account
                             </div>
                         </div>

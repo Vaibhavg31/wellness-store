@@ -220,7 +220,7 @@ export default function AdminContentPage() {
             case 'videoBanner':
                 return (
                     <div className="space-y-4 pt-3">
-                        <p className="text-xs text-admin-muted bg-forest/5 border border-forest/10 rounded-lg px-3 py-2">
+                        <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
                             A full-width autoplay video banner. Hidden automatically until you upload a video.
                         </p>
                         <VideoUploadField
@@ -251,8 +251,8 @@ export default function AdminContentPage() {
                                         onClick={() => update('videoBanner', { ...content.videoBanner, fit: opt.value })}
                                         className={`rounded-xl border p-3 text-left transition-all ${
                                             content.videoBanner.fit === opt.value
-                                                ? 'border-forest bg-forest/5 ring-2 ring-forest/20'
-                                                : 'border-admin-border bg-admin-surface-alt hover:border-border'
+                                                ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                                : 'border-admin-border bg-admin-surface-alt hover:border-line'
                                         }`}
                                     >
                                         <p className="text-sm font-semibold text-ink">{opt.title}</p>
@@ -335,7 +335,7 @@ export default function AdminContentPage() {
             case 'bannerSlider':
                 return (
                     <div className="pt-3 space-y-3">
-                        <p className="text-xs text-admin-muted bg-forest/5 border border-forest/10 rounded-lg px-3 py-2">
+                        <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
                             Full-width rotating carousel — one image visible at a time, auto-advancing.
                             Not the same as "Image Banners (Stacked)" below. Tag a banner "Both" to show it in both places.
                         </p>
@@ -346,7 +346,7 @@ export default function AdminContentPage() {
             case 'banners':
                 return (
                     <div className="pt-3 space-y-3">
-                        <p className="text-xs text-admin-muted bg-forest/5 border border-forest/10 rounded-lg px-3 py-2">
+                        <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
                             All enabled images shown stacked, full-size, one after another — not a carousel.
                             Not the same as "Banner Slider" above. Tag a banner "Both" to show it in both places.
                         </p>
@@ -432,7 +432,7 @@ export default function AdminContentPage() {
             case 'promoBanner':
                 return (
                     <div className="space-y-4 pt-3">
-                        <p className="text-xs text-admin-muted bg-forest/5 border border-forest/10 rounded-lg px-3 py-2">
+                        <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
                             This is a text-only strip pinned above the navigation on every page (see "Free
                             delivery above..." at the very top of the site) — no image, and unrelated to
                             Banner Slider / Image Banners below.
@@ -441,9 +441,9 @@ export default function AdminContentPage() {
                             <button
                                 type="button"
                                 onClick={() => update('promo', { ...content.promo, enabled: !content.promo.enabled })}
-                                className={`relative w-12 h-6 rounded-full transition-colors ${content.promo.enabled ? 'bg-emerald' : 'bg-slate/30'}`}
+                                className={`relative w-12 h-6 rounded-full transition-colors ${content.promo.enabled ? 'bg-primary' : 'bg-muted/30'}`}
                             >
-                                <span className={`absolute top-0.5 w-5 h-5 bg-cream rounded-full shadow transition-transform ${content.promo.enabled ? 'left-6' : 'left-0.5'}`} />
+                                <span className={`absolute top-0.5 w-5 h-5 bg-canvas rounded-full shadow transition-transform ${content.promo.enabled ? 'left-6' : 'left-0.5'}`} />
                             </button>
                             <span className="text-sm text-ink">Show promo banner</span>
                         </label>
@@ -466,7 +466,7 @@ export default function AdminContentPage() {
                 return (
                     <p className="text-sm text-admin-muted pt-3">
                         Shows products marked "Trending" in{' '}
-                        <Link to={`${ADMIN_PATH}/products`} className="text-forest font-medium hover:underline">Products</Link>. No extra content to configure here.
+                        <Link to={`${ADMIN_PATH}/products`} className="text-primary font-medium hover:underline">Products</Link>. No extra content to configure here.
                     </p>
                 );
 
@@ -474,7 +474,7 @@ export default function AdminContentPage() {
                 return (
                     <p className="text-sm text-admin-muted pt-3">
                         Shows categories with at least one product, managed in{' '}
-                        <Link to={`${ADMIN_PATH}/categories`} className="text-forest font-medium hover:underline">Categories</Link>. No extra content to configure here.
+                        <Link to={`${ADMIN_PATH}/categories`} className="text-primary font-medium hover:underline">Categories</Link>. No extra content to configure here.
                     </p>
                 );
 
@@ -482,7 +482,7 @@ export default function AdminContentPage() {
                 return (
                     <p className="text-sm text-admin-muted pt-3">
                         Shows every published bundle offer, managed in{' '}
-                        <Link to={`${ADMIN_PATH}/bundles`} className="text-forest font-medium hover:underline">Bundles</Link>. Hidden automatically when there are no bundles to show.
+                        <Link to={`${ADMIN_PATH}/bundles`} className="text-primary font-medium hover:underline">Bundles</Link>. Hidden automatically when there are no bundles to show.
                     </p>
                 );
 
@@ -518,7 +518,7 @@ export default function AdminContentPage() {
                 return (
                     <p className="text-sm text-admin-muted pt-3">
                         Shows approved reviews from{' '}
-                        <Link to={`${ADMIN_PATH}/reviews`} className="text-forest font-medium hover:underline">Reviews</Link>. No extra content to configure here.
+                        <Link to={`${ADMIN_PATH}/reviews`} className="text-primary font-medium hover:underline">Reviews</Link>. No extra content to configure here.
                     </p>
                 );
 
@@ -554,7 +554,7 @@ export default function AdminContentPage() {
                             onClick={() => setTab(id)}
                             className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm whitespace-nowrap transition-colors ${
                                 tab === id
-                                    ? 'bg-forest text-cream'
+                                    ? 'bg-primary text-canvas'
                                     : 'text-admin-muted hover:bg-admin-surface hover:text-ink'
                             }`}
                         >
@@ -629,7 +629,7 @@ export default function AdminContentPage() {
                             <AdminSection title="Payment Methods" description="Managed in Settings → Store Services. Individual products can override in the product editor.">
                                 <p className="text-sm text-admin-muted">
                                     Cash on Delivery and Online Payment toggles are in{' '}
-                                    <Link to={`${ADMIN_PATH}/settings`} className="text-forest font-medium hover:underline">
+                                    <Link to={`${ADMIN_PATH}/settings`} className="text-primary font-medium hover:underline">
                                         Settings
                                     </Link>
                                     .
@@ -782,9 +782,9 @@ export default function AdminContentPage() {
                                 <button
                                     type="button"
                                     onClick={() => update('popup', { ...content.popup, enabled: !content.popup.enabled })}
-                                    className={`relative w-12 h-6 rounded-full transition-colors ${content.popup.enabled ? 'bg-emerald' : 'bg-slate/30'}`}
+                                    className={`relative w-12 h-6 rounded-full transition-colors ${content.popup.enabled ? 'bg-primary' : 'bg-muted/30'}`}
                                 >
-                                    <span className={`absolute top-0.5 w-5 h-5 bg-cream rounded-full shadow transition-transform ${content.popup.enabled ? 'left-6' : 'left-0.5'}`} />
+                                    <span className={`absolute top-0.5 w-5 h-5 bg-canvas rounded-full shadow transition-transform ${content.popup.enabled ? 'left-6' : 'left-0.5'}`} />
                                 </button>
                                 <span className="text-sm text-ink">Show announcement popup</span>
                             </label>

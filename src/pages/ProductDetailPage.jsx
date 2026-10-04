@@ -69,10 +69,10 @@ function ProductBannerStrip({ banners }) {
             </AnimatePresence>
             {(banner.title || banner.subtitle || banner.ctaLabel) && (
                 <div className="absolute inset-0 bg-gradient-to-r from-ink/70 via-ink/20 to-transparent flex flex-col justify-center p-4 sm:p-6">
-                    {banner.subtitle && <p className="type-eyebrow-sm text-cream/75 mb-1">{banner.subtitle}</p>}
-                    {banner.title && <p className="font-display text-base sm:text-xl text-cream mb-2 max-w-xs">{banner.title}</p>}
+                    {banner.subtitle && <p className="eyebrow text-canvas/75 mb-1">{banner.subtitle}</p>}
+                    {banner.title && <p className="font-display text-base sm:text-xl text-canvas mb-2 max-w-xs">{banner.title}</p>}
                     {banner.ctaLabel && (
-                        <span className="inline-flex items-center gap-1 w-fit text-[11px] sm:text-xs uppercase tracking-wide font-medium text-ink bg-cream px-3 py-1.5 rounded-full">
+                        <span className="inline-flex items-center gap-1 w-fit text-[11px] sm:text-xs uppercase tracking-wide font-medium text-ink bg-canvas px-3 py-1.5 rounded-full">
                             {banner.ctaLabel} <ChevronRightIcon size={12} />
                         </span>
                     )}
@@ -81,7 +81,7 @@ function ProductBannerStrip({ banners }) {
             {banners.length > 1 && (
                 <div className="absolute bottom-2 sm:bottom-3 right-3 flex gap-1">
                     {banners.map((b, i) => (
-                        <span key={b.id} className={`block h-1 rounded-full transition-all ${i === index ? 'w-4 bg-cream' : 'w-1 bg-cream/50'}`} />
+                        <span key={b.id} className={`block h-1 rounded-full transition-all ${i === index ? 'w-4 bg-canvas' : 'w-1 bg-canvas/50'}`} />
                     ))}
                 </div>
             )}
@@ -185,7 +185,7 @@ export default function ProductDetailPage() {
     if (loading) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" aria-label="Loading product" />
+                <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" aria-label="Loading product" />
             </div>
         );
     }
@@ -316,7 +316,7 @@ export default function ProductDetailPage() {
     return (
         <div className="pb-28 lg:pb-20 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <Link to="/shop" className="inline-flex items-center gap-2 text-sm text-slate hover:text-forest mb-6 sm:mb-8 group transition-colors">
+                <Link to="/shop" className="inline-flex items-center gap-2 text-sm text-muted hover:text-primary mb-6 sm:mb-8 group transition-colors">
                     <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                     Back to Shop
                 </Link>
@@ -328,9 +328,9 @@ export default function ProductDetailPage() {
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                         className="min-w-0"
                     >
-                        <p className="type-eyebrow text-slate mb-3">Product gallery</p>
+                        <p className="eyebrow text-muted mb-3">Product gallery</p>
 
-                        <div className="relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl bg-sand/40 soft-shadow-lg mb-3 sm:mb-4 group">
+                        <div className="relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl bg-sand/40 shadow-lg mb-3 sm:mb-4 group">
                             <AnimatePresence mode="wait">
                                 <motion.img
                                     key={`photo-${selectedImage}`}
@@ -357,7 +357,7 @@ export default function ProductDetailPage() {
                                     type="button"
                                     onClick={() => setSelectedImage(i)}
                                     className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 overflow-hidden rounded-lg sm:rounded-xl border-2 transition-all duration-300 ${
-                                        selectedImage === i ? 'border-forest soft-shadow scale-[1.03]' : 'border-transparent opacity-55 hover:opacity-90'
+                                        selectedImage === i ? 'border-primary shadow-sm scale-[1.03]' : 'border-transparent opacity-55 hover:opacity-90'
                                     }`}
                                     aria-label={`View image ${i + 1}`}
                                 >
@@ -378,27 +378,27 @@ export default function ProductDetailPage() {
                         transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
                         className="lg:sticky lg:top-[calc(var(--site-header-h,7rem)+1rem)] lg:self-start min-w-0"
                     >
-                        <p className="type-eyebrow text-forest/75 mb-2 sm:mb-3 capitalize">{product.category}</p>
+                        <p className="eyebrow text-primary/75 mb-2 sm:mb-3 capitalize">{product.category}</p>
                         <h1 className="font-display text-3xl sm:text-4xl md:text-[2.75rem] font-medium text-ink mb-4 sm:mb-5 leading-tight">{product.title}</h1>
 
                         {product.reviewCount > 0 && (
                             <div className="flex items-center gap-3 mb-6 sm:mb-8">
                                 <div className="flex gap-0.5" aria-label={`${product.rating} out of 5 stars`}>
                                     {Array.from({ length: 5 }).map((_, i) => (
-                                        <Star key={i} size={14} className={i < Math.floor(product.rating) ? 'text-turmeric fill-turmeric' : 'text-border'} strokeWidth={0} />
+                                        <Star key={i} size={14} className={i < Math.floor(product.rating) ? 'text-accent fill-accent' : 'text-line'} strokeWidth={0} />
                                     ))}
                                 </div>
-                                <span className="text-sm text-slate">{product.rating} ({product.reviewCount} reviews)</span>
+                                <span className="text-sm text-muted">{product.rating} ({product.reviewCount} reviews)</span>
                             </div>
                         )}
 
-                        <div className="flex flex-wrap items-baseline gap-3 sm:gap-4 mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-border/60">
+                        <div className="flex flex-wrap items-baseline gap-3 sm:gap-4 mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-line/60">
                             <span className="font-display text-2xl sm:text-3xl text-ink">{formatPrice(displayPrice)}</span>
                             {displayOriginalPrice > displayPrice && (
-                                <span className="text-base sm:text-lg text-slate/50 line-through">{formatPrice(displayOriginalPrice)}</span>
+                                <span className="text-base sm:text-lg text-muted/50 line-through">{formatPrice(displayOriginalPrice)}</span>
                             )}
                             {displayDiscount > 0 && (
-                                <span className="px-2 py-0.5 rounded-full bg-forest/10 text-forest text-xs font-medium">
+                                <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
                                     {displayDiscount}% off
                                 </span>
                             )}
@@ -406,7 +406,7 @@ export default function ProductDetailPage() {
 
                         {hasVariants && (
                             <div className="mb-6 sm:mb-8">
-                                <p className="type-eyebrow text-slate mb-3">Choose a Pack</p>
+                                <p className="eyebrow text-muted mb-3">Choose a Pack</p>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     {variants.map((v) => {
                                         const active = v.id === activeVariant?.id;
@@ -421,13 +421,13 @@ export default function ProductDetailPage() {
                                                 onClick={() => setSelectedVariantId(v.id)}
                                                 className={`relative text-left px-4 py-4 rounded-2xl border-2 transition-all duration-200 flex flex-col ${
                                                     active
-                                                        ? 'border-forest bg-forest/5 shadow-md shadow-forest/10'
-                                                        : 'border-border/70 hover:border-forest/40'
+                                                        ? 'border-primary bg-primary/5 shadow-md shadow-primary/10'
+                                                        : 'border-line/70 hover:border-primary/40'
                                                 } ${sold ? 'opacity-45 cursor-not-allowed' : ''}`}
                                                 aria-pressed={active}
                                             >
                                                 {v.isDefault && !sold && (
-                                                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-turmeric text-ink text-[10px] font-semibold shadow-sm whitespace-nowrap">
+                                                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent text-ink text-[10px] font-semibold shadow-sm whitespace-nowrap">
                                                         <Sparkles size={10} /> RECOMMENDED
                                                     </span>
                                                 )}
@@ -437,32 +437,32 @@ export default function ProductDetailPage() {
                                                         <img
                                                             src={imageUrl(v.image)}
                                                             alt=""
-                                                            className="w-9 h-9 rounded-lg object-cover border border-border/50 flex-shrink-0"
+                                                            className="w-9 h-9 rounded-lg object-cover border border-line/50 flex-shrink-0"
                                                         />
                                                     )}
-                                                    <span className={`block text-sm font-semibold ${active ? 'text-forest' : 'text-ink'}`}>
+                                                    <span className={`block text-sm font-semibold ${active ? 'text-primary' : 'text-ink'}`}>
                                                         {v.label}
                                                     </span>
                                                 </div>
                                                 {v.netQuantity && (
-                                                    <span className="block text-xs text-slate/70 mt-1">{v.netQuantity}</span>
+                                                    <span className="block text-xs text-muted/70 mt-1">{v.netQuantity}</span>
                                                 )}
 
-                                                <div className="mt-3 pt-3 border-t border-border/40">
+                                                <div className="mt-3 pt-3 border-t border-line/40">
                                                     <div className="flex items-baseline gap-1.5 flex-wrap">
                                                         <span className="font-display text-lg text-ink">{formatPrice(v.price)}</span>
                                                         {v.originalPrice > v.price && (
-                                                            <span className="text-xs text-slate/50 line-through">{formatPrice(v.originalPrice)}</span>
+                                                            <span className="text-xs text-muted/50 line-through">{formatPrice(v.originalPrice)}</span>
                                                         )}
                                                         {v.discount > 0 && !sold && (
-                                                            <span className="text-[10px] font-semibold text-turmeric-ink">{v.discount}% off</span>
+                                                            <span className="text-[10px] font-semibold text-accent-ink">{v.discount}% off</span>
                                                         )}
                                                     </div>
                                                     {savings > 0 && !sold && (
-                                                        <p className="text-[11px] text-forest font-medium mt-1">Save {formatPrice(savings)} today</p>
+                                                        <p className="text-[11px] text-primary font-medium mt-1">Save {formatPrice(savings)} today</p>
                                                     )}
                                                     {perDay && !sold && (
-                                                        <p className="text-[11px] text-slate/60 mt-0.5">≈ {formatPrice(perDay)}/day</p>
+                                                        <p className="text-[11px] text-muted/60 mt-0.5">≈ {formatPrice(perDay)}/day</p>
                                                     )}
                                                 </div>
                                                 {sold && <span className="block text-[11px] text-red-600 mt-2">Out of stock</span>}
@@ -474,21 +474,21 @@ export default function ProductDetailPage() {
                         )}
 
                         <div className="mb-6 sm:mb-8">
-                            <div className="flex gap-0 border-b border-border/40 mb-4 sm:mb-5 overflow-x-auto">
+                            <div className="flex gap-0 border-b border-line/40 mb-4 sm:mb-5 overflow-x-auto">
                                 {TABS.map((tab) => (
                                     <button
                                         key={tab}
                                         type="button"
                                         onClick={() => setActiveTab(tab)}
-                                        className={`px-3 sm:px-4 pb-3 type-eyebrow transition-all duration-300 border-b-2 -mb-px whitespace-nowrap ${
+                                        className={`px-3 sm:px-4 pb-3 eyebrow transition-all duration-300 border-b-2 -mb-px whitespace-nowrap ${
                                             activeTab === tab
-                                                ? 'text-forest border-forest font-medium'
-                                                : 'text-slate/60 border-transparent hover:text-slate'
+                                                ? 'text-primary border-primary font-medium'
+                                                : 'text-muted/60 border-transparent hover:text-muted'
                                         }`}
                                     >
                                         {tab}
                                         {tab === 'Reviews' && reviews.length > 0 && (
-                                            <span className="ml-1.5 text-[11px] bg-forest/10 text-forest rounded-full px-1.5 py-0.5">{reviews.length}</span>
+                                            <span className="ml-1.5 text-[11px] bg-primary/10 text-primary rounded-full px-1.5 py-0.5">{reviews.length}</span>
                                         )}
                                     </button>
                                 ))}
@@ -502,7 +502,7 @@ export default function ProductDetailPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.25 }}
-                                        className="text-slate font-light leading-relaxed text-sm sm:text-base"
+                                        className="text-muted font-light leading-relaxed text-sm sm:text-base"
                                     >
                                         {product.description}
                                     </motion.p>
@@ -517,8 +517,8 @@ export default function ProductDetailPage() {
                                         className="space-y-3"
                                     >
                                         {product.features.map((feature) => (
-                                            <li key={feature} className="flex items-center gap-3 text-sm text-slate">
-                                                <span className="w-1.5 h-1.5 bg-forest/50 rounded-full flex-shrink-0" />
+                                            <li key={feature} className="flex items-center gap-3 text-sm text-muted">
+                                                <span className="w-1.5 h-1.5 bg-primary/50 rounded-full flex-shrink-0" />
                                                 {feature}
                                             </li>
                                         ))}
@@ -533,29 +533,29 @@ export default function ProductDetailPage() {
                                         transition={{ duration: 0.25 }}
                                     >
                                         {reviews.length === 0 ? (
-                                            <p className="text-slate/60 text-sm">No reviews yet. Be the first!</p>
+                                            <p className="text-muted/60 text-sm">No reviews yet. Be the first!</p>
                                         ) : (
                                             <div className="space-y-4 max-h-56 overflow-y-auto pr-2">
                                                 {reviews.map((review) => (
-                                                    <div key={review.id} className="border-b border-border/40 pb-4 last:border-0">
+                                                    <div key={review.id} className="border-b border-line/40 pb-4 last:border-0">
                                                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                                                             <p className="text-sm font-medium text-ink">{review.name}</p>
                                                             <div className="flex gap-0.5">
                                                                 {Array.from({ length: 5 }).map((_, j) => (
-                                                                    <Star key={j} size={11} className={j < review.rating ? 'text-turmeric fill-turmeric' : 'text-border'} strokeWidth={0} />
+                                                                    <Star key={j} size={11} className={j < review.rating ? 'text-accent fill-accent' : 'text-line'} strokeWidth={0} />
                                                                 ))}
                                                             </div>
                                                             {review.isVerifiedPurchase && (
-                                                                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-forest bg-forest/8 px-1.5 py-0.5 rounded-full">
+                                                                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary bg-primary/8 px-1.5 py-0.5 rounded-full">
                                                                     <ShieldCheck size={10} /> Verified Purchase
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <p className="text-slate text-sm leading-relaxed">{review.comment}</p>
+                                                        <p className="text-muted text-sm leading-relaxed">{review.comment}</p>
                                                         {review.images?.length > 0 && (
                                                             <div className="flex gap-2 mt-2">
                                                                 {review.images.map((src) => (
-                                                                    <a key={src} href={imageUrl(src)} target="_blank" rel="noopener noreferrer" className="block w-14 h-14 rounded-lg overflow-hidden border border-border/50 flex-shrink-0">
+                                                                    <a key={src} href={imageUrl(src)} target="_blank" rel="noopener noreferrer" className="block w-14 h-14 rounded-lg overflow-hidden border border-line/50 flex-shrink-0">
                                                                         <img src={imageUrl(src)} alt="Customer photo" className="w-full h-full object-cover" />
                                                                     </a>
                                                                 ))}
@@ -573,11 +573,11 @@ export default function ProductDetailPage() {
                         {outOfStock ? (
                             <p className="text-sm text-red-600 mb-5 font-medium">Out of stock</p>
                         ) : displayStock <= 5 && (
-                            <p className="text-sm text-forest/80 mb-5 font-medium">Only {displayStock} left in stock</p>
+                            <p className="text-sm text-primary/80 mb-5 font-medium">Only {displayStock} left in stock</p>
                         )}
 
                         <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-                            <div className="flex items-center rounded-full border border-border/80 overflow-hidden">
+                            <div className="flex items-center rounded-full border border-line/80 overflow-hidden">
                                 <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3 sm:p-3.5 hover:bg-sand/60 transition-colors" aria-label="Decrease quantity">
                                     <Minus size={16} />
                                 </button>
@@ -589,7 +589,7 @@ export default function ProductDetailPage() {
                             <button
                                 type="button"
                                 onClick={() => { toggleWishlist(product); showToast(wished ? 'Removed from wishlist' : 'Added to wishlist', 'success'); }}
-                                className={`p-3 sm:p-3.5 rounded-full border transition-all duration-300 ${wished ? 'border-forest text-forest bg-forest/8' : 'border-border/80 hover:border-forest/40 hover:text-forest'}`}
+                                className={`p-3 sm:p-3.5 rounded-full border transition-all duration-300 ${wished ? 'border-primary text-primary bg-primary/8' : 'border-line/80 hover:border-primary/40 hover:text-primary'}`}
                                 aria-label={wished ? 'Remove from wishlist' : 'Save to wishlist'}
                             >
                                 <Heart size={20} fill={wished ? 'currentColor' : 'none'} />
@@ -600,7 +600,7 @@ export default function ProductDetailPage() {
                             <Button
                                 variant="primary"
                                 size="lg"
-                                className="flex-1 bg-forest hover:bg-forest-light text-cream"
+                                className="flex-1 bg-primary hover:bg-primary-hover text-canvas"
                                 disabled={outOfStock}
                                 onClick={handleAddToCart}
                             >
@@ -622,7 +622,7 @@ export default function ProductDetailPage() {
                             <Button
                                 variant="primary"
                                 size="lg"
-                                className="w-full bg-forest hover:bg-forest-light text-cream"
+                                className="w-full bg-primary hover:bg-primary-hover text-canvas"
                                 disabled={outOfStock}
                                 onClick={handleAddToCart}
                             >
@@ -647,9 +647,9 @@ export default function ProductDetailPage() {
                                     : 'grid-cols-3'
                             }`}>
                                 {trustBadges.map(({ icon: Icon, label }) => (
-                                    <div key={label} className="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-xl bg-sand/40 border border-border/40 text-center">
-                                        <Icon size={16} className="text-forest/70" />
-                                        <span className="type-eyebrow-sm text-slate leading-tight">{label}</span>
+                                    <div key={label} className="flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-xl bg-sand/40 border border-line/40 text-center">
+                                        <Icon size={16} className="text-primary/70" />
+                                        <span className="eyebrow text-muted leading-tight">{label}</span>
                                     </div>
                                 ))}
                             </div>
@@ -666,40 +666,40 @@ export default function ProductDetailPage() {
                     </section>
                 )}
 
-                <section className="mt-12 sm:mt-16 bg-cream rounded-2xl p-5 sm:p-8 border border-border/40">
+                <section className="mt-12 sm:mt-16 bg-canvas rounded-2xl p-5 sm:p-8 border border-line/40">
                     <h2 className="font-display text-xl sm:text-2xl mb-6 text-ink">Write a Review</h2>
 
                     {reviewSubmitted ? (
-                        <p className="text-forest/80 font-light">Thank you! Your review has been submitted for approval.</p>
+                        <p className="text-primary/80 font-light">Thank you! Your review has been submitted for approval.</p>
                     ) : eligibility.loading ? (
                         <div className="h-24 rounded-xl bg-sand/40 animate-pulse" aria-hidden="true" />
                     ) : eligibility.reason === 'already_reviewed' ? (
-                        <p className="text-slate font-light">You have already reviewed this product — thank you for sharing your experience!</p>
+                        <p className="text-muted font-light">You have already reviewed this product — thank you for sharing your experience!</p>
                     ) : eligibility.reason === 'signed_out' ? (
                         <div className="max-w-lg">
-                            <p className="text-slate font-light mb-4">Sign in and purchase this product to write a review — reviews here are only from verified buyers.</p>
+                            <p className="text-muted font-light mb-4">Sign in and purchase this product to write a review — reviews here are only from verified buyers.</p>
                             <Link to={loginUrl(location.pathname)}>
                                 <Button variant="turmeric">Sign In</Button>
                             </Link>
                         </div>
                     ) : eligibility.reason === 'not_purchased' ? (
-                        <p className="text-slate font-light max-w-lg">
+                        <p className="text-muted font-light max-w-lg">
                             Only customers who have purchased this product can write a review. Once your order for {product.title} is placed, you will be able to share your experience here.
                         </p>
                     ) : eligibility.eligible ? (
                         <form onSubmit={handleReviewSubmit} className="space-y-4 max-w-lg">
-                            <div className="inline-flex items-center gap-1.5 text-xs text-forest bg-forest/8 px-3 py-1.5 rounded-full mb-1">
+                            <div className="inline-flex items-center gap-1.5 text-xs text-primary bg-primary/8 px-3 py-1.5 rounded-full mb-1">
                                 <ShieldCheck size={13} /> Verified purchase
                             </div>
                             <div>
-                                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-2">Rating</label>
+                                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-2">Rating</label>
                                 <div className="flex gap-1">
                                     {[1, 2, 3, 4, 5].map((r) => (
                                         <button
                                             key={r}
                                             type="button"
                                             onClick={() => setReviewForm({ ...reviewForm, rating: r })}
-                                            className={reviewForm.rating >= r ? 'text-turmeric' : 'text-border'}
+                                            className={reviewForm.rating >= r ? 'text-accent' : 'text-line'}
                                             aria-label={`Rate ${r} star${r !== 1 ? 's' : ''}`}
                                         >
                                             <Star size={18} fill={reviewForm.rating >= r ? 'currentColor' : 'none'} />
@@ -713,22 +713,22 @@ export default function ProductDetailPage() {
                                 rows={3}
                                 required
                                 minLength={10}
-                                className="w-full px-4 py-3 border border-sand/60 rounded-lg resize-none bg-cream focus:outline-none focus:ring-1 focus:ring-forest/30 text-ink placeholder:text-slate/40 font-light"
+                                className="w-full px-4 py-3 border border-sand/60 rounded-lg resize-none bg-canvas focus:outline-none focus:ring-1 focus:ring-primary/30 text-ink placeholder:text-muted/40 font-light"
                                 placeholder="Share your experience…"
                             />
 
                             <div>
-                                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-2">
-                                    Add photos <span className="normal-case text-slate/50">(optional, up to {MAX_REVIEW_IMAGES})</span>
+                                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-2">
+                                    Add photos <span className="normal-case text-muted/50">(optional, up to {MAX_REVIEW_IMAGES})</span>
                                 </label>
                                 <div className="flex flex-wrap gap-2.5">
                                     {reviewImages.map((img) => (
-                                        <div key={img.previewUrl} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50">
+                                        <div key={img.previewUrl} className="relative w-16 h-16 rounded-lg overflow-hidden border border-line/50">
                                             <img src={img.previewUrl} alt="" className="w-full h-full object-cover" />
                                             <button
                                                 type="button"
                                                 onClick={() => removeReviewImage(img.previewUrl)}
-                                                className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-ink/70 text-cream hover:bg-ink"
+                                                className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-ink/70 text-canvas hover:bg-ink"
                                                 aria-label="Remove photo"
                                             >
                                                 <X size={11} />
@@ -736,7 +736,7 @@ export default function ProductDetailPage() {
                                         </div>
                                     ))}
                                     {reviewImages.length < MAX_REVIEW_IMAGES && (
-                                        <label className="w-16 h-16 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 text-slate/50 hover:border-forest/40 hover:text-forest cursor-pointer transition-colors">
+                                        <label className="w-16 h-16 rounded-lg border-2 border-dashed border-line flex flex-col items-center justify-center gap-1 text-muted/50 hover:border-primary/40 hover:text-primary cursor-pointer transition-colors">
                                             <Camera size={16} />
                                             <span className="text-[9px]">Add</span>
                                             <input type="file" accept="image/*" multiple className="hidden" onChange={handleReviewImagePick} />
@@ -753,7 +753,7 @@ export default function ProductDetailPage() {
                             </Button>
                         </form>
                     ) : (
-                        <p className="text-slate/60 text-sm">Reviews are open to verified buyers only.</p>
+                        <p className="text-muted/60 text-sm">Reviews are open to verified buyers only.</p>
                     )}
                 </section>
 
@@ -777,14 +777,14 @@ export default function ProductDetailPage() {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: 80, opacity: 0 }}
                         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-cream/95 backdrop-blur-md border-t border-border/60 px-4 py-3 safe-area-pb"
+                        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-canvas/95 backdrop-blur-md border-t border-line/60 px-4 py-3 safe-area-pb"
                     >
                         <div className="max-w-7xl mx-auto flex items-center gap-3">
                             <div className="min-w-0 flex-1">
-                                <p className="text-xs text-slate line-clamp-1">
+                                <p className="text-xs text-muted line-clamp-1">
                                     {product.title}{activeVariant ? ` — ${activeVariant.label}` : ''}
                                 </p>
-                                <p className="font-display text-lg text-forest">{formatPrice(displayPrice)}</p>
+                                <p className="font-display text-lg text-primary">{formatPrice(displayPrice)}</p>
                             </div>
                             <Button
                                 variant="turmeric"

@@ -152,7 +152,7 @@ export default function BannerManager({ filterTarget, productId }) {
                 columns={3}
                 stats={[
                     { label: 'Total banners', value: visibleBanners.length },
-                    { label: 'Live', value: enabledCount, color: 'text-emerald' },
+                    { label: 'Live', value: enabledCount, color: 'text-primary' },
                     { label: 'Hidden', value: visibleBanners.length - enabledCount, color: 'text-admin-muted' },
                 ]}
             />
@@ -242,7 +242,7 @@ export default function BannerManager({ filterTarget, productId }) {
                                 </div>
                             </div>
                         ) : (
-                            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-forest/30 hover:bg-forest/5 transition-colors">
+                            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors">
                                 <Upload size={24} className="text-admin-muted/80" />
                                 <span className="text-sm text-admin-muted">{uploading ? 'Uploading…' : 'Click to upload image'}</span>
                                 <span className="text-xs text-admin-muted px-4 text-center">
@@ -253,7 +253,7 @@ export default function BannerManager({ filterTarget, productId }) {
                             </label>
                         )}
                         {form.image && (
-                            <label className="inline-flex items-center gap-2 mt-3 text-xs text-forest cursor-pointer hover:text-forest-light">
+                            <label className="inline-flex items-center gap-2 mt-3 text-xs text-primary cursor-pointer hover:text-primary-hover">
                                 <Upload size={14} />
                                 {uploading ? 'Uploading…' : 'Replace image'}
                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
@@ -275,7 +275,7 @@ export default function BannerManager({ filterTarget, productId }) {
                         <select
                             value={form.displayTarget}
                             onChange={(e) => setForm({ ...form, displayTarget: e.target.value, productId: null })}
-                            className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink rounded-lg text-sm focus:outline-none focus:border-turmeric-ink focus:ring-1 focus:ring-turmeric-ink/30"
+                            className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink rounded-lg text-sm focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30"
                         >
                             <option value="both">Both — Slider and Stacked</option>
                             <option value="slider">Banner Slider only (rotating)</option>
@@ -287,7 +287,7 @@ export default function BannerManager({ filterTarget, productId }) {
                         <input type="checkbox" checked={form.isEnabled} onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })} />
                         Live
                     </label>
-                    <div className="sticky bottom-0 pt-4 pb-2 bg-cream border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
+                    <div className="sticky bottom-0 pt-4 pb-2 bg-canvas border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
                         <Button variant="turmeric" className="w-full" onClick={handleSave} disabled={saving || !form.image}>
                             {saving ? 'Saving…' : 'Save Banner'}
                         </Button>

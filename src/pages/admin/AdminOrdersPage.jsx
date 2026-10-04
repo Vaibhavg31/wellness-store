@@ -199,7 +199,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                         <span>{formatPrice(order.subtotal)}</span>
                     </div>
                     {(order.discountAmount > 0 || order.couponCode) && (
-                        <div className="flex justify-between text-emerald">
+                        <div className="flex justify-between text-primary">
                             <span>Coupon{order.couponCode ? ` (${order.couponCode})` : ''}</span>
                             <span>−{formatPrice(order.discountAmount || 0)}</span>
                         </div>
@@ -493,7 +493,7 @@ export default function AdminOrdersPage() {
                                 <option key={s.value} value={s.value}>{s.adminLabel}</option>
                             ))}
                         </select>
-                        <button type="button" disabled={bulkLoading || !bulkStatus} onClick={() => bulkAction(bulkStatus)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-forest text-cream hover:bg-forest-light disabled:opacity-50">
+                        <button type="button" disabled={bulkLoading || !bulkStatus} onClick={() => bulkAction(bulkStatus)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-canvas hover:bg-primary-hover disabled:opacity-50">
                             Apply
                         </button>
                         {BULK_ACTIONS.map(({ status, label, icon: Icon }) => (
@@ -506,7 +506,7 @@ export default function AdminOrdersPage() {
                             <RotateCcw size={12} />
                             Refund
                         </button>
-                        <button type="button" onClick={() => printStickers()} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-ink text-cream hover:bg-ink/90">
+                        <button type="button" onClick={() => printStickers()} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-ink text-canvas hover:bg-ink/90">
                             <Printer size={12} />
                             Print {selected.size === 1 ? 'label' : 'labels'}
                         </button>
@@ -557,7 +557,7 @@ export default function AdminOrdersPage() {
                                     return (
                                         <tr
                                             key={order.id}
-                                            className={`border-b border-admin-border-light hover:bg-admin-surface-alt cursor-pointer ${selected.has(order.id) ? 'bg-forest/5' : ''}`}
+                                            className={`border-b border-admin-border-light hover:bg-admin-surface-alt cursor-pointer ${selected.has(order.id) ? 'bg-primary/5' : ''}`}
                                             onClick={() => setDetailOrder(order)}
                                         >
                                             <td className="p-4" onClick={(e) => e.stopPropagation()}>
@@ -604,7 +604,7 @@ export default function AdminOrdersPage() {
                                                     <button
                                                         type="button"
                                                         onClick={(e) => { e.stopPropagation(); printStickers([order.id]); }}
-                                                        className="text-ink hover:text-forest p-1 rounded-md hover:bg-sand/60"
+                                                        className="text-ink hover:text-primary p-1 rounded-md hover:bg-sand/60"
                                                         title="Print shipping label"
                                                         aria-label={`Print label for order ${shortOrderId(order.id)}`}
                                                     >
@@ -613,7 +613,7 @@ export default function AdminOrdersPage() {
                                                     <button
                                                         type="button"
                                                         onClick={(e) => { e.stopPropagation(); setDetailOrder(order); }}
-                                                        className="text-forest hover:text-forest-light text-xs font-medium inline-flex items-center gap-0.5"
+                                                        className="text-primary hover:text-primary-hover text-xs font-medium inline-flex items-center gap-0.5"
                                                     >
                                                         View <ChevronRight size={14} />
                                                     </button>

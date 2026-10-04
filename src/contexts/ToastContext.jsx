@@ -14,10 +14,10 @@ const ICONS = {
 };
 
 const STYLES = {
-    success: 'bg-ink/95 text-cream border border-emerald/30',
-    error: 'bg-ink/95 text-cream border border-red-400/30',
-    info: 'bg-ink/95 text-cream border border-cream/10',
-    cart: 'bg-ink/95 text-cream border border-forest/30',
+    success: 'bg-ink/95 text-canvas border border-primary/30',
+    error: 'bg-ink/95 text-canvas border border-red-400/30',
+    info: 'bg-ink/95 text-canvas border border-canvas/10',
+    cart: 'bg-ink/95 text-canvas border border-primary/30',
 };
 
 export function ToastProvider({ children }) {
@@ -69,21 +69,21 @@ export function ToastProvider({ children }) {
                                     <img
                                         src={imageUrl(toast.product.image)}
                                         alt=""
-                                        className="w-11 h-11 object-cover rounded-lg flex-shrink-0 ring-1 ring-cream/10"
+                                        className="w-11 h-11 object-cover rounded-lg flex-shrink-0 ring-1 ring-canvas/10"
                                     />
                                 ) : (
-                                    <Icon size={18} className="flex-shrink-0 text-emerald" strokeWidth={1.5} />
+                                    <Icon size={18} className="flex-shrink-0 text-primary" strokeWidth={1.5} />
                                 )}
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium leading-snug">{toast.message}</p>
                                     {toast.product?.title && (
-                                        <p className="text-xs text-cream/60 line-clamp-1 mt-0.5">{toast.product.title}</p>
+                                        <p className="text-xs text-canvas/60 line-clamp-1 mt-0.5">{toast.product.title}</p>
                                     )}
                                 </div>
                                 <button
                                     type="button"
                                     onClick={(e) => { e.stopPropagation(); dismissToast(toast.id); }}
-                                    className="flex-shrink-0 p-1 rounded-full text-cream/40 hover:text-cream/80 transition-colors"
+                                    className="flex-shrink-0 p-1 rounded-full text-canvas/40 hover:text-canvas/80 transition-colors"
                                     aria-label="Dismiss"
                                 >
                                     <X size={14} />

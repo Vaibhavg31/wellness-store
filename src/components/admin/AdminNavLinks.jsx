@@ -53,11 +53,11 @@ export default function AdminNavLinks({
                             mobile ? 'py-3 text-sm min-h-[44px]' : 'py-2.5 text-[13px]'
                         } ${
                             active
-                                ? 'bg-cream/12 text-turmeric-light shadow-sm'
-                                : 'text-cream/75 hover:bg-cream/8 hover:text-cream active:bg-cream/10'
+                                ? 'bg-canvas/12 text-accent-hover shadow-sm'
+                                : 'text-canvas/75 hover:bg-canvas/8 hover:text-canvas active:bg-canvas/10'
                         }`}
                     >
-                        <item.icon size={17} strokeWidth={1.5} className={active ? 'text-turmeric' : 'text-cream/50'} />
+                        <item.icon size={17} strokeWidth={1.5} className={active ? 'text-accent' : 'text-canvas/50'} />
                         {item.label}
                     </Link>
                 );

@@ -206,8 +206,8 @@ export default function AdminBundlesPage() {
                 columns={3}
                 stats={[
                     { label: 'Total bundles', value: bundles.length },
-                    { label: 'Published', value: publishedCount, color: 'text-emerald' },
-                    { label: 'Combined savings offered', value: formatPrice(totalSavingsOffered), color: 'text-turmeric-ink' },
+                    { label: 'Published', value: publishedCount, color: 'text-primary' },
+                    { label: 'Combined savings offered', value: formatPrice(totalSavingsOffered), color: 'text-accent-ink' },
                 ]}
             />
 
@@ -356,7 +356,7 @@ export default function AdminBundlesPage() {
                         <button
                             type="button"
                             onClick={addItem}
-                            className="mt-2 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20"
+                            className="mt-2 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20"
                         >
                             <Plus size={14} /> Add product
                         </button>
@@ -373,7 +373,7 @@ export default function AdminBundlesPage() {
                                     key={value}
                                     type="button"
                                     onClick={() => setForm({ ...form, discountType: value })}
-                                    className={`p-3 rounded-xl border text-xs text-left transition-colors ${form.discountType === value ? 'border-emerald bg-emerald/10 text-emerald' : 'border-border hover:border-emerald/40'}`}
+                                    className={`p-3 rounded-xl border text-xs text-left transition-colors ${form.discountType === value ? 'border-primary bg-primary/10 text-primary' : 'border-line hover:border-primary/40'}`}
                                 >
                                     {label}
                                 </button>
@@ -394,7 +394,7 @@ export default function AdminBundlesPage() {
                                 <span className="text-admin-muted/80 line-through">{formatPrice(preview.subtotal)}</span>
                                 <span className="font-semibold text-ink">{formatPrice(bundlePrice)}</span>
                                 {discountAmount > 0 && (
-                                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald/10 text-emerald border border-emerald/20">
+                                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                                         Save {formatPrice(discountAmount)}
                                     </span>
                                 )}
@@ -407,7 +407,7 @@ export default function AdminBundlesPage() {
                         Published (visible to customers)
                     </label>
 
-                    <div className="sticky bottom-0 pt-4 pb-2 bg-cream border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
+                    <div className="sticky bottom-0 pt-4 pb-2 bg-canvas border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
                         <Button variant="turmeric" className="w-full" onClick={handleSave} disabled={saving}>
                             {saving ? 'Saving…' : editing ? 'Update Bundle' : 'Create Bundle'}
                         </Button>

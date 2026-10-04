@@ -15,8 +15,8 @@ export default function ExportFormatModal({ isOpen, onClose, onSelect, exporting
                     onClick={() => onSelect('csv')}
                     className="flex items-center gap-4 p-4 rounded-xl border border-admin-border bg-admin-surface-alt hover:bg-admin-surface-alt transition-colors disabled:opacity-50 text-left"
                 >
-                    <div className="w-10 h-10 rounded-lg bg-emerald/10 flex items-center justify-center flex-shrink-0">
-                        <FileSpreadsheet size={20} className="text-emerald" />
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <FileSpreadsheet size={20} className="text-primary" />
                     </div>
                     <div>
                         <p className="font-medium text-ink">CSV spreadsheet</p>
@@ -29,8 +29,8 @@ export default function ExportFormatModal({ isOpen, onClose, onSelect, exporting
                     onClick={() => onSelect('pdf')}
                     className="flex items-center gap-4 p-4 rounded-xl border border-admin-border bg-admin-surface-alt hover:bg-admin-surface-alt transition-colors disabled:opacity-50 text-left"
                 >
-                    <div className="w-10 h-10 rounded-lg bg-forest/10 flex items-center justify-center flex-shrink-0">
-                        <FileText size={20} className="text-forest" />
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <FileText size={20} className="text-primary" />
                     </div>
                     <div>
                         <p className="font-medium text-ink">PDF document</p>

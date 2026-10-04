@@ -163,14 +163,14 @@ export default function AdminMediaPage() {
                                         onClick={() => copyUrl(item)}
                                         icon={copiedId === item.id ? Check : Copy}
                                         title="Copy URL"
-                                        className="bg-cream"
+                                        className="bg-canvas"
                                     />
                                     <AdminIconButton
                                         onClick={() => remove(item)}
                                         icon={Trash2}
                                         variant="danger"
                                         title="Delete"
-                                        className="bg-cream"
+                                        className="bg-canvas"
                                     />
                                 </div>
                             </div>

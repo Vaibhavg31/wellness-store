@@ -6,12 +6,12 @@ import Button from '@/components/ui/Button';
 import { cn } from '@/utils/formatPrice';
 
 const STAT_TONES = {
-    turmeric: { value: 'text-turmeric-ink', accent: 'border-l-turmeric' },
+    turmeric: { value: 'text-accent-ink', accent: 'border-l-turmeric' },
     blue: { value: 'text-blue-600', accent: 'border-l-blue-500' },
     amber: { value: 'text-amber-700', accent: 'border-l-amber-500' },
-    emerald: { value: 'text-emerald', accent: 'border-l-emerald' },
+    emerald: { value: 'text-primary', accent: 'border-l-emerald' },
     red: { value: 'text-red-600', accent: 'border-l-red-500' },
-    forest: { value: 'text-forest', accent: 'border-l-forest' },
+    forest: { value: 'text-primary', accent: 'border-l-forest' },
     default: { value: 'text-ink', accent: 'border-l-admin-border' },
 };
 
@@ -172,7 +172,7 @@ export function AdminTableShell({ children, className }) {
 export function AdminLoadingState() {
     return (
         <div className="flex items-center justify-center py-20">
-            <div className="w-7 h-7 border-2 border-forest/15 border-t-forest rounded-full animate-spin" />
+            <div className="w-7 h-7 border-2 border-primary/15 border-t-forest rounded-full animate-spin" />
         </div>
     );
 }
@@ -213,18 +213,18 @@ export function AdminQuickLink({ to, icon: Icon, label, value, sub, highlight })
                 highlight && 'admin-quick-link-highlight',
             )}
         >
-            {Icon && <Icon size={18} className={highlight ? 'text-turmeric-ink mb-2.5' : 'text-forest mb-2.5'} strokeWidth={1.5} />}
+            {Icon && <Icon size={18} className={highlight ? 'text-accent-ink mb-2.5' : 'text-primary mb-2.5'} strokeWidth={1.5} />}
             <p className="text-xl font-semibold text-ink tabular-nums">{value}</p>
             <p className="text-sm text-admin-muted font-medium mt-0.5">{label}</p>
-            {sub && <p className="text-xs text-turmeric-ink mt-1 font-semibold">{sub}</p>}
+            {sub && <p className="text-xs text-accent-ink mt-1 font-semibold">{sub}</p>}
         </Link>
     );
 }
 
 const ICON_BTN_VARIANTS = {
     default: 'text-ink hover:bg-admin-surface-alt',
-    success: 'text-emerald hover:bg-emerald/10',
-    warning: 'text-turmeric-ink hover:bg-turmeric/10',
+    success: 'text-primary hover:bg-primary/10',
+    warning: 'text-accent-ink hover:bg-accent/10',
     danger: 'text-red-600 hover:bg-red-50',
 };
 
@@ -244,10 +244,10 @@ export function AdminIconButton({ onClick, icon: Icon, variant = 'default', titl
 
 export function AdminStatusPill({ children, tone = 'default' }) {
     const tones = {
-        success: 'bg-emerald/10 text-emerald',
+        success: 'bg-primary/10 text-primary',
         warning: 'bg-amber-50 text-amber-800',
         muted: 'bg-admin-surface-alt text-admin-muted',
-        forest: 'bg-forest/8 text-forest',
+        forest: 'bg-primary/8 text-primary',
         danger: 'bg-red-50 text-red-700',
         default: 'bg-admin-surface-alt text-ink',
     };
@@ -262,11 +262,11 @@ export function AdminPromoCard({ to, icon: Icon, title, description }) {
     return (
         <Link to={to} className="admin-promo-card block mb-6 group">
             <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-forest/10 flex items-center justify-center shrink-0 group-hover:bg-forest/15 transition-colors">
-                    <Icon size={18} className="text-forest" />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                    <Icon size={18} className="text-primary" />
                 </div>
                 <div>
-                    <p className="font-semibold text-ink group-hover:text-forest transition-colors">{title}</p>
+                    <p className="font-semibold text-ink group-hover:text-primary transition-colors">{title}</p>
                     <p className="text-sm text-admin-muted mt-0.5">{description}</p>
                 </div>
             </div>
@@ -313,7 +313,7 @@ export function AdminSaveBar({
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.92 }}
                         transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary"
                     >
                         <Check size={14} strokeWidth={2.5} aria-hidden />
                         Saved successfully
@@ -327,7 +327,7 @@ export function AdminSaveBar({
                         exit={{ opacity: 0 }}
                         className="inline-flex items-center gap-1.5 text-sm font-medium text-admin-muted"
                     >
-                        <span className="w-3.5 h-3.5 border-2 border-forest/20 border-t-forest rounded-full animate-spin shrink-0" aria-hidden />
+                        <span className="w-3.5 h-3.5 border-2 border-primary/20 border-t-forest rounded-full animate-spin shrink-0" aria-hidden />
                         Saving…
                     </motion.span>
                 )}
@@ -361,7 +361,7 @@ export function AdminSaveBar({
     // scrollable) page wrapper instead of the actual browser viewport,
     // requiring a scroll to ever see it. Portaling escapes that entirely.
     return createPortal(
-        <div className="fixed bottom-0 left-0 right-0 z-40 lg:left-[15.5rem] border-t border-admin-border bg-cream/95 backdrop-blur-md shadow-[0_-8px_32px_rgba(0,0,0,0.08)] px-4 sm:px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="fixed bottom-0 left-0 right-0 z-40 lg:left-[15.5rem] border-t border-admin-border bg-canvas/95 backdrop-blur-md shadow-[0_-8px_32px_rgba(0,0,0,0.08)] px-4 sm:px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             {bar}
         </div>,
         document.body,

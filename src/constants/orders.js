@@ -28,7 +28,7 @@ export const STATUS_COLORS = {
     placed: 'bg-blue-100 text-blue-700 border-blue-200',
     confirmed: 'bg-amber-100 text-amber-800 border-amber-200',
     out_for_delivery: 'bg-purple-100 text-purple-800 border-purple-200',
-    delivered: 'bg-emerald/15 text-emerald border-emerald/30',
+    delivered: 'bg-primary/15 text-primary border-primary/30',
     cancelled: 'bg-red-100 text-red-700 border-red-200',
     returned: 'bg-orange-100 text-orange-800 border-orange-200',
     packed: 'bg-violet-100 text-violet-800 border-violet-200',

@@ -30,7 +30,7 @@ export default function VerifyEmailPendingPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-cream">
+        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-canvas">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -39,11 +39,11 @@ export default function VerifyEmailPendingPage() {
                 <Logo size="md" showHover className="mx-auto mb-8" />
 
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 rounded-full bg-forest/10 flex items-center justify-center mx-auto mb-5">
-                        <Mail size={28} className="text-forest" />
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                        <Mail size={28} className="text-primary" />
                     </div>
                     <h1 className="font-display text-3xl text-ink mb-2">Check your email</h1>
-                    <p className="text-slate text-sm">
+                    <p className="text-muted text-sm">
                         We sent a secure magic link to{' '}
                         <span className="font-medium text-ink">{displayEmail || 'your inbox'}</span>.
                         Click the link to verify your email and sign in.
@@ -57,7 +57,7 @@ export default function VerifyEmailPendingPage() {
                         Continue browsing
                     </Button>
                 </Link>
-                <p className="text-center text-xs text-slate">
+                <p className="text-center text-xs text-muted">
                     Didn&apos;t get it? Check spam, or use resend above.
                 </p>
             </motion.div>

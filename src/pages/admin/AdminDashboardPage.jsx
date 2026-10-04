@@ -163,7 +163,7 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
                 <div className="admin-table-shell p-4">
                     <div className="flex items-center gap-2 mb-3">
-                        <Clock size={16} className="text-forest" strokeWidth={1.75} />
+                        <Clock size={16} className="text-primary" strokeWidth={1.75} />
                         <h3 className="font-semibold text-ink text-sm">Recent Orders</h3>
                     </div>
                     {recentOrders.length === 0 ? (
@@ -202,7 +202,7 @@ export default function AdminDashboardPage() {
 
                 <div className="admin-table-shell p-4">
                     <div className="flex items-center gap-2 mb-3">
-                        <AlertTriangle size={16} className="text-forest" strokeWidth={1.75} />
+                        <AlertTriangle size={16} className="text-primary" strokeWidth={1.75} />
                         <h3 className="font-semibold text-ink text-sm">Low Stock Alerts</h3>
                     </div>
                     {lowStockProducts.length === 0 ? (
@@ -232,7 +232,7 @@ export default function AdminDashboardPage() {
 
             <div className="admin-table-shell p-4 mt-4">
                 <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp size={16} className="text-forest" strokeWidth={1.75} />
+                    <TrendingUp size={16} className="text-primary" strokeWidth={1.75} />
                     <h3 className="font-semibold text-ink text-sm">Best Selling Products</h3>
                 </div>
                 {bestSellers.length === 0 ? (
@@ -242,7 +242,7 @@ export default function AdminDashboardPage() {
                         {bestSellers.map((item, idx) => (
                             <li key={item.title + idx} className="flex items-center justify-between gap-3 py-2.5">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <span className="w-6 h-6 rounded-md bg-forest/8 text-forest text-xs font-semibold flex items-center justify-center shrink-0">
+                                    <span className="w-6 h-6 rounded-md bg-primary/8 text-primary text-xs font-semibold flex items-center justify-center shrink-0">
                                         {idx + 1}
                                     </span>
                                     <p className="text-sm font-medium text-ink truncate">{item.title}</p>

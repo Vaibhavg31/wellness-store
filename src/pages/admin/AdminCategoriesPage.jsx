@@ -116,7 +116,7 @@ export default function AdminCategoriesPage() {
                 columns={3}
                 stats={[
                     { label: 'Total categories', value: categories.length },
-                    { label: 'Published', value: publishedCount, color: 'text-emerald' },
+                    { label: 'Published', value: publishedCount, color: 'text-primary' },
                     { label: 'Hidden', value: hiddenCount, color: 'text-admin-muted' },
                 ]}
             />
@@ -181,7 +181,7 @@ export default function AdminCategoriesPage() {
                                         <td className="p-4 align-top text-center">
                                             <span
                                                 className={`inline-flex items-center justify-center min-w-[1.75rem] px-2 py-0.5 rounded-full text-xs font-medium ${
-                                                    cat.productCount > 0 ? 'bg-forest/10 text-forest' : 'bg-slate/10 text-admin-muted'
+                                                    cat.productCount > 0 ? 'bg-primary/10 text-primary' : 'bg-muted/10 text-admin-muted'
                                                 }`}
                                                 title={cat.productCount === 0 ? "No products yet — won't show on the storefront until it has at least one" : undefined}
                                             >
@@ -248,7 +248,7 @@ export default function AdminCategoriesPage() {
                                 </button>
                             </div>
                         ) : (
-                            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-forest/30 hover:bg-forest/5 transition-colors">
+                            <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors">
                                 <Upload size={24} className="text-admin-muted/80" />
                                 <span className="text-sm text-admin-muted">{uploading ? 'Uploading…' : 'Click to upload image'}</span>
                                 <span className="text-xs text-admin-muted">JPG, PNG, WebP · max 5MB</span>
@@ -256,7 +256,7 @@ export default function AdminCategoriesPage() {
                             </label>
                         )}
                         {form.image && (
-                            <label className="inline-flex items-center gap-2 mt-3 text-xs text-forest cursor-pointer hover:text-forest-light">
+                            <label className="inline-flex items-center gap-2 mt-3 text-xs text-primary cursor-pointer hover:text-primary-hover">
                                 <Upload size={14} />
                                 {uploading ? 'Uploading…' : 'Replace image'}
                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
@@ -272,7 +272,7 @@ export default function AdminCategoriesPage() {
                         <input type="checkbox" checked={form.isPublished} onChange={(e) => setForm({ ...form, isPublished: e.target.checked })} />
                         Published (visible on website)
                     </label>
-                    <div className="sticky bottom-0 pt-4 pb-2 bg-cream border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
+                    <div className="sticky bottom-0 pt-4 pb-2 bg-canvas border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
                         <Button variant="turmeric" className="w-full" onClick={handleSave}>Save Category</Button>
                     </div>
                 </div>

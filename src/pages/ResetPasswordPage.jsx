@@ -43,17 +43,17 @@ export default function ResetPasswordPage() {
 
     if (!token || !email) {
         return (
-            <div className="min-h-screen flex items-center justify-center px-6 bg-cream">
+            <div className="min-h-screen flex items-center justify-center px-6 bg-canvas">
                 <div className="text-center max-w-md">
                     <h1 className="font-display text-2xl mb-4">Invalid reset link</h1>
-                    <Link to="/forgot-password" className="text-forest hover:text-forest-light">Request a new link</Link>
+                    <Link to="/forgot-password" className="text-primary hover:text-primary-hover">Request a new link</Link>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-cream">
+        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-canvas">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
                 <Logo size="md" showHover className="mx-auto mb-8" />
                 <h1 className="font-display text-3xl text-ink text-center mb-8">Set new password</h1>

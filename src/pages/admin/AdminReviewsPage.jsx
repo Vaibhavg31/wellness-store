@@ -23,12 +23,12 @@ const STATUS_FILTERS = [
 
 function StarRating({ rating }) {
     return (
-        <span className="inline-flex items-center gap-0.5 text-turmeric" aria-label={`${rating} out of 5 stars`}>
+        <span className="inline-flex items-center gap-0.5 text-accent" aria-label={`${rating} out of 5 stars`}>
             {Array.from({ length: 5 }, (_, i) => (
                 <Star
                     key={i}
                     size={12}
-                    className={i < rating ? 'fill-turmeric text-turmeric' : 'text-sand'}
+                    className={i < rating ? 'fill-accent text-accent' : 'text-sand'}
                 />
             ))}
         </span>
@@ -135,9 +135,9 @@ export default function AdminReviewsPage() {
                 columns={4}
                 stats={[
                     { label: 'Total reviews', value: reviews.length },
-                    { label: 'Pending', value: pendingCount, color: 'text-turmeric-ink', sub: pendingCount > 0 ? 'Needs action' : undefined },
-                    { label: 'Approved', value: approvedCount, color: 'text-emerald' },
-                    { label: 'Average rating', value: avgRating, color: 'text-forest' },
+                    { label: 'Pending', value: pendingCount, color: 'text-accent-ink', sub: pendingCount > 0 ? 'Needs action' : undefined },
+                    { label: 'Approved', value: approvedCount, color: 'text-primary' },
+                    { label: 'Average rating', value: avgRating, color: 'text-primary' },
                 ]}
             />
 
@@ -215,7 +215,7 @@ export default function AdminReviewsPage() {
                                             <div className="flex items-center gap-1.5 flex-wrap">
                                                 <p className="font-medium text-ink">{review.name}</p>
                                                 {review.isVerifiedPurchase && (
-                                                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald bg-emerald/10 px-1.5 py-0.5 rounded-full" title="Confirmed against a real order">
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full" title="Confirmed against a real order">
                                                         <ShieldCheck size={10} /> Verified
                                                     </span>
                                                 )}

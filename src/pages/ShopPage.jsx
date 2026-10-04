@@ -85,7 +85,7 @@ export default function ShopPage() {
         <select
             value={filters.sort}
             onChange={(e) => updateFilter('sort', e.target.value)}
-            className={`text-xs sm:text-sm tracking-wide border border-ink/20 px-2 sm:px-3 py-2 rounded-full bg-cream text-ink focus:outline-none focus:border-forest/40 ${className}`}
+            className={`text-xs sm:text-sm tracking-wide border border-ink/20 px-2 sm:px-3 py-2 rounded-full bg-canvas text-ink focus:outline-none focus:border-primary/40 ${className}`}
             aria-label="Sort products"
         >
             <option value="newest">Newest</option>
@@ -98,7 +98,7 @@ export default function ShopPage() {
     const FilterControls = () => (
         <div className="space-y-6">
             <div>
-                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-3">Search</label>
+                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-3">Search</label>
                 <ProductSearchBar
                     value={filters.search}
                     onChange={(value) => updateFilter('search', value)}
@@ -107,11 +107,11 @@ export default function ShopPage() {
                 />
             </div>
             <div>
-                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-3">Goal</label>
+                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-3">Goal</label>
                 <GoalChipStrip activeGoal={filters.goal === 'all' ? null : filters.goal} eager />
             </div>
             <div>
-                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-3">Category</label>
+                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-3">Category</label>
                 <CategoryFilterTabs
                     categories={categories}
                     active={filters.category}
@@ -120,15 +120,15 @@ export default function ShopPage() {
             </div>
             {availableTags.length > 0 && (
                 <div>
-                    <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-3">Tag</label>
+                    <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-3">Tag</label>
                     <div className="flex flex-wrap gap-2">
                         <button
                             type="button"
                             onClick={() => updateFilter('tag', 'all')}
                             className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
                                 filters.tag === 'all'
-                                    ? 'bg-forest text-cream border-forest'
-                                    : 'border-border/60 text-slate hover:border-forest/40 hover:text-forest bg-cream'
+                                    ? 'bg-primary text-canvas border-primary'
+                                    : 'border-line/60 text-muted hover:border-primary/40 hover:text-primary bg-canvas'
                             }`}
                         >
                             All
@@ -140,8 +140,8 @@ export default function ShopPage() {
                                 onClick={() => updateFilter('tag', tag)}
                                 className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
                                     filters.tag === tag
-                                        ? 'bg-forest text-cream border-forest'
-                                        : 'border-border/60 text-slate hover:border-forest/40 hover:text-forest bg-cream'
+                                        ? 'bg-primary text-canvas border-primary'
+                                        : 'border-line/60 text-muted hover:border-primary/40 hover:text-primary bg-canvas'
                                 }`}
                             >
                                 {tag}
@@ -151,7 +151,7 @@ export default function ShopPage() {
                 </div>
             )}
             <div>
-                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-3">
+                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-3">
                     Price Range: ₹{filters.minPrice} to ₹{effectiveFilters.maxPrice}
                 </label>
                 <input
@@ -166,7 +166,7 @@ export default function ShopPage() {
                 />
             </div>
             <div>
-                <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-3">Sort By</label>
+                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-3">Sort By</label>
                 <SortSelect className="w-full !rounded-lg" />
             </div>
         </div>
@@ -175,13 +175,13 @@ export default function ShopPage() {
     if (loading) {
         return (
             <div className="min-h-[50vh] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="pb-16 sm:pb-20 bg-cream">
+        <div className="pb-16 sm:pb-20 bg-canvas">
             <InstagramStrip />
             <div className="px-3 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto pt-3 sm:pt-8 space-y-6 sm:space-y-10">
@@ -190,16 +190,16 @@ export default function ShopPage() {
                         heading with a real banner treatment (ambient blobs on the
                         brand-dark surface) so the shop page opens with the same
                         visual language as the home hero. */}
-                    <section className="relative overflow-hidden rounded-3xl bg-forest text-cream px-6 py-9 sm:px-10 sm:py-12">
+                    <section className="relative overflow-hidden rounded-3xl bg-primary text-canvas px-6 py-9 sm:px-10 sm:py-12">
                         <AmbientBlobs variant="dark" />
                         <div className="relative z-10 max-w-2xl">
-                            <p className="type-eyebrow text-turmeric-light/80 mb-3">
+                            <p className="eyebrow text-accent-hover/80 mb-3">
                                 {filtered.length} {filtered.length === 1 ? 'product' : 'products'} · Everyday Wellness Collection
                             </p>
                             <h1 className="font-display text-2xl sm:text-4xl font-semibold leading-tight mb-3">
                                 Find what your routine is missing
                             </h1>
-                            <p className="text-cream/70 text-sm sm:text-base leading-relaxed">
+                            <p className="text-canvas/70 text-sm sm:text-base leading-relaxed">
                                 Lab-tested, clean-label supplements — filter by goal, category, or search below.
                             </p>
                         </div>
@@ -218,7 +218,7 @@ export default function ShopPage() {
                     <div className="lg:grid lg:grid-cols-[272px_1fr] lg:gap-10 lg:items-start">
                         <aside className="hidden lg:block sticky top-[calc(var(--site-header-h,7rem)+1.25rem)]">
                             <div className="flex items-center gap-2 mb-5">
-                                <SlidersHorizontal size={16} className="text-forest" />
+                                <SlidersHorizontal size={16} className="text-primary" />
                                 <h2 className="font-display text-lg text-ink">Refine</h2>
                             </div>
                             <FilterControls />
@@ -242,17 +242,17 @@ export default function ShopPage() {
                             </div>
 
                             <div className="flex items-center justify-between mt-3 lg:mt-0 mb-3 sm:mb-5 gap-3">
-                                <p className="hidden lg:block text-sm text-slate">
+                                <p className="hidden lg:block text-sm text-muted">
                                     {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
                                 </p>
-                                <p className="lg:hidden text-xs text-slate">
+                                <p className="lg:hidden text-xs text-muted">
                                     {filtered.length} {filtered.length === 1 ? 'product' : 'products'}
                                 </p>
                                 <div className="flex items-center gap-2 ml-auto">
                                     <button
                                         type="button"
                                         onClick={() => setFilterOpen(true)}
-                                        className="lg:hidden flex items-center gap-1.5 type-eyebrow text-ink border border-ink/20 px-3 py-2 rounded-full hover:border-forest/40 hover:text-forest transition-colors"
+                                        className="lg:hidden flex items-center gap-1.5 eyebrow text-ink border border-ink/20 px-3 py-2 rounded-full hover:border-primary/40 hover:text-primary transition-colors"
                                     >
                                         <SlidersHorizontal size={14} />
                                         Filters
@@ -283,7 +283,7 @@ export default function ShopPage() {
                                         className="text-center py-16 sm:py-20"
                                     >
                                         <p className="font-display text-xl sm:text-2xl mb-2 text-ink">No products found</p>
-                                        <p className="text-slate text-sm">Try a different search or adjust filters</p>
+                                        <p className="text-muted text-sm">Try a different search or adjust filters</p>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

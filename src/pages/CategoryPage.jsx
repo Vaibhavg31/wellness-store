@@ -30,7 +30,7 @@ export default function CategoryPage() {
     if (catLoading || prodLoading) {
         return (
             <div className="min-h-[50vh] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-forest/30 border-t-forest rounded-full animate-spin" />
+                <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" />
             </div>
         );
     }
@@ -45,16 +45,16 @@ export default function CategoryPage() {
     }
 
     return (
-        <div className="pb-16 sm:pb-20 bg-cream">
+        <div className="pb-16 sm:pb-20 bg-canvas">
             {/* Hero banner */}
             <div className="relative h-44 sm:h-52 md:h-60 overflow-hidden -mt-[var(--site-header-h,7rem)] mb-6 sm:mb-8">
                 <img src={imageUrl(category.image)} alt={category.label} className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/45 to-ink/30" />
                 <div className="absolute inset-0 flex flex-col justify-end max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 pt-[calc(var(--site-header-h,7rem)+0.5rem)]">
                     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
-                        <p className="text-[10px] tracking-[0.28em] uppercase text-turmeric mb-1.5">Collection</p>
-                        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl text-cream">{category.label}</h1>
-                        <p className="text-cream/75 text-xs sm:text-sm mt-1 max-w-md">{category.description}</p>
+                        <p className="text-[10px] tracking-[0.28em] uppercase text-accent mb-1.5">Collection</p>
+                        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl text-canvas">{category.label}</h1>
+                        <p className="text-canvas/75 text-xs sm:text-sm mt-1 max-w-md">{category.description}</p>
                     </motion.div>
                 </div>
             </div>
@@ -67,7 +67,7 @@ export default function CategoryPage() {
 
                 <section>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                        <p className="text-xs text-slate">
+                        <p className="text-xs text-muted">
                             {categoryProducts.length} {categoryProducts.length === 1 ? 'piece' : 'pieces'}
                         </p>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
@@ -78,7 +78,7 @@ export default function CategoryPage() {
                                 size="compact"
                                 className="w-full sm:w-64"
                             />
-                            <Link to="/shop" className="text-[10px] tracking-[0.12em] uppercase text-forest hover:text-forest-light transition-colors text-right sm:text-left">
+                            <Link to="/shop" className="text-[10px] tracking-[0.12em] uppercase text-primary hover:text-primary-hover transition-colors text-right sm:text-left">
                                 View all →
                             </Link>
                         </div>
@@ -95,7 +95,7 @@ export default function CategoryPage() {
                             ))}
                         </motion.div>
                     ) : (
-                        <p className="text-slate text-center py-16 text-sm">No products in this category yet.</p>
+                        <p className="text-muted text-center py-16 text-sm">No products in this category yet.</p>
                     )}
                 </section>
             </div>

@@ -153,7 +153,7 @@ export default function AdminSettingsPage() {
                                 <span className="text-sm font-medium text-ink block">{item.label}</span>
                                 <span className="text-xs text-admin-muted block mt-0.5">{item.description}</span>
                                 {item.hint && (
-                                    <span className="text-[11px] text-slate block mt-1">{item.hint}</span>
+                                    <span className="text-[11px] text-muted block mt-1">{item.hint}</span>
                                 )}
                             </div>
                             <ToggleSwitch

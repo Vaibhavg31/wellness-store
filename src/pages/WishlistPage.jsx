@@ -40,7 +40,7 @@ function WishlistItem({ product, onRemove, onAddToCart, onMoveToCart }) {
             initial="hidden"
             animate={removing ? 'exit' : 'visible'}
             exit="exit"
-            className="group flex flex-col bg-cream rounded-2xl border border-border/40 overflow-hidden card-lift"
+            className="group flex flex-col bg-canvas rounded-2xl border border-line/40 overflow-hidden card-lift"
         >
             <div className="relative">
                 <Link to={`/product/${product.id}`} className="block aspect-[4/5] overflow-hidden bg-sand/60">
@@ -56,7 +56,7 @@ function WishlistItem({ product, onRemove, onAddToCart, onMoveToCart }) {
                     whileTap={{ scale: 0.88 }}
                     onClick={handleRemove}
                     disabled={removing}
-                    className="absolute top-2.5 right-2.5 p-2 rounded-full bg-cream/90 backdrop-blur-sm shadow-sm text-forest hover:bg-cream transition-colors"
+                    className="absolute top-2.5 right-2.5 p-2 rounded-full bg-canvas/90 backdrop-blur-sm shadow-sm text-primary hover:bg-canvas transition-colors"
                     aria-label="Remove from wishlist"
                 >
                     <motion.div
@@ -69,9 +69,9 @@ function WishlistItem({ product, onRemove, onAddToCart, onMoveToCart }) {
             </div>
 
             <div className="flex-1 flex flex-col p-4 space-y-1">
-                <p className="type-eyebrow-sm text-forest/65 capitalize">{product.category}</p>
+                <p className="eyebrow text-primary/65 capitalize">{product.category}</p>
                 <Link to={`/product/${product.id}`}>
-                    <h3 className="font-display text-sm sm:text-base text-ink hover:text-forest transition-colors line-clamp-2 leading-snug">
+                    <h3 className="font-display text-sm sm:text-base text-ink hover:text-primary transition-colors line-clamp-2 leading-snug">
                         {product.title}
                     </h3>
                 </Link>
@@ -170,11 +170,11 @@ export default function WishlistPage() {
                 transition={{ duration: 0.45 }}
                 className="pb-20 text-center px-6 min-h-[60vh] flex flex-col items-center justify-center"
             >
-                <div className="w-16 h-16 rounded-full bg-forest/5 flex items-center justify-center mb-6">
-                    <Heart size={28} className="text-forest/40" strokeWidth={1} />
+                <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center mb-6">
+                    <Heart size={28} className="text-primary/40" strokeWidth={1} />
                 </div>
                 <h1 className="font-display text-3xl font-light mb-4">Your Wishlist is Empty</h1>
-                <p className="text-slate font-light mb-2 max-w-md mx-auto leading-relaxed">
+                <p className="text-muted font-light mb-2 max-w-md mx-auto leading-relaxed">
                     Save pieces you love and return anytime. Your wishlist is stored on this device.
                 </p>
                 <Link to="/shop" className="inline-block mt-8">
@@ -185,11 +185,11 @@ export default function WishlistPage() {
     }
 
     return (
-        <div className="pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-cream pt-2 sm:pt-4">
+        <div className="pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-canvas pt-2 sm:pt-4">
             <div className="max-w-5xl mx-auto">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
                     <div>
-                        <p className="text-[10px] tracking-[0.3em] uppercase text-forest mb-2">Saved for later</p>
+                        <p className="text-[10px] tracking-[0.3em] uppercase text-primary mb-2">Saved for later</p>
                         <h1 className="font-display text-3xl md:text-4xl text-ink">
                             My Wishlist ({items.length})
                         </h1>
@@ -208,7 +208,7 @@ export default function WishlistPage() {
                 />
 
                 {filteredItems.length === 0 && search.trim() ? (
-                    <p className="text-center text-slate py-12 text-sm">No items match your search.</p>
+                    <p className="text-center text-muted py-12 text-sm">No items match your search.</p>
                 ) : (
                 <LayoutGroup>
                     <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
@@ -228,7 +228,7 @@ export default function WishlistPage() {
                 )}
 
                 <div className="mt-10 text-center">
-                    <Link to="/cart" className="inline-flex items-center gap-2 text-sm text-forest font-medium hover:text-forest-light transition-colors">
+                    <Link to="/cart" className="inline-flex items-center gap-2 text-sm text-primary font-medium hover:text-primary-hover transition-colors">
                         Go to Bag <ArrowRight size={16} />
                     </Link>
                 </div>

@@ -642,7 +642,7 @@ export default function AdminProductFormPage() {
                                 {originalPrice > price && (
                                     <>
                                         <span className="text-admin-muted/80 line-through">{formatPrice(originalPrice)}</span>
-                                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald/10 text-emerald border border-emerald/20">
+                                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                                             {computedDiscount}% off
                                         </span>
                                     </>
@@ -670,8 +670,8 @@ export default function AdminProductFormPage() {
                                             onClick={() => setDefaultVariant(i)}
                                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-colors ${
                                                 v.isDefault
-                                                    ? 'bg-forest text-cream border-forest'
-                                                    : 'border-admin-border text-admin-muted hover:border-forest/40 bg-white'
+                                                    ? 'bg-primary text-canvas border-primary'
+                                                    : 'border-admin-border text-admin-muted hover:border-primary/40 bg-white'
                                             }`}
                                             title="Pre-selected option on the product page"
                                         >
@@ -718,7 +718,7 @@ export default function AdminProductFormPage() {
                                                     type="button"
                                                     onClick={() => updateVariant(i, { image: '' })}
                                                     className={`px-3 py-2 rounded-lg border text-xs transition-colors ${
-                                                        !v.image ? 'border-forest bg-forest/5 text-forest' : 'border-admin-border text-admin-muted hover:border-forest/30'
+                                                        !v.image ? 'border-primary bg-primary/5 text-primary' : 'border-admin-border text-admin-muted hover:border-primary/30'
                                                     }`}
                                                 >
                                                     Same as product
@@ -729,7 +729,7 @@ export default function AdminProductFormPage() {
                                                         type="button"
                                                         onClick={() => updateVariant(i, { image: img })}
                                                         className={`w-11 h-11 rounded-lg overflow-hidden border-2 transition-colors shrink-0 ${
-                                                            v.image === img ? 'border-forest' : 'border-transparent opacity-70 hover:opacity-100'
+                                                            v.image === img ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'
                                                         }`}
                                                         title="Use this photo for this option"
                                                     >
@@ -739,7 +739,7 @@ export default function AdminProductFormPage() {
                                                 {v.image && !form.images.includes(v.image) && (
                                                     <button
                                                         type="button"
-                                                        className="w-11 h-11 rounded-lg overflow-hidden border-2 border-forest shrink-0"
+                                                        className="w-11 h-11 rounded-lg overflow-hidden border-2 border-primary shrink-0"
                                                         title="This option's own uploaded photo"
                                                     >
                                                         <img src={imageUrl(v.image)} alt="" className="w-full h-full object-cover" />
@@ -749,7 +749,7 @@ export default function AdminProductFormPage() {
                                                     className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed text-xs cursor-pointer transition-colors ${
                                                         uploadingVariantPhoto === i
                                                             ? 'border-admin-border text-admin-muted pointer-events-none'
-                                                            : 'border-forest/40 text-forest hover:bg-forest/5'
+                                                            : 'border-primary/40 text-primary hover:bg-primary/5'
                                                     }`}
                                                 >
                                                     <Upload size={12} />
@@ -812,7 +812,7 @@ export default function AdminProductFormPage() {
                         <button
                             type="button"
                             onClick={addVariant}
-                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20"
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20"
                         >
                             <Plus size={14} /> Add option
                         </button>
@@ -825,7 +825,7 @@ export default function AdminProductFormPage() {
                         title="Photos"
                         description="At least one image required"
                         action={(
-                            <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20 cursor-pointer">
+                            <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 cursor-pointer">
                                 <Upload size={14} />
                                 {uploading ? 'Uploading…' : 'Upload'}
                                 <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
@@ -833,7 +833,7 @@ export default function AdminProductFormPage() {
                         )}
                     />
                     {form.images.length === 0 ? (
-                        <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-12 cursor-pointer hover:border-forest/30 hover:bg-forest/5 transition-colors">
+                        <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-12 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors">
                             <ImageIcon size={32} className="text-admin-muted/40" />
                             <span className="text-sm text-admin-muted">Click to upload product images</span>
                             <span className="text-xs text-admin-muted">JPG, PNG, WebP · max 5MB each</span>
@@ -878,7 +878,7 @@ export default function AdminProductFormPage() {
                                         onClick={() => handleRemoveBackground(img, i)}
                                         disabled={cutoutSourceIndex !== null}
                                         title="Remove background — creates a transparent cutout for round product containers"
-                                        className="absolute top-1.5 left-1.5 p-1.5 rounded-lg bg-white/90 text-forest opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="absolute top-1.5 left-1.5 p-1.5 rounded-lg bg-white/90 text-primary opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                         aria-label="Remove background"
                                     >
                                         {cutoutSourceIndex === i ? (
@@ -893,14 +893,14 @@ export default function AdminProductFormPage() {
                     )}
 
                     {cutoutProgress && (
-                        <div className="mt-3 rounded-lg border border-forest/20 bg-forest/5 p-3">
-                            <div className="flex items-center justify-between text-xs text-forest font-medium mb-1.5">
+                        <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
+                            <div className="flex items-center justify-between text-xs text-primary font-medium mb-1.5">
                                 <span className="inline-flex items-center gap-1.5"><Wand2 size={12} /> {cutoutProgress.label}</span>
                                 <span>{Math.round(cutoutProgress.ratio * 100)}%</span>
                             </div>
-                            <div className="h-1.5 rounded-full bg-forest/15 overflow-hidden">
+                            <div className="h-1.5 rounded-full bg-primary/15 overflow-hidden">
                                 <div
-                                    className="h-full bg-forest rounded-full transition-[width] duration-200"
+                                    className="h-full bg-primary rounded-full transition-[width] duration-200"
                                     style={{ width: `${Math.max(4, Math.round(cutoutProgress.ratio * 100))}%` }}
                                 />
                             </div>
@@ -953,8 +953,8 @@ export default function AdminProductFormPage() {
                                 onClick={() => update('isPublished', true)}
                                 className={`rounded-xl border p-3 text-left transition-all ${
                                     form.isPublished
-                                        ? 'border-forest bg-forest/5 ring-2 ring-forest/20'
-                                        : 'border-admin-border bg-admin-surface-alt hover:border-border'
+                                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                        : 'border-admin-border bg-admin-surface-alt hover:border-line'
                                 }`}
                             >
                                 <p className="text-sm font-semibold text-ink">Published</p>
@@ -965,8 +965,8 @@ export default function AdminProductFormPage() {
                                 onClick={() => update('isPublished', false)}
                                 className={`rounded-xl border p-3 text-left transition-all ${
                                     !form.isPublished
-                                        ? 'border-forest bg-forest/5 ring-2 ring-forest/20'
-                                        : 'border-admin-border bg-admin-surface-alt hover:border-border'
+                                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                        : 'border-admin-border bg-admin-surface-alt hover:border-line'
                                 }`}
                             >
                                 <p className="text-sm font-semibold text-ink">Hidden</p>
@@ -990,8 +990,8 @@ export default function AdminProductFormPage() {
                                     onClick={() => toggleTag(tag)}
                                     className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
                                         tagExists(form.tags, tag)
-                                            ? 'bg-forest text-cream border-forest'
-                                            : 'border-admin-border text-admin-muted hover:border-forest/40 bg-white'
+                                            ? 'bg-primary text-canvas border-primary'
+                                            : 'border-admin-border text-admin-muted hover:border-primary/40 bg-white'
                                     }`}
                                 >
                                     {tag}
@@ -1006,13 +1006,13 @@ export default function AdminProductFormPage() {
                                     {customTagsOnly.map((tag) => (
                                         <span
                                             key={tag}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-forest/10 text-forest border border-forest/25"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/25"
                                         >
                                             {tag}
                                             <button
                                                 type="button"
                                                 onClick={() => removeTag(tag)}
-                                                className="p-0.5 rounded-full hover:bg-forest/20"
+                                                className="p-0.5 rounded-full hover:bg-primary/20"
                                                 aria-label={`Remove ${tag}`}
                                             >
                                                 <X size={12} />
@@ -1053,7 +1053,7 @@ export default function AdminProductFormPage() {
                                     type="checkbox"
                                     checked={form.isNew}
                                     onChange={(e) => update('isNew', e.target.checked)}
-                                    className="mt-0.5 rounded border-border"
+                                    className="mt-0.5 rounded border-line"
                                 />
                                 <span>
                                     <span className="text-sm font-medium text-ink">New arrival</span>
@@ -1065,7 +1065,7 @@ export default function AdminProductFormPage() {
                                     type="checkbox"
                                     checked={form.isBestSeller}
                                     onChange={(e) => update('isBestSeller', e.target.checked)}
-                                    className="mt-0.5 rounded border-border"
+                                    className="mt-0.5 rounded border-line"
                                 />
                                 <span>
                                     <span className="text-sm font-medium text-ink">Best seller</span>
@@ -1077,7 +1077,7 @@ export default function AdminProductFormPage() {
                                     type="checkbox"
                                     checked={form.isTrendingPinned}
                                     onChange={(e) => update('isTrendingPinned', e.target.checked)}
-                                    className="mt-0.5 rounded border-border"
+                                    className="mt-0.5 rounded border-line"
                                 />
                                 <span>
                                     <span className="text-sm font-medium text-ink">Pin to Trending</span>
@@ -1089,7 +1089,7 @@ export default function AdminProductFormPage() {
                                     type="checkbox"
                                     checked={form.orbitFeatured}
                                     onChange={(e) => update('orbitFeatured', e.target.checked)}
-                                    className="mt-0.5 rounded border-border"
+                                    className="mt-0.5 rounded border-line"
                                 />
                                 <span>
                                     <span className="text-sm font-medium text-ink">Feature in Orbit Ring</span>
@@ -1114,8 +1114,8 @@ export default function AdminProductFormPage() {
                                     onClick={() => toggleBadge(badge)}
                                     className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
                                         tagExists(form.badges, badge)
-                                            ? 'bg-forest text-cream border-forest'
-                                            : 'border-admin-border text-admin-muted hover:border-forest/40 bg-white'
+                                            ? 'bg-primary text-canvas border-primary'
+                                            : 'border-admin-border text-admin-muted hover:border-primary/40 bg-white'
                                     }`}
                                 >
                                     {resolveBadgeLabel(badge, siteContent)}
@@ -1130,13 +1130,13 @@ export default function AdminProductFormPage() {
                                     {customBadgesOnly.map((badge) => (
                                         <span
                                             key={badge}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-forest/10 text-forest border border-forest/25"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/25"
                                         >
                                             {badge}
                                             <button
                                                 type="button"
                                                 onClick={() => removeBadge(badge)}
-                                                className="p-0.5 rounded-full hover:bg-forest/20"
+                                                className="p-0.5 rounded-full hover:bg-primary/20"
                                                 aria-label={`Remove ${badge}`}
                                             >
                                                 <X size={12} />
@@ -1212,7 +1212,7 @@ export default function AdminProductFormPage() {
                         <button
                             type="button"
                             onClick={() => update('features', [...form.features, ''])}
-                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-forest bg-forest/5 hover:bg-forest/10 border border-forest/20"
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20"
                         >
                             <Plus size={14} /> Add feature
                         </button>
@@ -1231,7 +1231,7 @@ export default function AdminProductFormPage() {
                                     type="checkbox"
                                     checked={form.codEnabled}
                                     onChange={(e) => update('codEnabled', e.target.checked)}
-                                    className="mt-0.5 rounded border-border"
+                                    className="mt-0.5 rounded border-line"
                                 />
                                 <span>
                                     <span className="text-sm font-medium text-ink">Cash on delivery</span>
@@ -1243,7 +1243,7 @@ export default function AdminProductFormPage() {
                                     type="checkbox"
                                     checked={form.onlinePaymentEnabled}
                                     onChange={(e) => update('onlinePaymentEnabled', e.target.checked)}
-                                    className="mt-0.5 rounded border-border"
+                                    className="mt-0.5 rounded border-line"
                                 />
                                 <span>
                                     <span className="text-sm font-medium text-ink">Online payment</span>

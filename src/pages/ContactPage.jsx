@@ -58,7 +58,7 @@ export default function ContactPage() {
                         <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
                         <Input label="Phone" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                         <div>
-                            <label className="block text-xs tracking-[0.15em] uppercase text-slate mb-2 font-medium">
+                            <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-2 font-medium">
                                 Message
                             </label>
                             <textarea
@@ -66,12 +66,12 @@ export default function ContactPage() {
                                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                                 rows={5}
                                 required
-                                className="w-full px-4 py-3.5 bg-cream/50 border border-sand/60 text-ink placeholder:text-slate/50 focus:outline-none focus:border-turmeric-ink focus:ring-1 focus:ring-turmeric-ink/30 transition-all font-light resize-none"
+                                className="w-full px-4 py-3.5 bg-canvas/50 border border-sand/60 text-ink placeholder:text-muted/50 focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30 transition-all font-light resize-none"
                                 placeholder="How can we help you?"
                             />
                         </div>
                         {submitted ? (
-                            <p className="text-emerald font-light">Thank you! We&apos;ll get back to you soon.</p>
+                            <p className="text-primary font-light">Thank you! We&apos;ll get back to you soon.</p>
                         ) : (
                             <>
                                 {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -96,14 +96,14 @@ export default function ContactPage() {
                             className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-r from-[#833AB4]/10 via-[#FD1D1D]/8 to-[#FCAF45]/10 border border-[#833AB4]/20 hover:border-[#833AB4]/35 transition-colors group"
                         >
                             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-tr from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] p-[2px] flex-shrink-0 group-hover:scale-105 transition-transform">
-                                <span className="w-full h-full rounded-full bg-cream flex items-center justify-center">
-                                    <InstagramIcon size={22} className="text-forest" filled />
+                                <span className="w-full h-full rounded-full bg-canvas flex items-center justify-center">
+                                    <InstagramIcon size={22} className="text-primary" filled />
                                 </span>
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-xs tracking-[0.15em] uppercase text-[#833AB4] mb-0.5 font-medium">Instagram</p>
                                 <p className="text-ink font-medium truncate">@{social.instagramHandle}</p>
-                                <p className="text-xs text-slate mt-0.5">New collections, styling &amp; updates</p>
+                                <p className="text-xs text-muted mt-0.5">New collections, styling &amp; updates</p>
                             </div>
                         </a>
                         )}
@@ -120,7 +120,7 @@ export default function ContactPage() {
                             <div>
                                 <p className="text-xs tracking-[0.15em] uppercase text-[#128C7E] mb-0.5 font-medium">WhatsApp (Fastest Reply)</p>
                                 <p className="text-ink font-medium">{contact.whatsappDisplay}</p>
-                                <p className="text-xs text-slate mt-0.5">Tap to open chat instantly</p>
+                                <p className="text-xs text-muted mt-0.5">Tap to open chat instantly</p>
                             </div>
                         </a>
 
@@ -131,13 +131,13 @@ export default function ContactPage() {
                                 { icon: Clock, label: 'Hours', value: contact.businessHours },
                             ].map((item) => (
                                 <div key={item.label} className="flex gap-4">
-                                    <div className="w-12 h-12 flex items-center justify-center bg-cream text-forest flex-shrink-0 rounded-xl">
+                                    <div className="w-12 h-12 flex items-center justify-center bg-canvas text-primary flex-shrink-0 rounded-xl">
                                         <item.icon size={20} strokeWidth={1.2} />
                                     </div>
                                     <div>
-                                        <p className="text-xs tracking-[0.15em] uppercase text-slate mb-1">{item.label}</p>
+                                        <p className="text-xs tracking-[0.15em] uppercase text-muted mb-1">{item.label}</p>
                                         {item.href ? (
-                                            <a href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" className="text-ink font-light hover:text-forest transition-colors">
+                                            <a href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" className="text-ink font-light hover:text-primary transition-colors">
                                                 {item.value}
                                             </a>
                                         ) : (

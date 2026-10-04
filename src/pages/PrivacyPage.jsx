@@ -5,9 +5,9 @@ export default function PrivacyPage() {
         <div className="pb-20 px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4">
             <div className="max-w-3xl mx-auto">
                 <h1 className="font-display text-4xl font-light text-ink mb-4">Privacy Policy</h1>
-                <p className="text-sm text-slate mb-10">Last updated: August 2026</p>
+                <p className="text-sm text-muted mb-10">Last updated: August 2026</p>
 
-                <div className="prose prose-sm max-w-none space-y-6 text-slate font-light leading-relaxed">
+                <div className="prose prose-sm max-w-none space-y-6 text-muted font-light leading-relaxed">
                     <section>
                         <h2 className="font-display text-xl text-ink mb-3">Information We Collect</h2>
                         <p>
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
                     <section>
                         <h2 className="font-display text-xl text-ink mb-3">Contact</h2>
                         <p>
-                            For privacy-related questions, please reach out via our <a href="/contact" className="text-emerald hover:underline">Contact page</a>.
+                            For privacy-related questions, please reach out via our <a href="/contact" className="text-primary hover:underline">Contact page</a>.
                         </p>
                     </section>
                 </div>

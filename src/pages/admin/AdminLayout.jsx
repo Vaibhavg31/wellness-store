@@ -10,9 +10,9 @@ import AdminNavLinks, { getAdminPageTitle } from '@/components/admin/AdminNavLin
 
 function AdminSidebarHeader() {
     return (
-        <div className="p-5 border-b border-cream/10">
-            <Logo size="sm" linkToHome showHover={false} withWordmark className="mb-1.5 text-cream" />
-            <p className="text-[10px] tracking-[0.18em] uppercase text-cream/55 font-medium">Studio Admin</p>
+        <div className="p-5 border-b border-canvas/10">
+            <Logo size="sm" linkToHome showHover={false} withWordmark className="mb-1.5 text-canvas" />
+            <p className="text-[10px] tracking-[0.18em] uppercase text-canvas/55 font-medium">Studio Admin</p>
         </div>
     );
 }
@@ -54,12 +54,12 @@ export default function AdminLayout() {
     return (
         <div className="admin-panel min-h-screen flex">
             {/* Desktop sidebar */}
-            <aside className="hidden lg:flex w-[15.5rem] bg-forest-deep text-cream flex-col fixed h-full z-30 shadow-xl shadow-forest/20 overflow-hidden">
+            <aside className="hidden lg:flex w-[15.5rem] bg-primary-deep text-canvas flex-col fixed h-full z-30 shadow-xl shadow-primary/20 overflow-hidden">
                 <AdminSidebarHeader />
                 <AdminNavLinks location={location} />
                 <button
                     onClick={adminLogout}
-                    className="flex-shrink-0 flex items-center gap-3 px-5 py-4 text-cream/65 hover:text-cream hover:bg-cream/5 border-t border-cream/10 transition-colors text-sm font-medium"
+                    className="flex-shrink-0 flex items-center gap-3 px-5 py-4 text-canvas/65 hover:text-canvas hover:bg-canvas/5 border-t border-canvas/10 transition-colors text-sm font-medium"
                 >
                     <LogOut size={17} strokeWidth={1.25} />
                     Sign Out
@@ -84,22 +84,22 @@ export default function AdminLayout() {
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
                             transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-                            className="fixed top-0 left-0 bottom-0 z-50 w-[min(15.5rem,88vw)] bg-forest-deep text-cream flex flex-col shadow-xl shadow-forest/30 lg:hidden overflow-hidden"
+                            className="fixed top-0 left-0 bottom-0 z-50 w-[min(15.5rem,88vw)] bg-primary-deep text-canvas flex flex-col shadow-xl shadow-primary/30 lg:hidden overflow-hidden"
                             role="dialog"
                             aria-modal="true"
                             aria-label="Admin navigation"
                         >
-                            <div className="flex items-start justify-between gap-3 p-4 border-b border-cream/10 pt-[max(1rem,env(safe-area-inset-top))]">
+                            <div className="flex items-start justify-between gap-3 p-4 border-b border-canvas/10 pt-[max(1rem,env(safe-area-inset-top))]">
                                 <div className="min-w-0">
-                                    <Logo size="sm" linkToHome showHover={false} withWordmark className="mb-1 text-cream" />
-                                    <p className="text-[10px] tracking-[0.18em] uppercase text-cream/55 font-medium">
+                                    <Logo size="sm" linkToHome showHover={false} withWordmark className="mb-1 text-canvas" />
+                                    <p className="text-[10px] tracking-[0.18em] uppercase text-canvas/55 font-medium">
                                         Studio Admin
                                     </p>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={closeMobileNav}
-                                    className="flex-shrink-0 p-2 -mr-1 rounded-lg text-cream/70 hover:text-cream hover:bg-cream/10 transition-colors"
+                                    className="flex-shrink-0 p-2 -mr-1 rounded-lg text-canvas/70 hover:text-canvas hover:bg-canvas/10 transition-colors"
                                     aria-label="Close menu"
                                 >
                                     <X size={20} strokeWidth={1.25} />
@@ -112,7 +112,7 @@ export default function AdminLayout() {
                                     closeMobileNav();
                                     adminLogout();
                                 }}
-                                className="flex-shrink-0 flex items-center gap-3 px-5 py-4 text-cream/65 hover:text-cream hover:bg-cream/5 border-t border-cream/10 transition-colors text-sm font-medium pb-[max(1rem,env(safe-area-inset-bottom))]"
+                                className="flex-shrink-0 flex items-center gap-3 px-5 py-4 text-canvas/65 hover:text-canvas hover:bg-canvas/5 border-t border-canvas/10 transition-colors text-sm font-medium pb-[max(1rem,env(safe-area-inset-bottom))]"
                             >
                                 <LogOut size={17} strokeWidth={1.25} />
                                 Sign Out
@@ -130,7 +130,7 @@ export default function AdminLayout() {
                     <button
                         type="button"
                         onClick={() => setMobileNavOpen(true)}
-                        className="flex-shrink-0 p-2 -ml-1 rounded-lg text-ink hover:bg-forest/5 active:bg-forest/10 transition-colors"
+                        className="flex-shrink-0 p-2 -ml-1 rounded-lg text-ink hover:bg-primary/5 active:bg-primary/10 transition-colors"
                         aria-label="Open menu"
                         aria-expanded={mobileNavOpen}
                     >

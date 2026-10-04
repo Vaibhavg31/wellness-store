@@ -207,9 +207,9 @@ export default function AdminCouponsPage() {
                 columns={4}
                 stats={[
                     { label: 'Total coupons', value: coupons.length },
-                    { label: 'Active now', value: enabledCount, color: 'text-emerald' },
-                    { label: 'Total redemptions', value: totalUses, color: 'text-forest' },
-                    { label: 'Discount given', value: formatPrice(totalDiscountGiven), color: 'text-turmeric-ink' },
+                    { label: 'Active now', value: enabledCount, color: 'text-primary' },
+                    { label: 'Total redemptions', value: totalUses, color: 'text-primary' },
+                    { label: 'Discount given', value: formatPrice(totalDiscountGiven), color: 'text-accent-ink' },
                 ]}
             />
 
@@ -254,7 +254,7 @@ export default function AdminCouponsPage() {
                                             <td className="p-4 align-top">
                                                 <div className="flex items-start gap-2">
                                                     <div className="w-8 h-8 rounded-lg bg-sand/50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                        <Icon size={14} className="text-forest" />
+                                                        <Icon size={14} className="text-primary" />
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-mono text-sm font-semibold text-ink tracking-wide">{coupon.code}</p>
@@ -306,7 +306,7 @@ export default function AdminCouponsPage() {
                                                 <p className="font-display text-sm text-ink">{formatPrice(stats.totalRevenue || 0)}</p>
                                             </td>
                                             <td className="p-4 text-center align-top">
-                                                <p className="font-display text-sm text-turmeric-ink">{formatPrice(stats.totalDiscountGiven || 0)}</p>
+                                                <p className="font-display text-sm text-accent-ink">{formatPrice(stats.totalDiscountGiven || 0)}</p>
                                             </td>
                                             <td className="p-4 align-top">
                                                 <Badge variant={coupon.isEnabled ? 'sale' : 'stock'}>
@@ -384,7 +384,7 @@ export default function AdminCouponsPage() {
                                     key={value}
                                     type="button"
                                     onClick={() => setForm({ ...form, type: value })}
-                                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs transition-colors ${form.type === value ? 'border-emerald bg-emerald/10 text-emerald' : 'border-border hover:border-emerald/40'}`}
+                                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs transition-colors ${form.type === value ? 'border-primary bg-primary/10 text-primary' : 'border-line hover:border-primary/40'}`}
                                 >
                                     <TIcon size={16} />
                                     {label}
@@ -422,7 +422,7 @@ export default function AdminCouponsPage() {
                                     key={value}
                                     type="button"
                                     onClick={() => setForm({ ...form, audience: value })}
-                                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs text-center transition-colors ${form.audience === value ? 'border-emerald bg-emerald/10 text-emerald' : 'border-border hover:border-emerald/40'}`}
+                                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs text-center transition-colors ${form.audience === value ? 'border-primary bg-primary/10 text-primary' : 'border-line hover:border-primary/40'}`}
                                 >
                                     <AIcon size={16} />
                                     {label}
@@ -449,7 +449,7 @@ export default function AdminCouponsPage() {
                             </p>
                         )}
                         {form.audience === 'returning_customers' && form.autoApply && (
-                            <p className="text-xs text-turmeric-ink mt-2 bg-turmeric/10 border border-turmeric/20 rounded-lg px-3 py-2">
+                            <p className="text-xs text-accent-ink mt-2 bg-accent/10 border border-accent/20 rounded-lg px-3 py-2">
                                 With auto-apply on, this appears by itself in the cart the moment a qualifying repeat customer signs in — no code to remember or share.
                             </p>
                         )}
@@ -483,7 +483,7 @@ export default function AdminCouponsPage() {
                         </span>
                     </label>
 
-                    <div className="sticky bottom-0 pt-4 pb-2 bg-cream border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
+                    <div className="sticky bottom-0 pt-4 pb-2 bg-canvas border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
                         <Button variant="turmeric" className="w-full" onClick={handleSave} disabled={saving}>
                             {saving ? 'Saving…' : editing ? 'Update Coupon' : 'Create Coupon'}
                         </Button>

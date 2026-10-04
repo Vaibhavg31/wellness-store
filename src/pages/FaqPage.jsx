@@ -24,11 +24,11 @@ export default function FaqPage() {
                         <div key={i} className="border border-sand/30">
                             <button
                                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                                className="w-full flex items-center justify-between p-5 text-left hover:bg-cream/30 transition-colors"
+                                className="w-full flex items-center justify-between p-5 text-left hover:bg-canvas/30 transition-colors"
                                 aria-expanded={openFaq === i}
                             >
                                 <span className="font-display text-lg text-ink pr-4">{faq.question}</span>
-                                <ChevronDown size={18} className={`flex-shrink-0 text-slate transition-transform duration-300 ${openFaq === i ? 'rotate-180' : ''}`} />
+                                <ChevronDown size={18} className={`flex-shrink-0 text-muted transition-transform duration-300 ${openFaq === i ? 'rotate-180' : ''}`} />
                             </button>
                             <AnimatePresence>
                                 {openFaq === i && (
@@ -39,7 +39,7 @@ export default function FaqPage() {
                                         transition={{ duration: 0.3 }}
                                         className="overflow-hidden"
                                     >
-                                        <p className="px-5 pb-5 text-slate font-light leading-relaxed text-sm">{faq.answer}</p>
+                                        <p className="px-5 pb-5 text-muted font-light leading-relaxed text-sm">{faq.answer}</p>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

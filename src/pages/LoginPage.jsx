@@ -154,24 +154,24 @@ export default function LoginPage() {
 
     const panelCopy = isAdminAccess
         ? {
-            heading: <>Run the store<br />from one <span className="text-turmeric-light italic">Studio</span></>,
+            heading: <>Run the store<br />from one <span className="text-accent-hover italic">Studio</span></>,
             body: `Sign in with your admin Google account to manage products, orders, and storefront content for ${BRAND_NAME}.`,
         }
         : isCheckoutLogin
             ? {
-                heading: <>You&apos;re one step<br />from <span className="text-turmeric-light italic">checkout</span></>,
+                heading: <>You&apos;re one step<br />from <span className="text-accent-hover italic">checkout</span></>,
                 body: 'Sign in to save your address book, track this order, and check out in seconds.',
             }
             : {
-                heading: <>Wellness that fits<br />your <span className="text-turmeric-light italic">everyday</span></>,
+                heading: <>Wellness that fits<br />your <span className="text-accent-hover italic">everyday</span></>,
                 body: BRAND_DESCRIPTION,
             };
 
     return (
-        <div className="relative min-h-screen flex items-center justify-center px-4 py-14 sm:py-20 overflow-hidden bg-forest">
+        <div className="relative min-h-screen flex items-center justify-center px-4 py-14 sm:py-20 overflow-hidden bg-primary">
             <AmbientBlobs variant="dark" />
             <ConstellationField variant="light" density={0.9} className="opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-b from-forest-deep/40 via-transparent to-forest-deep/60 pointer-events-none" aria-hidden="true" />
+            <div className="absolute inset-0 bg-gradient-to-b from-primary-deep/40 via-transparent to-primary-deep/60 pointer-events-none" aria-hidden="true" />
 
             <div className="relative z-10 w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 xl:gap-20 items-center">
                 {/* Decorative brand panel — fills the desktop layout instead of
@@ -182,15 +182,15 @@ export default function LoginPage() {
                     initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    className="hidden lg:block text-cream"
+                    className="hidden lg:block text-canvas"
                 >
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cream/10 border border-turmeric-light/25 text-xs tracking-[0.2em] uppercase text-cream/90 mb-8">
-                        <Sparkles size={13} className="text-turmeric-light" /> {BRAND_NAME}
+                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-canvas/10 border border-accent-hover/25 text-xs tracking-[0.2em] uppercase text-canvas/90 mb-8">
+                        <Sparkles size={13} className="text-accent-hover" /> {BRAND_NAME}
                     </span>
                     <h2 className="font-display text-4xl xl:text-[3.25rem] leading-[1.15] font-semibold mb-6">
                         {panelCopy.heading}
                     </h2>
-                    <p className="text-cream/65 text-base xl:text-lg leading-relaxed max-w-md mb-10">
+                    <p className="text-canvas/65 text-base xl:text-lg leading-relaxed max-w-md mb-10">
                         {panelCopy.body}
                     </p>
                     <div className="flex flex-wrap gap-4 xl:gap-6">
@@ -199,9 +199,9 @@ export default function LoginPage() {
                             { icon: Star, label: '4.9★ Rated' },
                             { icon: Leaf, label: 'Lab Tested' },
                         ].map(({ icon: Icon, label }) => (
-                            <div key={label} className="flex items-center gap-2.5 text-cream/80">
-                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-cream/10 border border-cream/15 flex-shrink-0">
-                                    <Icon size={16} className="text-turmeric-light" strokeWidth={1.75} />
+                            <div key={label} className="flex items-center gap-2.5 text-canvas/80">
+                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-canvas/10 border border-canvas/15 flex-shrink-0">
+                                    <Icon size={16} className="text-accent-hover" strokeWidth={1.75} />
                                 </span>
                                 <span className="text-sm font-medium">{label}</span>
                             </div>
@@ -213,16 +213,16 @@ export default function LoginPage() {
                 initial={{ opacity: 0, y: 24, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="relative z-10 w-full max-w-[440px] mx-auto lg:mx-0 bg-cream rounded-3xl soft-shadow-lg border border-cream/10 px-6 py-9 sm:px-10 sm:py-11"
+                className="relative z-10 w-full max-w-[440px] mx-auto lg:mx-0 bg-canvas rounded-3xl shadow-lg border border-canvas/10 px-6 py-9 sm:px-10 sm:py-11"
             >
                 <Logo size="md" showHover className="mx-auto mb-6 lg:hidden" />
 
                 <div className="flex flex-col items-center gap-2 mb-8 lg:hidden">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest/8 text-xs tracking-[0.2em] uppercase text-forest">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/8 text-xs tracking-[0.2em] uppercase text-primary">
                         <Sparkles size={12} /> {BRAND_NAME}
                     </span>
                     {!isCheckoutLogin && !isAdminAccess && (
-                        <p className="text-sm text-slate text-center max-w-[280px]">{BRAND_TAGLINE}</p>
+                        <p className="text-sm text-muted text-center max-w-[280px]">{BRAND_TAGLINE}</p>
                     )}
                 </div>
 
@@ -231,7 +231,7 @@ export default function LoginPage() {
                     <div className="space-y-6">
                         <div className="text-center lg:text-left">
                             {isCheckoutLogin && (
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-forest/10 text-forest text-xs mb-4">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs mb-4">
                                     <ShoppingBag size={14} />
                                     Checkout login
                                 </div>
@@ -239,7 +239,7 @@ export default function LoginPage() {
                             <h1 className="font-display text-3xl sm:text-[2.25rem] text-ink mb-2">
                                 {isCheckoutLogin ? 'Sign in to buy' : isAdminAccess ? 'Studio access' : mode === 'signin' ? 'Sign in' : 'Create account'}
                             </h1>
-                            <p className="text-slate text-sm sm:text-base font-light">
+                            <p className="text-muted text-sm sm:text-base font-light">
                                 {isAdminAccess
                                     ? `Sign in with your admin Google account to open ${BRAND_NAME} Studio`
                                     : mode === 'signup'
@@ -250,18 +250,18 @@ export default function LoginPage() {
 
                         {!isAdminAccess && (
                             <>
-                                <div className="flex rounded-full bg-cream border border-border/50 p-1">
+                                <div className="flex rounded-full bg-canvas border border-line/50 p-1">
                                     <button
                                         type="button"
                                         onClick={() => { setMode('signin'); setError(''); }}
-                                        className={`flex-1 py-2.5 text-sm sm:text-base rounded-full transition-colors ${mode === 'signin' ? 'bg-forest text-cream' : 'text-slate hover:text-ink'}`}
+                                        className={`flex-1 py-2.5 text-sm sm:text-base rounded-full transition-colors ${mode === 'signin' ? 'bg-primary text-canvas' : 'text-muted hover:text-ink'}`}
                                     >
                                         Sign in
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => { setMode('signup'); setError(''); }}
-                                        className={`flex-1 py-2.5 text-sm sm:text-base rounded-full transition-colors ${mode === 'signup' ? 'bg-forest text-cream' : 'text-slate hover:text-ink'}`}
+                                        className={`flex-1 py-2.5 text-sm sm:text-base rounded-full transition-colors ${mode === 'signup' ? 'bg-primary text-canvas' : 'text-muted hover:text-ink'}`}
                                     >
                                         Sign up
                                     </button>
@@ -300,15 +300,15 @@ export default function LoginPage() {
                                     )}
                                     {mode === 'signin' && (
                                         <div className="flex items-center justify-between text-sm">
-                                            <label className="flex items-center gap-2 text-slate cursor-pointer">
-                                                <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="rounded border-border" />
+                                            <label className="flex items-center gap-2 text-muted cursor-pointer">
+                                                <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="rounded border-line" />
                                                 Remember me
                                             </label>
-                                            <Link to="/forgot-password" className="text-forest hover:text-forest-light">Forgot password?</Link>
+                                            <Link to="/forgot-password" className="text-primary hover:text-primary-hover">Forgot password?</Link>
                                         </div>
                                     )}
                                     {mode === 'signup' && (
-                                        <p className="text-xs text-slate text-center -mt-2">
+                                        <p className="text-xs text-muted text-center -mt-2">
                                             We&apos;ll send a magic link to verify your email. Click it to complete sign-in.
                                         </p>
                                     )}
@@ -319,9 +319,9 @@ export default function LoginPage() {
 
                                 {googleSignInEnabled && (
                                     <div className="flex items-center gap-3">
-                                        <div className="flex-1 h-px bg-border/60" />
-                                        <span className="text-xs text-slate uppercase tracking-wider">or</span>
-                                        <div className="flex-1 h-px bg-border/60" />
+                                        <div className="flex-1 h-px bg-line/60" />
+                                        <span className="text-xs text-muted uppercase tracking-wider">or</span>
+                                        <div className="flex-1 h-px bg-line/60" />
                                     </div>
                                 )}
                             </>
@@ -340,12 +340,12 @@ export default function LoginPage() {
                                 />
                             </div>
                         ) : GOOGLE_ENABLED ? (
-                            <div className="p-4 rounded-xl bg-turmeric/10 border border-turmeric/20 text-sm text-slate text-center">
+                            <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 text-sm text-muted text-center">
                                 Google sign-in is turned off in store settings.
                             </div>
                         ) : !isAdminAccess ? (
-                            <div className="p-4 rounded-xl bg-turmeric/10 border border-turmeric/20 text-sm text-slate text-center">
-                                Add <code className="text-xs bg-cream px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> to enable Google sign-in.
+                            <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 text-sm text-muted text-center">
+                                Add <code className="text-xs bg-canvas px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> to enable Google sign-in.
                             </div>
                         ) : null}
 
@@ -355,23 +355,23 @@ export default function LoginPage() {
                             </div>
                         )}
 
-                        <p className="text-center text-sm text-slate">
+                        <p className="text-center text-sm text-muted">
                             By signing in you agree to our Terms &amp; Privacy Policy
                         </p>
 
                         <Link
                             to={isCheckoutLogin ? '/cart' : isAdminAccess ? '/' : '/shop'}
-                            className="block text-center text-sm text-slate hover:text-forest transition-colors"
+                            className="block text-center text-sm text-muted hover:text-primary transition-colors"
                         >
                             {isCheckoutLogin ? '← Back to cart' : isAdminAccess ? '← Back to store' : 'Continue shopping without signing in →'}
                         </Link>
 
                         {isAdminAccess && (
-                            <div className="pt-4 border-t border-border/40">
+                            <div className="pt-4 border-t border-line/40">
                                 <button
                                     type="button"
                                     onClick={() => setShowStudioLogin(!showStudioLogin)}
-                                    className="text-xs text-slate hover:text-ink w-full text-center"
+                                    className="text-xs text-muted hover:text-ink w-full text-center"
                                 >
                                     {showStudioLogin ? 'Hide studio credentials' : 'Use studio username & password'}
                                 </button>
@@ -389,15 +389,15 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                <div className="flex lg:hidden items-center justify-center gap-5 mt-8 pt-6 border-t border-border/40">
-                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-slate uppercase">
-                        <Shield size={13} className="text-forest" /> FSSAI
+                <div className="flex lg:hidden items-center justify-center gap-5 mt-8 pt-6 border-t border-line/40">
+                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-muted uppercase">
+                        <Shield size={13} className="text-primary" /> FSSAI
                     </span>
-                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-slate uppercase">
-                        <Star size={13} className="text-turmeric" /> 4.9 Rated
+                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-muted uppercase">
+                        <Star size={13} className="text-accent" /> 4.9 Rated
                     </span>
-                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-slate uppercase">
-                        <Leaf size={13} className="text-forest" /> Lab Tested
+                    <span className="flex items-center gap-1.5 text-xs tracking-wide text-muted uppercase">
+                        <Leaf size={13} className="text-primary" /> Lab Tested
                     </span>
                 </div>
             </motion.div>

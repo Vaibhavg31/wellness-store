@@ -27,18 +27,18 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-cream">
+        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-canvas">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
                 <Logo size="md" showHover className="mx-auto mb-8" />
                 <h1 className="font-display text-3xl text-ink text-center mb-2">Forgot password</h1>
-                <p className="text-slate text-sm text-center mb-8">
+                <p className="text-muted text-sm text-center mb-8">
                     Enter your email and we&apos;ll send a secure reset link if an account exists.
                 </p>
 
                 {sent ? (
-                    <div className="p-5 rounded-2xl bg-forest/5 border border-forest/15 text-center">
+                    <div className="p-5 rounded-2xl bg-primary/5 border border-primary/15 text-center">
                         <p className="text-ink mb-4">Check your inbox for a reset link. It expires in 1 hour.</p>
-                        <Link to="/login" className="text-forest hover:text-forest-light text-sm">Back to sign in</Link>
+                        <Link to="/login" className="text-primary hover:text-primary-hover text-sm">Back to sign in</Link>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
                         <Button variant="turmeric" size="lg" className="w-full" type="submit" disabled={loading}>
                             {loading ? 'Sending…' : 'Send reset link'}
                         </Button>
-                        <Link to="/login" className="block text-center text-sm text-slate hover:text-forest">← Back to sign in</Link>
+                        <Link to="/login" className="block text-center text-sm text-muted hover:text-primary">← Back to sign in</Link>
                     </form>
                 )}
             </motion.div>

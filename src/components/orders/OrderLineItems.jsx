@@ -14,7 +14,7 @@ export default function OrderLineItems({ items = [], compact = false, plain = fa
                             ? 'flex gap-3 items-center py-2 first:pt-0 last:pb-0'
                             : compact
                                 ? 'flex gap-3 items-center'
-                                : 'flex gap-3 items-center bg-cream/50 rounded-xl p-3'
+                                : 'flex gap-3 items-center bg-canvas/50 rounded-xl p-3'
                     }
                 >
                     {item.image && (
@@ -30,7 +30,7 @@ export default function OrderLineItems({ items = [], compact = false, plain = fa
                         <p className={compact ? 'text-sm text-ink line-clamp-1' : 'text-sm text-ink font-medium line-clamp-2'}>
                             {item.title}
                         </p>
-                        <p className="text-xs text-slate mt-0.5">
+                        <p className="text-xs text-muted mt-0.5">
                             Qty {item.quantity}
                             {!compact && ` · ${formatPrice(item.price)} each`}
                         </p>
