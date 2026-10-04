@@ -1,5 +1,6 @@
 import Hero from '@/components/home/Hero';
 import TrustStrip from '@/components/home/TrustStrip';
+import IngredientMarquee from '@/components/home/IngredientMarquee';
 import VideoBanner from '@/components/home/VideoBanner';
 import { BannerSlider, PromoBanners } from '@/components/home/BannerSection';
 import CategoryGrid from '@/components/home/CategoryGrid';
@@ -19,7 +20,12 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
  */
 function buildSections({ products, loading, trending, featured }) {
     return {
-        hero: () => <Hero products={products} loading={loading} />,
+        hero: () => (
+            <>
+                <Hero products={products} loading={loading} />
+                <IngredientMarquee />
+            </>
+        ),
         brandMarquee: () => <TrustStrip />,
         videoBanner: () => <VideoBanner />,
         banners: () => <PromoBanners />,
