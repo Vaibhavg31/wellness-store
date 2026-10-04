@@ -6,6 +6,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import QuantityStepper from '@/components/ui/QuantityStepper';
 import PageHeader from '@/components/ui/PageHeader';
 import CheckoutSteps from '@/components/checkout/CheckoutSteps';
+import CartUpsell from '@/components/cart/CartUpsell';
 import CouponInput from '@/components/checkout/CouponInput';
 import ActiveCoupons from '@/components/checkout/ActiveCoupons';
 import PriceBreakdown from '@/components/checkout/PriceBreakdown';
@@ -144,13 +145,16 @@ export default function CartPage() {
                 )}
 
                 <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
-                    <ul className="space-y-3 lg:col-span-2">
+                    <div className="lg:col-span-2">
+                    <ul className="space-y-3">
                         {entries.map((entry) => (
                             entry.type === 'bundle'
                                 ? <BundleEntry key={`bundle-${entry.bundleId}`} entry={entry} onRemove={handleRemoveBundle} />
                                 : <LineEntry key={entry.item.product.variantId ? `${entry.item.product.id}::${entry.item.product.variantId}` : entry.item.product.id} item={entry.item} onRemove={handleRemove} onQuantity={updateQuantity} />
                         ))}
                     </ul>
+                    <CartUpsell />
+                    </div>
 
                     <div className="space-y-5">
                         <ActiveCoupons variant="sidebar" />

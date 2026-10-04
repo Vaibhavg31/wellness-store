@@ -9,6 +9,8 @@ import ProductCard from '@/components/product/ProductCard';
 import BundleCard from '@/components/product/BundleCard';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
 import DeliveryCheck from '@/components/product/DeliveryCheck';
+import OffersList from '@/components/product/OffersList';
+import ExpertChat from '@/components/product/ExpertChat';
 import { Banner } from '@/components/home/BannerSection';
 import Button from '@/components/ui/Button';
 import Price from '@/components/ui/Price';
@@ -195,6 +197,7 @@ export default function ProductDetailPage() {
                         <div className="mt-5 flex flex-wrap items-center gap-3 border-b border-line pb-6">
                             <Price price={price} originalPrice={originalPrice} size="lg" />
                             {discount > 0 && <span className="rounded-full bg-primary-tint px-2.5 py-0.5 text-caption font-semibold text-primary-deep">{discount}% off</span>}
+                            {originalPrice > price && <span className="text-small font-medium text-success">You save {formatPrice(originalPrice - price)}</span>}
                         </div>
 
                         {hasVariants && (
@@ -224,6 +227,7 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
 
+                    <OffersList />
                     <DeliveryCheck price={price} />
 
                     {trustBadges.length > 0 && (
@@ -238,6 +242,7 @@ export default function ProductDetailPage() {
                     )}
 
                     <div className="mt-10"><ProductTabs product={product} reviews={reviews} /></div>
+                    <ExpertChat product={product} />
                 </div>
             </div>
 

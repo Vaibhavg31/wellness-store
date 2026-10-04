@@ -132,7 +132,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
 
     return (
         <div className="space-y-5">
-            <div className="rounded-xl border border-admin-border bg-sand/30 p-4">
+            <div className="rounded-xl border border-admin-border bg-canvas-alt p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-2">
                         <OrderStatusBadge status={order.status} />
@@ -516,7 +516,7 @@ export default function AdminOrdersPage() {
                             Apply
                         </button>
                         {BULK_ACTIONS.map(({ status, label, icon: Icon }) => (
-                            <button key={status} type="button" disabled={bulkLoading} onClick={() => bulkAction(status)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-admin-surface-alt border border-admin-border-light hover:bg-sand/60 disabled:opacity-50">
+                            <button key={status} type="button" disabled={bulkLoading} onClick={() => bulkAction(status)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-admin-surface-alt border border-admin-border-light hover:bg-canvas-alt disabled:opacity-50">
                                 <Icon size={12} />
                                 {label}
                             </button>
@@ -634,7 +634,7 @@ export default function AdminOrdersPage() {
                                                     <button
                                                         type="button"
                                                         onClick={(e) => { e.stopPropagation(); printStickers([order.id]); }}
-                                                        className="text-ink hover:text-primary p-1 rounded-md hover:bg-sand/60"
+                                                        className="text-ink hover:text-primary p-1 rounded-md hover:bg-canvas-alt"
                                                         title="Print shipping label"
                                                         aria-label={`Print label for order ${shortOrderId(order.id)}`}
                                                     >

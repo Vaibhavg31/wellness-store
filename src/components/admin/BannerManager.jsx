@@ -186,7 +186,7 @@ export default function BannerManager({ filterTarget, productId }) {
                                             <img
                                                 src={imageUrl(banner.image)}
                                                 alt=""
-                                                className="w-20 h-12 rounded-lg object-cover border border-admin-border bg-sand/30"
+                                                className="w-20 h-12 rounded-lg object-cover border border-admin-border bg-canvas-alt"
                                             />
                                         </td>
                                         <td className="p-3 align-top">
@@ -275,7 +275,7 @@ export default function BannerManager({ filterTarget, productId }) {
                         <select
                             value={form.displayTarget}
                             onChange={(e) => setForm({ ...form, displayTarget: e.target.value, productId: null })}
-                            className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink rounded-lg text-sm focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30"
+                            className="w-full px-4 py-3 bg-admin-surface-alt border border-line text-ink rounded-lg text-sm focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30"
                         >
                             <option value="both">Both — Slider and Stacked</option>
                             <option value="slider">Banner Slider only (rotating)</option>

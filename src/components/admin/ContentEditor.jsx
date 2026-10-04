@@ -34,7 +34,7 @@ export function AdminTextarea({ value, onChange, rows = 3, placeholder }) {
             onChange={onChange}
             rows={rows}
             placeholder={placeholder}
-            className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink placeholder:text-admin-muted/50 focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30 transition-all font-light resize-none rounded-lg text-sm"
+            className="w-full px-4 py-3 bg-admin-surface-alt border border-line text-ink placeholder:text-admin-muted/50 focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30 transition-all font-light resize-none rounded-lg text-sm"
         />
     );
 }
@@ -278,7 +278,7 @@ export function FontField({ label, hint, value, onChange, options }) {
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full px-4 py-3 bg-admin-surface-alt border border-sand/60 text-ink focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30 transition-all rounded-lg text-sm"
+                className="w-full px-4 py-3 bg-admin-surface-alt border border-line text-ink focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30 transition-all rounded-lg text-sm"
                 style={{ fontFamily: value }}
             >
                 {options.map((opt) => (
@@ -359,7 +359,7 @@ export function BenefitEditor({ benefits = [], onChange }) {
                         <select
                             value={b.icon}
                             onChange={(e) => update(i, 'icon', e.target.value)}
-                            className="px-3 py-2 bg-canvas border border-sand/60 rounded-lg text-sm"
+                            className="px-3 py-2 bg-canvas border border-line rounded-lg text-sm"
                         >
                             {icons.map((ic) => (
                                 <option key={ic} value={ic}>{ic}</option>

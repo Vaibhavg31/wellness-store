@@ -742,6 +742,7 @@ CREATE TABLE `site_settings` (
   `popup_product_id` varchar(64) DEFAULT NULL,
   `popup_delay_seconds` int(10) UNSIGNED NOT NULL DEFAULT 2,
   `popup_frequency` varchar(20) NOT NULL DEFAULT 'session' COMMENT '"session" (once per browser session), "every_visit", or "once" (once ever, per browser)',
+  `extras_json` longtext DEFAULT NULL COMMENT 'JSON: newer storefront options',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Single-row site-wide CMS settings';

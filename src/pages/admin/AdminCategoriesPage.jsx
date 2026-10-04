@@ -161,10 +161,10 @@ export default function AdminCategoriesPage() {
                                                 <img
                                                     src={imageUrl(cat.image)}
                                                     alt=""
-                                                    className="w-14 h-14 rounded-xl object-cover border border-admin-border bg-sand/30"
+                                                    className="w-14 h-14 rounded-xl object-cover border border-admin-border bg-canvas-alt"
                                                 />
                                             ) : (
-                                                <div className="w-14 h-14 rounded-xl border border-admin-border bg-sand/30 flex items-center justify-center">
+                                                <div className="w-14 h-14 rounded-xl border border-admin-border bg-canvas-alt flex items-center justify-center">
                                                     <FolderOpen size={18} className="text-admin-muted/60" />
                                                 </div>
                                             )}
@@ -173,7 +173,7 @@ export default function AdminCategoriesPage() {
                                             <p className="font-display text-base text-ink">{cat.label}</p>
                                         </td>
                                         <td className="p-4 align-top">
-                                            <code className="text-xs text-admin-muted bg-sand/40 px-2 py-1 rounded-md">/{cat.slug}</code>
+                                            <code className="text-xs text-admin-muted bg-canvas-alt px-2 py-1 rounded-md">/{cat.slug}</code>
                                         </td>
                                         <td className="p-4 align-top">
                                             <p className="text-admin-muted line-clamp-2 leading-relaxed">{cat.description || '—'}</p>
@@ -265,7 +265,7 @@ export default function AdminCategoriesPage() {
                     </div>
                     <div>
                         <label className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">Description</label>
-                        <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-sand/60 rounded-lg" />
+                        <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-line rounded-lg" />
                     </div>
                     <Input label="Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
                     <label className="flex items-center gap-2 text-sm">

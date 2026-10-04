@@ -15,6 +15,7 @@ import SignInPrompt from '@/components/auth/SignInPrompt';
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import OrderJourney from '@/components/orders/OrderJourney';
 import SavedAddresses from '@/components/account/SavedAddresses';
+import RestockReminders from '@/components/account/RestockReminders';
 import EmailVerificationBanner from '@/components/auth/EmailVerificationBanner';
 import { formatOrderDate, isTerminalStatus, shortOrderId } from '@/constants/orders';
 
@@ -73,6 +74,8 @@ export default function AccountPage() {
                     <QuickLink to="/wishlist" icon={Heart} title="My wishlist" hint={`${wishlistCount} saved items`} />
                     <QuickLink to="/orders" icon={Package} title="My orders" hint={activeOrders.length > 0 ? `${activeOrders.length} in progress` : `${orders.length} total`} />
                 </div>
+
+                <RestockReminders orders={orders} />
 
                 <section aria-labelledby="recent-orders">
                     <div className="mb-5 flex items-center justify-between">

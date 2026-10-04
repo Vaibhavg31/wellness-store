@@ -22,8 +22,8 @@ export default function OrderLineItems({ items = [], compact = false, plain = fa
                             src={imageUrl(item.image)}
                             alt=""
                             className={compact
-                                ? 'w-10 h-12 object-cover rounded-lg flex-shrink-0 bg-sand'
-                                : 'w-12 h-14 object-cover rounded-lg flex-shrink-0 bg-sand'}
+                                ? 'w-10 h-12 object-cover rounded-lg flex-shrink-0 bg-canvas-alt'
+                                : 'w-12 h-14 object-cover rounded-lg flex-shrink-0 bg-canvas-alt'}
                         />
                     )}
                     <div className="flex-1 min-w-0">

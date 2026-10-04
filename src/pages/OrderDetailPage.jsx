@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Copy, MapPin, MessageCircle, Package, Phone, RotateCcw, Sparkles } from 'lucide-react';
+import { Copy, MapPin, MessageCircle, Package, Phone, RotateCcw, Sparkles, Star, Truck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
@@ -17,8 +17,10 @@ import { useWhatsApp } from '@/hooks/useWhatsApp';
 import { useCart } from '@/contexts/CartContext';
 import { useProducts } from '@/hooks/useApi';
 import { reorderItems, reorderSummaryMessage } from '@/utils/reorder';
-import { formatOrderDate, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
+import { formatOrderDate, isTerminalStatus, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
 import { useToast } from '@/contexts/ToastContext';
+import { useSiteContent } from '@/contexts/SiteContentContext';
+import { deliveryWindow } from '@/utils/delivery';
 
 const card = 'rounded-lg border border-line bg-surface p-5 sm:p-6';
 
@@ -28,6 +30,7 @@ export default function OrderDetailPage() {
     const { showToast } = useToast();
     const { getWhatsAppUrl } = useWhatsApp();
     const { addToCart } = useCart();
+    const { content } = useSiteContent();
     const { products } = useProducts();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -71,6 +74,8 @@ export default function OrderDetailPage() {
 
     const delivered = normalizeStatus(order.status) === 'delivered';
     const shipping = order.shipping || {};
+    const eta = !isTerminalStatus(order.status) ? deliveryWindow(content.extras.delivery, new Date(order.createdAt)) : null;
+    const reviewable = delivered ? [...new Map(order.items.filter((i) => i.productId).map((i) => [i.productId, i])).values()] : [];
 
     return (
         <div className="container-page py-8 lg:py-12">
@@ -97,7 +102,28 @@ export default function OrderDetailPage() {
                     <OrderStatusBadge status={order.status} audience="user" className="px-3 py-1 text-small" />
                 </div>
 
+                {eta && (
+                    <p className="mb-4 flex items-center gap-2 rounded-lg bg-primary-soft px-4 py-3 text-small text-ink">
+                        <Truck size={16} className="shrink-0 text-primary" aria-hidden="true" /> Expected delivery: <strong>{eta}</strong>
+                    </p>
+                )}
+
                 <div className="mb-8"><OrderJourney order={order} /></div>
+
+                {reviewable.length > 0 && (
+                    <section className={`${card} mb-8`} aria-labelledby="order-review">
+                        <h2 id="order-review" className="mb-1 flex items-center gap-2 font-sans text-h4"><Star size={18} aria-hidden="true" /> How did it go?</h2>
+                        <p className="mb-4 text-small text-muted">Your review helps others choose well.</p>
+                        <ul className="space-y-2">
+                            {reviewable.map((item) => (
+                                <li key={item.productId} className="flex items-center justify-between gap-3">
+                                    <span className="min-w-0 truncate text-small text-ink">{item.title}</span>
+                                    <Link to={`/product/${item.productId}`} className="shrink-0 text-small font-medium text-primary hover:underline">Write a review</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
 
                 <div className="mb-8 grid gap-4">
                     <section className={card} aria-labelledby="order-items">

@@ -4,6 +4,7 @@ import Button from '@/components/ui/Button';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { isValidPincode, lookupPincode } from '@/utils/pincodeLookup';
 import { formatPrice } from '@/utils/formatPrice';
+import { deliveryWindow } from '@/utils/delivery';
 
 const STORAGE_KEY = 'chikit-pincode';
 
@@ -19,6 +20,7 @@ function readSaved() {
 export default function DeliveryCheck({ price }) {
     const { content } = useSiteContent();
     const { fee, freeThreshold, returnDays } = content.delivery;
+    const eta = deliveryWindow(content.extras.delivery);
     const [pincode, setPincode] = useState(readSaved);
     const [state, setState] = useState({ status: 'idle', place: null });
 
@@ -71,12 +73,18 @@ export default function DeliveryCheck({ price }) {
                 {state.status === 'ok' && (
                     <p className="flex items-start gap-2 text-success">
                         <MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-                        <span>Delivering to <strong>{state.place.city}, {state.place.state}</strong>.</span>
+                        <span>Delivering to <strong>{state.place.city}, {state.place.state}</strong>{eta ? <>. Expected by <strong>{eta}</strong></> : ''}.</span>
                     </p>
                 )}
             </div>
 
             <ul className="mt-3 space-y-1.5 border-t border-line pt-3 text-caption text-muted">
+                {eta && (
+                    <li className="flex items-center gap-2">
+                        <Truck size={14} className="shrink-0 text-primary" aria-hidden="true" />
+                        <span>Order today, get it by <strong className="font-semibold text-ink">{eta}</strong>.</span>
+                    </li>
+                )}
                 <li className="flex items-center gap-2">
                     <Truck size={14} className="shrink-0 text-primary" aria-hidden="true" />
                     {freeDelivery ? 'Free delivery on this item.' : `Free delivery above ${formatPrice(freeThreshold)} · otherwise ${formatPrice(fee)}.`}

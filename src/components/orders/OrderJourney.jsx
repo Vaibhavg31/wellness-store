@@ -61,7 +61,7 @@ function StepIcon({ step, active, done, terminal }) {
     }
 
     return (
-        <div className="w-11 h-11 rounded-full bg-sand/80 border border-line/60 flex items-center justify-center text-muted/50">
+        <div className="w-11 h-11 rounded-full bg-canvas-alt border border-line/60 flex items-center justify-center text-muted/50">
             <Icon size={16} />
         </div>
     );
@@ -78,7 +78,7 @@ export default function OrderJourney({ order, variant = 'full' }) {
         const entry = history.find((h) => normalizeStatus(h.status) === status);
 
         return (
-            <div className="rounded-2xl bg-gradient-to-br from-sand/60 to-canvas border border-line/40 p-6 sm:p-8 text-center">
+            <div className="rounded-2xl bg-gradient-to-br from-canvas-alt to-canvas border border-line/40 p-6 sm:p-8 text-center">
                 <div className="w-16 h-16 rounded-full bg-danger-tint border border-danger/30 flex items-center justify-center mx-auto mb-4">
                     <Icon size={28} className="text-danger" />
                 </div>
@@ -107,7 +107,7 @@ export default function OrderJourney({ order, variant = 'full' }) {
                     <span>{getStatusLabel(activeStep, 'user')}</span>
                     <span>{Math.round(progress)}%</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-sand overflow-hidden">
+                <div className="h-1.5 rounded-full bg-canvas-alt overflow-hidden">
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
@@ -121,7 +121,7 @@ export default function OrderJourney({ order, variant = 'full' }) {
     }
 
     return (
-        <div className="rounded-2xl bg-gradient-to-b from-canvas to-sand/40 border border-line/40 p-6 sm:p-8 overflow-hidden relative">
+        <div className="rounded-2xl bg-gradient-to-b from-canvas to-canvas-alt border border-line/40 p-6 sm:p-8 overflow-hidden relative">
             <div className="absolute top-0 right-0 w-40 h-40 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
             <p className="text-xs tracking-[0.25em] uppercase text-muted mb-6">Your Journey</p>

@@ -253,7 +253,7 @@ export default function AdminCouponsPage() {
                                         <tr key={coupon.id} className="border-b border-admin-border-light hover:bg-admin-surface-alt/60">
                                             <td className="p-4 align-top">
                                                 <div className="flex items-start gap-2">
-                                                    <div className="w-8 h-8 rounded-lg bg-sand/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <div className="w-8 h-8 rounded-lg bg-canvas-alt flex items-center justify-center flex-shrink-0 mt-0.5">
                                                         <Icon size={14} className="text-primary" />
                                                     </div>
                                                     <div className="min-w-0">
@@ -367,7 +367,7 @@ export default function AdminCouponsPage() {
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                             rows={2}
-                            className="w-full px-4 py-3 border border-sand/60 rounded-lg text-sm"
+                            className="w-full px-4 py-3 border border-line rounded-lg text-sm"
                             placeholder="Shown to customers on cart page"
                         />
                     </div>

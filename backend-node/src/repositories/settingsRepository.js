@@ -97,7 +97,47 @@ const DEFAULTS = {
     footer: { tagline: 'Ayurveda and Wellness', description: 'Rooted in Ayurveda. Thoughtfully crafted for a healthier, happier you.', newsletterTitle: 'Our Wellness Circle', newsletterDescription: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.', instagramCardText: 'Wellness tips, product stories & behind-the-scenes.' },
     seo: { title: 'Chikit | Ayurveda and Wellness', description: 'Rooted in Ayurveda. Thoughtfully crafted for a healthier, happier you.' },
     popup: { enabled: false, type: 'info', title: 'Welcome to Chikit', message: 'Sign up for our newsletter and get 10% off your first order.', image: '', ctaLabel: 'Shop Now', ctaHref: '/shop', couponCode: 'WELCOME10', productId: null, delaySeconds: 2, frequency: 'session' },
+    extras: {
+        delivery: { minDays: 0, maxDays: 0 },
+        disclaimer: 'These statements have not been evaluated by the FSSAI. This product is not intended to diagnose, treat, cure or prevent any disease and is not a substitute for medical advice. Results may vary from person to person.',
+        announcements: [],
+        restockReminderDays: 30,
+        expertChat: true,
+        concerns: [],
+    },
 };
+
+/** Extras are stored as JSON; keep only known keys, with sane types and bounds. */
+function sanitizeExtras(input) {
+    const d = DEFAULTS.extras;
+    const e = input && typeof input === 'object' ? input : {};
+    const days = (v) => Math.min(60, Math.max(0, Number.parseInt(v, 10) || 0));
+    const minDays = days(e.delivery?.minDays);
+    const maxDays = Math.max(minDays, days(e.delivery?.maxDays));
+    return {
+        delivery: { minDays, maxDays },
+        disclaimer: typeof e.disclaimer === 'string' ? e.disclaimer.slice(0, 600) : d.disclaimer,
+        announcements: (Array.isArray(e.announcements) ? e.announcements : [])
+            .map((a) => ({ text: String(a?.text ?? '').trim().slice(0, 140), href: String(a?.href ?? '').trim().slice(0, 200) }))
+            .filter((a) => a.text)
+            .slice(0, 6),
+        restockReminderDays: Math.min(365, Math.max(0, Number.parseInt(e.restockReminderDays ?? d.restockReminderDays, 10) || 0)),
+        expertChat: e.expertChat === undefined ? d.expertChat : Boolean(e.expertChat),
+        concerns: (Array.isArray(e.concerns) ? e.concerns : [])
+            .map((c) => ({ label: String(c?.label ?? '').trim().slice(0, 40), search: String(c?.search ?? '').trim().slice(0, 60), image: String(c?.image ?? '').trim().slice(0, 300) }))
+            .filter((c) => c.label)
+            .slice(0, 8),
+    };
+}
+
+function parseExtras(raw) {
+    if (!raw) return DEFAULTS.extras;
+    try {
+        return sanitizeExtras(JSON.parse(raw));
+    } catch {
+        return DEFAULTS.extras;
+    }
+}
 
 export class SettingsRepository {
     pool() { return getPool(); }
@@ -235,6 +275,7 @@ export class SettingsRepository {
                 delaySeconds: row.popup_delay_seconds !== null && row.popup_delay_seconds !== undefined ? i(row.popup_delay_seconds) : DEFAULTS.popup.delaySeconds,
                 frequency: row.popup_frequency ?? DEFAULTS.popup.frequency,
             },
+            extras: parseExtras(row.extras_json),
             navLinks: await this.fetchList('site_nav_links', (r) => ({ label: r.label, href: r.href })),
             sections: await this.fetchSections(),
         };
@@ -315,6 +356,7 @@ export class SettingsRepository {
             popup_enabled, popup_type, popup_title, popup_message, popup_image,
             popup_cta_label, popup_cta_href, popup_coupon_code, popup_product_id,
             popup_delay_seconds, popup_frequency,
+            extras_json,
             updated_at
         ) VALUES (
             1, __VALUE_PLACEHOLDERS__
@@ -375,6 +417,7 @@ export class SettingsRepository {
             popup_cta_label=VALUES(popup_cta_label), popup_cta_href=VALUES(popup_cta_href),
             popup_coupon_code=VALUES(popup_coupon_code), popup_product_id=VALUES(popup_product_id),
             popup_delay_seconds=VALUES(popup_delay_seconds), popup_frequency=VALUES(popup_frequency),
+            extras_json=VALUES(extras_json),
             updated_at=VALUES(updated_at)`;
 
         const params = [
@@ -409,6 +452,7 @@ export class SettingsRepository {
             (pu.enabled ?? false) ? 1 : 0, pu.type ?? 'info', pu.title ?? '', pu.message ?? '', pu.image ?? '',
             pu.ctaLabel ?? '', pu.ctaHref ?? '', pu.couponCode ?? '', pu.productId ?? null,
             Number.parseInt(pu.delaySeconds ?? 2, 10), pu.frequency ?? 'session',
+            JSON.stringify(sanitizeExtras(s.extras)),
             now,
         ];
         // Placeholders are derived from the values so the column list and the parameters can never drift apart.

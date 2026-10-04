@@ -35,7 +35,7 @@ export default function CouponInput({ compact = false }) {
 
     if (couponCode && couponDetails) {
         return (
-            <div className={`rounded-xl border border-primary/15 bg-sand/50 ${compact ? 'p-3' : 'p-4'}`}>
+            <div className={`rounded-xl border border-primary/15 bg-canvas-alt ${compact ? 'p-3' : 'p-4'}`}>
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 text-primary">

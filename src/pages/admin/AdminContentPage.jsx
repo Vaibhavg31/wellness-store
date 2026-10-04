@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Store, Home, FileText, MessageCircle, Megaphone, Bell,
+    Store, Home, FileText, MessageCircle, Megaphone, Bell, Truck,
 } from 'lucide-react';
 import { api, ApiError } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
@@ -11,6 +11,7 @@ import { useAdminDirtySave } from '@/hooks/useAdminDirtySave';
 import { DEFAULT_SITE_CONTENT } from '@/data/defaultContent';
 import { deepMerge } from '@/utils/deepMerge';
 import { prepareSiteContentForSave } from '@/utils/prepareSiteContentForSave';
+import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
@@ -26,6 +27,7 @@ const TABS = [
     { id: 'contact', label: 'Contact & FAQ', icon: MessageCircle },
     { id: 'promo', label: 'SEO & Meta', icon: Megaphone },
     { id: 'popup', label: 'Announcement Popup', icon: Bell },
+    { id: 'experience', label: 'Delivery & Store Options', icon: Truck },
 ];
 
 // Deliberately distinct, unambiguous names — "Promo Banners" and "Top Promo
@@ -93,6 +95,8 @@ export default function AdminContentPage() {
             .then(setProducts)
             .catch(() => {});
     }, [adminToken]);
+
+    const updateExtras = (patch) => update('extras', { ...content.extras, ...patch });
 
     const update = (path, value) => {
         setSaveError(null);
@@ -787,6 +791,73 @@ export default function AdminContentPage() {
                                 />
                             </AdminField>
                         </AdminSection>
+                    )}
+
+                    {tab === 'experience' && (
+                        <>
+                            <AdminSection
+                                title="Delivery estimate"
+                                description="Shown on product pages, the cart and order pages as “Delivery by 12 Oct – 15 Oct”. Leave both at 0 to show no date promise."
+                            >
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <AdminField label="Fastest (days)" hint="Days from order date.">
+                                        <Input type="number" min={0} max={60} className="w-32" value={content.extras.delivery.minDays} onChange={(e) => updateExtras({ delivery: { ...content.extras.delivery, minDays: Number(e.target.value) || 0 } })} />
+                                    </AdminField>
+                                    <AdminField label="Slowest (days)">
+                                        <Input type="number" min={0} max={60} className="w-32" value={content.extras.delivery.maxDays} onChange={(e) => updateExtras({ delivery: { ...content.extras.delivery, maxDays: Number(e.target.value) || 0 } })} />
+                                    </AdminField>
+                                </div>
+                            </AdminSection>
+
+                            <AdminSection title="Rotating announcements" description="Extra messages that rotate in the top bar after the main promo (e.g. “Free shipping over ₹499”). Up to 6.">
+                                {content.extras.announcements.map((item, index) => (
+                                    <div key={index} className="grid gap-3 sm:grid-cols-[1fr_12rem_auto] sm:items-end">
+                                        <AdminField label={`Message ${index + 1}`}>
+                                            <Input value={item.text} maxLength={140} onChange={(e) => updateExtras({ announcements: content.extras.announcements.map((a, i) => (i === index ? { ...a, text: e.target.value } : a)) })} />
+                                        </AdminField>
+                                        <AdminField label="Link (optional)">
+                                            <Input value={item.href} placeholder="/shop" onChange={(e) => updateExtras({ announcements: content.extras.announcements.map((a, i) => (i === index ? { ...a, href: e.target.value } : a)) })} />
+                                        </AdminField>
+                                        <Button variant="outline" size="sm" onClick={() => updateExtras({ announcements: content.extras.announcements.filter((_, i) => i !== index) })}>Remove</Button>
+                                    </div>
+                                ))}
+                                {content.extras.announcements.length < 6 && (
+                                    <Button variant="outline" size="sm" onClick={() => updateExtras({ announcements: [...content.extras.announcements, { text: '', href: '' }] })}>Add message</Button>
+                                )}
+                            </AdminSection>
+
+                            <AdminSection title="Shop by concern" description="Health goals shown under the categories on the homepage (e.g. Digestion, Hair care). Each opens the shop filtered by the keyword you set. Up to 8.">
+                                {content.extras.concerns.map((item, index) => {
+                                    const patch = (change) => updateExtras({ concerns: content.extras.concerns.map((c, i) => (i === index ? { ...c, ...change } : c)) });
+                                    return (
+                                        <div key={index} className="space-y-3 rounded-lg border border-admin-border p-4">
+                                            <div className="grid gap-3 sm:grid-cols-2">
+                                                <AdminField label="Name"><Input value={item.label} maxLength={40} placeholder="Digestion" onChange={(e) => patch({ label: e.target.value })} /></AdminField>
+                                                <AdminField label="Shop keyword" hint="Matches product name, description or category."><Input value={item.search} maxLength={60} placeholder="digest" onChange={(e) => patch({ search: e.target.value })} /></AdminField>
+                                            </div>
+                                            <ImageUploadField label="Image (optional)" value={item.image} onChange={(v) => patch({ image: v })} adminToken={adminToken} />
+                                            <Button variant="outline" size="sm" onClick={() => updateExtras({ concerns: content.extras.concerns.filter((_, i) => i !== index) })}>Remove</Button>
+                                        </div>
+                                    );
+                                })}
+                                {content.extras.concerns.length < 8 && (
+                                    <Button variant="outline" size="sm" className="w-fit" onClick={() => updateExtras({ concerns: [...content.extras.concerns, { label: '', search: '', image: '' }] })}>Add concern</Button>
+                                )}
+                            </AdminSection>
+
+                            <AdminSection title="Product page & account">
+                                <AdminField label="Health disclaimer" hint="Shown at the bottom of every product page. Have it reviewed for your category.">
+                                    <AdminTextarea rows={3} maxLength={600} value={content.extras.disclaimer} onChange={(e) => updateExtras({ disclaimer: e.target.value })} />
+                                </AdminField>
+                                <AdminField label="Restock reminder after (days)" hint="Account page suggests re-ordering a delivered product after this many days. 0 turns it off.">
+                                    <Input type="number" min={0} max={365} className="w-32" value={content.extras.restockReminderDays} onChange={(e) => updateExtras({ restockReminderDays: Number(e.target.value) || 0 })} />
+                                </AdminField>
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" className="h-4 w-4 accent-primary" checked={content.extras.expertChat} onChange={(e) => updateExtras({ expertChat: e.target.checked })} />
+                                    <span className="text-sm text-ink">Show “Ask an expert on WhatsApp” on product pages</span>
+                                </label>
+                            </AdminSection>
+                        </>
                     )}
                 </div>
             </div>

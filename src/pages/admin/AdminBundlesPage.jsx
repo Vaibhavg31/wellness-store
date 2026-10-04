@@ -313,7 +313,7 @@ export default function AdminBundlesPage() {
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                             rows={2}
-                            className="w-full px-4 py-3 border border-sand/60 rounded-lg text-sm"
+                            className="w-full px-4 py-3 border border-line rounded-lg text-sm"
                             placeholder="Shown under the bundle title"
                         />
                     </div>

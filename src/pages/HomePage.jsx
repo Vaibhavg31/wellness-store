@@ -4,6 +4,7 @@ import TrustStrip from '@/components/home/TrustStrip';
 import VideoBanner from '@/components/home/VideoBanner';
 import { BannerSlider, PromoBanners } from '@/components/home/BannerSection';
 import CategoryGrid from '@/components/home/CategoryGrid';
+import ConcernShelf from '@/components/home/ConcernShelf';
 import ProductSection from '@/components/home/ProductSection';
 import BundleSection from '@/components/home/BundleSection';
 import WhyChoose from '@/components/home/WhyChoose';
@@ -36,7 +37,7 @@ function buildSections({ products, loading, trending, featured }) {
             />
         ),
         trending: () => <ProductSection eyebrow="Customer favourites" title="Trending now" products={trending} count={4} tint />,
-        categories: () => <CategoryGrid />,
+        categories: () => <><CategoryGrid /><ConcernShelf /></>,
         bundles: () => <BundleSection />,
         whyChoose: () => <WhyChoose />,
         certifiedBanner: () => <CertifiedBanner />,

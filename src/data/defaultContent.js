@@ -233,6 +233,16 @@ export const DEFAULT_SITE_CONTENT = {
         instagramCardText: 'Wellness tips, product stories & behind-the-scenes.',
     },
 
+    // Newer admin-editable storefront options (stored as one JSON value on the server).
+    extras: {
+        delivery: { minDays: 0, maxDays: 0 }, // 0 = no delivery-date promise shown
+        disclaimer: 'These statements have not been evaluated by the FSSAI. This product is not intended to diagnose, treat, cure or prevent any disease and is not a substitute for medical advice. Results may vary from person to person.',
+        announcements: [],
+        restockReminderDays: 30,
+        expertChat: true,
+        concerns: [], // [{ label, search, image }] → "Shop by concern" on the homepage
+    },
+
     seo: {
         title: 'Chikit | Ayurveda and Wellness',
         description: BRAND_DESCRIPTION,

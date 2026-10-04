@@ -30,7 +30,7 @@ function StarRating({ rating }) {
                 <Star
                     key={i}
                     size={12}
-                    className={i < rating ? 'fill-accent text-accent' : 'text-sand'}
+                    className={i < rating ? 'fill-accent text-accent' : 'text-line-strong'}
                 />
             ))}
         </span>
