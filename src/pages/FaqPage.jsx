@@ -1,52 +1,29 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import SectionTitle from '@/components/ui/SectionTitle';
+import PageHeader from '@/components/ui/PageHeader';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 
 export default function FaqPage() {
     const { content } = useSiteContent();
-    const { contactPage } = content;
-    const faqs = contactPage.faqs ?? [];
-    const [openFaq, setOpenFaq] = useState(null);
+    const faqs = content.contactPage.faqs ?? [];
 
     return (
-        <div className="pb-20 px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4">
-            <div className="max-w-3xl mx-auto px-6 lg:px-8">
-                <SectionTitle
-                    subtitle="FAQ"
-                    title="Frequently Asked Questions"
-                    description="Everything you need to know about our products, purity, and orders."
-                />
-
-                <div className="space-y-3">
-                    {faqs.map((faq, i) => (
-                        <div key={i} className="border border-sand/30">
-                            <button
-                                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                                className="w-full flex items-center justify-between p-5 text-left hover:bg-canvas/30 transition-colors"
-                                aria-expanded={openFaq === i}
-                            >
-                                <span className="font-display text-lg text-ink pr-4">{faq.question}</span>
-                                <ChevronDown size={18} className={`flex-shrink-0 text-muted transition-transform duration-300 ${openFaq === i ? 'rotate-180' : ''}`} />
-                            </button>
-                            <AnimatePresence>
-                                {openFaq === i && (
-                                    <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: 'auto', opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="overflow-hidden"
-                                    >
-                                        <p className="px-5 pb-5 text-muted font-light leading-relaxed text-sm">{faq.answer}</p>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
+        <>
+            <PageHeader eyebrow="FAQ" title="Frequently asked questions" description="Everything you need to know about our products, purity and orders." />
+            <div className="container-page py-10 lg:py-16">
+                <ul className="mx-auto max-w-3xl space-y-3">
+                    {faqs.map((faq) => (
+                        <li key={faq.question}>
+                            <details className="group rounded-lg border border-line bg-surface open:shadow-sm">
+                                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg p-5 [&::-webkit-details-marker]:hidden">
+                                    <span className="font-display text-h4">{faq.question}</span>
+                                    <ChevronDown size={20} className="shrink-0 text-muted transition-transform duration-300 group-open:rotate-180" aria-hidden="true" />
+                                </summary>
+                                <p className="px-5 pb-5 text-muted">{faq.answer}</p>
+                            </details>
+                        </li>
                     ))}
-                </div>
+                </ul>
             </div>
-        </div>
+        </>
     );
 }

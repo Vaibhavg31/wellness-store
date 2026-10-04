@@ -1,100 +1,58 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
-import SectionTitle from '@/components/ui/SectionTitle';
-import Input from '@/components/ui/Input';
+import { Link } from 'react-router-dom';
+import PageHeader from '@/components/ui/PageHeader';
+import Rating from '@/components/ui/Rating';
 import Button from '@/components/ui/Button';
-import { useReviews, useProducts } from '@/hooks/useApi';
-import { api } from '@/services/api';
+import UserAvatar from '@/components/ui/UserAvatar';
+import Skeleton from '@/components/ui/Skeleton';
+import Chip from '@/components/shop/Chip';
+import { useReviews } from '@/hooks/useApi';
+
 export default function ReviewsPage() {
-    const { reviews, loading, refetch } = useReviews();
-    const { products } = useProducts();
-    const [filterRating, setFilterRating] = useState(0);
-    const [form, setForm] = useState({ productId: '', name: '', email: '', rating: 5, comment: '' });
-    const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-    const filtered = filterRating
-        ? reviews.filter((r) => r.rating === filterRating)
-        : reviews;
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setSubmitting(true);
-        try {
-            await api.post('/api/reviews', form);
-            setSubmitted(true);
-            setForm({ productId: '', name: '', email: '', rating: 5, comment: '' });
-            refetch();
-        }
-        catch (err) {
-            alert(err instanceof Error ? err.message : 'Failed to submit review');
-        }
-        finally {
-            setSubmitting(false);
-        }
-    };
-    return (<div className="pb-20 px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4">
-      <div className="max-w-5xl mx-auto px-6 lg:px-8">
-        <SectionTitle subtitle="Customer Voices" title="Reviews" description="Real experiences from our cherished customers"/>
+    const { reviews, loading } = useReviews();
+    const [rating, setRating] = useState(0);
+    const filtered = rating ? reviews.filter((r) => r.rating === rating) : reviews;
 
-        <div className="flex flex-wrap gap-2 mb-10 justify-center">
-          <button onClick={() => setFilterRating(0)} className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider ${!filterRating ? 'bg-primary text-canvas' : 'bg-canvas text-ink border border-line'}`}>
-            All
-          </button>
-          {[5, 4, 3, 2, 1].map((r) => (<button key={r} onClick={() => setFilterRating(r)} className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider ${filterRating === r ? 'bg-primary text-canvas' : 'bg-canvas text-ink border border-line'}`}>
-              {r} ★
-            </button>))}
-        </div>
-
-        {loading ? (<p className="text-center text-muted">Loading reviews...</p>) : (<div className="space-y-6 mb-20">
-            {filtered.map((review, i) => (<motion.div key={review.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="bg-canvas rounded-2xl p-6 md:p-8 shadow-sm">
-                <div className="flex items-start gap-4">
-                  {review.avatar && (<img src={review.avatar} alt="" className="w-12 h-12 rounded-full object-cover"/>)}
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="font-medium text-ink">{review.name}</p>
-                      <p className="text-xs text-muted">{new Date(review.createdAt).toLocaleDateString()}</p>
+    return (
+        <>
+            <PageHeader eyebrow="Customer voices" title="Reviews" description="Real experiences from verified customers." />
+            <div className="container-page py-10 lg:py-14">
+                <div className="mx-auto max-w-3xl">
+                    <div className="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filter by rating">
+                        <Chip active={!rating} onClick={() => setRating(0)}>All</Chip>
+                        {[5, 4, 3, 2, 1].map((r) => <Chip key={r} active={rating === r} onClick={() => setRating(r)}>{r} ★</Chip>)}
                     </div>
-                    <div className="flex gap-0.5 mb-3">
-                      {Array.from({ length: 5 }).map((_, j) => (<Star key={j} size={14} className={j < review.rating ? 'text-accent fill-accent' : 'text-line'}/>))}
-                    </div>
-                    <p className="text-muted leading-relaxed">{review.comment}</p>
-                  </div>
-                </div>
-              </motion.div>))}
-            {filtered.length === 0 && <p className="text-center text-muted py-8">No reviews match this filter.</p>}
-          </div>)}
 
-        <div className="bg-canvas rounded-2xl p-8 md:p-10 border border-line/40">
-          <h2 className="font-display text-2xl text-ink mb-6">Write a Review</h2>
-          {submitted ? (<p className="text-primary">Thank you! Your review has been submitted for approval.</p>) : (<form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-2">Product</label>
-                <select value={form.productId} onChange={(e) => setForm({ ...form, productId: e.target.value })} required className="w-full px-4 py-3 bg-canvas border border-sand/60 rounded-lg">
-                  <option value="">Select a product</option>
-                  {products.map((p) => (<option key={p.id} value={p.id}>{p.title}</option>))}
-                </select>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-5">
-                <Input label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required/>
-                <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required/>
-              </div>
-              <div>
-                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-2">Rating</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((r) => (<button key={r} type="button" onClick={() => setForm({ ...form, rating: r })} className={`p-2 ${form.rating >= r ? 'text-accent' : 'text-line'}`}>
-                      <Star size={20} fill={form.rating >= r ? 'currentColor' : 'none'}/>
-                    </button>))}
+                    {loading ? (
+                        <div className="space-y-4">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-32 rounded-lg" />)}</div>
+                    ) : (
+                        <ul className="space-y-4">
+                            {filtered.map((review) => (
+                                <li key={review.id} className="rounded-lg border border-line bg-surface p-6">
+                                    <div className="flex items-start gap-4">
+                                        <UserAvatar user={{ name: review.name, avatar: review.avatar }} size="lg" signedIn />
+                                        <div className="min-w-0 flex-1">
+                                            <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                                                <p className="font-semibold text-ink">{review.name}</p>
+                                                <time dateTime={review.createdAt} className="text-caption text-muted">{new Date(review.createdAt).toLocaleDateString()}</time>
+                                            </div>
+                                            <Rating value={review.rating} />
+                                            <p className="mt-3 text-muted">{review.comment}</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                            {filtered.length === 0 && <li className="py-10 text-center text-muted">No reviews match this filter.</li>}
+                        </ul>
+                    )}
+
+                    <div className="mt-12 rounded-xl bg-primary-tint p-8 text-center">
+                        <h2 className="text-h3">Bought something from us?</h2>
+                        <p className="mx-auto mt-2 max-w-md text-muted">Open the product you purchased and share your experience — reviews are from verified buyers only.</p>
+                        <Link to="/orders" className="mt-5 inline-block"><Button>Go to my orders</Button></Link>
+                    </div>
                 </div>
-              </div>
-              <div>
-                <label className="block text-xs tracking-[0.15em] uppercase text-muted mb-2">Your Review</label>
-                <textarea value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} rows={4} required minLength={10} className="w-full px-4 py-3 bg-canvas border border-sand/60 rounded-lg resize-none" placeholder="Share your experience..."/>
-              </div>
-              <Button variant="turmeric" type="submit" disabled={submitting}>
-                {submitting ? 'Submitting...' : 'Submit Review'}
-              </Button>
-            </form>)}
-        </div>
-      </div>
-    </div>);
+            </div>
+        </>
+    );
 }

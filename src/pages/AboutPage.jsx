@@ -1,5 +1,6 @@
 import Logo from '@/components/ui/Logo';
-import SectionTitle from '@/components/ui/SectionTitle';
+import SectionHeader from '@/components/ui/SectionHeader';
+import Reveal from '@/components/ui/Reveal';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { imageUrl } from '@/services/api';
 import { DEFAULT_SITE_CONTENT } from '@/data/defaultContent';
@@ -7,65 +8,48 @@ import { DEFAULT_SITE_CONTENT } from '@/data/defaultContent';
 export default function AboutPage() {
     const { content } = useSiteContent();
     const about = content.about;
-    // An admin can save this field empty (this store's own settings do,
-    // right now) — imageUrl('') resolves to '', which renders a real,
-    // visibly-broken <img src="">, not just a missing picture. Falls back
-    // to the bundled default rather than showing that.
-    const storyImageSrc = about.storyImage ? imageUrl(about.storyImage) : DEFAULT_SITE_CONTENT.about.storyImage;
+    // An admin can save the story image empty; fall back to the bundled default rather than a broken <img>.
+    const storyImage = about.storyImage ? imageUrl(about.storyImage) : DEFAULT_SITE_CONTENT.about.storyImage;
 
     return (
-        <div className="pb-20 px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4">
-            <section className="py-16 px-6 lg:px-8">
-                <div className="max-w-4xl mx-auto text-center">
-                    <Logo size="xl" showHover className="mx-auto mb-8" />
-                    <h1 className="font-display text-4xl md:text-5xl font-light text-ink mb-6">
-                        {about.heroTitle}
-                    </h1>
-                    <p className="text-lg text-muted font-light leading-relaxed max-w-2xl mx-auto">
-                        {about.heroDescription}
-                    </p>
+        <>
+            <section className="bg-canvas-alt">
+                <div className="container-page py-14 text-center sm:py-20">
+                    <Logo size="xl" className="mx-auto mb-8" />
+                    <h1>{about.heroTitle}</h1>
+                    <p className="mx-auto mt-5 max-w-2xl text-lead text-muted">{about.heroDescription}</p>
                 </div>
             </section>
 
-            <section className="py-16 px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-                    <img
-                        src={storyImageSrc}
-                        alt={`${content.brandName} craftsmanship`}
-                        loading="lazy"
-                        className="w-full aspect-[4/5] object-cover rounded-2xl border border-line/30"
-                    />
-                    <div>
-                        <span className="text-xs tracking-[0.3em] uppercase text-accent mb-4 block">
-                            {about.storyBadge}
-                        </span>
-                        <h2 className="font-display text-3xl font-light text-ink mb-6">
-                            {about.storyTitle}
-                        </h2>
-                        {(about.storyParagraphs ?? []).map((para, i) => (
-                            <p key={i} className="text-muted font-light leading-relaxed mb-4">
-                                {para}
-                            </p>
+            <section className="section">
+                <div className="container-page grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                    <img src={storyImage} alt={`${content.brandName} story`} width="640" height="800" loading="lazy" decoding="async" className="aspect-[4/5] w-full rounded-xl object-cover" />
+                    <Reveal>
+                        <p className="eyebrow mb-3">{about.storyBadge}</p>
+                        <h2 className="mb-6">{about.storyTitle}</h2>
+                        <div className="space-y-4 text-lead text-muted">
+                            {(about.storyParagraphs ?? []).map((para) => <p key={para}>{para}</p>)}
+                        </div>
+                    </Reveal>
+                </div>
+            </section>
+
+            <section className="section bg-canvas-alt">
+                <div className="container-page">
+                    <SectionHeader eyebrow={about.valuesSubtitle} title={about.valuesTitle} />
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {[
+                            { title: about.missionTitle, text: about.missionText },
+                            { title: about.visionTitle, text: about.visionText },
+                        ].map((item, i) => (
+                            <Reveal key={item.title} delay={i * 80} className="rounded-xl border border-line bg-surface p-8">
+                                <h3 className="mb-3">{item.title}</h3>
+                                <p className="text-muted">{item.text}</p>
+                            </Reveal>
                         ))}
                     </div>
                 </div>
             </section>
-
-            <section className="py-16 px-6 lg:px-8 bg-canvas/50">
-                <div className="max-w-7xl mx-auto">
-                    <SectionTitle subtitle={about.valuesSubtitle} title={about.valuesTitle} />
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <div className="p-8 bg-canvas rounded-2xl border border-line/40">
-                            <h3 className="font-display text-2xl text-ink mb-4">{about.missionTitle}</h3>
-                            <p className="text-muted font-light leading-relaxed">{about.missionText}</p>
-                        </div>
-                        <div className="p-8 bg-canvas rounded-2xl border border-line/40">
-                            <h3 className="font-display text-2xl text-ink mb-4">{about.visionTitle}</h3>
-                            <p className="text-muted font-light leading-relaxed">{about.visionText}</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
+        </>
     );
 }

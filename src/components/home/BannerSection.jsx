@@ -14,7 +14,7 @@ function BannerLink({ href, children, className }) {
     return <Link to={href} className={className}>{children}</Link>;
 }
 
-function Banner({ banner, priority = false }) {
+export function Banner({ banner, priority = false }) {
     const hasCaption = banner.title || banner.subtitle || banner.ctaLabel;
     return (
         <BannerLink href={banner.ctaHref} className="group relative block overflow-hidden rounded-xl bg-canvas-alt">
