@@ -126,7 +126,8 @@ export default function ShopPage() {
                     </div>
                 </aside>
 
-                <section aria-label="Products">
+                <section aria-labelledby="shop-products">
+                    <h2 id="shop-products" className="sr-only">Products</h2>
                     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
                         <SearchField value={filters.search} onChange={(v) => update('search', v)} placeholder="Search products…" className="sm:flex-1" />
                         <div className="flex items-center gap-3">

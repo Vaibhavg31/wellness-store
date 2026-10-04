@@ -37,6 +37,7 @@ export default function CategoryPage() {
                 description={category?.description}
             />
             <div className="container-page py-8 lg:py-12">
+                <h2 className="sr-only">Products</h2>
                 <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-small text-muted" aria-live="polite">{!productsLoading && `${items.length} ${items.length === 1 ? 'product' : 'products'}`}</p>
                     <SearchField value={search} onChange={setSearch} placeholder={`Search in ${category?.label ?? 'collection'}…`} className="sm:w-72" />

@@ -39,6 +39,7 @@ export default function WishlistPage() {
         <>
             <PageHeader eyebrow="Saved for later" title={`My wishlist (${items.length})`} />
             <div className="container-page py-8 lg:py-12">
+                <h2 className="sr-only">Saved products</h2>
                 <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <SearchField value={search} onChange={setSearch} placeholder="Search saved items…" className="sm:w-80" />
                     <Button variant="outline" onClick={addAll}><ShoppingBag size={16} aria-hidden="true" /> Add all to bag</Button>
