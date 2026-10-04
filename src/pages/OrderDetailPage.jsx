@@ -1,22 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-    ArrowLeft,
-    Copy,
-    MapPin,
-    MessageCircle,
-    Package,
-    Phone,
-    RotateCcw,
-    Sparkles,
-} from 'lucide-react';
+import { Copy, MapPin, MessageCircle, Package, Phone, RotateCcw, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
 import { formatIndianAddress } from '@/utils/formatAddress';
-import { loginUrl } from '@/utils/authRedirect';
 import Button from '@/components/ui/Button';
+import Skeleton from '@/components/ui/Skeleton';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import EmptyState from '@/components/ui/EmptyState';
+import SignInPrompt from '@/components/auth/SignInPrompt';
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import OrderJourney from '@/components/orders/OrderJourney';
 import OrderLineItems from '@/components/orders/OrderLineItems';
@@ -24,13 +17,10 @@ import { useWhatsApp } from '@/hooks/useWhatsApp';
 import { useCart } from '@/contexts/CartContext';
 import { useProducts } from '@/hooks/useApi';
 import { reorderItems, reorderSummaryMessage } from '@/utils/reorder';
-import {
-    formatOrderDate,
-    normalizeStatus,
-    paymentLabel,
-    shortOrderId,
-} from '@/constants/orders';
+import { formatOrderDate, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
 import { useToast } from '@/contexts/ToastContext';
+
+const card = 'rounded-lg border border-line bg-surface p-5 sm:p-6';
 
 export default function OrderDetailPage() {
     const { id } = useParams();
@@ -42,7 +32,6 @@ export default function OrderDetailPage() {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [reordering, setReordering] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated || !token || !id) {
@@ -56,164 +45,90 @@ export default function OrderDetailPage() {
     }, [isAuthenticated, token, id]);
 
     const copyOrderId = () => {
-        if (!order?.id) return;
-        navigator.clipboard.writeText(order.id).then(() => {
-            showToast('Order ID copied');
-        });
+        if (order?.id) navigator.clipboard.writeText(order.id).then(() => showToast('Order ID copied'));
     };
 
-    const handleBuyAgain = () => {
-        if (reordering || !order) return;
-        setReordering(true);
+    const buyAgain = () => {
         const result = reorderItems(order, products, addToCart);
         showToast(reorderSummaryMessage(result), result.addedCount > 0 ? 'success' : 'error');
-        setReordering(false);
     };
 
     if (!isAuthenticated) {
-        return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-                <Package size={40} className="text-primary/30 mb-4" />
-                <h1 className="font-display text-3xl mb-3">Sign in to view this order</h1>
-                <Link to={loginUrl(`/orders/${id}`)}><Button variant="turmeric">Sign In</Button></Link>
-            </div>
-        );
+        return <SignInPrompt icon={Package} title="Sign in to view this order" description="Orders are private to the account they were placed with." redirect={`/orders/${id}`} />;
     }
 
     if (loading) {
-        return (
-            <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" />
-            </div>
-        );
+        return <div className="container-page max-w-3xl space-y-4 py-12"><Skeleton className="h-10 w-1/2" /><Skeleton className="h-40" /><Skeleton className="h-64" /></div>;
     }
 
     if (error || !order) {
         return (
-            <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 text-center">
-                <Package size={40} className="text-muted/30 mb-4" />
-                <h1 className="font-display text-2xl mb-2">Order not found</h1>
-                <p className="text-muted text-sm mb-6">{error || 'This order may not exist or belongs to another account.'}</p>
-                <Link to="/orders"><Button variant="outline">Back to orders</Button></Link>
+            <div className="container-page py-16">
+                <EmptyState icon={Package} title="Order not found" description={error || 'This order may not exist or belongs to another account.'} actionLabel="Back to orders" actionHref="/orders" />
             </div>
         );
     }
 
-    const status = normalizeStatus(order.status);
-    const s = order.shipping || {};
-    const delivered = status === 'delivered';
+    const delivered = normalizeStatus(order.status) === 'delivered';
+    const shipping = order.shipping || {};
 
     return (
-        <div className="pb-24 px-4 sm:px-6 lg:px-8 min-h-screen bg-canvas">
-            <div className="max-w-3xl mx-auto pt-4 sm:pt-8">
-                <Link to="/orders" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary mb-6 transition-colors">
-                    <ArrowLeft size={16} /> All orders
-                </Link>
+        <div className="container-page py-8 lg:py-12">
+            <div className="mx-auto max-w-3xl">
+                <Breadcrumbs className="mb-6" crumbs={[{ label: 'Account', href: '/account' }, { label: 'Orders', href: '/orders' }, { label: shortOrderId(order.id) }]} />
 
                 {delivered && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mb-6 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-primary-tint/40 border border-accent/30 p-5 text-center"
-                    >
-                        <Sparkles size={24} className="text-accent mx-auto mb-2" />
-                        <p className="font-display text-xl text-ink">Your order has arrived</p>
-                        <p className="text-sm text-muted mt-1">Thank you for choosing us. We hope you feel the difference.</p>
-                    </motion.div>
+                    <div className="mb-6 rounded-lg bg-success-tint p-5 text-center" role="status">
+                        <Sparkles size={24} className="mx-auto mb-2 text-success" aria-hidden="true" />
+                        <p className="font-display text-h4">Your order has arrived</p>
+                        <p className="mt-1 text-small text-muted">Thank you for choosing us. We hope you feel the difference.</p>
+                    </div>
                 )}
 
-                <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
+                <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                     <div>
-                        <p className="text-[10px] uppercase tracking-[0.25em] text-muted mb-1">Order</p>
-                        <div className="flex items-center gap-2">
-                            <h1 className="font-mono text-lg text-ink">{shortOrderId(order.id)}</h1>
-                            <button
-                                type="button"
-                                onClick={copyOrderId}
-                                className="p-1.5 rounded-lg hover:bg-sand/60 text-muted"
-                                aria-label="Copy order ID"
-                            >
-                                <Copy size={14} />
-                            </button>
+                        <p className="eyebrow mb-1">Order</p>
+                        <div className="flex items-center gap-1">
+                            <h1 className="font-mono text-h3">{shortOrderId(order.id)}</h1>
+                            <button type="button" onClick={copyOrderId} className="grid size-9 place-items-center rounded-full text-muted hover:bg-canvas-alt hover:text-ink" aria-label="Copy order ID"><Copy size={16} /></button>
                         </div>
-                        <p className="text-sm text-muted mt-1">{formatOrderDate(order.createdAt)}</p>
+                        <p className="mt-1 text-small text-muted">{formatOrderDate(order.createdAt)}</p>
                     </div>
-                    <OrderStatusBadge status={order.status} audience="user" className="text-sm px-3 py-1" />
+                    <OrderStatusBadge status={order.status} audience="user" className="px-3 py-1 text-small" />
                 </div>
 
-                <div className="mb-8">
-                    <OrderJourney order={order} />
-                </div>
+                <div className="mb-8"><OrderJourney order={order} /></div>
 
-                <div className="grid gap-4 mb-8">
-                    <section className="bg-canvas rounded-2xl border border-line/40 p-5 sm:p-6">
-                        <div className="flex items-center justify-between gap-3 mb-4">
-                            <p className="text-xs tracking-[0.2em] uppercase text-muted">Items</p>
-                            <button
-                                type="button"
-                                onClick={handleBuyAgain}
-                                disabled={reordering}
-                                className="inline-flex items-center gap-1.5 text-sm text-accent-ink font-medium hover:text-accent-hover transition-colors disabled:opacity-50"
-                            >
-                                <RotateCcw size={14} /> Buy Again
-                            </button>
+                <div className="mb-8 grid gap-4">
+                    <section className={card} aria-labelledby="order-items">
+                        <div className="mb-4 flex items-center justify-between gap-3">
+                            <h2 id="order-items" className="font-sans text-h4">Items</h2>
+                            <button type="button" onClick={buyAgain} className="inline-flex items-center gap-1.5 text-small font-medium text-primary hover:underline"><RotateCcw size={14} aria-hidden="true" /> Buy again</button>
                         </div>
                         <OrderLineItems items={order.items} />
-                        <div className="mt-4 pt-4 border-t border-line/30 space-y-2 text-sm">
-                            <div className="flex justify-between text-muted">
-                                <span>Subtotal</span>
-                                <span>{formatPrice(order.subtotal)}</span>
-                            </div>
+                        <dl className="mt-4 space-y-2 border-t border-line pt-4 text-small">
+                            <div className="flex justify-between text-muted"><dt>Subtotal</dt><dd>{formatPrice(order.subtotal)}</dd></div>
                             {(order.discountAmount > 0 || order.couponCode) && (
-                                <div className="flex justify-between text-primary">
-                                    <span>
-                                        Coupon
-                                        {order.couponCode ? ` (${order.couponCode})` : ''}
-                                    </span>
-                                    <span>−{formatPrice(order.discountAmount || 0)}</span>
-                                </div>
+                                <div className="flex justify-between text-success"><dt>Coupon{order.couponCode ? ` (${order.couponCode})` : ''}</dt><dd>−{formatPrice(order.discountAmount || 0)}</dd></div>
                             )}
-                            <div className="flex justify-between text-muted">
-                                <span>Delivery</span>
-                                <span>{order.deliveryFee > 0 ? formatPrice(order.deliveryFee) : 'Complimentary'}</span>
-                            </div>
-                            <div className="flex justify-between font-display text-xl text-ink pt-1">
-                                <span>Total</span>
-                                <span>{formatPrice(order.total)}</span>
-                            </div>
-                            <p className="text-xs text-muted pt-1">{paymentLabel(order)}</p>
-                        </div>
+                            <div className="flex justify-between text-muted"><dt>Delivery</dt><dd>{order.deliveryFee > 0 ? formatPrice(order.deliveryFee) : 'Free'}</dd></div>
+                            <div className="flex justify-between pt-1 font-display text-h4 text-ink"><dt>Total</dt><dd>{formatPrice(order.total)}</dd></div>
+                            <p className="pt-1 text-caption text-muted">{paymentLabel(order)}</p>
+                        </dl>
                     </section>
 
-                    <section className="bg-canvas rounded-2xl border border-line/40 p-5 sm:p-6">
-                        <p className="text-xs tracking-[0.2em] uppercase text-muted mb-4 flex items-center gap-2">
-                            <MapPin size={14} /> Delivery address
-                        </p>
-                        <p className="font-medium text-ink">{s.name}</p>
-                        <p className="text-sm text-ink/80 mt-1 whitespace-pre-line leading-relaxed">
-                            {formatIndianAddress(s, { multiline: true }) || '—'}
-                        </p>
-                        {s.phone && (
-                            <p className="text-sm text-muted mt-3 flex items-center gap-2">
-                                <Phone size={14} /> {s.phone}
-                            </p>
-                        )}
+                    <section className={card} aria-labelledby="order-address">
+                        <h2 id="order-address" className="mb-4 flex items-center gap-2 font-sans text-h4"><MapPin size={18} aria-hidden="true" /> Delivery address</h2>
+                        <p className="font-medium text-ink">{shipping.name}</p>
+                        <p className="mt-1 whitespace-pre-line text-small text-muted">{formatIndianAddress(shipping, { multiline: true }) || '—'}</p>
+                        {shipping.phone && <p className="mt-3 flex items-center gap-2 text-small text-muted"><Phone size={14} aria-hidden="true" /> {shipping.phone}</p>}
                     </section>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <Link to="/shop" className="flex-1">
-                        <Button variant="turmeric" className="w-full">Continue Shopping</Button>
-                    </Link>
-                    <a
-                        href={getWhatsAppUrl(`Hi, I have a question about my order ${order.id}`)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1"
-                    >
-                        <Button variant="outline" className="w-full gap-2">
-                            <MessageCircle size={16} /> Need help?
-                        </Button>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                    <Link to="/shop" className="flex-1"><Button className="w-full">Continue shopping</Button></Link>
+                    <a href={getWhatsAppUrl(`Hi, I have a question about my order ${order.id}`)} target="_blank" rel="noopener noreferrer" className="flex-1">
+                        <Button variant="outline" className="w-full"><MessageCircle size={16} aria-hidden="true" /> Need help?</Button>
                     </a>
                 </div>
             </div>

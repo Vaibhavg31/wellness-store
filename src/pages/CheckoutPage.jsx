@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { CheckCircle, MapPin, Phone, User, CreditCard, Package, Wallet, ChevronLeft, X, Plus } from 'lucide-react';
+import { CheckCircle, MapPin, Phone, User, CreditCard, ChevronLeft, ShoppingBag, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
@@ -12,8 +11,13 @@ import { isValidPincode } from '@/utils/pincodeLookup';
 import { validateDeliveryAddress } from '@/utils/validateAddress';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import EmptyState from '@/components/ui/EmptyState';
 import UserAvatar from '@/components/ui/UserAvatar';
-import VerifyAnimation from '@/components/ui/VerifyAnimation';
+import CheckoutSteps from '@/components/checkout/CheckoutSteps';
+import CheckoutSection from '@/components/checkout/CheckoutSection';
+import OrderPlaced from '@/components/checkout/OrderPlaced';
+import PaymentOptions from '@/components/checkout/PaymentOptions';
+import SavedAddressList from '@/components/checkout/SavedAddressList';
 import CheckoutLoginGate from '@/components/checkout/CheckoutLoginGate';
 import CheckoutInlineOtp, { normalizeCheckoutPhone } from '@/components/checkout/CheckoutInlineOtp';
 import EmailVerificationBanner from '@/components/auth/EmailVerificationBanner';
@@ -26,17 +30,19 @@ import PriceBreakdown from '@/components/checkout/PriceBreakdown';
 const OTP_FLOW_KEY = 'wellness-checkout-otp-flow';
 const MAX_SAVED_ADDRESSES = 3;
 
-const STEPS = [
-    { label: 'Bag',     icon: Package    },
-    { label: 'Address', icon: MapPin     },
-    { label: 'Payment', icon: CreditCard },
-];
-
 const razorpayKey = String(import.meta.env.VITE_RAZORPAY_KEY_ID || '');
 const RAZORPAY_ENABLED = razorpayKey.startsWith('rzp_') && !razorpayKey.includes('xxxx');
 
 function normalizePhone(value) {
     return normalizeCheckoutPhone(value);
+}
+
+function clearOtpFlow() {
+    try {
+        sessionStorage.removeItem(OTP_FLOW_KEY);
+    } catch {
+        /* ignore */
+    }
 }
 
 function isAccountPhoneVerified(user, phoneDigits) {
@@ -213,11 +219,7 @@ export default function CheckoutPage() {
         if (isAccountPhoneVerified(user, phoneDigits)) {
             setVerifiedPhone(phoneDigits);
             setOtpActive(false);
-            try {
-                sessionStorage.removeItem(OTP_FLOW_KEY);
-            } catch {
-                /* ignore */
-            }
+            clearOtpFlow();
             return;
         }
 
@@ -257,11 +259,7 @@ export default function CheckoutPage() {
                     setVerifiedPhone(res.phone);
                     setOtpActive(false);
                     setError('');
-                    try {
-                        sessionStorage.removeItem(OTP_FLOW_KEY);
-                    } catch {
-                        /* ignore */
-                    }
+                    clearOtpFlow();
                 }
             })
             .catch((err) => {
@@ -377,10 +375,8 @@ export default function CheckoutPage() {
 
     if (items.length === 0 && !placed) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-                <h1 className="font-display text-3xl mb-4">Nothing to checkout</h1>
-                <p className="text-muted mb-6">Add items to your bag and come back when you&apos;re ready.</p>
-                <Link to="/shop"><Button variant="turmeric">Continue Shopping</Button></Link>
+            <div className="container-page py-16">
+                <EmptyState icon={ShoppingBag} title="Nothing to checkout" description="Add items to your bag and come back when you're ready." actionLabel="Continue shopping" actionHref="/shop" />
             </div>
         );
     }
@@ -409,11 +405,7 @@ export default function CheckoutPage() {
 
     const closePhoneVerify = () => {
         setOtpActive(false);
-        try {
-            sessionStorage.removeItem(OTP_FLOW_KEY);
-        } catch {
-            /* ignore */
-        }
+        clearOtpFlow();
     };
 
     const handlePhoneVerified = (phone10) => {
@@ -421,11 +413,7 @@ export default function CheckoutPage() {
         setVerifiedPhone(phone10);
         setOtpActive(false);
         setError('');
-        try {
-            sessionStorage.removeItem(OTP_FLOW_KEY);
-        } catch {
-            /* ignore */
-        }
+        clearOtpFlow();
     };
 
     const validateAddress = () => {
@@ -494,505 +482,174 @@ export default function CheckoutPage() {
         }
     };
 
-    if (placed) {
-        const paidOnline = placed.payment === 'razorpay';
-        return (
-            <div className="min-h-[80vh] flex items-center justify-center px-6">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="text-center max-w-md"
-                >
-                    <VerifyAnimation size={88} className="mx-auto mb-6 text-primary" />
-                    <motion.h1
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4, duration: 0.4 }}
-                        className="font-display text-3xl text-ink mb-3"
-                    >
-                        {paidOnline ? 'Payment Successful' : 'Order Confirmed'}
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.55 }}
-                        className="text-muted font-light mb-2 leading-relaxed"
-                    >
-                        Thank you, {placed.shipping?.name}. Your order is confirmed.
-                    </motion.p>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.65 }}
-                        className="text-sm text-ink mb-8"
-                    >
-                        Order ID: <span className="font-medium">{placed.id}</span>
-                    </motion.p>
-                    <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.75 }}
-                        className="flex flex-col sm:flex-row gap-3 justify-center"
-                    >
-                        <Link to={`/orders/${placed.id}`}><Button variant="turmeric">Track Your Order</Button></Link>
-                        <Link to="/shop"><Button variant="outline">Continue Shopping</Button></Link>
-                    </motion.div>
-                </motion.div>
-            </div>
-        );
-    }
+    if (placed) return <OrderPlaced placed={placed} />;
 
     const ctaLabel = loading
-        ? (form.payment === 'razorpay' ? 'Opening Razorpay…' : 'Placing Order…')
+        ? (form.payment === 'razorpay' ? 'Opening Razorpay…' : 'Placing order…')
         : phoneReady
-            ? (form.payment === 'razorpay' ? 'Pay Securely' : 'Place Order')
-            : 'Verify Mobile & Continue';
+            ? (form.payment === 'razorpay' ? 'Pay securely' : 'Place order')
+            : 'Verify mobile & continue';
 
     const currentStep = addressComplete ? 2 : phoneReady ? 1 : 0;
+    const placeOrderDisabled = loading || !canPlaceOrder;
+
+    const onPhoneChange = (e) => {
+        const next = e.target.value.replace(/[^\d+\s-]/g, '');
+        const nextDigits = normalizePhone(next);
+        setForm({ ...form, phone: next });
+        if (otpActive) return;
+        if (isAccountPhoneVerified(user, nextDigits)) {
+            setVerifiedPhone(nextDigits);
+            setOtpActive(false);
+            clearOtpFlow();
+            return;
+        }
+        if (nextDigits !== verifiedPhone) {
+            setVerifiedPhone('');
+            setOtpActive(false);
+            clearOtpFlow();
+        }
+    };
 
     return (
-        <div className="pb-12 lg:pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-canvas pt-2 sm:pt-4">
-            <div className="max-w-6xl mx-auto">
-                <Link
-                    to="/cart"
-                    className="inline-flex items-center gap-2 text-sm text-muted hover:text-primary mb-5 group transition-colors"
-                >
-                    <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-                    Back to Bag
-                </Link>
+        <div className="container-page py-8 lg:py-12">
+            <Link to="/cart" className="group mb-5 inline-flex items-center gap-2 text-small text-muted hover:text-primary">
+                <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-0.5" aria-hidden="true" /> Back to bag
+            </Link>
 
-                <div className="mb-6 sm:mb-8">
-                    <p className="text-xs tracking-[0.25em] uppercase text-primary mb-2 font-medium">Secure Checkout</p>
-                    <h1 className="font-display text-3xl sm:text-4xl text-ink">Complete Your Order</h1>
-                </div>
-
-                <div className="flex items-center justify-center gap-2 sm:gap-4 mb-10" aria-label="Checkout progress">
-                    {STEPS.map(({ label, icon: StepIcon }, i) => {
-                        const done = i < currentStep;
-                        const current = i === currentStep;
-                        return (
-                            <div key={label} className="flex items-center gap-2 sm:gap-3">
-                                <div className="flex items-center gap-2 sm:gap-2.5">
-                                    <motion.span
-                                        animate={{
-                                            backgroundColor: done || current ? 'var(--color-forest)' : 'transparent',
-                                        }}
-                                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm font-medium border transition-colors ${
-                                            done || current
-                                                ? 'border-primary text-canvas'
-                                                : 'border-primary/20 text-primary/40 bg-primary/5'
-                                        }`}
-                                        aria-current={current ? 'step' : undefined}
-                                    >
-                                        {done ? <CheckCircle size={16} /> : <StepIcon size={15} strokeWidth={1.75} />}
-                                    </motion.span>
-                                    <span className={`text-sm sm:text-base transition-colors ${done || current ? 'text-ink font-medium' : 'text-muted/50'}`}>
-                                        {label}
-                                    </span>
-                                </div>
-                                {i < STEPS.length - 1 && (
-                                    <div className={`w-8 sm:w-16 h-px transition-colors ${done ? 'bg-primary/40' : 'bg-line'}`} />
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {/* Mobile / tablet — single sticky CTA (no duplicate bottom bar) */}
-                <div className="lg:hidden sticky top-[var(--site-header-h,7rem)] z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 mb-6 bg-canvas/95 backdrop-blur-md border-b border-line/40 space-y-2">
-                    {error && (
-                        <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2" role="alert">
-                            {error}
-                        </p>
-                    )}
-                    <div className="flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                            <p className="text-xs tracking-[0.15em] uppercase text-muted">
-                                {items.length} item{items.length !== 1 ? 's' : ''}
-                            </p>
-                            <p className="font-display text-xl text-primary leading-tight">{formatPrice(total)}</p>
-                        </div>
-                        <Button
-                            variant="turmeric"
-                            size="md"
-                            type="button"
-                            onClick={handlePlaceOrder}
-                            disabled={loading || !canPlaceOrder}
-                            className="flex-shrink-0 px-6 shadow-md shadow-primary/15"
-                        >
-                            {ctaLabel}
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="mb-6 p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-center gap-3">
-                    <UserAvatar user={user} size="md" signedIn />
-                    <p className="text-sm text-ink min-w-0">
-                        Signed in as <span className="font-medium">{user?.name || user?.email}</span>
-                        {isPhoneVerified && (
-                            <motion.span
-                                initial={{ opacity: 0, x: -4 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="text-primary-700 inline-flex items-center gap-1 ml-1"
-                            >
-                                <CheckCircle size={12} /> Verified
-                            </motion.span>
-                        )}
-                    </p>
-                </div>
-
-                {!emailVerified && (
-                    <EmailVerificationBanner className="mb-6" />
-                )}
-
-                <form
-                    className="grid lg:grid-cols-5 gap-8 lg:gap-10"
-                    noValidate
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handlePlaceOrder();
-                    }}
-                >
-                    <div className="lg:col-span-3 space-y-6 sm:space-y-8 order-2 lg:order-1">
-                        <section className="bg-canvas rounded-2xl p-4 sm:p-6 md:p-8 shadow-sm">
-                            <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/8 flex-shrink-0">
-                                    <User size={17} className="text-primary" strokeWidth={1.75} />
-                                </span>
-                                <h2 className="font-display text-xl sm:text-2xl text-ink">Contact Details</h2>
-                            </div>
-                            <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-                                <Input label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-                                <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-                                <div className="sm:col-span-2" ref={otpSectionRef}>
-                                    <div className="flex gap-2 items-end">
-                                        <div className="flex-1 min-w-0">
-                                            <Input
-                                                label="Mobile Number"
-                                                type="tel"
-                                                value={form.phone}
-                                                onChange={(e) => {
-                                                    const next = e.target.value.replace(/[^\d+\s-]/g, '');
-                                                    const nextDigits = normalizePhone(next);
-                                                    setForm({ ...form, phone: next });
-                                                    if (otpActive) return;
-                                                    if (isAccountPhoneVerified(user, nextDigits)) {
-                                                        setVerifiedPhone(nextDigits);
-                                                        setOtpActive(false);
-                                                        try {
-                                                            sessionStorage.removeItem(OTP_FLOW_KEY);
-                                                        } catch {
-                                                            /* ignore */
-                                                        }
-                                                        return;
-                                                    }
-                                                    if (nextDigits !== verifiedPhone) {
-                                                        setVerifiedPhone('');
-                                                        setOtpActive(false);
-                                                        try {
-                                                            sessionStorage.removeItem(OTP_FLOW_KEY);
-                                                        } catch {
-                                                            /* ignore */
-                                                        }
-                                                    }
-                                                }}
-                                                placeholder="98765 43210"
-                                                required
-                                                disabled={otpActive && !isPhoneVerified}
-                                            />
-                                        </div>
-                                        {normalizePhone(form.phone).length === 10 && !isPhoneVerified && !otpActive && !skipPhoneVerify && (
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="md"
-                                                className="flex-shrink-0 mb-0.5 border-primary/30 text-primary whitespace-nowrap"
-                                                onClick={openPhoneVerify}
-                                            >
-                                                Verify mobile
-                                            </Button>
-                                        )}
-                                        {isPhoneVerified && (
-                                            <motion.span
-                                                initial={{ opacity: 0, scale: 0.9 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                className="flex-shrink-0 mb-3 inline-flex items-center gap-1 text-xs text-primary-700 font-medium"
-                                            >
-                                                <CheckCircle size={14} />
-                                                Verified
-                                            </motion.span>
-                                        )}
-                                    </div>
-                                    <p className="text-sm text-muted mt-2">
-                                        {isPhoneVerified
-                                            ? isAccountPhoneVerified(user, phoneDigits)
-                                                ? 'Your account mobile is verified. No OTP needed for future orders.'
-                                                : 'This number is verified for your order.'
-                                            : skipPhoneVerify
-                                                ? !otpEnabled
-                                                    ? 'Mobile verification is currently disabled.'
-                                                    : 'Dev mode: mobile verification is skipped.'
-                                                : otpActive
-                                                    ? 'Tap Send OTP below, then enter the code from SMS.'
-                                                    : 'Verify your mobile once. It stays verified on your account.'}
-                                    </p>
-
-                                    {!skipPhoneVerify && (
-                                        <CheckoutInlineOtp
-                                            phone={form.phone}
-                                            token={token}
-                                            active={otpActive && !isPhoneVerified}
-                                            onVerified={handlePhoneVerified}
-                                            onCancel={closePhoneVerify}
-                                        />
-                                    )}
-                                </div>
-                            </div>
-                        </section>
-
-                        <section ref={addressSectionRef} className="bg-canvas rounded-2xl p-4 sm:p-6 md:p-8 shadow-sm scroll-mt-[calc(var(--site-header-h,7rem)+5rem)]">
-                            <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/8 flex-shrink-0">
-                                    <MapPin size={17} className="text-primary" strokeWidth={1.75} />
-                                </span>
-                                <h2 className="font-display text-xl sm:text-2xl text-ink">Delivery Address</h2>
-                            </div>
-                            {savedAddresses.length > 0 && (
-                                <div className="mb-5 sm:mb-6">
-                                    <div className="flex items-center justify-between gap-2 mb-3">
-                                        <p className="text-xs sm:text-sm tracking-[0.1em] sm:tracking-[0.12em] uppercase text-muted font-medium">
-                                            Saved addresses
-                                        </p>
-                                        <span className="text-xs sm:text-sm text-muted/70 tabular-nums">
-                                            {savedAddresses.length}/{MAX_SAVED_ADDRESSES}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col gap-2.5 sm:grid sm:grid-cols-2 sm:gap-3">
-                                        {savedAddresses.map((addr) => {
-                                            const selected = selectedAddressId === addr.id;
-                                            return (
-                                                <label
-                                                    key={addr.id}
-                                                    className={`relative flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border cursor-pointer transition-all active:scale-[0.98] ${
-                                                        selected
-                                                            ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
-                                                            : 'border-line hover:border-primary/30 hover:bg-primary/[0.02]'
-                                                    }`}
-                                                >
-                                                    <input
-                                                        type="radio"
-                                                        name="checkout-saved-address"
-                                                        value={addr.id}
-                                                        checked={selected}
-                                                        onChange={() => applySavedAddress(addr)}
-                                                        className="sr-only"
-                                                    />
-                                                    <span
-                                                        className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                                                            selected ? 'border-primary bg-primary' : 'border-primary/35 bg-canvas'
-                                                        }`}
-                                                        aria-hidden="true"
-                                                    >
-                                                        {selected && <span className="h-2 w-2 rounded-full bg-canvas" />}
-                                                    </span>
-                                                    <div className="min-w-0 flex-1 pr-1">
-                                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                            <p className="text-sm font-medium text-ink">
-                                                                {addr.label || 'Address'}
-                                                            </p>
-                                                            {addr.isDefault && (
-                                                                <span className="text-[9px] uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
-                                                                    Default
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <p className="text-sm text-muted mt-1.5 leading-relaxed break-words">
-                                                            {addr.address}
-                                                            {addr.landmark ? `, ${addr.landmark}` : ''}
-                                                            <span className="text-ink/70"> · {addr.city}, {addr.pincode}</span>
-                                                        </p>
-                                                    </div>
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
-                                    <div className="mt-3 space-y-2">
-                                        <button
-                                            type="button"
-                                            onClick={enterNewAddress}
-                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-sm py-2.5 px-4 rounded-xl border border-primary/25 text-primary bg-primary/5 hover:bg-primary/10 active:bg-primary/15 transition-colors"
-                                        >
-                                            <Plus size={15} />
-                                            Enter a new address
-                                        </button>
-                                        {savedAddresses.length < MAX_SAVED_ADDRESSES && (
-                                            <p className="text-xs sm:text-sm text-muted/80 leading-relaxed px-0.5">
-                                                New addresses are saved automatically when you place your order.
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                            <div className={`${savedAddresses.length > 0 ? 'border-t border-line/50 pt-4 sm:pt-5' : ''}`}>
-                                <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                                    <p className="text-xs sm:text-sm tracking-[0.1em] sm:tracking-[0.12em] uppercase text-muted font-medium">
-                                        {selectedAddressId ? 'Selected address' : 'Address details'}
-                                    </p>
-                                    {hasAddressInput && (
-                                        <button
-                                            type="button"
-                                            onClick={clearAddressFields}
-                                            className="inline-flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border border-line/70 bg-canvas/60 text-xs sm:text-sm text-muted hover:text-primary hover:border-primary/30 active:bg-primary/5 transition-colors"
-                                        >
-                                            <X size={13} />
-                                            Clear
-                                        </button>
-                                    )}
-                                </div>
-                                <DeliveryAddressForm
-                                    value={form}
-                                    onChange={handleAddressFormChange}
-                                    errors={addressErrors}
-                                    compact
-                                />
-                            </div>
-                        </section>
-
-                        <section className="bg-canvas rounded-2xl p-5 sm:p-6 md:p-8 shadow-sm">
-                            <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
-                                <span className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/8 flex-shrink-0">
-                                    <CreditCard size={17} className="text-primary" strokeWidth={1.75} />
-                                </span>
-                                <h2 className="font-display text-xl sm:text-2xl text-ink">Payment</h2>
-                            </div>
-                            <div className="space-y-3">
-                                {razorpayAvailable && (
-                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'razorpay' ? 'border-primary bg-primary/5' : 'border-line hover:border-primary/40'}`}>
-                                        <input
-                                            type="radio"
-                                            name="payment"
-                                            value="razorpay"
-                                            checked={form.payment === 'razorpay'}
-                                            onChange={() => setForm({ ...form, payment: 'razorpay' })}
-                                            className="mt-1 accent-forest"
-                                        />
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <Wallet size={16} className="text-primary" />
-                                                <p className="font-medium text-ink text-sm sm:text-base">Pay Online</p>
-                                            </div>
-                                            <p className="text-sm text-muted mt-0.5">UPI · Cards · Net Banking via Razorpay</p>
-                                        </div>
-                                    </label>
-                                )}
-                                {codAvailable && (
-                                    <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${form.payment === 'cod' ? 'border-primary bg-primary/5' : 'border-line hover:border-primary/40'}`}>
-                                        <input
-                                            type="radio"
-                                            name="payment"
-                                            value="cod"
-                                            checked={form.payment === 'cod'}
-                                            onChange={() => setForm({ ...form, payment: 'cod' })}
-                                            className="mt-1 accent-forest"
-                                        />
-                                        <div>
-                                            <p className="font-medium text-ink text-sm sm:text-base">Cash on Delivery</p>
-                                            <p className="text-sm text-muted mt-0.5">Pay when your order arrives</p>
-                                        </div>
-                                    </label>
-                                )}
-                                {!razorpayAvailable && !codAvailable && (
-                                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                                        No payment methods are available for the items in your bag. Please contact support.
-                                    </p>
-                                )}
-                                {!razorpayAvailable && codAvailable && content.payments?.onlinePaymentEnabled === false && (
-                                    <p className="text-xs text-muted/70 px-1">
-                                        Online payment is turned off in store settings.
-                                    </p>
-                                )}
-                                {!razorpayAvailable && codAvailable && content.payments?.onlinePaymentEnabled !== false && !RAZORPAY_ENABLED && (
-                                    <p className="text-xs text-muted/70 px-1">
-                                        Online payment will appear here once Razorpay keys are configured.
-                                    </p>
-                                )}
-                            </div>
-                        </section>
-
-                        {/* Full-width place order — after payment (mobile / tablet) */}
-                        <div className="lg:hidden space-y-4">
-                            {error && (
-                                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3" role="alert">
-                                    {error}
-                                </p>
-                            )}
-                            <div className="flex items-center justify-between px-1">
-                                <span className="text-sm text-muted">Total payable</span>
-                                <span className="font-display text-2xl text-primary">{formatPrice(total)}</span>
-                            </div>
-                            <Button
-                                variant="turmeric"
-                                size="lg"
-                                type="button"
-                                className="w-full"
-                                onClick={handlePlaceOrder}
-                                disabled={loading || !canPlaceOrder}
-                            >
-                                {ctaLabel}
-                            </Button>
-                        </div>
-                    </div>
-
-                    <div className="lg:col-span-2 order-1 lg:order-2 space-y-6">
-                        <ActiveCoupons variant="sidebar" />
-
-                        <div className="lg:sticky lg:top-[calc(var(--site-header-h,7rem)+1rem)] lg:z-10 bg-canvas rounded-2xl p-5 sm:p-6 md:p-8 shadow-sm space-y-5">
-                            <h2 className="font-display text-xl sm:text-2xl text-ink">Order Summary</h2>
-
-                            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-                                {items.map((item) => (
-                                    <div key={item.product.id} className="flex gap-3">
-                                        <img src={imageUrl(item.product.images[0])} alt="" className="w-14 h-16 object-cover rounded-lg flex-shrink-0" />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm sm:text-[15px] text-ink line-clamp-1">{item.product.title}</p>
-                                            <p className="text-sm text-muted">Qty: {item.quantity}</p>
-                                        </div>
-                                        <p className="text-sm sm:text-[15px] font-medium">{formatPrice(item.product.price * item.quantity)}</p>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="border-t border-line/60 pt-4 space-y-2 text-sm">
-                                <CouponInput compact />
-                                <PriceBreakdown totalClassName="text-primary" />
-                            </div>
-
-                            {error && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -4 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="hidden lg:block p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm"
-                                    role="alert"
-                                >
-                                    {error}
-                                </motion.div>
-                            )}
-
-                            <div className="hidden lg:block">
-                                <Button variant="turmeric" size="lg" className="w-full" type="button" onClick={handlePlaceOrder} disabled={loading || !canPlaceOrder}>
-                                    {ctaLabel}
-                                </Button>
-                            </div>
-
-                            <div className="hidden lg:flex items-center justify-center gap-2 text-xs text-muted">
-                                <Phone size={12} className="text-primary" />
-                                Mobile verified once per account
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <div className="mb-6">
+                <p className="eyebrow mb-2">Secure checkout</p>
+                <h1 className="text-h2">Complete your order</h1>
             </div>
+
+            <CheckoutSteps activeIndex={currentStep} />
+
+            {/* Mobile / tablet — single sticky CTA */}
+            <div className="sticky top-16 z-30 -mx-4 mb-6 space-y-2 border-b border-line bg-canvas/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+                {error && <p className="rounded-md bg-danger-tint px-3 py-2 text-caption text-danger" role="alert">{error}</p>}
+                <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                        <p className="text-caption text-muted">{items.length} item{items.length !== 1 ? 's' : ''}</p>
+                        <p className="font-display text-h4 leading-tight text-primary">{formatPrice(total)}</p>
+                    </div>
+                    <Button onClick={handlePlaceOrder} disabled={placeOrderDisabled} className="shrink-0">{ctaLabel}</Button>
+                </div>
+            </div>
+
+            <p className="mb-6 flex items-center gap-3 rounded-lg bg-primary-tint p-4 text-small text-ink">
+                <UserAvatar user={user} size="md" signedIn />
+                <span className="min-w-0">
+                    Signed in as <strong>{user?.name || user?.email}</strong>
+                    {isPhoneVerified && <span className="ml-2 inline-flex items-center gap-1 font-medium text-success"><CheckCircle size={14} aria-hidden="true" /> Verified</span>}
+                </span>
+            </p>
+
+            {!emailVerified && <EmailVerificationBanner className="mb-6" />}
+
+            <form className="grid gap-8 lg:grid-cols-5 lg:gap-10" noValidate onSubmit={(e) => { e.preventDefault(); handlePlaceOrder(); }}>
+                <div className="order-2 space-y-6 lg:order-1 lg:col-span-3">
+                    <CheckoutSection icon={User} title="Contact details">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <Input label="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoComplete="name" required />
+                            <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} autoComplete="email" required />
+                            <div className="sm:col-span-2" ref={otpSectionRef}>
+                                <div className="flex items-end gap-2">
+                                    <div className="min-w-0 flex-1">
+                                        <Input label="Mobile number" type="tel" value={form.phone} onChange={onPhoneChange} placeholder="98765 43210" autoComplete="tel" required disabled={otpActive && !isPhoneVerified} />
+                                    </div>
+                                    {normalizePhone(form.phone).length === 10 && !isPhoneVerified && !otpActive && !skipPhoneVerify && (
+                                        <Button variant="outline" onClick={openPhoneVerify} className="shrink-0">Verify mobile</Button>
+                                    )}
+                                    {isPhoneVerified && <span className="mb-3 inline-flex shrink-0 items-center gap-1 text-small font-medium text-success"><CheckCircle size={16} aria-hidden="true" /> Verified</span>}
+                                </div>
+                                <p className="mt-2 text-small text-muted">
+                                    {isPhoneVerified
+                                        ? isAccountPhoneVerified(user, phoneDigits)
+                                            ? 'Your account mobile is verified. No OTP needed for future orders.'
+                                            : 'This number is verified for your order.'
+                                        : skipPhoneVerify
+                                            ? !otpEnabled ? 'Mobile verification is currently disabled.' : 'Dev mode: mobile verification is skipped.'
+                                            : otpActive
+                                                ? 'Tap Send OTP below, then enter the code from SMS.'
+                                                : 'Verify your mobile once. It stays verified on your account.'}
+                                </p>
+
+                                {!skipPhoneVerify && (
+                                    <CheckoutInlineOtp phone={form.phone} token={token} active={otpActive && !isPhoneVerified} onVerified={handlePhoneVerified} onCancel={closePhoneVerify} />
+                                )}
+                            </div>
+                        </div>
+                    </CheckoutSection>
+
+                    <CheckoutSection ref={addressSectionRef} icon={MapPin} title="Delivery address" className="scroll-mt-40">
+                        {savedAddresses.length > 0 && (
+                            <SavedAddressList addresses={savedAddresses} selectedId={selectedAddressId} onSelect={applySavedAddress} onNew={enterNewAddress} max={MAX_SAVED_ADDRESSES} />
+                        )}
+                        <div className={savedAddresses.length > 0 ? 'border-t border-line pt-5' : ''}>
+                            <div className="mb-4 flex items-center justify-between gap-2">
+                                <p className="text-small font-semibold text-ink">{selectedAddressId ? 'Selected address' : 'Address details'}</p>
+                                {hasAddressInput && (
+                                    <Button variant="ghost" size="sm" onClick={clearAddressFields}><X size={14} aria-hidden="true" /> Clear</Button>
+                                )}
+                            </div>
+                            <DeliveryAddressForm value={form} onChange={handleAddressFormChange} errors={addressErrors} compact />
+                        </div>
+                    </CheckoutSection>
+
+                    <CheckoutSection icon={CreditCard} title="Payment">
+                        <PaymentOptions
+                            value={form.payment}
+                            onChange={(payment) => setForm({ ...form, payment })}
+                            razorpayAvailable={razorpayAvailable}
+                            codAvailable={codAvailable}
+                            onlineEnabledInSettings={content.payments?.onlinePaymentEnabled !== false}
+                            razorpayConfigured={RAZORPAY_ENABLED}
+                        />
+                    </CheckoutSection>
+
+                    <div className="space-y-4 lg:hidden">
+                        {error && <p className="rounded-lg bg-danger-tint px-4 py-3 text-small text-danger" role="alert">{error}</p>}
+                        <p className="flex items-center justify-between px-1">
+                            <span className="text-small text-muted">Total payable</span>
+                            <span className="font-display text-h3 text-primary">{formatPrice(total)}</span>
+                        </p>
+                        <Button size="lg" className="w-full" onClick={handlePlaceOrder} disabled={placeOrderDisabled}>{ctaLabel}</Button>
+                    </div>
+                </div>
+
+                <aside className="order-1 space-y-6 lg:order-2 lg:col-span-2" aria-label="Order summary">
+                    <ActiveCoupons variant="sidebar" />
+
+                    <div className="space-y-5 rounded-lg border border-line bg-surface p-5 sm:p-6 lg:sticky lg:top-28 lg:p-8">
+                        <h2 className="font-sans text-h4">Order summary</h2>
+
+                        <ul className="max-h-64 space-y-3 overflow-y-auto pr-1">
+                            {items.map((item) => (
+                                <li key={`${item.product.id}-${item.product.variantId || ''}`} className="flex gap-3">
+                                    <img src={imageUrl(item.product.images[0])} alt="" width="56" height="64" className="h-16 w-14 shrink-0 rounded-md object-cover" />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="line-clamp-1 text-small text-ink">{item.product.title}</p>
+                                        <p className="text-small text-muted">Qty: {item.quantity}</p>
+                                    </div>
+                                    <p className="text-small font-medium">{formatPrice(item.product.price * item.quantity)}</p>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <div className="space-y-2 border-t border-line pt-4 text-small">
+                            <CouponInput compact />
+                            <PriceBreakdown totalClassName="text-primary" />
+                        </div>
+
+                        {error && <p className="hidden rounded-lg bg-danger-tint p-3 text-small text-danger lg:block" role="alert">{error}</p>}
+
+                        <div className="hidden lg:block">
+                            <Button size="lg" className="w-full" onClick={handlePlaceOrder} disabled={placeOrderDisabled}>{ctaLabel}</Button>
+                        </div>
+                        <p className="hidden items-center justify-center gap-2 text-caption text-muted lg:flex"><Phone size={14} className="text-primary" aria-hidden="true" /> Mobile verified once per account</p>
+                    </div>
+                </aside>
+            </form>
         </div>
     );
 }

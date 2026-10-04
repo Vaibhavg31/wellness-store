@@ -1,126 +1,76 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, Package, RotateCcw, Sparkles } from 'lucide-react';
+import { ChevronRight, Package, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api, imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
-import { loginUrl } from '@/utils/authRedirect';
-import Button from '@/components/ui/Button';
+import PageHeader from '@/components/ui/PageHeader';
+import EmptyState from '@/components/ui/EmptyState';
+import Skeleton from '@/components/ui/Skeleton';
+import SignInPrompt from '@/components/auth/SignInPrompt';
+import Chip from '@/components/shop/Chip';
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import OrderJourney from '@/components/orders/OrderJourney';
 import { useCart } from '@/contexts/CartContext';
 import { useProducts } from '@/hooks/useApi';
 import { useToast } from '@/contexts/ToastContext';
 import { reorderItems, reorderSummaryMessage } from '@/utils/reorder';
-import {
-    formatOrderDate,
-    isTerminalStatus,
-    normalizeStatus,
-    paymentLabel,
-    shortOrderId,
-} from '@/constants/orders';
+import { formatOrderDate, isTerminalStatus, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
 
-function OrderCard({ order, index }) {
-    const status = normalizeStatus(order.status);
+const FILTERS = [
+    { key: 'all', label: 'All' },
+    { key: 'active', label: 'In progress' },
+    { key: 'delivered', label: 'Delivered' },
+    { key: 'cancelled', label: 'Cancelled' },
+];
+
+function OrderCard({ order }) {
     const firstItem = order.items?.[0];
     const itemCount = order.items?.length || 0;
-    const active = !isTerminalStatus(order.status);
     const { addToCart } = useCart();
     const { products } = useProducts();
     const { showToast } = useToast();
-    const [reordering, setReordering] = useState(false);
 
-    const handleBuyAgain = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (reordering) return;
-        setReordering(true);
+    const buyAgain = () => {
         const result = reorderItems(order, products, addToCart);
         showToast(reorderSummaryMessage(result), result.addedCount > 0 ? 'success' : 'error');
-        setReordering(false);
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.06, duration: 0.4 }}
-        >
-            <Link
-                to={`/orders/${order.id}`}
-                className="group block bg-canvas rounded-2xl border border-line/40 overflow-hidden hover:border-primary/20 hover:shadow-md transition-all duration-300"
-            >
-                <div className="p-5 sm:p-6">
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                        <div>
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-muted mb-1">Order</p>
-                            <p className="font-mono text-sm text-ink">{shortOrderId(order.id)}</p>
-                            <p className="text-xs text-muted mt-1">{formatOrderDate(order.createdAt)}</p>
-                        </div>
-                        <OrderStatusBadge status={order.status} audience="user" />
-                    </div>
-
-                    <div className="flex gap-3 mb-4">
-                        {firstItem?.image && (
-                            <div className="relative flex-shrink-0">
-                                <img
-                                    src={imageUrl(firstItem.image)}
-                                    alt=""
-                                    className="w-16 h-20 object-cover rounded-xl bg-sand"
-                                />
-                                {itemCount > 1 && (
-                                    <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-canvas text-[10px] flex items-center justify-center font-medium">
-                                        +{itemCount - 1}
-                                    </span>
-                                )}
-                            </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                            <p className="text-ink font-medium line-clamp-2 group-hover:text-primary transition-colors">
-                                {firstItem?.title || 'Your order'}
-                            </p>
-                            {itemCount > 1 && (
-                                <p className="text-xs text-muted mt-1">
-                                    + {itemCount - 1} more piece{itemCount - 1 === 1 ? '' : 's'}
-                                </p>
-                            )}
-                            <p className="font-display text-xl text-ink mt-2">{formatPrice(order.total)}</p>
-                        </div>
-                    </div>
-
-                    {active && (
-                        <div className="mb-4">
-                            <OrderJourney order={order} variant="compact" />
-                        </div>
-                    )}
-
-                    <div className="flex items-center justify-between gap-3 pt-3 border-t border-line/30">
-                        <p className="text-xs text-muted">{paymentLabel(order)}</p>
-                        <div className="flex items-center gap-4 flex-shrink-0">
-                            <button
-                                type="button"
-                                onClick={handleBuyAgain}
-                                disabled={reordering}
-                                className="inline-flex items-center gap-1.5 text-sm text-accent-ink font-medium hover:text-accent-hover transition-colors disabled:opacity-50"
-                            >
-                                <RotateCcw size={14} /> Buy Again
-                            </button>
-                            <span className="inline-flex items-center gap-1 text-sm text-primary font-medium group-hover:gap-2 transition-all">
-                                Track order <ChevronRight size={16} />
-                            </span>
-                        </div>
-                    </div>
+        <li className="relative rounded-lg border border-line bg-surface p-5 transition-shadow hover:shadow-md sm:p-6">
+            <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                    <p className="text-caption font-semibold uppercase tracking-wider text-muted">Order</p>
+                    <p className="font-mono text-small text-ink">{shortOrderId(order.id)}</p>
+                    <p className="mt-1 text-caption text-muted">{formatOrderDate(order.createdAt)}</p>
                 </div>
+                <OrderStatusBadge status={order.status} audience="user" />
+            </div>
 
-                {status === 'delivered' && (
-                    <div className="px-5 py-2.5 bg-gradient-to-r from-accent/10 to-primary/5 border-t border-accent/20 text-xs text-accent-ink flex items-center gap-2">
-                        <Sparkles size={12} />
-                        Delivered. We hope it's working wonders for you
+            <div className="mb-4 flex gap-3">
+                {firstItem?.image && (
+                    <div className="relative shrink-0">
+                        <img src={imageUrl(firstItem.image)} alt="" width="64" height="80" loading="lazy" className="h-20 w-16 rounded-md bg-canvas-alt object-cover" />
+                        {itemCount > 1 && <span className="absolute -bottom-1 -right-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-semibold text-white">+{itemCount - 1}</span>}
                     </div>
                 )}
-            </Link>
-        </motion.div>
+                <div className="min-w-0 flex-1">
+                    <Link to={`/orders/${order.id}`} className="line-clamp-2 font-medium text-ink after:absolute after:inset-0 hover:text-primary">{firstItem?.title || 'Your order'}</Link>
+                    {itemCount > 1 && <p className="mt-1 text-caption text-muted">+ {itemCount - 1} more item{itemCount - 1 === 1 ? '' : 's'}</p>}
+                    <p className="mt-2 font-display text-h4">{formatPrice(order.total)}</p>
+                </div>
+            </div>
+
+            {!isTerminalStatus(order.status) && <div className="mb-4"><OrderJourney order={order} variant="compact" /></div>}
+
+            <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
+                <p className="text-caption text-muted">{paymentLabel(order)}</p>
+                <div className="flex items-center gap-4">
+                    <button type="button" onClick={buyAgain} className="relative z-10 inline-flex items-center gap-1.5 text-small font-medium text-primary hover:underline"><RotateCcw size={14} aria-hidden="true" /> Buy again</button>
+                    <span className="inline-flex items-center gap-1 text-small font-medium text-primary">Track <ChevronRight size={16} aria-hidden="true" /></span>
+                </div>
+            </div>
+        </li>
     );
 }
 
@@ -135,104 +85,52 @@ export default function OrdersPage() {
             setLoading(false);
             return;
         }
-        api.get('/api/orders', token)
-            .then(setOrders)
-            .catch(() => setOrders([]))
-            .finally(() => setLoading(false));
+        api.get('/api/orders', token).then(setOrders).catch(() => setOrders([])).finally(() => setLoading(false));
     }, [isAuthenticated, token]);
 
     const filtered = useMemo(() => {
-        if (filter === 'all') return orders;
         if (filter === 'active') return orders.filter((o) => !isTerminalStatus(o.status));
         if (filter === 'delivered') return orders.filter((o) => normalizeStatus(o.status) === 'delivered');
         if (filter === 'cancelled') return orders.filter((o) => ['cancelled', 'returned'].includes(normalizeStatus(o.status)));
         return orders;
     }, [orders, filter]);
 
-    const activeCount = orders.filter((o) => !isTerminalStatus(o.status)).length;
-
     if (!isAuthenticated) {
-        return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center px-6 text-center">
-                <Package size={40} className="text-primary/30 mb-4" />
-                <h1 className="font-display text-3xl mb-3">Your Orders</h1>
-                <p className="text-muted mb-6 max-w-sm">
-                    Sign in to track your orders from our warehouse to your doorstep.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <Link to={loginUrl('/orders')}><Button variant="turmeric">Sign In</Button></Link>
-                    <Link to="/shop"><Button variant="outline">Continue Shopping</Button></Link>
-                </div>
-            </div>
-        );
+        return <SignInPrompt icon={Package} title="Your orders" description="Sign in to track your orders from our warehouse to your doorstep." redirect="/orders" />;
     }
 
+    const activeCount = orders.filter((o) => !isTerminalStatus(o.status)).length;
+
     return (
-        <div className="pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-canvas pt-4 sm:pt-8">
-            <div className="max-w-3xl mx-auto">
-                <div className="mb-8">
-                    <Link to="/account" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary mb-4 transition-colors">
-                        <ArrowLeft size={16} /> Back to account
-                    </Link>
-                    <h1 className="font-display text-3xl md:text-4xl text-ink mb-2">Your Orders</h1>
-                    <p className="text-muted">
-                        {activeCount > 0
-                            ? `${activeCount} order${activeCount === 1 ? '' : 's'} on the way. Follow each journey below`
-                            : 'Every order, all in one place'}
-                    </p>
+        <>
+            <PageHeader
+                crumbs={[{ label: 'Account', href: '/account' }, { label: 'Orders' }]}
+                title="Your orders"
+                description={activeCount > 0 ? `${activeCount} order${activeCount === 1 ? '' : 's'} on the way. Follow each journey below.` : 'Every order, all in one place.'}
+            />
+            <div className="container-page py-8 lg:py-12">
+                <div className="mx-auto max-w-3xl">
+                    {orders.length > 0 && (
+                        <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filter orders">
+                            {FILTERS.map((f) => <Chip key={f.key} active={filter === f.key} onClick={() => setFilter(f.key)}>{f.label}</Chip>)}
+                        </div>
+                    )}
+
+                    {loading ? (
+                        <div className="space-y-4"><Skeleton className="h-56 rounded-lg" /><Skeleton className="h-56 rounded-lg" /></div>
+                    ) : filtered.length === 0 ? (
+                        <EmptyState
+                            icon={Package}
+                            title={filter === 'all' ? 'No orders yet' : `No ${filter} orders`}
+                            description={filter === 'all' ? "When you place an order, you'll see a live journey here." : 'Try a different filter to see other orders.'}
+                            actionLabel={filter === 'all' ? 'Discover products' : undefined}
+                            actionHref="/shop"
+                        />
+                    ) : (
+                        <ul className="space-y-4">{filtered.map((order) => <OrderCard key={order.id} order={order} />)}</ul>
+                    )}
                 </div>
-
-                {orders.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        {[
-                            { key: 'all', label: 'All' },
-                            { key: 'active', label: 'In progress' },
-                            { key: 'delivered', label: 'Delivered' },
-                            { key: 'cancelled', label: 'Cancelled' },
-                        ].map((f) => (
-                            <button
-                                key={f.key}
-                                type="button"
-                                onClick={() => setFilter(f.key)}
-                                className={`px-4 py-1.5 rounded-full text-sm transition-colors ${
-                                    filter === f.key
-                                        ? 'bg-primary text-canvas'
-                                        : 'bg-canvas border border-line/40 text-muted hover:text-ink'
-                                }`}
-                            >
-                                {f.label}
-                            </button>
-                        ))}
-                    </div>
-                )}
-
-                {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" />
-                    </div>
-                ) : filtered.length === 0 ? (
-                    <div className="bg-canvas rounded-2xl p-12 text-center border border-line/40">
-                        <Package size={36} className="text-primary/20 mx-auto mb-4" />
-                        <p className="text-ink font-medium mb-2">
-                            {filter === 'all' ? 'No orders yet' : `No ${filter} orders`}
-                        </p>
-                        <p className="text-muted text-sm mb-6">
-                            {filter === 'all'
-                                ? 'When you place an order, you\'ll see a live journey here.'
-                                : 'Try a different filter to see other orders.'}
-                        </p>
-                        {filter === 'all' && (
-                            <Link to="/shop"><Button variant="turmeric">Discover Collection</Button></Link>
-                        )}
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {filtered.map((order, i) => (
-                            <OrderCard key={order.id} order={order} index={i} />
-                        ))}
-                    </div>
-                )}
             </div>
-        </div>
+        </>
     );
 }
