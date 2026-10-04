@@ -28,7 +28,7 @@ export default function ProductSection({ eyebrow, title, products, loading = fal
                     title={title}
                     align="left"
                     action={(
-                        <Link to="/shop" className="inline-flex items-center gap-1.5 text-small font-medium text-primary hover:underline">
+                        <Link to="/shop" className="inline-flex min-h-11 items-center gap-1.5 text-small font-medium text-primary hover:underline">
                             {viewAllLabel} <ArrowRight size={16} aria-hidden="true" />
                         </Link>
                     )}

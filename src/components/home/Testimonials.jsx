@@ -29,7 +29,7 @@ export default function Testimonials() {
                     ))}
                 </ul>
                 <p className="mt-8 text-center">
-                    <Link to="/reviews" className="text-small font-medium text-primary hover:underline">Read all reviews</Link>
+                    <Link to="/reviews" className="inline-flex min-h-11 items-center text-small font-medium text-primary hover:underline">Read all reviews</Link>
                 </p>
             </div>
         </section>

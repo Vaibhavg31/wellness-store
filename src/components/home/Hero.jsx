@@ -12,12 +12,13 @@ export default function Hero({ products, loading = false }) {
     const { content } = useSiteContent();
     const hero = content.hero;
 
-    const featured = useMemo(() => {
-        const withImage = products.filter((p) => p.images?.[0]);
-        return withImage.find((p) => p.id === hero.featuredProductId) ?? withImage.find((p) => p.isBestSeller) ?? withImage[0] ?? null;
-    }, [products, hero.featuredProductId]);
-
-    const image = featured?.images?.[0] ?? hero.images?.[0];
+    const withImage = useMemo(() => products.filter((p) => p.images?.[0]), [products]);
+    // An admin-pinned product drives the hero image; otherwise the image comes straight from site
+    // content so it can start loading before the catalogue request returns (keeps LCP early).
+    const pinned = hero.featuredProductId ? withImage.find((p) => p.id === hero.featuredProductId) : null;
+    const featured = pinned ?? withImage.find((p) => p.isBestSeller) ?? withImage[0] ?? null;
+    const waitingForPinned = Boolean(hero.featuredProductId) && loading;
+    const image = pinned?.images[0] ?? hero.images?.[0] ?? featured?.images?.[0];
 
     return (
         <section className="relative overflow-hidden bg-canvas">
@@ -56,11 +57,11 @@ export default function Hero({ products, loading = false }) {
 
                 <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
                     <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-primary-tint" aria-hidden="true" />
-                    {loading && <div className="skeleton aspect-[9/10] w-full rounded-xl" aria-hidden="true" />}
-                    {!loading && image && (
+                    {waitingForPinned && <div className="skeleton aspect-[9/10] w-full rounded-xl" aria-hidden="true" />}
+                    {!waitingForPinned && image && (
                         <img
                             src={imageUrl(image, 800)}
-                            alt={featured?.title ?? ''}
+                            alt={pinned?.title ?? 'Chikit Ayurvedic wellness products'}
                             width="720"
                             height="800"
                             fetchPriority="high"
@@ -68,7 +69,7 @@ export default function Hero({ products, loading = false }) {
                             className="aspect-[9/10] w-full rounded-xl object-cover shadow-lg"
                         />
                     )}
-                    {!loading && featured && (
+                    {featured && (
                         <Link
                             to={`/product/${featured.id}`}
                             className="absolute -bottom-5 left-4 right-4 flex items-center justify-between gap-4 rounded-lg bg-surface p-4 shadow-md transition-shadow hover:shadow-lg sm:left-auto sm:right-6 sm:w-72"
