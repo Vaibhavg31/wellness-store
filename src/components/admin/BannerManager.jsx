@@ -5,6 +5,7 @@ import { useAdminAuth } from '@/contexts/AuthContext';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Drawer from '@/components/ui/Drawer';
+import { ImageUploadField } from '@/components/admin/ContentEditor';
 import {
     AdminSummaryGrid,
     AdminTableShell,
@@ -14,10 +15,10 @@ import {
     AdminStatusPill,
 } from '@/components/admin/AdminUi';
 
-const TARGET_LABELS = { slider: 'Slider only', stacked: 'Stacked only', both: 'Both', product: 'This product page' };
+const TARGET_LABELS = { slider: 'Full-width slider only', stacked: 'Stacked only', both: 'Both', product: 'This product page' };
 
 function emptyForm(defaultTarget, productId) {
-    return { title: '', subtitle: '', image: '', ctaLabel: '', ctaHref: '', order: 0, isEnabled: true, displayTarget: defaultTarget, productId: productId ?? null };
+    return { title: '', subtitle: '', image: '', mobileImage: '', ctaLabel: '', ctaHref: '', order: 0, isEnabled: true, displayTarget: defaultTarget, productId: productId ?? null };
 }
 
 /**
@@ -83,6 +84,7 @@ export default function BannerManager({ filterTarget, productId }) {
             title: banner.title || '',
             subtitle: banner.subtitle || '',
             image: banner.image || '',
+            mobileImage: banner.mobileImage || '',
             ctaLabel: banner.ctaLabel || '',
             ctaHref: banner.ctaHref || '',
             order: banner.order,
@@ -143,7 +145,7 @@ export default function BannerManager({ filterTarget, productId }) {
                         ? 'Shown only on this product’s own page — add as many as you like, they rotate automatically when there’s more than one.'
                         : filterTarget
                             ? `Showing banners tagged for this section (or "Both"). ${banners.length - visibleBanners.length > 0 ? `${banners.length - visibleBanners.length} more tagged for the other section or a product page only.` : ''}`
-                            : 'Images shown here power both Banner Slider (Rotating) and Image Banners (Stacked). Product-page banners are managed from each product’s own edit screen.'}
+                            : 'Images shown here power both Full-width Banner Slider and Image Banners (Stacked). Product-page banners are managed from each product’s own edit screen.'}
                 </p>
                 <Button variant="turmeric" size="sm" onClick={openNew} className="gap-1.5 flex-shrink-0"><Plus size={14} /> Add Banner</Button>
             </div>
@@ -237,8 +239,8 @@ export default function BannerManager({ filterTarget, productId }) {
                                     </button>
                                 </div>
                                 <div>
-                                    <p className="text-[11px] text-admin-muted mb-1.5">How this will look on mobile (used everywhere):</p>
-                                    <img src={imageUrl(form.image)} alt="" className="w-full max-w-xs aspect-[16/9] object-cover rounded-xl border border-admin-border" />
+                                    <p className="text-[11px] text-admin-muted mb-1.5">How this looks on a phone:</p>
+                                    <img src={imageUrl(form.mobileImage || form.image)} alt="" className={`w-full max-w-[12rem] object-cover rounded-xl border border-admin-border ${form.mobileImage ? "aspect-[4/5]" : "aspect-[16/10]"}`} />
                                 </div>
                             </div>
                         ) : (
@@ -260,6 +262,13 @@ export default function BannerManager({ filterTarget, productId }) {
                             </label>
                         )}
                     </div>
+                    <ImageUploadField
+                        label="Phone image (optional)"
+                        hint="A portrait picture (about 1080×1350, 4:5) shown instead of the wide image on phones. Skip it and the wide image is cropped to fit."
+                        value={form.mobileImage}
+                        onChange={(v) => setForm((prev) => ({ ...prev, mobileImage: v }))}
+                        adminToken={adminToken}
+                    />
                     <Input label="Title (optional)" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Festival Sale is Live" />
                     <Input label="Subtitle (optional)" value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} placeholder="Up to 30% off" />
                     <Input label="Button label (optional)" value={form.ctaLabel} onChange={(e) => setForm({ ...form, ctaLabel: e.target.value })} placeholder="Shop the Sale" />
@@ -278,7 +287,7 @@ export default function BannerManager({ filterTarget, productId }) {
                             className="w-full px-4 py-3 bg-admin-surface-alt border border-line text-ink rounded-lg text-sm focus:outline-none focus:border-accent-ink focus:ring-1 focus:ring-accent-ink/30"
                         >
                             <option value="both">Both — Slider and Stacked</option>
-                            <option value="slider">Banner Slider only (rotating)</option>
+                            <option value="slider">Full-width Banner Slider only</option>
                             <option value="stacked">Image Banners only (stacked)</option>
                         </select>
                     </div>

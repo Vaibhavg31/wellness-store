@@ -5,6 +5,7 @@ import VideoBanner from '@/components/home/VideoBanner';
 import { BannerSlider, PromoBanners } from '@/components/home/BannerSection';
 import CategoryGrid from '@/components/home/CategoryGrid';
 import ConcernShelf from '@/components/home/ConcernShelf';
+import CategoryShelves from '@/components/home/CategoryShelves';
 import ProductSection from '@/components/home/ProductSection';
 import BundleSection from '@/components/home/BundleSection';
 import WhyChoose from '@/components/home/WhyChoose';
@@ -24,6 +25,7 @@ function buildSections({ products, loading, trending, featured }) {
         hero: () => <Hero products={products} loading={loading} />,
         brandMarquee: () => <TrustStrip />,
         videoBanner: () => <VideoBanner />,
+        categoryShelves: () => <CategoryShelves products={products} loading={loading} />,
         banners: () => <PromoBanners />,
         bannerSlider: () => <BannerSlider />,
         featured: () => (

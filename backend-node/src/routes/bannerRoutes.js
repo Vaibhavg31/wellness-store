@@ -39,6 +39,7 @@ router.post('/banners', asyncRoute(async (req, res) => {
         title: body.title ?? '',
         subtitle: body.subtitle ?? '',
         image: body.image,
+        mobileImage: String(body.mobileImage ?? '').slice(0, 2048),
         ctaLabel: body.ctaLabel ?? '',
         ctaHref: body.ctaHref ?? '',
         isEnabled: Boolean(body.isEnabled ?? true),
@@ -52,7 +53,7 @@ router.post('/banners', asyncRoute(async (req, res) => {
 
 router.put('/banners/:id', asyncRoute(async (req, res) => {
     requireAdmin(req);
-    const allowed = ['title', 'subtitle', 'image', 'ctaLabel', 'ctaHref', 'isEnabled', 'displayTarget', 'productId', 'order'];
+    const allowed = ['title', 'subtitle', 'image', 'mobileImage', 'ctaLabel', 'ctaHref', 'isEnabled', 'displayTarget', 'productId', 'order'];
     const body = req.body || {};
     const changes = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
 

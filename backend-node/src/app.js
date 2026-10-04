@@ -20,6 +20,7 @@ import mediaRoutes from './routes/mediaRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import spinRoutes from './routes/spinRoutes.js';
+import offerRoutes from './routes/offerRoutes.js';
 import bundleRoutes from './routes/bundleRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -85,6 +86,7 @@ export function createApp() {
     app.use('/api', productRoutes);
     app.use('/api', couponRoutes);
     app.use('/api', spinRoutes);
+    app.use('/api', offerRoutes);
     app.use('/api', bundleRoutes);
     app.use('/api', authRoutes);
     app.use('/api', userRoutes);

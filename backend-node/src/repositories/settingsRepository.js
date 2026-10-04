@@ -51,7 +51,7 @@ const DEFAULTS = {
         { label: 'Contact', href: '/contact' },
     ],
     sections: {
-        hero: true, videoBanner: true, brandMarquee: true, banners: true, bannerSlider: true,
+        hero: true, videoBanner: true, brandMarquee: true, bannerSlider: true, categoryShelves: true, banners: true,
         featured: true, trending: true, categories: true, bundles: true,
         whyChoose: true, certifiedBanner: true,
         reviews: true, instagram: true, newsletter: true, promoBanner: true,
@@ -108,6 +108,22 @@ const DEFAULTS = {
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' },
         // Spin-the-wheel popup: slices (no couponId = "better luck next time"), weights are relative odds.
         spin: { cooldownDays: 30, segments: [] },
+        // Homepage category shelves: 'auto' = every category that has products; 'custom' = the listed ones, in order.
+        shelves: { mode: 'auto', limit: 8, items: [] },
+        // Sticky edge tab that opens an "unlock your code" panel.
+        offerTab: {
+            enabled: false,
+            tabLabel: 'Get 10% OFF',
+            side: 'right',
+            couponId: '',
+            title: 'Unlock 10% off your first order',
+            subtitle: 'Join the Chikit circle and we will send your code right away.',
+            steps: ['Enter your email', 'Get your coupon code instantly', 'Use it at checkout'],
+            requireEmail: true,
+            buttonLabel: 'Unlock my code',
+            delaySeconds: 3,
+            pages: 'all',
+        },
     },
 };
 
@@ -149,6 +165,30 @@ function sanitizeExtras(input) {
                 }))
                 .filter((s) => s.label)
                 .slice(0, 8),
+        },
+        shelves: {
+            mode: e.shelves?.mode === 'custom' ? 'custom' : 'auto',
+            limit: Math.min(16, Math.max(2, Number.parseInt(e.shelves?.limit ?? d.shelves.limit, 10) || d.shelves.limit)),
+            items: (Array.isArray(e.shelves?.items) ? e.shelves.items : [])
+                .map((s) => ({ categorySlug: String(s?.categorySlug ?? '').trim().slice(0, 64), subtitle: String(s?.subtitle ?? '').trim().slice(0, 120) }))
+                .filter((s) => s.categorySlug)
+                .slice(0, 20),
+        },
+        offerTab: {
+            enabled: Boolean(e.offerTab?.enabled),
+            tabLabel: String(e.offerTab?.tabLabel ?? d.offerTab.tabLabel).trim().slice(0, 24) || d.offerTab.tabLabel,
+            side: e.offerTab?.side === 'left' ? 'left' : 'right',
+            couponId: String(e.offerTab?.couponId ?? '').trim().slice(0, 64),
+            title: String(e.offerTab?.title ?? d.offerTab.title).trim().slice(0, 90),
+            subtitle: String(e.offerTab?.subtitle ?? d.offerTab.subtitle).trim().slice(0, 200),
+            steps: (Array.isArray(e.offerTab?.steps) ? e.offerTab.steps : d.offerTab.steps)
+                .map((s) => String(s ?? '').trim().slice(0, 80))
+                .filter(Boolean)
+                .slice(0, 4),
+            requireEmail: e.offerTab?.requireEmail === undefined ? d.offerTab.requireEmail : Boolean(e.offerTab.requireEmail),
+            buttonLabel: String(e.offerTab?.buttonLabel ?? d.offerTab.buttonLabel).trim().slice(0, 30) || d.offerTab.buttonLabel,
+            delaySeconds: Math.min(120, Math.max(0, Number.parseInt(e.offerTab?.delaySeconds ?? d.offerTab.delaySeconds, 10) || 0)),
+            pages: e.offerTab?.pages === 'home' ? 'home' : 'all',
         },
     };
 }
@@ -313,7 +353,22 @@ export class SettingsRepository {
         const [rows] = await this.pool().query('SELECT section_key, is_enabled FROM site_section_toggles ORDER BY sort_order ASC');
         const result = {};
         for (const row of rows) result[row.section_key] = Boolean(row.is_enabled);
-        return result;
+
+        // Sections added in a later release aren't in an older saved list: slot each in right after the default
+        // section that precedes it, so it shows up (enabled) in the storefront and in the admin toggles.
+        const defaults = Object.keys(DEFAULTS.sections);
+        const ordered = Object.keys(result);
+        defaults.forEach((key, i) => {
+            if (key in result) return;
+            let at = 0;
+            for (let j = i - 1; j >= 0; j -= 1) {
+                const found = ordered.indexOf(defaults[j]);
+                if (found !== -1) { at = found + 1; break; }
+            }
+            ordered.splice(at, 0, key);
+            result[key] = DEFAULTS.sections[key];
+        });
+        return Object.fromEntries(ordered.map((key) => [key, result[key]]));
     }
 
     async writeToDb(s) {

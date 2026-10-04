@@ -79,8 +79,9 @@ export const DEFAULT_SITE_CONTENT = {
         hero: true,
         videoBanner: true,
         brandMarquee: true,
-        banners: true,
         bannerSlider: true,
+        categoryShelves: true,
+        banners: true,
         featured: true,
         trending: true,
         categories: true,
@@ -243,6 +244,20 @@ export const DEFAULT_SITE_CONTENT = {
         concerns: [], // [{ label, search, image }] → "Shop by concern" on the homepage
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' }, // extra popup options; see AnnouncementPopup
         spin: { cooldownDays: 30, segments: [] }, // spin-the-wheel slices: [{ label, couponId, weight }]
+        shelves: { mode: 'auto', limit: 8, items: [] }, // homepage category shelves: custom items = [{ categorySlug, subtitle }]
+        offerTab: {
+            enabled: false,
+            tabLabel: 'Get 10% OFF',
+            side: 'right',
+            couponId: '',
+            title: 'Unlock 10% off your first order',
+            subtitle: 'Join the Chikit circle and we will send your code right away.',
+            steps: ['Enter your email', 'Get your coupon code instantly', 'Use it at checkout'],
+            requireEmail: true,
+            buttonLabel: 'Unlock my code',
+            delaySeconds: 3,
+            pages: 'all',
+        },
     },
 
     seo: {

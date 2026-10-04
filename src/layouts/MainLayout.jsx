@@ -4,6 +4,7 @@ import Footer from '@/components/layout/Footer';
 import PageTransition from '@/components/layout/PageTransition';
 import CartDrawer from '@/components/cart/CartDrawer';
 import SiteSchema from '@/components/seo/SiteSchema';
+import OfferTab from '@/components/offer/OfferTab';
 
 export default function MainLayout() {
     return (
@@ -19,6 +20,7 @@ export default function MainLayout() {
                 <PageTransition />
             </main>
             <Footer />
+            <OfferTab />
         </div>
     );
 }

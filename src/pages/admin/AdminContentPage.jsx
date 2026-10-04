@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Store, Home, FileText, MessageCircle, Megaphone, Bell, Truck,
+    Store, Home, FileText, MessageCircle, Megaphone, Bell, Truck, Gift,
 } from 'lucide-react';
 import { api, ApiError } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import { deepMerge } from '@/utils/deepMerge';
 import { prepareSiteContentForSave } from '@/utils/prepareSiteContentForSave';
 import Button from '@/components/ui/Button';
 import { PopupDialog } from '@/components/layout/AnnouncementPopup';
+import OfferPanel from '@/components/offer/OfferPanel';
 import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
@@ -28,6 +29,7 @@ const TABS = [
     { id: 'contact', label: 'Contact & FAQ', icon: MessageCircle },
     { id: 'promo', label: 'SEO & Meta', icon: Megaphone },
     { id: 'popup', label: 'Announcement Popup', icon: Bell },
+    { id: 'offer', label: 'Sticky Offer Tab', icon: Gift },
     { id: 'experience', label: 'Delivery & Store Options', icon: Truck },
 ];
 
@@ -40,7 +42,8 @@ const SECTION_LABELS = {
     videoBanner: 'Video Banner',
     brandMarquee: 'Brand Marquee',
     banners: 'Image Banners (Stacked)',
-    bannerSlider: 'Banner Slider (Rotating)',
+    bannerSlider: 'Full-width Banner Slider',
+    categoryShelves: 'Category Shelves (products by category)',
     featured: 'Featured Collection',
     trending: 'Trending Now',
     categories: 'Shop by Category',
@@ -63,6 +66,7 @@ export default function AdminContentPage() {
     const [categories, setCategories] = useState([]);
     const [coupons, setCoupons] = useState([]);
     const [previewing, setPreviewing] = useState(false);
+    const [previewingOffer, setPreviewingOffer] = useState(false);
     const contentRef = useRef(content);
     contentRef.current = content;
     const sectionsSavedToastRef = useRef(null);
@@ -328,8 +332,9 @@ export default function AdminContentPage() {
                 return (
                     <div className="pt-3 space-y-3">
                         <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
-                            Full-width rotating carousel — one image visible at a time, auto-advancing.
-                            Not the same as "Image Banners (Stacked)" below. Tag a banner "Both" to show it in both places.
+                            A full-width slider that runs edge to edge: one banner at a time, auto-advancing, swipeable on phones.
+                            Use it for sales, announcements or brand images. Add a separate phone image to each banner so it
+                            looks right on mobile. Not the same as "Image Banners (Stacked)" below.
                         </p>
                         <BannerManager filterTarget="slider" />
                     </div>
@@ -460,6 +465,66 @@ export default function AdminContentPage() {
                         Shows products marked "Trending" in{' '}
                         <Link to={`${ADMIN_PATH}/products`} className="text-primary font-medium hover:underline">Products</Link>. No extra content to configure here.
                     </p>
+                );
+
+            case 'categoryShelves':
+                return (
+                    <div className="space-y-4 pt-3">
+                        <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
+                            Puts products first: a sticky bar of category buttons, and under it one swipeable row of products per category.
+                            Drag this section higher or lower in the list above to place it.
+                        </p>
+                        <AdminField label="Which categories">
+                            <AdminSelect
+                                aria-label="Shelf mode"
+                                value={content.extras.shelves.mode}
+                                onChange={(e) => updateExtras({ shelves: { ...content.extras.shelves, mode: e.target.value } })}
+                                className="w-full sm:w-80"
+                                options={[
+                                    { value: 'auto', label: 'All categories that have products (automatic)' },
+                                    { value: 'custom', label: 'Only the ones I choose, in my order' },
+                                ]}
+                            />
+                        </AdminField>
+                        <AdminField label="Products per shelf" hint="2 to 16. Shoppers can open 'View all' for the rest.">
+                            <Input type="number" min={2} max={16} className="w-28" value={content.extras.shelves.limit} onChange={(e) => updateExtras({ shelves: { ...content.extras.shelves, limit: Number(e.target.value) || 8 } })} />
+                        </AdminField>
+                        {content.extras.shelves.mode === 'custom' && (
+                            <div className="space-y-3">
+                                {content.extras.shelves.items.map((item, index) => {
+                                    const items = content.extras.shelves.items;
+                                    const patch = (change) => updateExtras({ shelves: { ...content.extras.shelves, items: items.map((s, i) => (i === index ? { ...s, ...change } : s)) } });
+                                    const move = (by) => {
+                                        const next = [...items];
+                                        const [moved] = next.splice(index, 1);
+                                        next.splice(index + by, 0, moved);
+                                        updateExtras({ shelves: { ...content.extras.shelves, items: next } });
+                                    };
+                                    return (
+                                        <div key={index} className="grid gap-3 rounded-lg border border-admin-border p-3 sm:grid-cols-[1fr_1.4fr_auto] sm:items-end">
+                                            <AdminField label={`Shelf ${index + 1}`}>
+                                                <AdminSelect
+                                                    aria-label={`Shelf ${index + 1} category`}
+                                                    value={item.categorySlug}
+                                                    onChange={(e) => patch({ categorySlug: e.target.value })}
+                                                    className="w-full"
+                                                    options={[{ value: '', label: 'Choose a category' }, ...categories.map((c) => ({ value: c.slug, label: c.label }))]}
+                                                />
+                                            </AdminField>
+                                            <AdminField label="Subtitle (optional)"><Input value={item.subtitle} maxLength={120} placeholder="Fresh picks this month" onChange={(e) => patch({ subtitle: e.target.value })} /></AdminField>
+                                            <div className="flex gap-2">
+                                                <Button variant="outline" size="sm" disabled={index === 0} onClick={() => move(-1)} aria-label="Move shelf up">↑</Button>
+                                                <Button variant="outline" size="sm" disabled={index === items.length - 1} onClick={() => move(1)} aria-label="Move shelf down">↓</Button>
+                                                <Button variant="outline" size="sm" onClick={() => updateExtras({ shelves: { ...content.extras.shelves, items: items.filter((_, i) => i !== index) } })}>Remove</Button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                <Button variant="outline" size="sm" onClick={() => updateExtras({ shelves: { ...content.extras.shelves, items: [...content.extras.shelves.items, { categorySlug: '', subtitle: '' }] } })}>Add shelf</Button>
+                                {content.extras.shelves.items.length === 0 && <p className="text-caption text-admin-muted">No shelves chosen yet, so every category with products is shown.</p>}
+                            </div>
+                        )}
+                    </div>
                 );
 
             case 'categories':
@@ -884,6 +949,64 @@ export default function AdminContentPage() {
                                     onDismiss={() => setPreviewing(false)}
                                 />
                             )}
+                        </AdminSection>
+                    )}
+
+                    {tab === 'offer' && (
+                        <AdminSection
+                            title="Sticky Offer Tab"
+                            description="A small tab fixed to the edge of every page (e.g. “Get 10% OFF”). Shoppers tap it, see how the offer works, and unlock the coupon code. The code is only revealed by the server, so it never appears in the page source."
+                        >
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" className="h-4 w-4 accent-primary" checked={content.extras.offerTab.enabled} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, enabled: e.target.checked } })} />
+                                <span className="text-sm text-ink">Show the offer tab on the website</span>
+                            </label>
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <AdminField label="Coupon to give" hint="Create coupons under Coupons. If it expires or runs out, the tab says the offer has ended.">
+                                    <AdminSelect
+                                        aria-label="Offer coupon"
+                                        value={content.extras.offerTab.couponId}
+                                        onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, couponId: e.target.value } })}
+                                        className="w-full"
+                                        options={[{ value: '', label: 'Choose a coupon' }, ...coupons.map((c) => ({ value: c.id, label: `${c.code}${c.isEnabled ? '' : ' (disabled)'}` }))]}
+                                    />
+                                </AdminField>
+                                <AdminField label="Text on the tab"><Input maxLength={24} value={content.extras.offerTab.tabLabel} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, tabLabel: e.target.value } })} /></AdminField>
+                            </div>
+
+                            <AdminField label="Panel heading"><Input maxLength={90} value={content.extras.offerTab.title} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, title: e.target.value } })} /></AdminField>
+                            <AdminField label="Panel description"><AdminTextarea rows={2} maxLength={200} value={content.extras.offerTab.subtitle} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, subtitle: e.target.value } })} /></AdminField>
+
+                            <AdminField label="How it works (up to 4 steps)">
+                                <StringListEditor
+                                    items={content.extras.offerTab.steps}
+                                    onChange={(steps) => updateExtras({ offerTab: { ...content.extras.offerTab, steps: steps.slice(0, 4) } })}
+                                    placeholder="e.g. Enter your email"
+                                />
+                            </AdminField>
+
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" className="h-4 w-4 accent-primary" checked={content.extras.offerTab.requireEmail} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, requireEmail: e.target.checked } })} />
+                                <span className="text-sm text-ink">Ask for an email before showing the code (the email is added to your newsletter list)</span>
+                            </label>
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <AdminField label="Button text"><Input maxLength={30} value={content.extras.offerTab.buttonLabel} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, buttonLabel: e.target.value } })} /></AdminField>
+                                <AdminField label="Appears after (seconds)"><Input type="number" min={0} max={120} className="w-28" value={content.extras.offerTab.delaySeconds} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, delaySeconds: Number(e.target.value) || 0 } })} /></AdminField>
+                                <AdminField label="Side of the screen">
+                                    <AdminSelect aria-label="Tab side" value={content.extras.offerTab.side} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, side: e.target.value } })} className="w-full" options={[{ value: 'right', label: 'Right edge' }, { value: 'left', label: 'Left edge' }]} />
+                                </AdminField>
+                                <AdminField label="Where it appears" hint="Never in checkout, sign-in or this admin.">
+                                    <AdminSelect aria-label="Tab pages" value={content.extras.offerTab.pages} onChange={(e) => updateExtras({ offerTab: { ...content.extras.offerTab, pages: e.target.value } })} className="w-full" options={[{ value: 'all', label: 'Any storefront page' }, { value: 'home', label: 'Homepage only' }]} />
+                                </AdminField>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Button variant="outline" size="sm" onClick={() => setPreviewingOffer(true)}>Preview panel</Button>
+                                <span className="text-caption text-admin-muted">Uses your unsaved edits and never sends anything.</span>
+                            </div>
+                            {previewingOffer && <OfferPanel offer={content.extras.offerTab} onClose={() => setPreviewingOffer(false)} preview />}
                         </AdminSection>
                     )}
 

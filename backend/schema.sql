@@ -443,6 +443,7 @@ CREATE TABLE `promo_banners` (
   `title` varchar(255) DEFAULT NULL,
   `subtitle` varchar(500) DEFAULT NULL,
   `image` varchar(2048) NOT NULL,
+  `mobile_image` varchar(2048) DEFAULT NULL COMMENT 'Optional phone-sized artwork',
   `cta_label` varchar(100) DEFAULT NULL,
   `cta_href` varchar(500) DEFAULT NULL,
   `display_target` enum('slider','stacked','both','product') NOT NULL DEFAULT 'both' COMMENT 'slider/stacked/both for homepage sections, product for a single product page',
