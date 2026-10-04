@@ -5,7 +5,7 @@
  *
  * Brand anchor: #602460, sampled from the official logo.
  * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): primary/white 10.9, ink/canvas 15,
- * muted/canvas 6.0, accent-ink/canvas 5.6, white/danger 6.5, white/success 5.1.
+ * muted/canvas 6.0, accent-ink/canvas 5.6, white/danger 6.5, white/success 6.4, success/tint 5.7, warning/tint 5.4.
  * Gold (accent) is a FILL colour only: pair it with ink text, never white.
  */
 @theme {
@@ -33,9 +33,9 @@
   --color-line-strong:    #9A8794;  /* input borders (3:1 on white) */
 
   /* Status */
-  --color-success:        #2E7D4F;
+  --color-success:        #276B43;
   --color-success-tint:   #E6F3EB;
-  --color-warning:        #B26A00;
+  --color-warning:        #8F5400;
   --color-warning-tint:   #FCF0DC;
   --color-danger:         #B3261E;
   --color-danger-tint:    #FBE9E7;

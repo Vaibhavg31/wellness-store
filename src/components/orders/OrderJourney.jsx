@@ -27,8 +27,8 @@ function StepIcon({ step, active, done, terminal }) {
 
     if (terminal) {
         return (
-            <div className="w-11 h-11 rounded-full bg-red-50 border-2 border-red-200 flex items-center justify-center">
-                <Icon size={18} className="text-red-600" />
+            <div className="w-11 h-11 rounded-full bg-danger-tint border-2 border-danger/30 flex items-center justify-center">
+                <Icon size={18} className="text-danger" />
             </div>
         );
     }
@@ -79,8 +79,8 @@ export default function OrderJourney({ order, variant = 'full' }) {
 
         return (
             <div className="rounded-2xl bg-gradient-to-br from-sand/60 to-canvas border border-line/40 p-6 sm:p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-4">
-                    <Icon size={28} className="text-red-600" />
+                <div className="w-16 h-16 rounded-full bg-danger-tint border border-danger/30 flex items-center justify-center mx-auto mb-4">
+                    <Icon size={28} className="text-danger" />
                 </div>
                 <p className="font-display text-2xl text-ink mb-2">{getStatusLabel(status, 'user')}</p>
                 <p className="text-muted text-sm max-w-sm mx-auto">{meta.message}</p>

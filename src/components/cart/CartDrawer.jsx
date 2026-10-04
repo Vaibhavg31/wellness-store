@@ -61,7 +61,7 @@ export default function CartDrawer() {
             subtitle={itemCount > 0 ? `${itemCount} item${itemCount === 1 ? '' : 's'}` : undefined}
         >
             {items.length === 0 ? (
-                <EmptyState icon={ShoppingBag} title="Your bag is empty" description="Add something wellness-worthy to get started." actionLabel="Browse products" actionHref="/shop" />
+                <EmptyState icon={ShoppingBag} title="Your bag is empty" description="Add something Ayurvedic to get started." actionLabel="Browse products" actionHref="/shop" />
             ) : (
                 <div className="flex min-h-full flex-col">
                     <ul className="flex-1 divide-y divide-line">

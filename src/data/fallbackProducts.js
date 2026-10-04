@@ -1,7 +1,7 @@
 /** Curated showcase products — used when the API is unreachable in dev. */
 export const FALLBACK_PRODUCTS = [
     {
-        id: 'wellness-protein-001',
+        id: 'chikit-protein-001',
         title: 'Whey Protein Isolate — Chocolate',
         price: 2499,
         originalPrice: 3499,
@@ -22,7 +22,7 @@ export const FALLBACK_PRODUCTS = [
         isPublished: true,
     },
     {
-        id: 'wellness-vitamins-001',
+        id: 'chikit-vitamins-001',
         title: 'Vitamin D3 + K2 Drops',
         price: 899,
         originalPrice: 1299,
@@ -42,7 +42,7 @@ export const FALLBACK_PRODUCTS = [
         isPublished: true,
     },
     {
-        id: 'wellness-herbal-001',
+        id: 'chikit-herbal-001',
         title: 'Ashwagandha Root Extract',
         price: 799,
         originalPrice: 1099,
@@ -62,7 +62,7 @@ export const FALLBACK_PRODUCTS = [
         isPublished: true,
     },
     {
-        id: 'wellness-superfoods-001',
+        id: 'chikit-superfoods-001',
         title: 'Organic Moringa Powder',
         price: 599,
         originalPrice: 899,
@@ -82,7 +82,7 @@ export const FALLBACK_PRODUCTS = [
         isPublished: true,
     },
     {
-        id: 'wellness-protein-002',
+        id: 'chikit-protein-002',
         title: 'Plant Protein Blend — Vanilla',
         price: 2199,
         originalPrice: 2999,
@@ -102,7 +102,7 @@ export const FALLBACK_PRODUCTS = [
         isPublished: true,
     },
     {
-        id: 'wellness-vitamins-002',
+        id: 'chikit-vitamins-002',
         title: 'Multivitamin Daily Capsules',
         price: 1099,
         originalPrice: 1499,
@@ -122,7 +122,7 @@ export const FALLBACK_PRODUCTS = [
         isPublished: true,
     },
     {
-        id: 'wellness-herbal-002',
+        id: 'chikit-herbal-002',
         title: 'Turmeric Curcumin Capsules',
         price: 699,
         originalPrice: 999,
@@ -142,7 +142,7 @@ export const FALLBACK_PRODUCTS = [
         isPublished: true,
     },
     {
-        id: 'wellness-superfoods-002',
+        id: 'chikit-superfoods-002',
         title: 'Chia & Flax Seed Mix',
         price: 499,
         originalPrice: 799,

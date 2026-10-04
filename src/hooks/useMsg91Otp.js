@@ -5,7 +5,7 @@ const SCRIPT_URLS = [
 
 const WIDGET_INIT_MS = 12_000;
 
-export const MSG91_CAPTCHA_ID = 'wellness-msg91-captcha';
+export const MSG91_CAPTCHA_ID = 'chikit-msg91-captcha';
 
 export const DEV_SKIP_PHONE_VERIFY = import.meta.env.VITE_SKIP_PHONE_VERIFY === 'true';
 
@@ -125,7 +125,7 @@ export function isMsg91CaptchaVerified() {
  * @see https://msg91.com/help/sendotp/how-to-integrate-the-new-login-with-otp-widget
  */
 export async function ensureMsg91Widget(captchaRenderId = MSG91_CAPTCHA_ID) {
-    if (typeof window !== 'undefined' && window.__wellnessMsg91Ready) {
+    if (typeof window !== 'undefined' && window.__chikitMsg91Ready) {
         return;
     }
     if (widgetInitPromise) return widgetInitPromise;
@@ -155,7 +155,7 @@ export async function ensureMsg91Widget(captchaRenderId = MSG91_CAPTCHA_ID) {
             const finish = () => {
                 clearTimeout(timeoutId);
                 if (typeof window.sendOtp === 'function' && typeof window.verifyOtp === 'function') {
-                    window.__wellnessMsg91Ready = true;
+                    window.__chikitMsg91Ready = true;
                     resolve();
                 } else {
                     reject(new Error('MSG91 exposed methods (sendOtp / verifyOtp) are unavailable.'));
@@ -258,8 +258,8 @@ export async function verifyMsg91Otp(otp) {
     });
 }
 
-const WIDGET_TOKEN_KEY = 'wellness-msg91-access-token';
-const WIDGET_REQ_ID_KEY = 'wellness-msg91-req-id';
+const WIDGET_TOKEN_KEY = 'chikit-msg91-access-token';
+const WIDGET_REQ_ID_KEY = 'chikit-msg91-req-id';
 
 export function storeWidgetReqId(reqId) {
     if (typeof window === 'undefined' || !reqId) return;
@@ -351,6 +351,6 @@ export async function retryMsg91Otp(channel = null) {
 export function resetMsg91Widget() {
     widgetInitPromise = null;
     if (typeof window !== 'undefined') {
-        window.__wellnessMsg91Ready = false;
+        window.__chikitMsg91Ready = false;
     }
 }

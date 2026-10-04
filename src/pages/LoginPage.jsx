@@ -161,7 +161,7 @@ function LoginScreen() {
                 body: 'Sign in to save your address book, track this order, and check out in seconds.',
             }
             : {
-                heading: <>Wellness that fits<br />your <span className="text-primary italic">everyday</span></>,
+                heading: <>Ayurveda that fits<br />your <span className="text-primary italic">everyday</span></>,
                 body: BRAND_DESCRIPTION,
             };
 

@@ -74,7 +74,7 @@ function LineItemRow({ item, index, products, onChange, onRemove, canRemove }) {
                         <button
                             type="button"
                             onClick={() => onRemove(index)}
-                            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50"
+                            className="p-1.5 rounded-lg text-danger hover:bg-danger-tint"
                             aria-label="Remove item"
                         >
                             <Trash2 size={15} />
@@ -150,7 +150,7 @@ function DirectOrderDetailPanel({ order, adminToken, onUpdated }) {
                     <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
                             <OrderStatusBadge status={order.status} />
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-violet-100 text-violet-800 border border-violet-200 font-medium">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-primary-tint text-primary-deep border border-primary/20 font-medium">
                                 Direct
                             </span>
                         </div>
@@ -478,7 +478,7 @@ export default function AdminDirectOrdersPage() {
             {activeTab === 'create' && (
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {error && (
-                        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex gap-3">
+                        <div className="p-4 rounded-xl bg-danger-tint border border-danger/30 text-danger text-sm flex gap-3">
                             <AlertCircle size={18} className="flex-shrink-0" />
                             <span>{error}</span>
                         </div>
@@ -845,7 +845,7 @@ export default function AdminDirectOrdersPage() {
 
                     {loadingOrders ? (
                         <div className="flex justify-center py-20">
-                            <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" />
+                            <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                         </div>
                     ) : directOrders.length === 0 ? (
                         <div className="text-center py-16 px-4">

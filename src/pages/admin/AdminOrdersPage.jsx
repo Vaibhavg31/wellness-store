@@ -136,12 +136,12 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                     <div className="flex flex-wrap items-center gap-2">
                         <OrderStatusBadge status={order.status} />
                         {isDirectOrder(order) && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-violet-100 text-violet-800 border border-violet-200">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-primary-tint text-primary-deep border border-primary/20">
                                 {orderSourceLabel(order)}
                             </span>
                         )}
                         {order.refundStatus === 'refunded' && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 border border-orange-200">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-warning-tint text-warning border border-warning/30">
                                 Refunded
                             </span>
                         )}
@@ -178,7 +178,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                             size="sm"
                             disabled={updating}
                             onClick={() => updateStatus('cancelled', 'Cancelled by admin')}
-                            className="w-full normal-case tracking-normal text-xs gap-1.5 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                            className="w-full normal-case tracking-normal text-xs gap-1.5 text-danger border-danger/30 hover:bg-danger-tint hover:text-danger"
                         >
                             <XCircle size={14} />
                             Cancel order
@@ -427,7 +427,7 @@ export default function AdminOrdersPage() {
             await api.download(
                 `/api/orders/admin/export${formatParam}`,
                 adminToken,
-                `wellness-orders-${from}-to-${to}.${ext}`,
+                `chikit-orders-${from}-to-${to}.${ext}`,
             );
             setExportModalOpen(false);
         } catch (err) {
@@ -502,7 +502,7 @@ export default function AdminOrdersPage() {
                                 {label}
                             </button>
                         ))}
-                        <button type="button" disabled={bulkLoading} onClick={bulkRefund} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-orange-50 text-orange-800 border border-orange-200 hover:bg-orange-100 disabled:opacity-50">
+                        <button type="button" disabled={bulkLoading} onClick={bulkRefund} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-warning-tint text-warning border border-warning/30 hover:bg-warning-tint disabled:opacity-50">
                             <RotateCcw size={12} />
                             Refund
                         </button>
@@ -571,7 +571,7 @@ export default function AdminOrdersPage() {
                                             <td className="p-4">
                                                 <p className="font-mono text-xs text-ink">{shortOrderId(order.id)}</p>
                                                 {isDirectOrder(order) && (
-                                                    <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-800 border border-violet-200">
+                                                    <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-primary-tint text-primary-deep border border-primary/20">
                                                         Direct
                                                     </span>
                                                 )}

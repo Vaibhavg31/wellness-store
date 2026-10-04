@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'wellness-recently-viewed';
+const STORAGE_KEY = 'chikit-recently-viewed';
 const MAX_ITEMS = 12;
 
 function readIds() {

@@ -53,7 +53,7 @@ export default function CouponInput({ compact = false }) {
                             setInput('');
                             showToast('Coupon removed', 'info');
                         }}
-                        className="p-1.5 rounded-lg text-muted hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-danger-tint transition-colors"
                         aria-label="Remove coupon"
                     >
                         <X size={14} />

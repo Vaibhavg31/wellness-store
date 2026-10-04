@@ -168,7 +168,7 @@ export const DEFAULT_SITE_CONTENT = {
 
     whyChoose: {
         subtitle: 'Why Choose Us',
-        title: 'Wellness You Can Trust',
+        title: 'Ayurveda You Can Trust',
         description: 'From sourcing to lab testing, every step is built around Ayurvedic tradition and transparency.',
         benefits: BENEFITS,
         ctaText: "Stay connected with us on Instagram and WhatsApp. We're always happy to help.",
@@ -185,7 +185,7 @@ export const DEFAULT_SITE_CONTENT = {
 
     newsletter: {
         badge: 'Exclusive Access',
-        title: 'Join Our Wellness Circle',
+        title: 'Join the Chikit Circle',
         description: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.',
         buttonLabel: 'Subscribe',
         disclaimer: 'No spam. Unsubscribe anytime.',
@@ -228,7 +228,7 @@ export const DEFAULT_SITE_CONTENT = {
     footer: {
         tagline: BRAND_TAGLINE,
         description: BRAND_DESCRIPTION,
-        newsletterTitle: 'Our Wellness Circle',
+        newsletterTitle: 'The Chikit Circle',
         newsletterDescription: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.',
         instagramCardText: 'Wellness tips, product stories & behind-the-scenes.',
     },

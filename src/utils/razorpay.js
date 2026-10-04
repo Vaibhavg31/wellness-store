@@ -54,7 +54,7 @@ export async function openRazorpayCheckout(opts) {
             key: opts.key,
             amount: opts.amount,
             currency: 'INR',
-            name: opts.name || 'Wellness Store',
+            name: opts.name || 'Chikit',
             description: opts.description || 'Order payment',
             order_id: opts.orderId,
             prefill: {

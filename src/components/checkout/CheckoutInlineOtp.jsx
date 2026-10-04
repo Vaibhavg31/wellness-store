@@ -16,7 +16,7 @@ function formatDisplayPhone(phone) {
 }
 
 function sentKey(phoneDigits) {
-    return `wellness-otp-sent-${phoneDigits}`;
+    return `chikit-otp-sent-${phoneDigits}`;
 }
 
 /**
@@ -165,7 +165,7 @@ export default function CheckoutInlineOtp({
 
             try {
                 sessionStorage.removeItem(otpSentStorageKey);
-                sessionStorage.removeItem('wellness-checkout-otp-flow');
+                sessionStorage.removeItem('chikit-checkout-otp-flow');
             } catch {
                 /* ignore */
             }
@@ -302,7 +302,7 @@ export default function CheckoutInlineOtp({
                     )}
 
                     {error && (
-                        <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700" role="alert">
+                        <div className="mt-3 p-3 rounded-lg bg-danger-tint border border-danger/30 text-sm text-danger" role="alert">
                             <p>{error}</p>
                         </div>
                     )}

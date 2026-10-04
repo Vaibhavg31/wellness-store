@@ -6,12 +6,12 @@ import Button from '@/components/ui/Button';
 import { cn } from '@/utils/formatPrice';
 
 const STAT_TONES = {
-    turmeric: { value: 'text-accent-ink', accent: 'border-l-turmeric' },
-    blue: { value: 'text-blue-600', accent: 'border-l-blue-500' },
-    amber: { value: 'text-amber-700', accent: 'border-l-amber-500' },
-    emerald: { value: 'text-primary', accent: 'border-l-emerald' },
-    red: { value: 'text-red-600', accent: 'border-l-red-500' },
-    forest: { value: 'text-primary', accent: 'border-l-forest' },
+    turmeric: { value: 'text-accent-ink', accent: 'border-l-accent' },
+    blue: { value: 'text-info', accent: 'border-l-info' },
+    amber: { value: 'text-warning', accent: 'border-l-warning' },
+    emerald: { value: 'text-primary', accent: 'border-l-success' },
+    red: { value: 'text-danger', accent: 'border-l-danger' },
+    forest: { value: 'text-primary', accent: 'border-l-primary' },
     default: { value: 'text-ink', accent: 'border-l-admin-border' },
 };
 
@@ -172,7 +172,7 @@ export function AdminTableShell({ children, className }) {
 export function AdminLoadingState() {
     return (
         <div className="flex items-center justify-center py-20">
-            <div className="w-7 h-7 border-2 border-primary/15 border-t-forest rounded-full animate-spin" />
+            <div className="w-7 h-7 border-2 border-primary/15 border-t-primary rounded-full animate-spin" />
         </div>
     );
 }
@@ -190,13 +190,13 @@ export function AdminEmptyState({ icon: Icon, title, description }) {
 export function AdminErrorBanner({ message, onDismiss }) {
     if (!message) return null;
     return (
-        <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200/80 flex items-start gap-3 text-red-700 text-sm" role="alert">
+        <div className="mb-4 p-3 rounded-lg bg-danger-tint border border-danger/30 flex items-start gap-3 text-danger text-sm" role="alert">
             <div className="flex-1">
                 <p className="font-medium">Something went wrong</p>
                 <p className="mt-0.5 opacity-90">{message}</p>
             </div>
             {onDismiss && (
-                <button type="button" onClick={onDismiss} className="p-1 hover:bg-red-100 rounded-md shrink-0">
+                <button type="button" onClick={onDismiss} className="p-1 hover:bg-danger-tint rounded-md shrink-0">
                     <X size={16} />
                 </button>
             )}
@@ -225,7 +225,7 @@ const ICON_BTN_VARIANTS = {
     default: 'text-ink hover:bg-admin-surface-alt',
     success: 'text-primary hover:bg-primary/10',
     warning: 'text-accent-ink hover:bg-accent/10',
-    danger: 'text-red-600 hover:bg-red-50',
+    danger: 'text-danger hover:bg-danger-tint',
 };
 
 export function AdminIconButton({ onClick, icon: Icon, variant = 'default', title, size = 16, className, disabled = false }) {
@@ -245,10 +245,10 @@ export function AdminIconButton({ onClick, icon: Icon, variant = 'default', titl
 export function AdminStatusPill({ children, tone = 'default' }) {
     const tones = {
         success: 'bg-primary/10 text-primary',
-        warning: 'bg-amber-50 text-amber-800',
+        warning: 'bg-warning-tint text-warning',
         muted: 'bg-admin-surface-alt text-admin-muted',
         forest: 'bg-primary/8 text-primary',
-        danger: 'bg-red-50 text-red-700',
+        danger: 'bg-danger-tint text-danger',
         default: 'bg-admin-surface-alt text-ink',
     };
     return (
@@ -300,9 +300,9 @@ export function AdminSaveBar({
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -8 }}
                         transition={{ duration: 0.2 }}
-                        className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-700"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-warning"
                     >
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 animate-pulse" aria-hidden />
+                        <span className="w-1.5 h-1.5 rounded-full bg-warning shrink-0 animate-pulse" aria-hidden />
                         Unsaved changes
                     </motion.span>
                 )}
@@ -327,7 +327,7 @@ export function AdminSaveBar({
                         exit={{ opacity: 0 }}
                         className="inline-flex items-center gap-1.5 text-sm font-medium text-admin-muted"
                     >
-                        <span className="w-3.5 h-3.5 border-2 border-primary/20 border-t-forest rounded-full animate-spin shrink-0" aria-hidden />
+                        <span className="w-3.5 h-3.5 border-2 border-primary/20 border-t-primary rounded-full animate-spin shrink-0" aria-hidden />
                         Saving…
                     </motion.span>
                 )}

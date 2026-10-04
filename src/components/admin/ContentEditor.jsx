@@ -171,7 +171,7 @@ export function VideoUploadField({ value, width, height, onChange, adminToken, l
             <video ref={probeRef} className="hidden" muted playsInline />
 
             {error && (
-                <div className="mb-3 flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs">
+                <div className="mb-3 flex items-start gap-2 p-3 rounded-lg bg-danger-tint border border-danger/30 text-danger text-xs">
                     <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
                     <span>{error}</span>
                 </div>
@@ -192,7 +192,7 @@ export function VideoUploadField({ value, width, height, onChange, adminToken, l
                             <p className="text-[11px] text-admin-muted">{(pending.file.size / (1024 * 1024)).toFixed(1)}MB</p>
                             {pendingAspect && (
                                 <div className={`mt-1.5 flex items-start gap-1.5 text-[11px] ${
-                                    pendingAspect.tone === 'good' ? 'text-primary' : pendingAspect.tone === 'warn' ? 'text-accent-ink' : 'text-red-600'
+                                    pendingAspect.tone === 'good' ? 'text-primary' : pendingAspect.tone === 'warn' ? 'text-accent-ink' : 'text-danger'
                                 }`}>
                                     {pendingAspect.tone === 'good'
                                         ? <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
@@ -223,7 +223,7 @@ export function VideoUploadField({ value, width, height, onChange, adminToken, l
                     <div className="flex-1 min-w-0 space-y-2">
                         {currentAspect && (
                             <div className={`flex items-start gap-1.5 text-[11px] ${
-                                currentAspect.tone === 'good' ? 'text-primary' : currentAspect.tone === 'warn' ? 'text-accent-ink' : 'text-red-600'
+                                currentAspect.tone === 'good' ? 'text-primary' : currentAspect.tone === 'warn' ? 'text-accent-ink' : 'text-danger'
                             }`}>
                                 {currentAspect.tone === 'good'
                                     ? <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5" />
@@ -237,7 +237,7 @@ export function VideoUploadField({ value, width, height, onChange, adminToken, l
                                 Replace video
                                 <input ref={fileInputRef} type="file" accept="video/mp4,video/webm,video/quicktime" className="hidden" onChange={handleSelect} />
                             </label>
-                            <button type="button" onClick={clearVideo} className="inline-flex items-center gap-1.5 text-xs text-red-600 hover:text-red-700">
+                            <button type="button" onClick={clearVideo} className="inline-flex items-center gap-1.5 text-xs text-danger hover:text-danger">
                                 <X size={14} /> Remove
                             </button>
                         </div>
@@ -320,7 +320,7 @@ export function StringListEditor({ items = [], onChange, placeholder = 'New item
                     <button
                         type="button"
                         onClick={() => remove(i)}
-                        className="p-2 text-admin-muted hover:text-red-500 transition-colors"
+                        className="p-2 text-admin-muted hover:text-danger transition-colors"
                         aria-label="Remove item"
                     >
                         <Trash2 size={14} />
@@ -351,7 +351,7 @@ export function BenefitEditor({ benefits = [], onChange }) {
                 <div key={i} className="p-4 rounded-xl border border-admin-border bg-admin-surface-alt space-y-3">
                     <div className="flex justify-between items-center">
                         <span className="text-xs text-admin-muted uppercase tracking-wider">Benefit {i + 1}</span>
-                        <button type="button" onClick={() => remove(i)} className="text-admin-muted hover:text-red-500">
+                        <button type="button" onClick={() => remove(i)} className="text-admin-muted hover:text-danger">
                             <Trash2 size={14} />
                         </button>
                     </div>
@@ -397,7 +397,7 @@ export function FaqEditor({ faqs = [], onChange }) {
                 <div key={i} className="p-4 rounded-xl border border-admin-border bg-admin-surface-alt space-y-3">
                     <div className="flex justify-between items-center">
                         <span className="text-xs text-admin-muted uppercase tracking-wider">FAQ {i + 1}</span>
-                        <button type="button" onClick={() => remove(i)} className="text-admin-muted hover:text-red-500">
+                        <button type="button" onClick={() => remove(i)} className="text-admin-muted hover:text-danger">
                             <Trash2 size={14} />
                         </button>
                     </div>

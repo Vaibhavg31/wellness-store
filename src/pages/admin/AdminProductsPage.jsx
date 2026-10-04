@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Eye, EyeOff, Package } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
+import { humanizeSlug } from '@/utils/products';
 import {
     AdminPageHeader,
     AdminSummaryGrid,
@@ -148,7 +149,7 @@ export default function AdminProductsPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="p-4 capitalize text-admin-muted">{product.category}</td>
+                                        <td className="p-4 text-admin-muted">{humanizeSlug(product.category)}</td>
                                         <td className="p-4 font-medium tabular-nums">
                                             {product.hasVariants && <span className="text-admin-muted font-normal">From </span>}
                                             ₹{product.price}

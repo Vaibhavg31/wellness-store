@@ -1,33 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api, setUnauthorizedHandler } from '@/services/api';
 
-function migrateKey(oldKey, newKey) {
-    const existing = localStorage.getItem(newKey);
-    if (!existing) {
-        const old = localStorage.getItem(oldKey);
-        if (old) localStorage.setItem(newKey, old);
-    }
-    localStorage.removeItem(oldKey);
-}
+const TOKEN_KEY       = 'chikit-auth-token';
+const USER_KEY        = 'chikit-auth-user';
+const ADMIN_TOKEN_KEY = 'chikit-admin-token';
 
-// Two rebrands' worth of history: this template started as "rims", was
-// adapted into "Krivea Jewels", and is now this wellness store — each
-// storage key below has carried an open DevTools tab straight back to
-// whichever brand it was named for, so the migration chain runs one more
-// hop rather than just renaming the constants and stranding anyone with an
-// existing session under the old key.
-migrateKey('rims-auth-token', 'krivea-auth-token');
-migrateKey('rims-auth-user',  'krivea-auth-user');
-migrateKey('rims-admin-token','krivea-admin-token');
-migrateKey('krivea-auth-token', 'wellness-auth-token');
-migrateKey('krivea-auth-user',  'wellness-auth-user');
-migrateKey('krivea-admin-token','wellness-admin-token');
-
-const TOKEN_KEY       = 'wellness-auth-token';
-const USER_KEY        = 'wellness-auth-user';
-const ADMIN_TOKEN_KEY = 'wellness-admin-token';
-
-export const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || '/wellness-studio';
+export const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || '/chikit-studio';
 
 const AuthContext = createContext(null);
 

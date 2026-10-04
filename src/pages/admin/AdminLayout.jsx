@@ -1,18 +1,33 @@
-import { useState, useEffect } from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Menu, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
+import { ExternalLink, LogOut, Menu } from 'lucide-react';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { loginUrl } from '@/utils/authRedirect';
 import PageTransition from '@/components/layout/PageTransition';
 import Logo from '@/components/ui/Logo';
+import Drawer from '@/components/ui/Drawer';
 import AdminNavLinks, { getAdminPageTitle } from '@/components/admin/AdminNavLinks';
 
-function AdminSidebarHeader() {
+const footerLink = 'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-small font-medium text-ink transition-colors hover:bg-primary-soft hover:text-primary';
+
+function SidebarBrand() {
     return (
-        <div className="p-5 border-b border-canvas/10">
-            <Logo size="sm" linkToHome showHover={false} withWordmark className="mb-1.5 text-canvas" />
-            <p className="text-[10px] tracking-[0.18em] uppercase text-canvas/55 font-medium">Studio Admin</p>
+        <div className="border-b border-admin-border px-5 py-3">
+            <Logo size="md" />
+            <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-admin-muted">Studio Admin</p>
+        </div>
+    );
+}
+
+function SidebarFooter({ onSignOut, onNavigate }) {
+    return (
+        <div className="space-y-0.5 border-t border-admin-border p-2.5">
+            <a href="/" target="_blank" rel="noopener noreferrer" onClick={onNavigate} className={footerLink}>
+                <ExternalLink size={18} strokeWidth={1.75} className="text-admin-muted" aria-hidden="true" /> View store
+            </a>
+            <button type="button" onClick={onSignOut} className={`${footerLink} hover:!text-danger`}>
+                <LogOut size={18} strokeWidth={1.75} className="text-admin-muted" aria-hidden="true" /> Sign out
+            </button>
         </div>
     );
 }
@@ -21,130 +36,48 @@ export default function AdminLayout() {
     const { isAdmin, adminLogout } = useAdminAuth();
     const location = useLocation();
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
     const pageTitle = getAdminPageTitle(location.pathname);
-    const closeMobileNav = () => setMobileNavOpen(false);
 
-    useEffect(() => {
-        setMobileNavOpen(false);
-    }, [location.pathname]);
-
-    useEffect(() => {
-        if (!mobileNavOpen) return;
-        const prev = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = prev;
-        };
-    }, [mobileNavOpen]);
-
-    useEffect(() => {
-        if (!mobileNavOpen) return;
-        const handleEsc = (e) => {
-            if (e.key === 'Escape') setMobileNavOpen(false);
-        };
-        window.addEventListener('keydown', handleEsc);
-        return () => window.removeEventListener('keydown', handleEsc);
-    }, [mobileNavOpen]);
+    useEffect(() => setMobileNavOpen(false), [location.pathname]);
 
     if (!isAdmin) {
         return <Navigate to={loginUrl(ADMIN_PATH)} replace />;
     }
 
     return (
-        <div className="admin-panel min-h-screen flex">
+        <div className="admin-panel flex min-h-screen">
             {/* Desktop sidebar */}
-            <aside className="hidden lg:flex w-[15.5rem] bg-primary-deep text-canvas flex-col fixed h-full z-30 shadow-xl shadow-primary/20 overflow-hidden">
-                <AdminSidebarHeader />
+            <aside className="fixed z-30 hidden h-full w-[15.5rem] flex-col border-r border-admin-border bg-admin-surface lg:flex">
+                <SidebarBrand />
                 <AdminNavLinks location={location} />
-                <button
-                    onClick={adminLogout}
-                    className="flex-shrink-0 flex items-center gap-3 px-5 py-4 text-canvas/65 hover:text-canvas hover:bg-canvas/5 border-t border-canvas/10 transition-colors text-sm font-medium"
-                >
-                    <LogOut size={17} strokeWidth={1.25} />
-                    Sign Out
-                </button>
+                <SidebarFooter onSignOut={adminLogout} />
             </aside>
 
-            {/* Mobile nav drawer */}
-            <AnimatePresence>
-                {mobileNavOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="fixed inset-0 z-40 bg-ink/55 backdrop-blur-[3px] lg:hidden"
-                            onClick={closeMobileNav}
-                            aria-hidden="true"
-                        />
-                        <motion.aside
-                            initial={{ x: '-100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '-100%' }}
-                            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-                            className="fixed top-0 left-0 bottom-0 z-50 w-[min(15.5rem,88vw)] bg-primary-deep text-canvas flex flex-col shadow-xl shadow-primary/30 lg:hidden overflow-hidden"
-                            role="dialog"
-                            aria-modal="true"
-                            aria-label="Admin navigation"
-                        >
-                            <div className="flex items-start justify-between gap-3 p-4 border-b border-canvas/10 pt-[max(1rem,env(safe-area-inset-top))]">
-                                <div className="min-w-0">
-                                    <Logo size="sm" linkToHome showHover={false} withWordmark className="mb-1 text-canvas" />
-                                    <p className="text-[10px] tracking-[0.18em] uppercase text-canvas/55 font-medium">
-                                        Studio Admin
-                                    </p>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={closeMobileNav}
-                                    className="flex-shrink-0 p-2 -mr-1 rounded-lg text-canvas/70 hover:text-canvas hover:bg-canvas/10 transition-colors"
-                                    aria-label="Close menu"
-                                >
-                                    <X size={20} strokeWidth={1.25} />
-                                </button>
-                            </div>
-                            <AdminNavLinks location={location} onNavigate={closeMobileNav} mobile />
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    closeMobileNav();
-                                    adminLogout();
-                                }}
-                                className="flex-shrink-0 flex items-center gap-3 px-5 py-4 text-canvas/65 hover:text-canvas hover:bg-canvas/5 border-t border-canvas/10 transition-colors text-sm font-medium pb-[max(1rem,env(safe-area-inset-bottom))]"
-                            >
-                                <LogOut size={17} strokeWidth={1.25} />
-                                Sign Out
-                            </button>
-                        </motion.aside>
-                    </>
-                )}
-            </AnimatePresence>
+            {/* Mobile navigation */}
+            <Drawer isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} title="Studio Admin" side="left" admin>
+                <div className="-mx-5 -my-5 flex min-h-full flex-col sm:-mx-6 sm:-my-6">
+                    <AdminNavLinks location={location} onNavigate={() => setMobileNavOpen(false)} mobile />
+                    <SidebarFooter onSignOut={() => { setMobileNavOpen(false); adminLogout(); }} onNavigate={() => setMobileNavOpen(false)} />
+                </div>
+            </Drawer>
 
-            <main className="flex-1 min-h-screen bg-admin-bg lg:ml-[15.5rem]">
+            <main className="min-h-screen flex-1 bg-admin-bg lg:ml-[15.5rem]">
                 {/* Mobile top bar */}
-                <header
-                    className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3 bg-admin-bg/95 backdrop-blur-md border-b border-admin-border shadow-sm lg:hidden pt-[max(0.75rem,env(safe-area-inset-top))]"
-                >
+                <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-admin-border bg-admin-surface/95 px-4 py-3 backdrop-blur lg:hidden">
                     <button
                         type="button"
                         onClick={() => setMobileNavOpen(true)}
-                        className="flex-shrink-0 p-2 -ml-1 rounded-lg text-ink hover:bg-primary/5 active:bg-primary/10 transition-colors"
+                        className="-ml-1 grid size-10 shrink-0 place-items-center rounded-lg text-ink hover:bg-primary-soft"
                         aria-label="Open menu"
                         aria-expanded={mobileNavOpen}
                     >
-                        <Menu size={22} strokeWidth={1.5} />
+                        <Menu size={22} strokeWidth={1.75} />
                     </button>
-                    <div className="min-w-0 flex-1">
-                        <p className="text-[10px] tracking-[0.16em] uppercase text-admin-muted font-medium leading-none">
-                            Studio Admin
-                        </p>
-                        <h1 className="text-base font-semibold text-ink truncate mt-0.5">{pageTitle}</h1>
-                    </div>
+                    <Link to={ADMIN_PATH} className="shrink-0" aria-label="Admin dashboard"><Logo size="sm" /></Link>
+                    <p className="ml-auto truncate text-small font-semibold text-ink">{pageTitle}</p>
                 </header>
 
-                <div className="p-4 sm:p-6 lg:p-8 max-w-[1440px] pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <div className="max-w-[1440px] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">
                     <PageTransition />
                 </div>
             </main>

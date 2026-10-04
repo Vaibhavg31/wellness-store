@@ -223,7 +223,7 @@ router.get('/users/admin/export', asyncRoute(async (req, res) => {
 
     const from = filters.from || 'all';
     const to = filters.to || 'all';
-    const baseName = `wellness-users-${from}-to-${to}`;
+    const baseName = `chikit-users-${from}-to-${to}`;
 
     if (format === 'pdf') return exportTablePdf(res, `${baseName}.pdf`, 'Users Export', headers, rows);
     sendCsv(res, `${baseName}.csv`, headers, rows);

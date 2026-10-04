@@ -331,8 +331,8 @@ async function notifyAdminsNewOrder(order) {
     const payment = paymentLabel(order);
     const customer = esc(order.shipping?.name || 'Customer');
     const itemsHtml = renderItemsTable(order, false);
-    let adminPath = String(process.env.ADMIN_PATH || '/wellness-studio').trim();
-    if (!adminPath) adminPath = '/wellness-studio';
+    let adminPath = String(process.env.ADMIN_PATH || '/chikit-studio').trim();
+    if (!adminPath) adminPath = '/chikit-studio';
     const adminUrl = esc(`${frontendUrl()}${adminPath}/orders`);
     const brand = esc(await senderName());
     const tagline = await brandTagline();

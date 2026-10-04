@@ -27,7 +27,7 @@ import CouponInput from '@/components/checkout/CouponInput';
 import ActiveCoupons from '@/components/checkout/ActiveCoupons';
 import PriceBreakdown from '@/components/checkout/PriceBreakdown';
 
-const OTP_FLOW_KEY = 'wellness-checkout-otp-flow';
+const OTP_FLOW_KEY = 'chikit-checkout-otp-flow';
 const MAX_SAVED_ADDRESSES = 3;
 
 const razorpayKey = String(import.meta.env.VITE_RAZORPAY_KEY_ID || '');

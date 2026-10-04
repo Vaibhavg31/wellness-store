@@ -231,7 +231,7 @@ export default function BannerManager({ filterTarget, productId }) {
                                     <button
                                         type="button"
                                         onClick={() => setForm({ ...form, image: '' })}
-                                        className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                                        className="absolute -top-2 -right-2 p-1 bg-danger text-white rounded-full hover:bg-danger/90"
                                     >
                                         <X size={12} />
                                     </button>

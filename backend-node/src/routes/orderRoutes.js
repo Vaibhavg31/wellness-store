@@ -335,7 +335,7 @@ router.get('/orders/admin/export', asyncRoute(async (req, res) => {
 
     const from = filters.from || 'all';
     const to = filters.to || 'all';
-    const baseName = `wellness-orders-${from}-to-${to}`;
+    const baseName = `chikit-orders-${from}-to-${to}`;
 
     if (format === 'pdf') return exportTablePdf(res, `${baseName}.pdf`, 'Orders Export', headers, rows);
     sendCsv(res, `${baseName}.csv`, headers, rows);

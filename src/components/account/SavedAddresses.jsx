@@ -138,7 +138,7 @@ export default function SavedAddresses() {
                 {addresses.length > 0 && ` (${addresses.length}/${MAX_ADDRESSES} saved)`}
             </p>
 
-            {error && <p className="text-sm text-red-600 mb-4" role="alert">{error}</p>}
+            {error && <p className="text-sm text-danger mb-4" role="alert">{error}</p>}
 
             {editing ? (
                 <div className="bg-canvas rounded-2xl p-6 border border-line/40 space-y-4">
@@ -185,7 +185,7 @@ export default function SavedAddresses() {
                                     <button type="button" onClick={() => openEdit(addr)} className="p-2 text-muted hover:text-primary" aria-label="Edit">
                                         <Pencil size={14} />
                                     </button>
-                                    <button type="button" onClick={() => remove(addr.id)} className="p-2 text-muted hover:text-red-600" aria-label="Delete">
+                                    <button type="button" onClick={() => remove(addr.id)} className="p-2 text-muted hover:text-danger" aria-label="Delete">
                                         <Trash2 size={14} />
                                     </button>
                                 </div>

@@ -82,11 +82,11 @@ export default function DeliveryAddressForm({ value, onChange, errors = {}, comp
                         compact
                             ? 'px-4 py-3 text-sm rounded-xl sm:px-5 sm:py-3.5 sm:text-base sm:rounded-2xl'
                             : 'px-5 py-3.5 rounded-2xl'
-                    } ${errors.address ? 'border-red-400' : 'border-line'}`}
+                    } ${errors.address ? 'border-danger/30' : 'border-line'}`}
                     placeholder="House / Flat no., Building, Street, Area"
                 />
                 {errors.address && (
-                    <p className="mt-1.5 text-xs text-red-500" role="alert">{errors.address}</p>
+                    <p className="mt-1.5 text-xs text-danger" role="alert">{errors.address}</p>
                 )}
             </div>
 
@@ -184,7 +184,7 @@ export default function DeliveryAddressForm({ value, onChange, errors = {}, comp
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="mt-1.5 text-xs text-amber-700 leading-relaxed"
+                            className="mt-1.5 text-xs text-warning leading-relaxed"
                         >
                             PIN not found. Enter city & state manually.
                         </motion.p>

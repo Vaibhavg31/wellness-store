@@ -529,7 +529,7 @@ export default function AdminProductFormPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                    <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex gap-3">
+                    <div className="p-4 rounded-xl bg-danger-tint border border-danger/30 text-danger text-sm flex gap-3">
                         <AlertCircle size={18} className="flex-shrink-0" />
                         <span>{error}</span>
                     </div>
@@ -677,7 +677,7 @@ export default function AdminProductFormPage() {
                                         <button
                                             type="button"
                                             onClick={() => removeVariant(i)}
-                                            className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 shrink-0"
+                                            className="p-1.5 rounded-lg text-danger hover:bg-danger-tint shrink-0"
                                             aria-label="Remove option"
                                         >
                                             <Trash2 size={15} />
@@ -846,7 +846,7 @@ export default function AdminProductFormPage() {
                                             ...prev,
                                             images: prev.images.filter((_, j) => j !== i),
                                         }))}
-                                        className="absolute top-1.5 right-1.5 p-1.5 rounded-lg bg-red-500 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm"
+                                        className="absolute top-1.5 right-1.5 p-1.5 rounded-lg bg-danger text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm"
                                         aria-label="Remove image"
                                     >
                                         <X size={12} />
@@ -922,7 +922,7 @@ export default function AdminProductFormPage() {
                                         <button
                                             type="button"
                                             onClick={() => removeCutoutImage(i)}
-                                            className="absolute top-1.5 right-1.5 p-1.5 rounded-lg bg-red-500 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm"
+                                            className="absolute top-1.5 right-1.5 p-1.5 rounded-lg bg-danger text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm"
                                             aria-label="Remove cutout"
                                         >
                                             <X size={12} />
@@ -1185,7 +1185,7 @@ export default function AdminProductFormPage() {
                                     <button
                                         type="button"
                                         onClick={() => update('features', form.features.filter((_, j) => j !== i))}
-                                        className="p-2.5 rounded-lg text-red-500 hover:bg-red-50 shrink-0"
+                                        className="p-2.5 rounded-lg text-danger hover:bg-danger-tint shrink-0"
                                         aria-label="Remove feature"
                                     >
                                         <Trash2 size={15} />

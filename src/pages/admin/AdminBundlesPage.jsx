@@ -302,7 +302,7 @@ export default function AdminBundlesPage() {
             >
                 <div className="space-y-4">
                     {error && (
-                        <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>
+                        <div className="p-3 rounded-lg bg-danger-tint border border-danger/30 text-danger text-sm">{error}</div>
                     )}
 
                     <Input label="Bundle Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Complete Wellness Kit" />
@@ -344,7 +344,7 @@ export default function AdminBundlesPage() {
                                         type="button"
                                         onClick={() => removeItem(i)}
                                         disabled={form.items.length <= 1}
-                                        className="p-2.5 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:pointer-events-none shrink-0"
+                                        className="p-2.5 rounded-lg text-danger hover:bg-danger-tint disabled:opacity-30 disabled:pointer-events-none shrink-0"
                                         aria-label="Remove product"
                                         title={form.items.length <= 1 ? 'Keep at least one row' : 'Remove this product'}
                                     >

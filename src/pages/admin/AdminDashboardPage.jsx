@@ -136,7 +136,7 @@ export default function AdminDashboardPage() {
         <div>
             <AdminPageHeader
                 title="Dashboard"
-                subtitle="Overview of your Wellness Store"
+                subtitle="Overview of your Chikit store"
             />
 
             <AdminPromoCard
@@ -146,7 +146,7 @@ export default function AdminDashboardPage() {
                 description="Edit headlines, images, FAQs, promos and more — no code needed."
             />
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {cards.map((card) => (
                     <AdminQuickLink
                         key={card.label}

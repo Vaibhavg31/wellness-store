@@ -5,7 +5,7 @@ import { getPool } from '../lib/db.js';
  * Mirrors backend/lib/Repository/SettingsRepository.php exactly (same
  * columns, same child tables, same merge semantics), with defaults updated
  * to the Chikit brand (the PHP version's defaults were never updated past
- * the original "Wellness Store" template — see backend-node/MIGRATION.md).
+ * the original template — see backend-node/MIGRATION.md).
  */
 const DEFAULTS = {
     siteName: 'Chikit',
@@ -52,8 +52,8 @@ const DEFAULTS = {
     ],
     sections: {
         hero: true, videoBanner: true, brandMarquee: true, banners: true, bannerSlider: true,
-        featured: true, trending: true, categories: true, bundles: true, ritualBuilder: true,
-        wellnessJourney: true, bodyMap: true, sourceTrail: true, whyChoose: true, certifiedBanner: true,
+        featured: true, trending: true, categories: true, bundles: true,
+        whyChoose: true, certifiedBanner: true,
         reviews: true, instagram: true, newsletter: true, promoBanner: true,
     },
     promo: { enabled: true, text: '✦ Free delivery on orders above ₹1,999. Use code', code: 'WELCOME10', suffix: 'for 10% off your first order', href: '/shop' },
@@ -75,9 +75,9 @@ const DEFAULTS = {
     videoBanner: { videoUrl: '', poster: '', title: '', subtitle: '', ctaLabel: '', ctaHref: '', fit: 'cover', width: null, height: null },
     marquee: { items: ['FSSAI & GMP Certified', 'Authentic Ayurvedic Formulations', 'Lab Tested Purity', 'Free Delivery Above ₹1999', '7-Day Easy Returns'] },
     featured: { collectionTitle: 'Featured Collection', stylesTitle: 'Trending Now', viewAllLabel: 'View All', productCount: 8 },
-    whyChoose: { subtitle: 'Why Choose Us', title: 'Wellness You Can Trust', description: 'From sourcing to lab testing, every step is built around Ayurvedic tradition and transparency.', benefits: [], ctaText: "Stay connected with us on Instagram and WhatsApp. We're always happy to help." },
+    whyChoose: { subtitle: 'Why Choose Us', title: 'Ayurveda You Can Trust', description: 'From sourcing to lab testing, every step is built around Ayurvedic tradition and transparency.', benefits: [], ctaText: "Stay connected with us on Instagram and WhatsApp. We're always happy to help." },
     certifiedBanner: { badge: 'FSSAI & GMP Certified', title: 'Purity You Can Verify', description: 'Every product is manufactured in certified facilities and third-party lab tested before it reaches you.', ctaLabel: 'See Our Certifications', ctaHref: '/about', image: '' },
-    newsletter: { badge: 'Exclusive Access', title: 'Join Our Wellness Circle', description: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.', buttonLabel: 'Subscribe', disclaimer: 'No spam. Unsubscribe anytime.', successMessage: 'Thank you for subscribing!' },
+    newsletter: { badge: 'Exclusive Access', title: 'Join the Chikit Circle', description: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.', buttonLabel: 'Subscribe', disclaimer: 'No spam. Unsubscribe anytime.', successMessage: 'Thank you for subscribing!' },
     instagram: { subtitle: '@chikit.ayurveda', title: 'Follow Our Journey', description: 'Follow us for Ayurvedic rituals, wellness tips and behind-the-scenes.', stripLabel: 'Follow us on Instagram', images: [] },
     about: {
         heroTitle: 'Our Story',
@@ -317,10 +317,7 @@ export class SettingsRepository {
             popup_delay_seconds, popup_frequency,
             updated_at
         ) VALUES (
-            1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            1, __VALUE_PLACEHOLDERS__
         ) ON DUPLICATE KEY UPDATE
             site_name=VALUES(site_name), brand_name=VALUES(brand_name), brand_short=VALUES(brand_short),
             brand_tagline=VALUES(brand_tagline), brand_description=VALUES(brand_description), logo=VALUES(logo), favicon=VALUES(favicon),
@@ -380,7 +377,7 @@ export class SettingsRepository {
             popup_delay_seconds=VALUES(popup_delay_seconds), popup_frequency=VALUES(popup_frequency),
             updated_at=VALUES(updated_at)`;
 
-        await pool.query(sql, [
+        const params = [
             s.siteName ?? '', s.brandName ?? '', s.brandShort ?? '', s.brandTagline ?? '', s.brandDescription ?? '', s.logo ?? '', s.favicon ?? '',
             th.primaryColor ?? '#602460', th.primaryLight ?? '#7A3380', th.primaryDark ?? '#431A43',
             th.accentColor ?? '#C08A3E', th.accentLight ?? '#D8A860', th.tintColor ?? '#F1E4F2',
@@ -413,7 +410,9 @@ export class SettingsRepository {
             pu.ctaLabel ?? '', pu.ctaHref ?? '', pu.couponCode ?? '', pu.productId ?? null,
             Number.parseInt(pu.delaySeconds ?? 2, 10), pu.frequency ?? 'session',
             now,
-        ]);
+        ];
+        // Placeholders are derived from the values so the column list and the parameters can never drift apart.
+        await pool.query(sql.replace('__VALUE_PLACEHOLDERS__', params.map(() => '?').join(', ')), params);
 
         await this.replaceList('site_nav_links', s.navLinks ?? [], (item) => [item.label ?? '', item.href ?? ''], 'INSERT INTO site_nav_links (label, href, sort_order) VALUES (?, ?, ?)');
         await this.replaceSections(s.sections ?? {});

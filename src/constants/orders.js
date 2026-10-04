@@ -25,14 +25,14 @@ export const FULFILLMENT_PIPELINE = ['confirmed', 'out_for_delivery', 'delivered
 export const TERMINAL_STATUSES = ['delivered', 'cancelled', 'returned'];
 
 export const STATUS_COLORS = {
-    placed: 'bg-blue-100 text-blue-700 border-blue-200',
-    confirmed: 'bg-amber-100 text-amber-800 border-amber-200',
-    out_for_delivery: 'bg-purple-100 text-purple-800 border-purple-200',
+    placed: 'bg-info-tint text-info border-info/30',
+    confirmed: 'bg-warning-tint text-warning border-warning/30',
+    out_for_delivery: 'bg-primary-tint text-primary-deep border-primary/20',
     delivered: 'bg-primary/15 text-primary border-primary/30',
-    cancelled: 'bg-red-100 text-red-700 border-red-200',
-    returned: 'bg-orange-100 text-orange-800 border-orange-200',
-    packed: 'bg-violet-100 text-violet-800 border-violet-200',
-    shipped: 'bg-purple-100 text-purple-800 border-purple-200',
+    cancelled: 'bg-danger-tint text-danger border-danger/30',
+    returned: 'bg-warning-tint text-warning border-warning/30',
+    packed: 'bg-primary-tint text-primary-deep border-primary/20',
+    shipped: 'bg-primary-tint text-primary-deep border-primary/20',
 };
 
 export const STATUS_LABELS = Object.fromEntries(

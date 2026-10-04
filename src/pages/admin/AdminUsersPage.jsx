@@ -99,12 +99,12 @@ function UserProfileSection({ user }) {
                     <p className="text-sm text-admin-muted break-all">{user.email}</p>
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {user.isGuest && (
-                            <span className="inline-flex items-center gap-1 text-xs text-violet-800 bg-violet-100 px-2 py-0.5 rounded-full">
+                            <span className="inline-flex items-center gap-1 text-xs text-primary-deep bg-primary-tint px-2 py-0.5 rounded-full">
                                 Guest (no account)
                             </span>
                         )}
                         {user.isBlocked && (
-                            <span className="inline-flex items-center gap-1 text-xs text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                            <span className="inline-flex items-center gap-1 text-xs text-danger bg-danger-tint px-2 py-0.5 rounded-full">
                                 <Ban size={12} />
                                 Blocked
                             </span>
@@ -414,7 +414,7 @@ export default function AdminUsersPage() {
             await api.download(
                 `/api/users/admin/export${formatParam}`,
                 adminToken,
-                `wellness-users-${from}-to-${to}.${ext}`,
+                `chikit-users-${from}-to-${to}.${ext}`,
             );
             setExportModalOpen(false);
         } catch (err) {
@@ -535,7 +535,7 @@ export default function AdminUsersPage() {
                                 {users.map((user) => (
                                     <tr
                                         key={user.id}
-                                        className={`border-b border-admin-border-light hover:bg-admin-surface-alt cursor-pointer ${user.isBlocked ? 'bg-red-50/50' : ''}`}
+                                        className={`border-b border-admin-border-light hover:bg-admin-surface-alt cursor-pointer ${user.isBlocked ? 'bg-danger-tint' : ''}`}
                                         onClick={() => openUserDetail(user)}
                                     >
                                         <td className="p-4">
@@ -551,10 +551,10 @@ export default function AdminUsersPage() {
                                                     <p className="font-medium text-ink">{user.name || '—'}</p>
                                                     <div className="flex flex-wrap gap-1 mt-0.5">
                                                         {user.isGuest && (
-                                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-800">Guest</span>
+                                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary-tint text-primary-deep">Guest</span>
                                                         )}
                                                         {user.isBlocked && (
-                                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-700">Blocked</span>
+                                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-danger-tint text-danger">Blocked</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -626,7 +626,7 @@ export default function AdminUsersPage() {
             >
                 {detailLoading ? (
                     <div className="flex items-center justify-center py-20">
-                        <div className="w-8 h-8 border-2 border-primary/30 border-t-forest rounded-full animate-spin" />
+                        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                     </div>
                 ) : selectedOrder ? (
                     <OrderDetailView order={selectedOrder} onBack={() => setSelectedOrder(null)} />
@@ -682,7 +682,7 @@ export default function AdminUsersPage() {
                                         size="sm"
                                         onClick={() => toggleBlock(detailUser, true)}
                                         disabled={blocking}
-                                        className="gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                                        className="gap-2 text-danger border-danger/30 hover:bg-danger-tint"
                                     >
                                         <Ban size={14} />
                                         Block user

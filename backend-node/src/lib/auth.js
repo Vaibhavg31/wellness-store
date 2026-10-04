@@ -8,7 +8,7 @@ import { UserRepository } from '../repositories/userRepository.js';
  * backends during the migration.
  */
 function secret() {
-    return process.env.JWT_SECRET || 'wellness-dev-secret-change-in-production';
+    return process.env.JWT_SECRET || 'chikit-dev-secret-change-in-production';
 }
 
 const EXPIRY_SECONDS = { '24h': 86400, '7d': 604800 };

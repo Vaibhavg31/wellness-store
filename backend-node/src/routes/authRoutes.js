@@ -189,7 +189,7 @@ router.post('/auth/login', asyncRoute(async (req, res) => {
     const adminDevPass = process.env.ADMIN_DEV_PASSWORD || '';
     if (adminDevPass && adminEmails().includes(email) && password === adminDevPass) {
         const token = signToken({ role: 'admin', email });
-        return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/wellness-studio', user: { email } });
+        return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email } });
     }
 
     const user = await repo.findByEmail(email);
@@ -365,7 +365,7 @@ router.post('/auth/google', asyncRoute(async (req, res) => {
 
         if (shouldGrantAdminRole(email)) {
             const token = signToken({ role: 'admin', email });
-            return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/wellness-studio', user: { email, name, avatar } });
+            return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email, name, avatar } });
         }
 
         const existing = await repo.findByEmail(email);
@@ -397,7 +397,7 @@ router.post('/auth/admin/login', asyncRoute(async (req, res) => {
     if (!username || !password) return sendError(res, 'Username and password required', 400);
     if (!(await checkRateLimit(`admin-${clientIp(req)}`))) return sendError(res, 'Too many login attempts. Try again later.', 429);
 
-    const adminUser = process.env.ADMIN_USERNAME || 'wellness_admin';
+    const adminUser = process.env.ADMIN_USERNAME || 'chikit_admin';
     const adminPassHash = process.env.ADMIN_PASSWORD_HASH || null;
 
     const validUser = username === adminUser;

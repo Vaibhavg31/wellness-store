@@ -31,7 +31,7 @@ export default function EmailVerificationBanner({ className = '', compact = fals
 
     if (compact) {
         return (
-            <div className={`p-4 rounded-xl bg-amber-50 border border-amber-200/80 ${className}`}>
+            <div className={`p-4 rounded-xl bg-warning-tint border border-warning/30 ${className}`}>
                 <p className="text-sm text-ink mb-2">
                     Verify <span className="font-medium">{email}</span> to place orders.
                 </p>
@@ -39,15 +39,15 @@ export default function EmailVerificationBanner({ className = '', compact = fals
                     {loading ? 'Sending…' : 'Resend email'}
                 </Button>
                 {message && <p className="text-xs text-primary mt-2">{message}</p>}
-                {error && <p className="text-xs text-red-600 mt-2" role="alert">{error}</p>}
+                {error && <p className="text-xs text-danger mt-2" role="alert">{error}</p>}
             </div>
         );
     }
 
     return (
-        <div className={`p-5 rounded-2xl bg-amber-50 border border-amber-200/80 flex gap-4 ${className}`}>
-            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                <Mail size={18} className="text-amber-700" />
+        <div className={`p-5 rounded-2xl bg-warning-tint border border-warning/30 flex gap-4 ${className}`}>
+            <div className="w-10 h-10 rounded-full bg-warning-tint flex items-center justify-center flex-shrink-0">
+                <Mail size={18} className="text-warning" />
             </div>
             <div className="flex-1 min-w-0">
                 <h3 className="font-display text-lg text-ink mb-1">Verify your email</h3>
@@ -66,7 +66,7 @@ export default function EmailVerificationBanner({ className = '', compact = fals
                     )}
                 </Button>
                 {message && <p className="text-xs text-primary mt-2">{message}</p>}
-                {error && <p className="text-xs text-red-600 mt-2" role="alert">{error}</p>}
+                {error && <p className="text-xs text-danger mt-2" role="alert">{error}</p>}
             </div>
         </div>
     );

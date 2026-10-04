@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 
 const CartContext = createContext(null);
-const AUTO_SKIP_KEY = 'wellness-auto-coupon-skipped';
+const AUTO_SKIP_KEY = 'chikit-auto-coupon-skipped';
 
 function maxQtyFor(product, requested) {
     const stock = typeof product?.stock === 'number' ? product.stock : Infinity;
@@ -62,8 +62,8 @@ function bundleItemUnitPrice(bundle, productId) {
 }
 
 export function CartProvider({ children }) {
-    const [items, setItems] = useLocalStorage('wellness-cart', []);
-    const [couponCode, setCouponCode] = useLocalStorage('wellness-coupon', '');
+    const [items, setItems] = useLocalStorage('chikit-cart', []);
+    const [couponCode, setCouponCode] = useLocalStorage('chikit-coupon', '');
     const [couponState, setCouponState] = useState(null);
     const [couponLoading, setCouponLoading] = useState(false);
     const [cartPulse, setCartPulse] = useState(0);
