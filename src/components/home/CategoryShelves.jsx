@@ -5,9 +5,7 @@ import ProductCard from '@/components/product/ProductCard';
 import Skeleton from '@/components/ui/Skeleton';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
-import { imageUrl } from '@/services/api';
-import { jumpToShelf, shelfId, shelfSpy, useShelfSpy } from '@/utils/shelfSpy';
-import { cn } from '@/utils/formatPrice';
+import { shelfId, shelfSpy } from '@/utils/shelfSpy';
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -111,15 +109,13 @@ function Shelf({ shelf }) {
 
 /**
  * Products grouped by category, front and centre on the homepage: one swipeable shelf per category, in the order set
- * in the admin. A category with no products is never shown (the categories API leaves it out). The header's category
- * bar highlights the shelf being read; on phones, where that bar is in the menu, a sticky chip bar does the same job.
+ * in the admin. A category with no products is never shown (the categories API leaves it out). The category strip in the
+ * header (a second row on phones) highlights and follows the shelf being read.
  */
 export default function CategoryShelves({ products, loading }) {
     const { content } = useSiteContent();
     const { plan } = useCategoryPlan();
     const { limit } = content.extras.shelves;
-    const chipBar = useRef(null);
-    const { active } = useShelfSpy();
 
     const shelves = useMemo(() => plan
         .map((item) => {
@@ -129,13 +125,6 @@ export default function CategoryShelves({ products, loading }) {
         .filter(Boolean), [plan, products, limit]);
 
     useShelfScrollSpy(shelves.map((s) => s.category.slug));
-
-    // Keep the active chip visible inside the horizontally scrolling phone bar without moving the page.
-    useEffect(() => {
-        const bar = chipBar.current;
-        const chip = active ? bar?.querySelector(`[data-chip="${active}"]`) : null;
-        if (bar && chip) bar.scrollTo({ left: chip.offsetLeft - bar.clientWidth / 2 + chip.clientWidth / 2, behavior: reducedMotion() ? 'auto' : 'smooth' });
-    }, [active]);
 
     if (loading) {
         return (
@@ -149,33 +138,6 @@ export default function CategoryShelves({ products, loading }) {
 
     return (
         <div className="bg-canvas">
-            <nav aria-label="Shop by category" className="sticky top-[65px] z-30 border-b border-line bg-canvas/95 backdrop-blur lg:hidden">
-                <div className="container-page">
-                    <ul ref={chipBar} className="scrollbar-none flex gap-2 overflow-x-auto py-3">
-                        {shelves.map(({ category }) => {
-                            const selected = category.slug === active;
-                            return (
-                                <li key={category.slug} className="shrink-0">
-                                    <button
-                                        type="button"
-                                        data-chip={category.slug}
-                                        onClick={() => jumpToShelf(category.slug)}
-                                        aria-current={selected ? 'true' : undefined}
-                                        className={cn(
-                                            'inline-flex h-11 items-center gap-2 rounded-full border pr-4 text-small font-medium transition-colors',
-                                            category.image ? 'pl-1.5' : 'pl-4',
-                                            selected ? 'border-primary bg-primary text-white' : 'border-line-strong bg-surface text-ink hover:border-primary hover:text-primary',
-                                        )}
-                                    >
-                                        {category.image && <img src={imageUrl(category.image, 80)} alt="" width="32" height="32" loading="lazy" className="size-8 rounded-full bg-canvas-alt object-cover" />}
-                                        {category.label}
-                                    </button>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </div>
-            </nav>
             {shelves.map((shelf) => <Shelf key={shelf.category.slug} shelf={shelf} />)}
         </div>
     );

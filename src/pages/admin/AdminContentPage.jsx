@@ -707,11 +707,14 @@ export default function AdminContentPage() {
                                     <>
                                         <label className="flex items-center gap-3 cursor-pointer">
                                             <input type="checkbox" className="h-4 w-4 accent-primary" checked={content.extras.nav.showAll} onChange={(e) => updateExtras({ nav: { ...content.extras.nav, showAll: e.target.checked } })} />
-                                            <span className="text-sm text-ink">Show “All products” as the first item</span>
+                                            <span className="text-sm text-ink">Show a “Shop” button first (opens all products)</span>
                                         </label>
-                                        <AdminField label="Categories shown before “More”" hint="On wide screens. Smaller laptops show up to 4; the rest go under “More”.">
-                                            <Input type="number" min={2} max={10} className="w-28" value={content.extras.nav.maxVisible} onChange={(e) => updateExtras({ nav: { ...content.extras.nav, maxVisible: Number(e.target.value) || 6 } })} />
-                                        </AdminField>
+                                        {content.extras.nav.showAll && (
+                                            <AdminField label="Shop button text">
+                                                <Input maxLength={20} className="w-48" value={content.extras.nav.shopLabel} onChange={(e) => updateExtras({ nav: { ...content.extras.nav, shopLabel: e.target.value } })} />
+                                            </AdminField>
+                                        )}
+                                        <p className="text-caption text-admin-muted">Categories sit in a row that slides sideways. On the homepage it moves by itself to the category being scrolled past. On phones it is a second row under the logo.</p>
                                         <p className="text-caption text-admin-muted">
                                             Which categories appear, and their order, follow the “Category Shelves” section below — so the top bar and the homepage always match.
                                             A category with no products is hidden automatically. Rename, reorder or hide categories in{' '}

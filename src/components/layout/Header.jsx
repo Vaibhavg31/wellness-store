@@ -59,7 +59,7 @@ export default function Header() {
 
                 <Logo size="header" linkToHome priority />
 
-                <CategoryNav />
+                <CategoryNav variant="desktop" />
 
                 <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
                     <button type="button" className={iconButton} onClick={() => setSearchOpen(true)} aria-label="Search">
@@ -76,6 +76,8 @@ export default function Header() {
                     </button>
                 </div>
             </div>
+
+            <CategoryNav variant="phone" />
 
             <MobileNav isOpen={menuOpen} onClose={() => setMenuOpen(false)} links={links} />
             {searchOpen && (

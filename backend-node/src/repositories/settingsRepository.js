@@ -111,7 +111,7 @@ const DEFAULTS = {
         // Homepage category shelves: 'auto' = every category that has products; 'custom' = the listed ones, in order.
         shelves: { mode: 'auto', limit: 8, items: [] },
         // Top navigation: 'categories' shows the shop's categories (product-first); 'links' shows the custom link list.
-        nav: { mode: 'categories', showAll: true, maxVisible: 6 },
+        nav: { mode: 'categories', showAll: true, shopLabel: 'Shop' },
         // Sticky edge tab that opens an "unlock your code" panel.
         offerTab: {
             enabled: false,
@@ -179,7 +179,7 @@ function sanitizeExtras(input) {
         nav: {
             mode: e.nav?.mode === 'links' ? 'links' : 'categories',
             showAll: e.nav?.showAll === undefined ? d.nav.showAll : Boolean(e.nav.showAll),
-            maxVisible: Math.min(10, Math.max(2, Number.parseInt(e.nav?.maxVisible ?? d.nav.maxVisible, 10) || d.nav.maxVisible)),
+            shopLabel: String(e.nav?.shopLabel ?? d.nav.shopLabel).trim().slice(0, 20) || d.nav.shopLabel,
         },
         offerTab: {
             enabled: Boolean(e.offerTab?.enabled),

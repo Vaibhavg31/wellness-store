@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
 import { jumpToShelf, useShelfSpy } from '@/utils/shelfSpy';
@@ -9,12 +9,12 @@ import { cn } from '@/utils/formatPrice';
 const pill = 'relative z-10 block whitespace-nowrap rounded-full px-4 py-2 text-small font-medium transition-colors duration-200';
 const pillIdle = 'text-ink hover:text-primary';
 const pillActive = 'text-primary-deep';
-const GAP = 2; // px between pills (gap-0.5)
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Behaviour shared by every category link (desktop bar, "More" menu, mobile drawer): on the homepage the link
- * scrolls to that category's shelf; anywhere else it opens the category page. Also reports whether it is "current":
- * the shelf being read on the homepage, or the category page being viewed.
+ * Behaviour shared by every category link (this strip and the mobile drawer): on the homepage the link scrolls to
+ * that category's shelf; anywhere else it opens the category page. Also reports whether it is "current": the shelf
+ * being read on the homepage, or the category page being viewed.
  */
 export function useCategoryLink(slug) {
     const { pathname } = useLocation();
@@ -31,7 +31,7 @@ export function useCategoryLink(slug) {
     return { to: `/category/${slug}`, current, onClick };
 }
 
-/** Same rule as useCategoryLink, for the bar as a whole (so it can slide one highlight between its items). */
+/** The category being read on the homepage, or the category page being viewed ('' when neither). */
 function useCurrentSlug() {
     const { pathname } = useLocation();
     const { slugs, active } = useShelfSpy();
@@ -39,166 +39,86 @@ function useCurrentSlug() {
     return pathname.startsWith('/category/') ? decodeURIComponent(pathname.split('/')[2] ?? '') : '';
 }
 
-function CategoryLink({ category, current, onNavigate, className, itemRef }) {
+function CategoryLink({ category, current, itemRef }) {
     const { to, onClick } = useCategoryLink(category.slug);
     return (
         <Link
             ref={itemRef}
             to={to}
-            onClick={(event) => { onClick(event); onNavigate?.(); }}
+            onClick={onClick}
             aria-current={current ? 'true' : undefined}
-            className={cn(className ?? pill, current ? pillActive : pillIdle)}
+            className={cn(pill, current ? pillActive : pillIdle)}
         >
             {category.label}
         </Link>
     );
 }
 
-function MoreMenu({ categories, currentSlug, buttonRef, active }) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef(null);
-    const { pathname } = useLocation();
-
-    useEffect(() => {
-        if (!open) return undefined;
-        const onDown = (event) => { if (!ref.current?.contains(event.target)) setOpen(false); };
-        const onKey = (event) => { if (event.key === 'Escape') setOpen(false); };
-        document.addEventListener('mousedown', onDown);
-        document.addEventListener('keydown', onKey);
-        return () => {
-            document.removeEventListener('mousedown', onDown);
-            document.removeEventListener('keydown', onKey);
-        };
-    }, [open]);
-
-    useEffect(() => setOpen(false), [pathname]);
-
-    return (
-        <div ref={ref} className="relative">
-            <button
-                ref={buttonRef}
-                type="button"
-                onClick={() => setOpen((v) => !v)}
-                aria-expanded={open}
-                aria-haspopup="true"
-                aria-current={active ? 'true' : undefined}
-                className={cn(pill, 'inline-flex items-center gap-1', active ? pillActive : pillIdle)}
-            >
-                More <ChevronDown size={14} className={cn('transition-transform', open && 'rotate-180')} aria-hidden="true" />
-            </button>
-            {open && (
-                <ul className="absolute right-0 top-full z-50 mt-2 max-h-[70vh] min-w-52 animate-fade-in overflow-y-auto rounded-lg border border-line bg-surface p-1.5 shadow-md">
-                    {categories.map((category) => (
-                        <li key={category.slug}>
-                            <CategoryLink
-                                category={category}
-                                current={currentSlug === category.slug}
-                                className="block rounded-md px-3 py-2 text-small font-medium transition-colors"
-                                onNavigate={() => setOpen(false)}
-                            />
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    );
-}
-
 /**
- * Decides how many items fit. All items are laid out once in an invisible row to measure their real widths (names
- * differ a lot, and the browser may be zoomed), then the largest prefix that fits next to a "More" button is shown.
- * Re-measured whenever the bar resizes or the web fonts finish loading. `cap` is the admin's upper limit.
+ * The category strip used in the header. "Shop" is pinned first; the categories sit in a row that slides sideways,
+ * and as the visitor scrolls the homepage it moves on its own to keep the category being read in view while a
+ * rounded highlight glides under it. Used twice: inline in the header on desktop, and as the second row of the
+ * header on phones. `variant` only changes sizing.
  */
-function useFit(containerRef, measureRef, itemCount, cap) {
-    const [fit, setFit] = useState(itemCount);
-
-    const measure = useCallback(() => {
-        const container = containerRef.current;
-        const row = measureRef.current;
-        if (!container || !row) return;
-        const kids = [...row.children];
-        const moreWidth = kids.at(-1)?.offsetWidth ?? 0;
-        const widths = kids.slice(0, -1).map((k) => k.offsetWidth + GAP);
-        const available = container.clientWidth;
-        const total = widths.reduce((a, b) => a + b, 0);
-        let count = 0;
-        let used = 0;
-        if (total <= available) {
-            count = widths.length;
-        } else {
-            for (const w of widths) {
-                if (used + w + moreWidth > available) break;
-                used += w;
-                count += 1;
-            }
-        }
-        setFit(Math.max(1, Math.min(count, cap)));
-    }, [containerRef, measureRef, cap]);
-
-    useLayoutEffect(() => {
-        measure();
-        const container = containerRef.current;
-        if (!container) return undefined;
-        const observer = new ResizeObserver(measure);
-        observer.observe(container);
-        document.fonts?.ready.then(measure);
-        return () => observer.disconnect();
-    }, [measure, containerRef, itemCount]);
-
-    return fit;
-}
-
-/**
- * The header's main navigation. By default it is the shop's categories (product-first): "All products" then each
- * category, whatever doesn't fit under "More". On the homepage a single rounded highlight glides along the bar to
- * the category being read as the visitor scrolls; elsewhere it marks the current category page. The admin can
- * switch it to a custom link list (Content → Homepage → Top navigation bar).
- */
-export default function CategoryNav() {
+export default function CategoryNav({ variant = 'desktop' }) {
     const { content } = useSiteContent();
     const { plan } = useCategoryPlan();
-    const { mode, showAll, maxVisible } = content.extras.nav;
+    const { mode, showAll, shopLabel } = content.extras.nav;
     const { pathname } = useLocation();
     const currentSlug = useCurrentSlug();
+    const phone = variant === 'phone';
 
-    const navRef = useRef(null);
-    const measureRef = useRef(null);
+    const scrollerRef = useRef(null);
     const listRef = useRef(null);
     const itemRefs = useRef({});
     const [indicator, setIndicator] = useState(null);
-    const [glide, setGlide] = useState(false); // animate only after the first placement, so it doesn't fly in from the left edge
+    const [glide, setGlide] = useState(false); // animate only after the first placement, so it doesn't fly in from the edge
+    const [edges, setEdges] = useState({ left: false, right: false });
 
-    const items = [...(showAll ? [{ key: '__all', label: 'All products' }] : []), ...plan.map((c) => ({ key: c.slug, label: c.label, category: c }))];
-    const cap = maxVisible + (showAll ? 1 : 0);
-    const fit = useFit(navRef, measureRef, items.length, cap);
-    const shown = items.slice(0, fit);
-    const more = items.slice(fit).map((i) => i.category);
+    const activeKey = plan.some((c) => c.slug === currentSlug) ? currentSlug : '';
+    const shopActive = showAll && pathname.startsWith('/shop');
 
-    const allActive = showAll && pathname.startsWith('/shop');
-    const activeKey = allActive ? '__all' : (shown.some((i) => i.key === currentSlug) ? currentSlug : (more.some((c) => c.slug === currentSlug) ? '__more' : ''));
+    const updateEdges = useCallback(() => {
+        const node = scrollerRef.current;
+        if (!node) return;
+        setEdges({ left: node.scrollLeft > 4, right: node.scrollLeft + node.clientWidth < node.scrollWidth - 4 });
+    }, []);
 
-    // Slide the highlight under the active item.
+    // Glide the highlight under the active category, and slide the strip so that category is in view.
     useLayoutEffect(() => {
         const list = listRef.current;
+        const scroller = scrollerRef.current;
         const node = activeKey ? itemRefs.current[activeKey] : null;
-        if (!list || !node) {
+        if (!list || !scroller || !node) {
             setIndicator(null);
             return undefined;
         }
-        const listBox = list.getBoundingClientRect();
-        const box = node.getBoundingClientRect();
-        setIndicator({ left: box.left - listBox.left, width: box.width });
+        setIndicator({ left: node.offsetLeft, width: node.offsetWidth });
+        const target = node.offsetLeft - (scroller.clientWidth - node.offsetWidth) / 2;
+        scroller.scrollTo({ left: Math.max(0, target), behavior: glide && !reducedMotion() ? 'smooth' : 'auto' });
         const frame = requestAnimationFrame(() => setGlide(true));
         return () => cancelAnimationFrame(frame);
-    }, [activeKey, fit, plan, showAll, mode]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeKey, plan]);
+
+    useEffect(() => {
+        updateEdges();
+        const scroller = scrollerRef.current;
+        if (!scroller) return undefined;
+        const observer = new ResizeObserver(updateEdges);
+        observer.observe(scroller);
+        document.fonts?.ready.then(updateEdges);
+        return () => observer.disconnect();
+    }, [updateEdges, plan]);
 
     if (mode === 'links') {
+        if (phone) return null;
         return (
             <nav aria-label="Main navigation" className="ml-8 hidden lg:block">
                 <ul className="flex items-center gap-1">
                     {(content.navLinks ?? []).map((link) => (
                         <li key={link.href}>
-                            <NavLink to={link.href} end={link.href === '/'} className={({ isActive }) => cn(pill, 'bg-transparent', isActive ? 'bg-primary-tint text-primary-deep' : pillIdle)}>{link.label}</NavLink>
+                            <NavLink to={link.href} end={link.href === '/'} className={({ isActive }) => cn(pill, isActive ? 'bg-primary-tint text-primary-deep' : pillIdle)}>{link.label}</NavLink>
                         </li>
                     ))}
                 </ul>
@@ -206,35 +126,65 @@ export default function CategoryNav() {
         );
     }
 
-    const setRef = (key) => (node) => { itemRefs.current[key] = node; };
+    if (plan.length === 0 && !showAll) return null;
+
+    const slide = (direction) => {
+        const scroller = scrollerRef.current;
+        if (scroller) scroller.scrollBy({ left: direction * scroller.clientWidth * 0.7, behavior: reducedMotion() ? 'auto' : 'smooth' });
+    };
 
     return (
-        <nav ref={navRef} aria-label="Main navigation" className="relative ml-6 hidden min-w-0 flex-1 lg:block">
-            {/* invisible copy used only to measure each item's real width */}
-            <ul ref={measureRef} aria-hidden="true" className="pointer-events-none invisible absolute left-0 top-0 flex h-0 w-max items-center gap-0.5 overflow-hidden">
-                {items.map((item) => <li key={item.key} className="shrink-0"><span className={cn(pill, 'px-4')}>{item.label}</span></li>)}
-                <li className="shrink-0"><span className={cn(pill, 'inline-flex items-center gap-1')}>More <ChevronDown size={14} /></span></li>
-            </ul>
+        <nav
+            aria-label={phone ? 'Categories' : 'Main navigation'}
+            className={cn('flex min-w-0 items-center gap-2', phone ? 'container-page py-2 lg:hidden' : 'ml-6 hidden flex-1 lg:flex')}
+        >
+            {showAll && (
+                <NavLink
+                    to="/shop"
+                    className={cn(
+                        'inline-flex shrink-0 items-center rounded-full bg-primary px-5 text-small font-semibold text-white transition-colors hover:bg-primary-hover',
+                        phone ? 'h-9' : 'h-10',
+                        shopActive && 'ring-2 ring-primary/30 ring-offset-2 ring-offset-canvas',
+                    )}
+                >
+                    {shopLabel}
+                </NavLink>
+            )}
 
-            <ul ref={listRef} className="relative flex w-max max-w-full items-center gap-0.5">
-                <li
-                    aria-hidden="true"
-                    className={cn('absolute inset-y-0 rounded-full bg-primary-tint', glide && 'transition-[left,width,opacity] duration-500 ease-out', indicator ? 'opacity-100' : 'opacity-0')}
-                    style={{ left: indicator?.left ?? 0, width: indicator?.width ?? 0 }}
-                />
-                {shown.map((item) => (
-                    <li key={item.key}>
-                        {item.category ? (
-                            <CategoryLink category={item.category} current={currentSlug === item.key} itemRef={setRef(item.key)} />
-                        ) : (
-                            <NavLink ref={setRef(item.key)} to="/shop" className={({ isActive }) => cn(pill, isActive ? pillActive : pillIdle)}>{item.label}</NavLink>
-                        )}
-                    </li>
-                ))}
-                {more.length > 0 && (
-                    <li><MoreMenu categories={more} currentSlug={currentSlug} buttonRef={setRef('__more')} active={activeKey === '__more'} /></li>
+            <div className="relative min-w-0 flex-1">
+                {edges.left && !phone && (
+                    <button type="button" onClick={() => slide(-1)} aria-label="Scroll categories left" className="absolute left-0 top-1/2 z-20 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-surface shadow-md hover:bg-canvas-alt">
+                        <ChevronLeft size={16} />
+                    </button>
                 )}
-            </ul>
+                {edges.right && !phone && (
+                    <button type="button" onClick={() => slide(1)} aria-label="Scroll categories right" className="absolute right-0 top-1/2 z-20 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-surface shadow-md hover:bg-canvas-alt">
+                        <ChevronRight size={16} />
+                    </button>
+                )}
+                {/* soft fade where the row continues */}
+                <span aria-hidden="true" className={cn('pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-canvas to-transparent transition-opacity', edges.left ? 'opacity-100' : 'opacity-0')} />
+                <span aria-hidden="true" className={cn('pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-canvas to-transparent transition-opacity', edges.right ? 'opacity-100' : 'opacity-0')} />
+
+                <div ref={scrollerRef} onScroll={updateEdges} className="scrollbar-none overflow-x-auto overscroll-x-contain">
+                    <ul ref={listRef} className="relative flex w-max items-center gap-0.5">
+                        <li
+                            aria-hidden="true"
+                            className={cn('absolute inset-y-0 rounded-full bg-primary-tint', glide && 'transition-[left,width,opacity] duration-500 ease-out', indicator ? 'opacity-100' : 'opacity-0')}
+                            style={{ left: indicator?.left ?? 0, width: indicator?.width ?? 0 }}
+                        />
+                        {plan.map((category) => (
+                            <li key={category.slug}>
+                                <CategoryLink
+                                    category={category}
+                                    current={activeKey === category.slug}
+                                    itemRef={(node) => { itemRefs.current[category.slug] = node; }}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
         </nav>
     );
 }
