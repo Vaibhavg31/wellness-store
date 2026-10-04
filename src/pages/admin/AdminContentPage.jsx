@@ -328,17 +328,79 @@ export default function AdminContentPage() {
                     </div>
                 );
 
-            case 'bannerSlider':
+            case 'bannerSlider': {
+                const top = content.extras.topSlider;
+                const patchTop = (change) => updateExtras({ topSlider: { ...top, ...change } });
+                const patchVideo = (change) => patchTop({ video: { ...top.video, ...change } });
                 return (
-                    <div className="pt-3 space-y-3">
+                    <div className="pt-3 space-y-4">
                         <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
-                            A full-width slider that runs edge to edge: one banner at a time, auto-advancing, swipeable on phones.
-                            Use it for sales, announcements or brand images. Add a separate phone image to each banner so it
-                            looks right on mobile. Not the same as "Image Banners (Stacked)" below.
+                            The first thing visitors see: a full-width section that runs edge to edge. Show either a slider of several
+                            images, or one video. Use it for sales, announcements or brand images.
                         </p>
-                        <BannerManager filterTarget="slider" />
+
+                        <AdminField label="What should this section show?">
+                            <div className="grid grid-cols-2 gap-3">
+                                {[
+                                    { value: 'images', title: 'Image slider', desc: 'Several images that slide automatically' },
+                                    { value: 'video', title: 'One video', desc: 'A single full-width video' },
+                                ].map((option) => (
+                                    <button
+                                        key={option.value}
+                                        type="button"
+                                        onClick={() => patchTop({ mode: option.value })}
+                                        aria-pressed={top.mode === option.value}
+                                        className={`rounded-xl border p-3 text-left transition-all ${top.mode === option.value ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-admin-border bg-admin-surface-alt hover:border-line'}`}
+                                    >
+                                        <p className="text-sm font-semibold text-ink">{option.title}</p>
+                                        <p className="text-[11px] text-admin-muted mt-0.5">{option.desc}</p>
+                                    </button>
+                                ))}
+                            </div>
+                        </AdminField>
+
+                        {top.mode === 'images' ? (
+                            <>
+                                <AdminField label="Slide every (seconds)" hint="How long each image stays. Use 0 to stop automatic sliding (visitors can still swipe or use the arrows).">
+                                    <Input type="number" min={0} max={30} className="w-28" value={top.autoplaySeconds} onChange={(e) => patchTop({ autoplaySeconds: Math.min(30, Math.max(0, Number(e.target.value) || 0)) })} />
+                                </AdminField>
+                                <p className="text-xs text-admin-muted">
+                                    Add as many slides as you like and move them with the arrows. Best size 1920×730px (wide); add a separate phone
+                                    image (about 1080×1350px) so it looks right on mobile. Not the same as “Image Banners (Stacked)” below.
+                                </p>
+                                <BannerManager filterTarget="slider" />
+                            </>
+                        ) : (
+                            <div className="space-y-4">
+                                <VideoUploadField
+                                    label="Video"
+                                    hint="MP4 or WebM, wide (landscape) works best, max 20MB. It plays silently on a loop; visitors can pause it or turn sound on."
+                                    value={top.video.url}
+                                    width={top.video.width}
+                                    height={top.video.height}
+                                    onChange={({ url, width, height }) => patchVideo({ url, width, height })}
+                                    adminToken={adminToken}
+                                />
+                                <ImageUploadField
+                                    label="Poster image (optional)"
+                                    hint="Shown while the video loads, and to visitors who prefer reduced motion."
+                                    value={top.video.poster}
+                                    onChange={(v) => patchVideo({ poster: v })}
+                                    adminToken={adminToken}
+                                />
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <AdminField label="Small heading (optional)"><Input maxLength={90} value={top.video.subtitle} onChange={(e) => patchVideo({ subtitle: e.target.value })} /></AdminField>
+                                    <AdminField label="Big heading (optional)"><Input maxLength={90} value={top.video.title} onChange={(e) => patchVideo({ title: e.target.value })} /></AdminField>
+                                    <AdminField label="Button text (optional)"><Input maxLength={30} value={top.video.ctaLabel} onChange={(e) => patchVideo({ ctaLabel: e.target.value })} placeholder="Shop Now" /></AdminField>
+                                    <AdminField label="Button link"><Input maxLength={200} value={top.video.ctaHref} onChange={(e) => patchVideo({ ctaHref: e.target.value })} placeholder="/shop" /></AdminField>
+                                </div>
+                                {!top.video.url && <p className="text-xs text-danger">No video uploaded yet — until you upload one, nothing shows in this section.</p>}
+                                <p className="text-xs text-admin-muted">Your slider images are kept. Switch back to “Image slider” any time.</p>
+                            </div>
+                        )}
                     </div>
                 );
+            }
 
             case 'banners':
                 return (

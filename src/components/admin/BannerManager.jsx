@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Upload, X, Image as ImageIcon, Eye, EyeOff } from 'lucide-react';
+import { Plus, Pencil, Trash2, Upload, X, Image as ImageIcon, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import Input from '@/components/ui/Input';
@@ -66,11 +66,24 @@ export default function BannerManager({ filterTarget, productId }) {
         fetchBanners();
     }, [adminToken]);
 
-    const visibleBanners = productId
+    const visibleBanners = (productId
         ? banners.filter((b) => b.displayTarget === 'product' && b.productId === productId)
         : filterTarget
             ? banners.filter((b) => b.displayTarget === filterTarget || b.displayTarget === 'both')
-            : banners.filter((b) => b.displayTarget !== 'product');
+            : banners.filter((b) => b.displayTarget !== 'product')
+    ).sort((a, b) => a.order - b.order);
+
+    // Move one slide up/down by renumbering the list 1..n, so equal or gappy order numbers can never block a move.
+    const move = async (banner, direction) => {
+        if (!adminToken) return;
+        const list = [...visibleBanners];
+        const from = list.findIndex((b) => b.id === banner.id);
+        const to = from + direction;
+        if (to < 0 || to >= list.length) return;
+        list.splice(to, 0, list.splice(from, 1)[0]);
+        await Promise.all(list.map((b, i) => (b.order === i + 1 ? null : api.put(`/api/banners/${b.id}`, { order: i + 1 }, adminToken))));
+        fetchBanners();
+    };
 
     const openNew = () => {
         setEditing(null);
@@ -176,7 +189,7 @@ export default function BannerManager({ filterTarget, productId }) {
                                     <th className="p-3 font-medium text-admin-muted w-24">Preview</th>
                                     <th className="p-3 font-medium text-admin-muted min-w-[160px]">Title</th>
                                     <th className="p-3 font-medium text-admin-muted w-28">Shows in</th>
-                                    <th className="p-3 font-medium text-admin-muted w-16 text-center">Order</th>
+                                    <th className="p-3 font-medium text-admin-muted w-24 text-center">Move</th>
                                     <th className="p-3 font-medium text-admin-muted w-24">Status</th>
                                     <th className="p-3 font-medium text-admin-muted w-20" />
                                 </tr>
@@ -198,8 +211,11 @@ export default function BannerManager({ filterTarget, productId }) {
                                         <td className="p-3 align-top">
                                             <span className="text-xs text-admin-muted">{TARGET_LABELS[banner.displayTarget] || 'Both'}</span>
                                         </td>
-                                        <td className="p-3 align-top text-center">
-                                            <span className="font-display text-ink">{banner.order}</span>
+                                        <td className="p-3 align-top">
+                                            <div className="flex items-center justify-center gap-1">
+                                                <AdminIconButton onClick={() => move(banner, -1)} icon={ArrowUp} title="Move earlier" />
+                                                <AdminIconButton onClick={() => move(banner, 1)} icon={ArrowDown} title="Move later" />
+                                            </div>
                                         </td>
                                         <td className="p-3 align-top">
                                             <button type="button" onClick={() => toggleEnabled(banner)}>
@@ -229,7 +245,7 @@ export default function BannerManager({ filterTarget, productId }) {
                         {form.image ? (
                             <div className="space-y-3">
                                 <div className="relative inline-block">
-                                    <img src={imageUrl(form.image)} alt="" className="w-full max-w-xs aspect-[21/9] object-cover rounded-xl border border-admin-border" />
+                                    <img src={imageUrl(form.image)} alt="" className="w-full max-w-xs aspect-[21/8] object-cover rounded-xl border border-admin-border" />
                                     <button
                                         type="button"
                                         onClick={() => setForm({ ...form, image: '' })}
@@ -248,8 +264,8 @@ export default function BannerManager({ filterTarget, productId }) {
                                 <Upload size={24} className="text-admin-muted/80" />
                                 <span className="text-sm text-admin-muted">{uploading ? 'Uploading…' : 'Click to upload image'}</span>
                                 <span className="text-xs text-admin-muted px-4 text-center">
-                                    Any wide/landscape photo works — it's automatically cropped to fit.
-                                    Best results around 1920×800–1920×960px (roughly 2:1–2.4:1). JPG, PNG, WebP · max 5MB.
+                                    Best size 1920×730px (a wide 21:8 banner). Other wide photos are cropped to fit, so keep
+                                    important text away from the edges. JPG, PNG, WebP · max 5MB.
                                 </span>
                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
                             </label>

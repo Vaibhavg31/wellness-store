@@ -112,6 +112,8 @@ const DEFAULTS = {
         shelves: { mode: 'auto', limit: 8, items: [] },
         // Top navigation: 'categories' shows the shop's categories (product-first); 'links' shows the custom link list.
         nav: { mode: 'categories', showAll: true, shopLabel: 'Shop' },
+        // Top-of-homepage media: 'images' = the banner slider, 'video' = one full-width video. 0 seconds = no auto-advance.
+        topSlider: { mode: 'images', autoplaySeconds: 6, video: { url: '', poster: '', width: 0, height: 0, title: '', subtitle: '', ctaLabel: '', ctaHref: '' } },
         // Sticky edge tab that opens an "unlock your code" panel.
         offerTab: {
             enabled: false,
@@ -175,6 +177,20 @@ function sanitizeExtras(input) {
                 .map((s) => ({ categorySlug: String(s?.categorySlug ?? '').trim().slice(0, 64), subtitle: String(s?.subtitle ?? '').trim().slice(0, 120) }))
                 .filter((s) => s.categorySlug)
                 .slice(0, 20),
+        },
+        topSlider: {
+            mode: e.topSlider?.mode === 'video' ? 'video' : 'images',
+            autoplaySeconds: Math.min(30, Math.max(0, Number.parseInt(e.topSlider?.autoplaySeconds ?? d.topSlider.autoplaySeconds, 10) || 0)),
+            video: {
+                url: String(e.topSlider?.video?.url ?? '').trim().slice(0, 500),
+                poster: String(e.topSlider?.video?.poster ?? '').trim().slice(0, 500),
+                width: Math.max(0, Number.parseInt(e.topSlider?.video?.width, 10) || 0),
+                height: Math.max(0, Number.parseInt(e.topSlider?.video?.height, 10) || 0),
+                title: String(e.topSlider?.video?.title ?? '').trim().slice(0, 90),
+                subtitle: String(e.topSlider?.video?.subtitle ?? '').trim().slice(0, 90),
+                ctaLabel: String(e.topSlider?.video?.ctaLabel ?? '').trim().slice(0, 30),
+                ctaHref: String(e.topSlider?.video?.ctaHref ?? '').trim().slice(0, 200),
+            },
         },
         nav: {
             mode: e.nav?.mode === 'links' ? 'links' : 'categories',

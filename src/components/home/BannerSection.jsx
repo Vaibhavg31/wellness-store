@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useBanners } from '@/hooks/useApi';
+import TopVideo from '@/components/home/TopVideo';
+import { useSiteContent } from '@/contexts/SiteContentContext';
 import { imageUrl } from '@/services/api';
 
 const isExternal = (href) => /^https?:\/\//i.test(href);
@@ -79,6 +81,8 @@ function SlideContent({ banner, priority, phoneRatio }) {
  * added it. Announcements, offers or plain brand images all work: a slide is just an image with optional text.
  */
 export function BannerSlider() {
+    const { content } = useSiteContent();
+    const { mode, autoplaySeconds, video } = content.extras.topSlider;
     const { banners, loading } = useBanners('slider');
     const trackRef = useRef(null);
     const [index, setIndex] = useState(0);
@@ -99,11 +103,12 @@ export function BannerSlider() {
     };
 
     useEffect(() => {
-        if (count < 2 || paused || reducedMotion()) return undefined;
-        const timer = setInterval(() => go(index + 1), 6000);
+        if (mode !== 'images' || autoplaySeconds <= 0 || count < 2 || paused || reducedMotion()) return undefined;
+        const timer = setInterval(() => go(index + 1), autoplaySeconds * 1000);
         return () => clearInterval(timer);
-    }, [count, paused, index, go]);
+    }, [mode, autoplaySeconds, count, paused, index, go]);
 
+    if (mode === 'video') return video.url ? <TopVideo video={video} /> : null;
     if (loading || count === 0) return null;
 
     return (

@@ -245,6 +245,7 @@ export const DEFAULT_SITE_CONTENT = {
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' }, // extra popup options; see AnnouncementPopup
         spin: { cooldownDays: 30, segments: [] }, // spin-the-wheel slices: [{ label, couponId, weight }]
         shelves: { mode: 'auto', limit: 8, items: [] }, // homepage category shelves: custom items = [{ categorySlug, subtitle }]
+        topSlider: { mode: 'images', autoplaySeconds: 6, video: { url: '', poster: '', width: 0, height: 0, title: '', subtitle: '', ctaLabel: '', ctaHref: '' } }, // top section: image slider or one video
         nav: { mode: 'categories', showAll: true, shopLabel: 'Shop' }, // top bar: 'categories' (product-first) or 'links' (custom list)
         offerTab: {
             enabled: false,
