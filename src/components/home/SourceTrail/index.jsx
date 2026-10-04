@@ -32,7 +32,7 @@ export default function SourceTrail({ products = [] }) {
     const reducedMotion = useReducedMotion();
 
     return (
-        <section aria-label="Source trail" className="relative bg-[#0A3D25] py-16">
+        <section aria-label="Source trail" className="relative bg-[#431A43] py-16">
             <div className="relative z-10 max-w-3xl mx-auto px-6 pb-10 text-center">
                 <SectionTitle
                     subtitle="Traced, Not Just Claimed"

@@ -30,16 +30,16 @@ export const DEFAULT_SITE_CONTENT = {
     favicon: '',
 
     theme: {
-        primaryColor: '#0F5132',
-        primaryLight: '#15803D',
-        primaryDark: '#0A3D25',
-        accentColor: '#D97706',
-        accentLight: '#F59E0B',
-        tintColor: '#DCEEE1',
-        backgroundColor: '#FBF9F4',
-        textColor: '#1C1A16',
-        fontHeading: '"Manrope", system-ui, sans-serif',
-        fontBody: '"Inter", system-ui, sans-serif',
+        primaryColor: '#602460',
+        primaryLight: '#7A3380',
+        primaryDark: '#431A43',
+        accentColor: '#C08A3E',
+        accentLight: '#D8A860',
+        tintColor: '#F1E4F2',
+        backgroundColor: '#FDF9F4',
+        textColor: '#241720',
+        fontHeading: '"Lora", Georgia, serif',
+        fontBody: '"Poppins", system-ui, sans-serif',
     },
 
     contact: {
@@ -77,14 +77,12 @@ export const DEFAULT_SITE_CONTENT = {
 
     sections: {
         hero: true,
-        spotlightOrbit: true,
         videoBanner: true,
         brandMarquee: true,
         banners: true,
         bannerSlider: true,
         featured: true,
         trending: true,
-        atelier3d: true,
         categories: true,
         bundles: true,
         ritualBuilder: true,
@@ -114,7 +112,7 @@ export const DEFAULT_SITE_CONTENT = {
     popup: {
         enabled: false,
         type: 'info',
-        title: 'Welcome to Wellness Store',
+        title: `Welcome to ${BRAND_NAME}`,
         message: 'Sign up for our newsletter and get 10% off your first order.',
         image: '',
         ctaLabel: 'Shop Now',
@@ -141,25 +139,25 @@ export const DEFAULT_SITE_CONTENT = {
 
     hero: {
         badge: 'FSSAI & Lab Tested',
-        headline: 'Wellness, Backed by',
-        headlineAccent: 'Science',
+        headline: 'Ancient Wisdom for',
+        headlineAccent: 'Modern Living',
         subheadline: BRAND_DESCRIPTION,
         primaryCta: { label: 'Shop Now', href: '/shop' },
         featuredProductId: '',
         images: HERO_PRODUCT_IMAGES,
         productImageIds: [],
         trustBadges: [
-            { icon: 'shield', label: 'FSSAI Certified' },
+            { icon: 'shield', label: 'Ayurveda Certified' },
             { icon: 'star', label: '4.9★ Rated' },
-            { icon: 'sparkles', label: 'Lab Tested' },
+            { icon: 'sparkles', label: '100% Natural' },
         ],
     },
 
     marquee: {
         items: [
             'FSSAI & GMP Certified',
+            'Authentic Ayurvedic Formulations',
             'Lab Tested Purity',
-            'No Added Preservatives',
             'Free Delivery Above ₹1999',
             '7-Day Easy Returns',
         ],
@@ -175,7 +173,7 @@ export const DEFAULT_SITE_CONTENT = {
     whyChoose: {
         subtitle: 'Why Choose Us',
         title: 'Wellness You Can Trust',
-        description: 'From sourcing to lab testing, every step is built around transparency.',
+        description: 'From sourcing to lab testing, every step is built around Ayurvedic tradition and transparency.',
         benefits: BENEFITS,
         ctaText: "Stay connected with us on Instagram and WhatsApp. We're always happy to help.",
     },
@@ -192,7 +190,7 @@ export const DEFAULT_SITE_CONTENT = {
     newsletter: {
         badge: 'Exclusive Access',
         title: 'Join Our Wellness Circle',
-        description: 'Be the first to hear about new products, offers, and wellness tips.',
+        description: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.',
         buttonLabel: 'Subscribe',
         disclaimer: 'No spam. Unsubscribe anytime.',
         successMessage: 'Thank you for subscribing!',
@@ -208,18 +206,18 @@ export const DEFAULT_SITE_CONTENT = {
 
     about: {
         heroTitle: 'Our Story',
-        heroDescription: `${BRAND_NAME} was founded on a simple belief: everyday wellness shouldn't mean compromising on purity or transparency.`,
+        heroDescription: `${BRAND_NAME} was founded on a simple belief: ancient Ayurvedic wisdom shouldn't mean compromising on purity or modern-day convenience.`,
         storyBadge: 'The Beginning',
-        storyTitle: 'Wellness, Honestly Made',
+        storyTitle: 'Ayurveda, Honestly Made',
         storyParagraphs: [
-            `${BRAND_NAME} was founded with a simple yet powerful vision: to make clean-label, lab-tested wellness products accessible to every household.`,
-            'Every product we make is thoughtfully sourced and rigorously tested, combining traditional wellness knowledge with modern quality standards.',
+            `${BRAND_NAME} was founded with a simple yet powerful vision: to make authentic, lab-tested Ayurvedic wellness accessible to every household.`,
+            'Every product we make is thoughtfully sourced and rigorously tested, combining traditional Ayurvedic knowledge with modern quality standards.',
         ],
         storyImage: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=800&q=80',
         missionTitle: 'Our Mission',
-        missionText: 'To make clean-label, lab-tested wellness products accessible to every household.',
+        missionText: 'To make authentic, lab-tested Ayurvedic wellness accessible to every household.',
         visionTitle: 'Our Vision',
-        visionText: "To become India's most trusted wellness brand, known for transparency and quality.",
+        visionText: "To become India's most trusted Ayurveda and wellness brand, known for transparency and quality.",
         valuesSubtitle: 'What Drives Us',
         valuesTitle: 'Mission & Vision',
     },
@@ -235,12 +233,12 @@ export const DEFAULT_SITE_CONTENT = {
         tagline: BRAND_TAGLINE,
         description: BRAND_DESCRIPTION,
         newsletterTitle: 'Our Wellness Circle',
-        newsletterDescription: 'Be the first to hear about new products, offers, and wellness tips.',
+        newsletterDescription: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.',
         instagramCardText: 'Wellness tips, product stories & behind-the-scenes.',
     },
 
     seo: {
-        title: 'Wellness Store | Clean-Label Supplements & Nutrition',
+        title: 'Chikit | Ayurveda and Wellness',
         description: BRAND_DESCRIPTION,
     },
 };

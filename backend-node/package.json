@@ -1,0 +1,23 @@
+{
+  "name": "chikit-backend-node",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Node/Express port of backend/ (PHP). Parallel build against the SAME MySQL database — not wired into the live site. See MIGRATION.md.",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mysql2": "^3.11.5",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.4.5",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.5",
+    "compression": "^1.7.5",
+    "google-auth-library": "^9.15.0",
+    "pdfkit": "^0.15.1",
+    "bcryptjs": "^2.4.3"
+  }
+}

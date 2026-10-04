@@ -10,7 +10,7 @@ import ZoneProductCard from './ZoneProductCard';
  *  homepage's story sections on small screens. */
 export default function MobileBodyMap({ products }) {
     return (
-        <div className="relative bg-[#0A3D25] py-16 px-6">
+        <div className="relative bg-[#431A43] py-16 px-6">
             <div className="max-w-md mx-auto mb-12 flex justify-center">
                 <BodyFigure reducedMotion />
             </div>

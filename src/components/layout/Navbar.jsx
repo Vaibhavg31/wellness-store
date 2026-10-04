@@ -157,7 +157,7 @@ export default function Navbar() {
                         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 flex items-center justify-between gap-4"
                         aria-label="Main navigation"
                     >
-                        <Logo size="md" linkToHome showHover variant="default" />
+                        <Logo size="sm" linkToHome showHover variant="default" withWordmark className="text-cream" />
 
                         <Link
                             to="/shop"
@@ -406,7 +406,7 @@ export default function Navbar() {
                         className="fixed top-0 right-0 bottom-0 z-[71] w-full max-w-sm bg-forest soft-shadow-lg lg:hidden flex flex-col"
                     >
                         <div className="flex items-center justify-between p-5 border-b border-cream/10">
-                            <Logo size="sm" showHover={false} />
+                            <Logo size="sm" showHover={false} withWordmark className="text-cream" />
                             <button onClick={() => setMobileOpen(false)} className="p-2 rounded-full text-cream hover:bg-cream/10" aria-label="Close menu">
                                 <X size={20} strokeWidth={1.25} />
                             </button>

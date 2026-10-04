@@ -13,9 +13,9 @@ import { BRAND_NAME, BRAND_TAGLINE } from '@/constants';
  */
 function OrbitDots() {
     const dots = [
-        { angle: 0, radius: 92, size: 7, color: '#F59E0B', duration: 9 },
+        { angle: 0, radius: 92, size: 7, color: '#D8A860', duration: 9 },
         { angle: 130, radius: 78, size: 5, color: '#FBF9F4', duration: 12 },
-        { angle: 250, radius: 100, size: 5, color: '#DCEEE1', duration: 15 },
+        { angle: 250, radius: 100, size: 5, color: '#F1E4F2', duration: 15 },
     ];
     return (
         <>
@@ -59,7 +59,7 @@ function DrawnMark({ reducedMotion }) {
             <circle cx="60" cy="60" r="58" fill="#FBF9F4" />
             <motion.path
                 d="M60 96C40 84 28 68 28 50C28 36 38 26 50 26C54.5 26 58 27.8 60 30.5C62 27.8 65.5 26 70 26C82 26 92 36 92 50C92 68 80 84 60 96Z"
-                fill="#0F5132"
+                fill="#602460"
                 initial={{ opacity: 0, scale: 0.7 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: reducedMotion ? 0 : 0.15 }}
@@ -67,7 +67,7 @@ function DrawnMark({ reducedMotion }) {
             />
             <motion.path
                 d="M60 30.5C60 30.5 60 60 60 96"
-                stroke="#D97706"
+                stroke="#C08A3E"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 fill="none"
@@ -77,7 +77,7 @@ function DrawnMark({ reducedMotion }) {
             />
             <motion.path
                 d="M40 50C46 46 54 46 60 52C66 46 74 46 80 50"
-                stroke="#D97706"
+                stroke="#C08A3E"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 fill="none"

@@ -94,7 +94,7 @@ export default function RitualBuilder({ products = [] }) {
                     description="Two questions, and we'll assemble the routine your day is actually missing — from what's already in the shop."
                 />
 
-                <div className="rounded-3xl border border-border bg-white/60 shadow-[0_20px_60px_rgba(28,26,22,0.06)] overflow-hidden">
+                <div className="rounded-3xl border border-border bg-white/60 shadow-[0_20px_60px_rgba(36, 23, 32,0.06)] overflow-hidden">
                     {/* Step rail */}
                     <div className="flex items-center gap-2 px-6 sm:px-10 pt-8">
                         {STEP_LABELS.map((label, i) => (
@@ -153,7 +153,7 @@ export default function RitualBuilder({ products = [] }) {
                                                     className={cn(
                                                         'relative text-left rounded-2xl border p-4 transition-colors duration-200',
                                                         selected
-                                                            ? 'border-emerald bg-emerald/[0.06] shadow-[0_0_0_3px_rgba(15,81,50,0.12)]'
+                                                            ? 'border-emerald bg-emerald/[0.06] shadow-[0_0_0_3px_rgba(96, 36, 96,0.12)]'
                                                             : 'border-border bg-white hover:border-emerald/40',
                                                     )}
                                                 >
@@ -208,7 +208,7 @@ export default function RitualBuilder({ products = [] }) {
                                                     className={cn(
                                                         'text-left rounded-2xl border p-5 transition-colors duration-200',
                                                         selected
-                                                            ? 'border-emerald bg-emerald/[0.06] shadow-[0_0_0_3px_rgba(15,81,50,0.12)]'
+                                                            ? 'border-emerald bg-emerald/[0.06] shadow-[0_0_0_3px_rgba(96, 36, 96,0.12)]'
                                                             : 'border-border bg-white hover:border-emerald/40',
                                                     )}
                                                 >
@@ -251,7 +251,7 @@ export default function RitualBuilder({ products = [] }) {
                                     ) : (
                                         <div className="relative">
                                             <svg className="absolute left-0 right-0 top-9 hidden sm:block" height="2" width="100%" preserveAspectRatio="none">
-                                                <line ref={onResultMount} x1="16%" y1="1" x2="84%" y2="1" stroke="#D97706" strokeWidth="2" strokeOpacity="0.4" />
+                                                <line ref={onResultMount} x1="16%" y1="1" x2="84%" y2="1" stroke="#C08A3E" strokeWidth="2" strokeOpacity="0.4" />
                                             </svg>
                                             <motion.div
                                                 variants={listVariants}

@@ -30,7 +30,7 @@ export default function WellnessJourney({ products = [] }) {
     const reducedMotion = useReducedMotion();
 
     return (
-        <section aria-label="24 hours with your ritual" className="relative bg-[#0F5132]">
+        <section aria-label="24 hours with your ritual" className="relative bg-[#602460]">
             <div className="relative z-10 max-w-3xl mx-auto px-6 pt-16 pb-2 text-center">
                 <SectionTitle
                     subtitle="A Day, Mapped"

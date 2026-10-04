@@ -22,16 +22,16 @@ import {
 } from '@/components/admin/ContentEditor';
 
 const HEADING_FONT_OPTIONS = [
-    { value: '"Manrope", system-ui, sans-serif', label: 'Manrope (default)' },
-    { value: '"Poppins", system-ui, sans-serif', label: 'Poppins' },
+    { value: '"Lora", Georgia, serif', label: 'Lora (default)' },
+    { value: '"Manrope", system-ui, sans-serif', label: 'Manrope' },
     { value: '"Sora", system-ui, sans-serif', label: 'Sora' },
     { value: '"Space Grotesk", system-ui, sans-serif', label: 'Space Grotesk' },
     { value: 'Georgia, serif', label: 'Georgia (serif)' },
 ];
 
 const BODY_FONT_OPTIONS = [
-    { value: '"Inter", system-ui, sans-serif', label: 'Inter (default)' },
-    { value: '"Poppins", system-ui, sans-serif', label: 'Poppins' },
+    { value: '"Poppins", system-ui, sans-serif', label: 'Poppins (default)' },
+    { value: '"Inter", system-ui, sans-serif', label: 'Inter' },
     { value: '"Lato", system-ui, sans-serif', label: 'Lato' },
     { value: '"Nunito Sans", system-ui, sans-serif', label: 'Nunito Sans' },
     { value: 'system-ui, sans-serif', label: 'System default' },
@@ -53,14 +53,12 @@ const TABS = [
 // genuinely confusing. Every label below stands on its own.
 const SECTION_LABELS = {
     hero: 'Hero Banner',
-    spotlightOrbit: 'Product Spotlight (Card Orbit)',
     videoBanner: 'Video Banner',
     brandMarquee: 'Brand Marquee',
     banners: 'Image Banners (Stacked)',
     bannerSlider: 'Banner Slider (Rotating)',
     featured: 'Featured Collection',
     trending: 'Trending Now',
-    atelier3d: 'Interactive 3D Preview',
     categories: 'Shop by Category',
     bundles: 'Bundle & Save Offers',
     ritualBuilder: 'Build Your Ritual (Interactive Quiz)',

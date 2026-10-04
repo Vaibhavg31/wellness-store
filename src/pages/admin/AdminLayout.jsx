@@ -11,7 +11,7 @@ import AdminNavLinks, { getAdminPageTitle } from '@/components/admin/AdminNavLin
 function AdminSidebarHeader() {
     return (
         <div className="p-5 border-b border-cream/10">
-            <Logo size="sm" linkToHome showHover={false} className="mb-1.5" />
+            <Logo size="sm" linkToHome showHover={false} withWordmark className="mb-1.5 text-cream" />
             <p className="text-[10px] tracking-[0.18em] uppercase text-cream/55 font-medium">Studio Admin</p>
         </div>
     );
@@ -91,7 +91,7 @@ export default function AdminLayout() {
                         >
                             <div className="flex items-start justify-between gap-3 p-4 border-b border-cream/10 pt-[max(1rem,env(safe-area-inset-top))]">
                                 <div className="min-w-0">
-                                    <Logo size="sm" linkToHome showHover={false} className="mb-1" />
+                                    <Logo size="sm" linkToHome showHover={false} withWordmark className="mb-1 text-cream" />
                                     <p className="text-[10px] tracking-[0.18em] uppercase text-cream/55 font-medium">
                                         Studio Admin
                                     </p>

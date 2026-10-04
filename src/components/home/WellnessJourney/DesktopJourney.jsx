@@ -110,7 +110,7 @@ export default function DesktopJourney({ products }) {
 
     return (
         <section ref={sectionRef} style={{ height: `${STAGES.length * 100}vh` }} className="relative">
-            <div ref={pinRef} className="h-screen w-full overflow-hidden bg-gradient-to-b from-[#0A3D25] via-[#0F5132] to-[#0A3D25]">
+            <div ref={pinRef} className="h-screen w-full overflow-hidden bg-gradient-to-b from-[#431A43] via-[#602460] to-[#431A43]">
                 {/* Atmospheric depth layer — a generated glow/smoke plate that
                     reads as dawn light breaking through, echoing the vitality
                     arc (dim -> bright) without competing with the foreground

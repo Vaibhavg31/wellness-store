@@ -76,7 +76,7 @@ export default function Footer() {
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
                         className="lg:col-span-4">
-                        <Logo size="xl" showHover className="mb-8" />
+                        <Logo size="lg" showHover withWordmark className="mb-8 text-cream" />
                         <p className="text-sm font-light leading-relaxed text-cream/60 max-w-xs mb-2">
                             {footer.tagline}
                         </p>

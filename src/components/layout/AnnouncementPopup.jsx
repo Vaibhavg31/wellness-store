@@ -147,7 +147,7 @@ export default function AnnouncementPopup() {
                         {popup.image ? (
                             <img src={imageUrl(popup.image)} alt="" className="w-full h-40 object-cover" />
                         ) : (
-                            <div className="w-full h-24 bg-gradient-to-br from-emerald to-[#0A3D25] flex items-center justify-center">
+                            <div className="w-full h-24 bg-gradient-to-br from-emerald to-[#431A43] flex items-center justify-center">
                                 <Icon size={32} className="text-turmeric-light" />
                             </div>
                         )}

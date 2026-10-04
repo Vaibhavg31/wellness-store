@@ -1,93 +1,103 @@
-# Wellness Store
+# Chikit — Ayurveda and Wellness
 
-A wellness / nutrition D2C e-commerce storefront (Kapiva / OZiva style) with **React (JavaScript)** frontend and **PHP** backend — see `backend/schema.sql` and `backend/seed.sql` for the full data model.
+A D2C Ayurveda/wellness e-commerce storefront with a **React (JavaScript)** frontend and a **Node.js (Express)** backend — see `backend-node/src/repositories/settingsRepository.js` for the CMS content shape and `backend-node/MIGRATION.md` for how this backend came to be (ported from an earlier PHP version, now fully replaced).
 
-> **Status:** schema, backend, and UI are wellness-native end to end.
+> **Status:** schema, backend, and UI are Chikit-branded end to end. MySQL is the database for both.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
 | **Frontend** | React 19, JavaScript (JSX), Vite, Tailwind CSS v4 |
-| **Backend** | PHP 8.1+, JSON file storage (MySQL-ready repository layer) |
+| **Backend** | Node.js (Express), MySQL via `mysql2` |
 | **Auth** | JWT, Google OAuth, Email verification (Brevo), Phone OTP (MSG91) |
 
 ## Getting Started (Local Development)
 
 ### Prerequisites
 
-- Node.js 18+ (only for building the frontend)
-- PHP 8.1+
-- Composer
+- Node.js 18+
+- MySQL (via XAMPP or a standalone install) — database `wellness_store`, loaded from `backend/schema.sql` + `backend/seed.sql`
 
 ### Setup
 
 ```bash
 npm install
-cd backend && composer install && cd ..
-npm run dev:all
+npm run dev
 ```
+
+`npm run dev` installs and starts the Node API (`backend-node/`) alongside the Vite dev server automatically.
 
 All configuration — database, secrets, API keys, feature flags — lives in
 one file: **`config.json`** at the repo root. It's committed with working
 local-dev values already filled in, so the command above works immediately;
 open `config.json` and edit values in place for your own setup or to deploy.
-See the comments at the top of that file for how PHP and Vite both read it,
-and what needs a dev-server restart vs. what applies immediately.
+See the comments at the top of that file for what each value does and what
+needs a dev-server restart vs. what applies immediately.
 
 - Storefront: http://localhost:5173
-- PHP API: http://localhost:8000
+- API: http://localhost:8000
 - Admin panel: http://localhost:5173/wellness-studio
 
 ## Testing on Your Phone (same Wi-Fi)
 
 The dev server binds to all network interfaces (`vite.config.js` → `server.host: true`), so a phone on the **same Wi-Fi network** as this PC can load the site directly — no deploy needed.
 
-1. Start the app as usual: `npm run dev:all`
+1. Start the app as usual: `npm run dev`
 2. Find this PC's local IP (Windows): `ipconfig` → look for "IPv4 Address" under your Wi-Fi adapter (e.g. `192.168.1.3`)
 3. On your phone's browser, go to: `http://<that-IP>:5173` (e.g. `http://192.168.1.3:5173`)
 4. **Windows Firewall**: the first time, Windows may prompt "Allow this app through the firewall?" for Node.js — click **Allow** (Private networks). If you don't see a prompt and the phone can't connect, open PowerShell **as Administrator** and run:
    ```powershell
    New-NetFirewallRule -DisplayName "Vite Dev Server (5173)" -Direction Inbound -Protocol TCP -LocalPort 5173 -Action Allow -Profile Private
    ```
-5. The PHP API itself doesn't need to be exposed — the phone only talks to the Vite dev server (port 5173), which proxies `/api` and `/uploads` requests to the PHP backend on this same PC (`127.0.0.1:8000`).
+5. The API itself doesn't need to be exposed — the phone only talks to the Vite dev server (port 5173), which proxies `/api` and `/uploads` requests to the Node backend on this same PC (`127.0.0.1:8000`).
 
 If it still doesn't load: confirm the phone is on the same Wi-Fi (not mobile data), and that the PC's Wi-Fi network profile is set to **Private**, not Public (Public profiles block inbound connections by default).
 
 ### Default Admin Login
 
-Set `ADMIN_USERNAME` and `ADMIN_PASSWORD_HASH` in `config.json`.  
-Generate a bcrypt hash: `php -r "echo password_hash('yourpassword', PASSWORD_BCRYPT) . PHP_EOL;"`
+Set `ADMIN_USERNAME` and `ADMIN_PASSWORD_HASH` in `config.json`.
+Generate a bcrypt hash:
+```bash
+node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 10))" "yourpassword"
+```
+(run from `backend-node/`, where `bcryptjs` is installed)
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | React dev server |
-| `npm run dev:server` | PHP API (port 8000) |
-| `npm run dev:all` | Both together |
+| `npm run dev:web` | React dev server only |
+| `npm run dev:server` | Node API only (port 8000) |
+| `npm run dev` | Both together |
+| `npm run dev:prod-like` / `npm run dev:otp` | Both, with real email verification + real OTP (no dev skips) |
 | `npm run build` | Build frontend → `dist/` folder |
 
 ## Project Structure
 
 ```
-backend/               # PHP API (upload to server)
-├── lib/               # PHP classes
-│   └── Repository/    # Data repository layer (JSON now, DB-ready)
-├── public/            # Web entry point (index.php)
-├── data/              # JSON database files
-└── uploads/           # Product images
+backend-node/          # Node/Express API
+├── src/
+│   ├── routes/         # One file per feature area (products, orders, auth, ...)
+│   ├── repositories/    # DB access layer (mysql2) — one per table/feature
+│   ├── services/        # Razorpay, MSG91, Brevo, coupon logic
+│   └── lib/              # Auth, config, response helpers, shared utilities
+├── MIGRATION.md         # How this backend was ported from the original PHP version
+└── uploads/              # Product/review/banner images
 
-src/                   # React source (JavaScript .jsx / .js)
+backend/                # Database only — schema.sql, seed.sql, migrations/
+                         # (no application code; MySQL is shared infrastructure)
+
+src/                    # React source (JavaScript .jsx / .js)
 ├── components/
 ├── pages/
 ├── contexts/
 └── services/
 
-dist/                  # Built frontend (after npm run build)
+dist/                   # Built frontend (after npm run build)
 ```
 
-## Shared Hosting Deployment
+## Deployment
 
 ### 1. Build frontend on your computer
 
@@ -98,17 +108,22 @@ npm install
 npm run build
 ```
 
-Upload everything inside `dist/` to your main domain `public_html/`.
+Upload everything inside `dist/` to your static host / CDN / main domain.
 
-### 2. Upload PHP backend
+### 2. Deploy the Node backend
 
-Upload `backend/` to your server. Point the API document root to `backend/public/`.
-
-Make `backend/data/` and `backend/uploads/` writable. Run:
+`backend-node/` needs a Node-capable host (a VPS, Render, Railway, Fly.io,
+etc. — not classic PHP shared hosting). On the server:
 
 ```bash
-cd backend && composer install --no-dev
+cd backend-node
+npm install --omit=dev
+NODE_ENV=production node src/server.js
 ```
+
+Put it behind a process manager (pm2, systemd) and a reverse proxy
+(nginx/Caddy) that forwards `/api` and `/uploads` to it, the same way Vite's
+dev proxy does locally. Make `backend-node/uploads/` writable.
 
 ### 3. Configuration
 
@@ -133,18 +148,11 @@ VITE_SKIP_PHONE_VERIFY=false
 
 See the comments inside `config.json` for what every variable does.
 
-### 4. React SPA routing (Apache)
+### 4. React SPA routing
 
-Add to `public_html/.htaccess` if pages show 404 on refresh:
-
-```apache
-RewriteEngine On
-RewriteBase /
-RewriteRule ^index\.html$ - [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.html [L]
-```
+If pages 404 on refresh, configure your host/reverse proxy to fall back to
+`index.html` for any path that isn't a real file (a standard SPA rewrite
+rule — the exact syntax depends on your host).
 
 ## Admin Panel
 
@@ -170,4 +178,4 @@ Look at `otp.serverOutboundIp` and whitelist that IP in **MSG91 Dashboard → Au
 | Real OTP (like production) | `SKIP_PHONE_VERIFY=false`, `VITE_SKIP_PHONE_VERIFY=false`, `MSG91_OTP_MODE=production` |
 | Skip OTP locally | `SKIP_PHONE_VERIFY=true`, `VITE_SKIP_PHONE_VERIFY=true`, or `MSG91_OTP_MODE=skip` |
 
-Audit log: `backend/data/otp-logs.json` (last 200 events). Dev endpoint: `GET /api/auth/otp-logs` (customer JWT).
+Audit log: `otp_logs` table (last 200 events). Dev endpoint: `GET /api/auth/otp-logs` (customer JWT).

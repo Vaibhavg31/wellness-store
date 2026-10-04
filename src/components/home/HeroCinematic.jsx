@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Shield, Sparkles, Star } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Shield, Sparkles, Star, FlaskConical, Truck, Leaf } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import GoalChipStrip from '@/components/shop/GoalChipStrip';
 import ConstellationField from '@/components/ui/ConstellationField';
@@ -17,7 +17,7 @@ const fadeUp = (delay = 0) => ({
     transition: { delay, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
 });
 
-const TRUST_ICONS = { shield: Shield, star: Star, sparkles: Sparkles };
+const TRUST_ICONS = { shield: Shield, star: Star, sparkles: Sparkles, flask: FlaskConical, truck: Truck, leaf: Leaf };
 const AUTOPLAY_MS = 6000;
 
 const container = {

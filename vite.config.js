@@ -9,11 +9,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 /**
  * Reads config.json's ACTIVE environment block — the single app-wide config
- * file used by both the PHP backend (see backend/lib/ConfigLoader.php) and
- * this frontend. Vite only auto-loads files named .env*, so we read this one
- * ourselves and inject its VITE_* keys via `define`, which makes every
- * existing `import.meta.env.VITE_X` reference in the app keep working
- * completely unchanged.
+ * file used by both the Node backend (see backend-node/src/lib/config.js)
+ * and this frontend. Vite only auto-loads files named .env*, so we read
+ * this one ourselves and inject its VITE_* keys via `define`, which makes
+ * every existing `import.meta.env.VITE_X` reference in the app keep
+ * working completely unchanged.
  */
 function loadActiveConfig(filePath) {
   if (!fs.existsSync(filePath)) return {}
@@ -27,8 +27,8 @@ const activeConfig = loadActiveConfig(path.resolve(__dirname, 'config.json'))
 
 // A shell-level env var (e.g. `VITE_SKIP_PHONE_VERIFY=false vite`, used by
 // the `dev:web:prod-like` script) wins over config.json's value — mirroring
-// how the PHP side already behaves (ConfigLoader never overrides a variable
-// the environment already set).
+// how the Node backend already behaves (loadConfig() never overrides a
+// variable the environment already set).
 const viteEnvDefines = Object.fromEntries(
   Object.entries(activeConfig)
     .filter(([key]) => key.startsWith('VITE_'))
@@ -56,10 +56,6 @@ export default defineConfig({
     // project quietly answer requests meant for this one.
     port: 5173,
     strictPort: true,
-    // Backend JSON stores (orders, rate limits, etc.) must not trigger a dev reload.
-    watch: {
-      ignored: ['**/backend/data/**'],
-    },
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',

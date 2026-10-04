@@ -30,7 +30,7 @@ export default function BodyMap({ products = [] }) {
     const reducedMotion = useReducedMotion();
 
     return (
-        <section aria-label="Body map" className="relative bg-[#0A3D25]">
+        <section aria-label="Body map" className="relative bg-[#431A43]">
             <div className="relative z-10 max-w-3xl mx-auto px-6 pt-16 pb-2 text-center">
                 <SectionTitle
                     subtitle="Zone By Zone"

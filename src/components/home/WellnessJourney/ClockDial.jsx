@@ -30,7 +30,7 @@ const ClockDial = forwardRef(function ClockDial({ stages, activeIndex }, markerR
                                 cx={x}
                                 cy={y}
                                 r={lit ? 4.5 : 3}
-                                fill={lit ? '#F59E0B' : 'rgba(251,249,244,0.35)'}
+                                fill={lit ? '#D8A860' : 'rgba(251,249,244,0.35)'}
                                 style={{ transition: 'r 0.3s ease, fill 0.3s ease' }}
                             />
                         </g>

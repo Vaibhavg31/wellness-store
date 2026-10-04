@@ -1,17 +1,17 @@
 export const WHATSAPP_NUMBER = '+910000000000';
 export const WHATSAPP_DISPLAY = '+91 00000 00000';
-export const WHATSAPP_DEFAULT_MESSAGE = 'Hi! I have a question about a product.';
-export const INSTAGRAM_HANDLE = 'wellnessstore';
-export const INSTAGRAM_URL = 'https://instagram.com/wellnessstore';
-export const INSTAGRAM_TAGLINE = 'Follow us for wellness tips and behind-the-scenes.';
-export const CONTACT_EMAIL = 'hello@wellnessstore.example';
-export const BRAND_NAME = 'Wellness Store';
-export const BRAND_SHORT = 'WS';
+export const WHATSAPP_DEFAULT_MESSAGE = 'Hi! I have a question about a Chikit product.';
+export const INSTAGRAM_HANDLE = 'chikit.ayurveda';
+export const INSTAGRAM_URL = 'https://instagram.com/chikit.ayurveda';
+export const INSTAGRAM_TAGLINE = 'Follow us for Ayurvedic rituals, wellness tips and behind-the-scenes.';
+export const CONTACT_EMAIL = 'hello@chikit.in';
+export const BRAND_NAME = 'Chikit';
+export const BRAND_SHORT = 'Chikit';
 export const DEVELOPER_NAME = 'VG';
 export const DEVELOPER_URL = 'https://github.com/Vaibhavg31';
 export const DEVELOPER_CREDIT = 'Designed & developed by';
-export const BRAND_TAGLINE = 'Everyday Wellness, Honestly Made';
-export const BRAND_DESCRIPTION = 'Clean-label supplements and nutrition, honestly sourced and lab tested for purity.';
+export const BRAND_TAGLINE = 'Ayurveda and Wellness';
+export const BRAND_DESCRIPTION = 'Rooted in Ayurveda. Thoughtfully crafted for a healthier, happier you.';
 export const NAV_LINKS = [
     { label: 'Home', href: '/' },
     { label: 'Shop', href: '/shop' },
@@ -55,8 +55,8 @@ export const BENEFITS = [
     },
     {
         icon: 'heart',
-        title: 'Clean Label',
-        description: 'No hidden fillers or artificial additives. Just honest, transparent ingredients.',
+        title: 'Rooted in Ayurveda',
+        description: 'Traditional Ayurvedic formulations, honestly made with no hidden fillers or artificial additives.',
     },
     {
         icon: 'badge',
@@ -66,7 +66,7 @@ export const BENEFITS = [
     {
         icon: 'sparkles',
         title: 'Affordable Wellness',
-        description: 'Experience genuine, science-backed wellness at prices that work for every household.',
+        description: 'Experience genuine, ancient-wisdom-backed wellness at prices that work for every household.',
     },
     {
         icon: 'sun',
@@ -76,7 +76,7 @@ export const BENEFITS = [
 ];
 export const FAQS = [
     {
-        question: 'What makes your supplements clean-label?',
+        question: 'What makes Chikit products clean-label?',
         answer: 'Every product is free from unnecessary fillers and artificial additives, with every ingredient clearly listed on the label.',
     },
     {

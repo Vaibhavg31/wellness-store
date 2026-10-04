@@ -6,10 +6,10 @@ const STYLE_TAG_ID = 'dynamic-theme-vars';
 const FAVICON_LINK_ID = 'dynamic-favicon';
 const FONT_LINK_ID = 'dynamic-google-fonts';
 
-// Fonts already loaded statically in index.html (Manrope, Inter)
+// Fonts already loaded statically in index.html (Lora, Poppins)
 // or system fonts that need no stylesheet at all.
 const NO_LOAD_NEEDED = new Set([
-    'Manrope', 'Inter', 'Georgia', 'Times New Roman', 'system-ui',
+    'Lora', 'Poppins', 'Georgia', 'Times New Roman', 'system-ui',
 ]);
 
 /** Pull the first (quoted or bare) font family name out of a CSS font-family value. */

@@ -17,8 +17,6 @@ import TrendingProducts from '@/components/home/TrendingProducts';
 import PromoBanners from '@/components/home/PromoBanners';
 import BannerSlider from '@/components/home/BannerSlider';
 import OrbitShowcase from '@/components/home/OrbitShowcase';
-import ProductSpotlight from '@/components/home/ProductSpotlight';
-import ProductAtelier3D from '@/components/home/ProductAtelier3D';
 import { useProducts } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { FALLBACK_PRODUCTS } from '@/data/fallbackProducts';
@@ -63,7 +61,6 @@ function FeaturedSkeleton() {
 function buildSectionRenderers({ displayProducts, loading, error }) {
     return {
         hero: () => <HeroCinematic key="hero" products={displayProducts} />,
-        spotlightOrbit: () => <ProductSpotlight key="spotlightOrbit" />,
         videoBanner: () => <VideoBanner key="videoBanner" />,
         brandMarquee: () => <BrandMarquee key="brandMarquee" />,
         banners: () => <PromoBanners key="banners" />,
@@ -80,7 +77,6 @@ function buildSectionRenderers({ displayProducts, loading, error }) {
             </span>
         ),
         trending: () => <TrendingProducts key="trending" />,
-        atelier3d: () => <ProductAtelier3D key="atelier3d" />,
         categories: () => <Categories key="categories" />,
         bundles: () => <BundleShowcase key="bundles" />,
         ritualBuilder: () => (
@@ -89,17 +85,17 @@ function buildSectionRenderers({ displayProducts, loading, error }) {
             </Suspense>
         ),
         wellnessJourney: () => (
-            <Suspense key="wellnessJourney" fallback={<div className="h-[32rem] bg-[#0F5132] animate-pulse" aria-hidden="true" />}>
+            <Suspense key="wellnessJourney" fallback={<div className="h-[32rem] bg-[#602460] animate-pulse" aria-hidden="true" />}>
                 <WellnessJourney products={displayProducts} />
             </Suspense>
         ),
         bodyMap: () => (
-            <Suspense key="bodyMap" fallback={<div className="h-[32rem] bg-[#0A3D25] animate-pulse" aria-hidden="true" />}>
+            <Suspense key="bodyMap" fallback={<div className="h-[32rem] bg-[#431A43] animate-pulse" aria-hidden="true" />}>
                 <BodyMap products={displayProducts} />
             </Suspense>
         ),
         sourceTrail: () => (
-            <Suspense key="sourceTrail" fallback={<div className="h-[32rem] bg-[#0A3D25] animate-pulse" aria-hidden="true" />}>
+            <Suspense key="sourceTrail" fallback={<div className="h-[32rem] bg-[#431A43] animate-pulse" aria-hidden="true" />}>
                 <SourceTrail products={displayProducts} />
             </Suspense>
         ),

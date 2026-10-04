@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Shield, Droplets, Heart, BadgeCheck, Sparkles, Sun, MessageCircle } from 'lucide-react';
+import { Shield, Droplets, Heart, BadgeCheck, Sparkles, Sun, MessageCircle, FlaskConical, Truck } from 'lucide-react';
 import SectionTitle from '@/components/ui/SectionTitle';
 import Button from '@/components/ui/Button';
 import InstagramIcon from '@/components/ui/InstagramIcon';
@@ -15,6 +15,8 @@ const iconMap = {
     badge: BadgeCheck,
     sparkles: Sparkles,
     sun: Sun,
+    flask: FlaskConical,
+    truck: Truck,
 };
 
 const InstagramIconInline = () => <InstagramIcon size={16} />;

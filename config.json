@@ -1,8 +1,8 @@
 {
   "_comment": [
-    "WELLNESS STORE — APP CONFIG",
-    "One file, everything: the PHP backend and the React frontend both read",
-    "this exact file (see backend/lib/ConfigLoader.php and vite.config.js).",
+    "CHIKIT — APP CONFIG",
+    "One file, everything: the Node backend and the React frontend both read",
+    "this exact file (see backend-node/src/lib/config.js and vite.config.js).",
     "",
     "HOW ENVIRONMENTS WORK:",
     "  Change \"environment\" below to \"development\" or \"production\".",
@@ -20,9 +20,10 @@
     "before enabling those features. Do not reuse another project's live keys.",
     "",
     "After changing a value:",
-    "  • PHP backend picks it up on the very next request — no restart needed.",
-    "  • Frontend (Vite) only reads this file when it starts — restart",
-    "    `npm run dev` after editing any \"VITE_...\" value below.",
+    "  • Backend (Node) only reads this file on startup — restart",
+    "    `npm run dev` (or `dev:server`) after editing any value below.",
+    "  • Frontend (Vite) only reads this file when it starts too — same",
+    "    restart covers both.",
     "",
     "See each key's own name — they match exactly what they configure, e.g.",
     "DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASS is the MySQL connection."

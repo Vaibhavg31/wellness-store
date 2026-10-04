@@ -1,50 +1,54 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Wellness Store Design Tokens ─────────────────────────────────────── */
+  /* ── Chikit Brand Design Tokens ───────────────────────────────────────── */
+  /* Token names below (forest/emerald/turmeric/sage) are legacy from the
+     pre-rebrand wellness template — renaming them would mean touching every
+     bg-forest/text-forest/etc. class across the codebase, so only the VALUES
+     changed to the Chikit brand palette. Read "forest" as "plum primary"
+     and "turmeric" as "gold accent" everywhere you see them used. */
 
-  /* Primary — forest green (hero, footer, loader, nav). This is the site's
-     one anchor color, shared with Body Map / Wellness Journey / Source Trail
-     / Ritual Builder — it's what unifies those sections with the rest of the
-     storefront. */
-  --color-forest:       #0F5132;
-  --color-forest-light: #15803D;
-  --color-forest-deep:  #0A3D25;
+  /* Primary — Chikit plum (hero, footer, loader, nav, CTAs). The brand's one
+     anchor color, straight from the logo (#602460). */
+  --color-forest:       #602460;
+  --color-forest-light: #7A3380;
+  --color-forest-deep:  #431A43;
 
-  /* Legacy aliases mapped to forest so existing bg-emerald / text-emerald
-     classes continue to work without touching every component */
-  --color-emerald:       #0F5132;
-  --color-emerald-light: #15803D;
-  --color-emerald-dark:  #0A3D25;
+  /* Legacy aliases mapped to the same plum so existing bg-emerald /
+     text-emerald classes continue to work without touching every component */
+  --color-emerald:       #602460;
+  --color-emerald-light: #7A3380;
+  --color-emerald-dark:  #431A43;
 
-  /* Accent — one warm highlight, used sparingly for CTAs (buttons, price
-     highlights, badges). No second metallic/cosmetic accent alongside it. */
-  --color-turmeric:      #D97706;   /* fills: CTAs, badges, price highlights */
-  --color-turmeric-light:#F59E0B;   /* hover fills */
-  --color-turmeric-ink:  #92400E;   /* text/icons on light bg */
+  /* Accent — warm antique gold, used sparingly for CTAs (buttons, price
+     highlights, badges, ratings). Pairs with deep plum without competing
+     with it. */
+  --color-turmeric:      #C08A3E;   /* fills: CTAs, badges, price highlights */
+  --color-turmeric-light:#D8A860;   /* hover fills */
+  --color-turmeric-ink:  #8A5A1E;   /* text/icons on light bg */
 
-  /* Gentle backgrounds / decorative blobs — mint reads wellness, not the
-     blush-pink of the old cosmetics/jewelry palette. */
-  --color-sage-light:    #DCEEE1;
+  /* Gentle backgrounds / decorative blobs — a soft plum-tinted lavender wash. */
+  --color-sage-light:    #F1E4F2;
 
   /* Secondary accent — warm terracotta, used only for the odd decorative
-     blob / mega-menu tile so backgrounds don't read as one flat mint wash
-     everywhere. Never used for CTAs (turmeric owns that job). */
+     blob / mega-menu tile so backgrounds don't read as one flat wash
+     everywhere. Echoes the terracotta pots/stone in the brand photography.
+     Never used for CTAs (gold owns that job). */
   --color-clay:          #C2703D;
   --color-clay-light:    #E8C4A0;
 
   /* Surfaces */
-  --color-cream:         #FBF9F4;  /* page background */
-  --color-sand:          #F3EEE3;  /* section tint bands */
+  --color-cream:         #FDF9F4;  /* page background — warm ivory */
+  --color-sand:          #FEE1C5;  /* section tint bands — brand swatch */
 
   /* Text */
-  --color-ink:           #1C1A16;  /* body text */
-  --color-slate:         #57534E;  /* muted text */
+  --color-ink:           #241720;  /* body text — warm near-black */
+  --color-slate:         #6B5D68;  /* muted text */
 
   /* Borders */
-  --color-border:        #E5DDD0;  /* warm neutral hairlines */
+  --color-border:        #ECD9C4;  /* warm neutral hairlines */
 
-  /* Admin panel — clean neutral chrome with forest accents (not customer-facing) */
+  /* Admin panel — clean neutral chrome with plum accents (not customer-facing) */
   --color-admin-border:       #E5DDD6;
   --color-admin-border-light: #EDE8E2;
   --color-admin-muted:        #6B6560;
@@ -52,12 +56,11 @@
   --color-admin-surface-alt:  #F9F6F3;
   --color-admin-bg:           #F3EEE8;
 
-  /* Typography — bold sans headlines (Manrope) over Inter body text, the
-     ingredient-forward convention of OZiva / Kapiva / HealthKart-style
-     wellness brands. --font-display used to be --font-serif; it isn't a
-     serif anymore, so the old name would lie. */
-  --font-display: "Manrope", system-ui, sans-serif;
-  --font-sans:    "Inter", system-ui, sans-serif;
+  /* Typography — Lora (serif display/headlines) over Poppins (sans body/UI),
+     straight from the Chikit brand kit's primary/secondary font pairing.
+     --font-display used to be Manrope; --font-sans used to be Inter. */
+  --font-display: "Lora", Georgia, serif;
+  --font-sans:    "Poppins", system-ui, sans-serif;
 
   /* Storefront type scale */
   --text-announce:  0.8125rem;  /* 13px — promo / announcement bars */
@@ -86,8 +89,8 @@
     line-height: 1.6;
     overflow-x: hidden;
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(15, 81, 50, 0.04), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(217, 119, 6, 0.04), transparent);
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(96, 36, 96, 0.04), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(192, 138, 62, 0.04), transparent);
   }
 
   ::selection {
@@ -172,9 +175,9 @@
   .bg-mesh-brand {
     background-color: var(--color-cream);
     background-image:
-      radial-gradient(at 20% 20%, rgba(15, 81, 50, 0.06) 0%, transparent 50%),
-      radial-gradient(at 80% 80%, rgba(217, 119, 6, 0.06) 0%, transparent 50%),
-      radial-gradient(at 50% 50%, rgba(220, 238, 225, 0.5) 0%, transparent 70%);
+      radial-gradient(at 20% 20%, rgba(96, 36, 96, 0.06) 0%, transparent 50%),
+      radial-gradient(at 80% 80%, rgba(192, 138, 62, 0.06) 0%, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(241, 228, 242, 0.5) 0%, transparent 70%);
   }
 
   /* ── Glass / frosted surfaces ───────────────────────────────────────── */
@@ -184,23 +187,23 @@
 
   /* ── Shadows ────────────────────────────────────────────────────────── */
   .soft-shadow {
-    box-shadow: 0 2px 24px rgba(15, 81, 50, 0.06), 0 1px 2px rgba(28, 26, 22, 0.04);
+    box-shadow: 0 2px 24px rgba(96, 36, 96, 0.06), 0 1px 2px rgba(36, 23, 32, 0.04);
   }
 
   .soft-shadow-lg {
-    box-shadow: 0 12px 48px rgba(15, 81, 50, 0.10), 0 2px 8px rgba(28, 26, 22, 0.04);
+    box-shadow: 0 12px 48px rgba(96, 36, 96, 0.10), 0 2px 8px rgba(36, 23, 32, 0.04);
   }
 
   .soft-shadow-hover {
-    box-shadow: 0 8px 32px rgba(15, 81, 50, 0.15), 0 2px 8px rgba(217, 119, 6, 0.08);
+    box-shadow: 0 8px 32px rgba(96, 36, 96, 0.15), 0 2px 8px rgba(192, 138, 62, 0.08);
   }
 
   .accent-glow {
-    box-shadow: 0 0 40px rgba(217, 119, 6, 0.20);
+    box-shadow: 0 0 40px rgba(192, 138, 62, 0.20);
   }
 
   .emerald-glow {
-    box-shadow: 0 0 40px rgba(15, 81, 50, 0.15);
+    box-shadow: 0 0 40px rgba(96, 36, 96, 0.15);
   }
 
   /* ── Cards ──────────────────────────────────────────────────────────── */
@@ -208,8 +211,8 @@
     background-color: #FFFFFF;
     background-image: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(251,249,244,0.95) 100%);
     border-radius: 1rem;
-    border: 1px solid rgba(220, 238, 225, 0.6);
-    box-shadow: 0 2px 24px rgba(15, 81, 50, 0.06), 0 1px 2px rgba(28, 26, 22, 0.03);
+    border: 1px solid rgba(241, 228, 242, 0.6);
+    box-shadow: 0 2px 24px rgba(96, 36, 96, 0.06), 0 1px 2px rgba(36, 23, 32, 0.03);
   }
 
   /* ── Typography helpers ─────────────────────────────────────────────── */
@@ -246,7 +249,7 @@
   }
 
   .text-shadow-brand {
-    text-shadow: 0 2px 24px rgba(15, 81, 50, 0.15);
+    text-shadow: 0 2px 24px rgba(96, 36, 96, 0.15);
   }
 
   /* ── Texture overlay ────────────────────────────────────────────────── */
@@ -294,8 +297,8 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(217, 119, 6, 0.15); }
-    50%       { box-shadow: 0 0 40px rgba(217, 119, 6, 0.30); }
+    0%, 100% { box-shadow: 0 0 20px rgba(192, 138, 62, 0.15); }
+    50%       { box-shadow: 0 0 40px rgba(192, 138, 62, 0.30); }
   }
 
   .pulse-glow {
@@ -404,7 +407,7 @@
      wash, used behind shop/cart headers so panels don't feel like empty
      cards on cream. */
   .bg-dot-grid {
-    background-image: radial-gradient(rgba(15, 81, 50, 0.14) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(96, 36, 96, 0.14) 1px, transparent 1px);
     background-size: 18px 18px;
   }
 
@@ -416,7 +419,7 @@
 
   .card-lift:hover {
     transform: translateY(-3px);
-    box-shadow: 0 16px 40px rgba(15, 81, 50, 0.12), 0 2px 8px rgba(28, 26, 22, 0.05);
+    box-shadow: 0 16px 40px rgba(96, 36, 96, 0.12), 0 2px 8px rgba(36, 23, 32, 0.05);
   }
 
   /* Scroll-reveal helper (driven by JS IntersectionObserver) */
@@ -535,8 +538,8 @@
 
   .admin-control:focus {
     outline: none;
-    border-color: rgba(15, 81, 50, 0.35);
-    box-shadow: 0 0 0 3px rgba(15, 81, 50, 0.08);
+    border-color: rgba(96, 36, 96, 0.35);
+    box-shadow: 0 0 0 3px rgba(96, 36, 96, 0.08);
   }
 
   /* Date inputs */
@@ -627,8 +630,8 @@
   }
 
   .admin-quick-link-highlight {
-    background: linear-gradient(135deg, rgba(15, 81, 50, 0.04) 0%, rgba(217, 119, 6, 0.08) 100%);
-    border-color: rgba(217, 119, 6, 0.35);
+    background: linear-gradient(135deg, rgba(96, 36, 96, 0.04) 0%, rgba(192, 138, 62, 0.08) 100%);
+    border-color: rgba(192, 138, 62, 0.35);
   }
 
   .admin-promo-card {
@@ -641,7 +644,7 @@
   }
 
   .admin-promo-card:hover {
-    border-color: rgba(15, 81, 50, 0.2);
-    box-shadow: 0 4px 12px rgba(15, 81, 50, 0.06);
+    border-color: rgba(96, 36, 96, 0.2);
+    box-shadow: 0 4px 12px rgba(96, 36, 96, 0.06);
   }
 }

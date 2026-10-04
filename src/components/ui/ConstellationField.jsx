@@ -4,7 +4,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 const COLORS = {
     light: { dot: 'rgba(251, 249, 244, 0.55)', line: 'rgba(251, 249, 244, 0.16)' },
-    dark: { dot: 'rgba(15, 81, 50, 0.45)', line: 'rgba(15, 81, 50, 0.12)' },
+    dark: { dot: 'rgba(96, 36, 96, 0.45)', line: 'rgba(96, 36, 96, 0.12)' },
 };
 
 /**

@@ -63,7 +63,7 @@ function StageProduct({ product }) {
  *  scroll-scrub this layout doesn't have. */
 export default function MobileJourney({ products }) {
     return (
-        <div className="relative overflow-hidden bg-gradient-to-b from-[#0A3D25] via-[#0F5132] to-[#0A3D25] py-16 px-6">
+        <div className="relative overflow-hidden bg-gradient-to-b from-[#431A43] via-[#602460] to-[#431A43] py-16 px-6">
             <img
                 src={journeyGlow}
                 alt=""
