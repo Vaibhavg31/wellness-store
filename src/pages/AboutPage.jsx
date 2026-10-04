@@ -1,4 +1,5 @@
 import Logo from '@/components/ui/Logo';
+import Seo from '@/components/seo/Seo';
 import SectionHeader from '@/components/ui/SectionHeader';
 import Reveal from '@/components/ui/Reveal';
 import { useSiteContent } from '@/contexts/SiteContentContext';
@@ -13,6 +14,7 @@ export default function AboutPage() {
 
     return (
         <>
+            <Seo title="Our Story" description={about.heroDescription} path="/about" image={storyImage} />
             <section className="bg-canvas-alt">
                 <div className="container-page py-14 text-center sm:py-20">
                     <Logo size="xl" className="mx-auto mb-8" />

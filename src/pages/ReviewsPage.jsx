@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Seo from '@/components/seo/Seo';
 import { Link } from 'react-router-dom';
 import PageHeader from '@/components/ui/PageHeader';
 import Rating from '@/components/ui/Rating';
@@ -15,6 +16,7 @@ export default function ReviewsPage() {
 
     return (
         <>
+            <Seo title="Customer Reviews" description="Read verified customer reviews of Chikit Ayurvedic products." path="/reviews" />
             <PageHeader eyebrow="Customer voices" title="Reviews" description="Real experiences from verified customers." />
             <div className="container-page py-10 lg:py-14">
                 <div className="mx-auto max-w-3xl">

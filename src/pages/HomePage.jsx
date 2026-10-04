@@ -1,4 +1,5 @@
 import Hero from '@/components/home/Hero';
+import Seo from '@/components/seo/Seo';
 import TrustStrip from '@/components/home/TrustStrip';
 import VideoBanner from '@/components/home/VideoBanner';
 import { BannerSlider, PromoBanners } from '@/components/home/BannerSection';
@@ -54,6 +55,7 @@ export default function HomePage() {
 
     return (
         <>
+            <Seo path="/" />
             {Object.keys(sections)
                 .filter((key) => sections[key] !== false && renderers[key])
                 .map((key) => <div key={key} className="contents">{renderers[key]()}</div>)}

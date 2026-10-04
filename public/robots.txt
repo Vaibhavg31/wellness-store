@@ -1,7 +1,4 @@
+# Overwritten at build time by scripts/seo-postbuild.mjs (absolute Sitemap URL needs the production domain).
 User-agent: *
 Allow: /
-
-# Admin panel — not for indexing
 Disallow: /chikit-studio
-
-Sitemap: https://wellnessstore.example/sitemap.xml

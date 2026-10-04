@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Seo, { SITE_URL } from '@/components/seo/Seo';
 import { Clock, Mail, MessageCircle, Phone } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
 import Input from '@/components/ui/Input';
@@ -57,6 +58,7 @@ export default function ContactPage() {
 
     return (
         <>
+            <Seo title="Contact Us" description={contactPage.description} path="/contact" jsonLd={{ '@context': 'https://schema.org', '@type': 'ContactPage', name: 'Contact Chikit', url: `${SITE_URL}/contact` }} />
             <PageHeader eyebrow={contactPage.subtitle} title={contactPage.title} description={contactPage.description} />
             <div className="container-page grid gap-12 py-10 lg:grid-cols-2 lg:gap-20 lg:py-16">
                 {submitted ? (

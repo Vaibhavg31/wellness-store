@@ -12,6 +12,7 @@ import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
 import PageLoader from '@/components/layout/PageLoader';
 import MainLayout from '@/layouts/MainLayout';
+import Seo from '@/components/seo/Seo';
 import HomePage from '@/pages/HomePage';
 
 // Storefront pages
@@ -61,12 +62,12 @@ const STOREFRONT_ROUTES = [
     { path: 'category/:slug', Page: CategoryPage },
     { path: 'product/:id', Page: ProductDetailPage },
     { path: 'reviews', Page: ReviewsPage },
-    { path: 'cart', Page: CartPage },
-    { path: 'checkout', Page: CheckoutPage },
-    { path: 'wishlist', Page: WishlistPage },
-    { path: 'account', Page: AccountPage },
-    { path: 'orders', Page: OrdersPage },
-    { path: 'orders/:id', Page: OrderDetailPage },
+    { path: 'cart', title: 'Your Bag', Page: CartPage, noindex: true },
+    { path: 'checkout', title: 'Checkout', Page: CheckoutPage, noindex: true },
+    { path: 'wishlist', title: 'Wishlist', Page: WishlistPage, noindex: true },
+    { path: 'account', title: 'My Account', Page: AccountPage, noindex: true },
+    { path: 'orders', title: 'My Orders', Page: OrdersPage, noindex: true },
+    { path: 'orders/:id', title: 'Order Details', Page: OrderDetailPage, noindex: true },
     { path: 'about', Page: AboutPage },
     { path: 'contact', Page: ContactPage },
     { path: 'faq', Page: FaqPage },
@@ -99,10 +100,14 @@ const ADMIN_ROUTES = [
     { path: 'settings', Page: AdminSettingsPage },
 ];
 
-const lazyElement = (Page) => (
-    <Suspense fallback={<PageLoader />}>
-        <Page />
-    </Suspense>
+// Private, transactional and admin routes are kept out of search results.
+const lazyElement = (Page, { noindex = false, title } = {}) => (
+    <>
+        {noindex && <Seo noindex title={title} />}
+        <Suspense fallback={<PageLoader />}>
+            <Page />
+        </Suspense>
+    </>
 );
 
 export default function App() {
@@ -119,17 +124,17 @@ export default function App() {
                                         <Routes>
                                             <Route element={<MainLayout />}>
                                                 <Route index element={<HomePage />} />
-                                                {STOREFRONT_ROUTES.map(({ path, Page }) => (
-                                                    <Route key={path} path={path} element={lazyElement(Page)} />
+                                                {STOREFRONT_ROUTES.map(({ path, Page, noindex, title }) => (
+                                                    <Route key={path} path={path} element={lazyElement(Page, { noindex, title })} />
                                                 ))}
                                             </Route>
 
                                             {AUTH_ROUTES.map(({ path, Page }) => (
-                                                <Route key={path} path={path} element={lazyElement(Page)} />
+                                                <Route key={path} path={path} element={lazyElement(Page, { noindex: true, title: 'Sign in' })} />
                                             ))}
 
                                             <Route path={`${ADMIN_PATH}/login`} element={<Navigate to={loginUrl(ADMIN_PATH)} replace />} />
-                                            <Route path={ADMIN_PATH} element={lazyElement(AdminLayout)}>
+                                            <Route path={ADMIN_PATH} element={lazyElement(AdminLayout, { noindex: true, title: 'Studio Admin' })}>
                                                 <Route index element={lazyElement(AdminDashboardPage)} />
                                                 {/* Banner management lives in Content → Homepage; keep old bookmarks working */}
                                                 <Route path="banners" element={<Navigate to={`${ADMIN_PATH}/content`} replace />} />
@@ -138,7 +143,7 @@ export default function App() {
                                                 ))}
                                             </Route>
 
-                                            <Route path="*" element={lazyElement(NotFoundPage)} />
+                                            <Route path="*" element={lazyElement(NotFoundPage, { noindex: true, title: 'Page not found' })} />
                                         </Routes>
                                         {/* Last in DOM order so the skip link stays the first keyboard tab stop */}
                                         <WhatsAppButton />

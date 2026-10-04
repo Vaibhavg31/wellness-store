@@ -16,6 +16,9 @@ import Skeleton from '@/components/ui/Skeleton';
 import QuantityStepper from '@/components/ui/QuantityStepper';
 import SectionHeader from '@/components/ui/SectionHeader';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import Seo, { SITE_URL } from '@/components/seo/Seo';
+import { breadcrumbJsonLd, productJsonLd } from '@/utils/seoSchema';
+import { imageUrl } from '@/services/api';
 import { getRelatedProducts } from '@/utils/filterProducts';
 import { humanizeSlug } from '@/utils/products';
 import { formatPrice, cn } from '@/utils/formatPrice';
@@ -152,6 +155,17 @@ export default function ProductDetailPage() {
 
     return (
         <div className={cn(showMobileBar && 'pb-24 lg:pb-0')}>
+            <Seo
+                title={product.title}
+                description={product.description}
+                path={`/product/${product.id}`}
+                image={product.images?.[0]}
+                type="product"
+                jsonLd={[
+                    productJsonLd(product, { siteUrl: SITE_URL, brand: content.brandName, resolveImage: (img) => imageUrl(img), returnDays: content.delivery?.returnDays }),
+                    breadcrumbJsonLd(SITE_URL, [{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }, { name: categoryLabel, path: `/category/${product.category}` }, { name: product.title }]),
+                ]}
+            />
             <Breadcrumbs
                 className="container-page py-5"
                 crumbs={[

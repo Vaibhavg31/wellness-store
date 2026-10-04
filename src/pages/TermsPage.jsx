@@ -10,6 +10,8 @@ export default function TermsPage() {
     return (
         <LegalPage
             title="Terms of Service"
+            path="/terms"
+            summary="Terms of service for shopping at Chikit: orders, payments, shipping, returns and refunds."
             updated="August 2026"
             sections={[
                 {

@@ -15,7 +15,8 @@
     "dev:all": "npm run dev",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postbuild": "node scripts/seo-postbuild.mjs"
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",

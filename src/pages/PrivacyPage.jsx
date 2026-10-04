@@ -9,6 +9,8 @@ export default function PrivacyPage() {
     return (
         <LegalPage
             title="Privacy Policy"
+            path="/privacy"
+            summary="How Chikit collects, uses and protects your personal information when you shop with us."
             updated="August 2026"
             sections={[
                 {

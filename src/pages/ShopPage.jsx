@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import Seo from '@/components/seo/Seo';
 import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
@@ -112,6 +113,7 @@ export default function ShopPage() {
 
     return (
         <>
+            <Seo title="Shop Ayurvedic Wellness Products" description="Shop lab-tested, clean-label Ayurvedic supplements, juices, gummies and personal care from Chikit. Free delivery above the threshold, easy returns and COD." path="/shop" />
             <PageHeader
                 crumbs={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
                 title="Shop all"

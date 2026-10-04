@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import Seo, { SITE_URL } from '@/components/seo/Seo';
+import { breadcrumbJsonLd } from '@/utils/seoSchema';
 import { Link, useParams } from 'react-router-dom';
 import PageHeader from '@/components/ui/PageHeader';
 import Button from '@/components/ui/Button';
@@ -30,6 +32,15 @@ export default function CategoryPage() {
 
     return (
         <>
+            {category && (
+                <Seo
+                    title={category.label}
+                    description={category.description || `Shop ${category.label} from Chikit — lab-tested Ayurvedic wellness.`}
+                    path={`/category/${slug}`}
+                    image={category.image}
+                    jsonLd={breadcrumbJsonLd(SITE_URL, [{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }, { name: category.label, path: `/category/${slug}` }])}
+                />
+            )}
             <PageHeader
                 crumbs={[{ label: 'Home', href: '/' }, { label: 'Shop', href: '/shop' }, { label: category?.label ?? '…' }]}
                 eyebrow="Collection"

@@ -1,4 +1,6 @@
 import { ChevronDown } from 'lucide-react';
+import Seo from '@/components/seo/Seo';
+import { faqJsonLd } from '@/utils/seoSchema';
 import PageHeader from '@/components/ui/PageHeader';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 
@@ -8,6 +10,7 @@ export default function FaqPage() {
 
     return (
         <>
+            <Seo title="FAQs" description="Answers about Chikit products, purity and lab testing, delivery, returns and payments." path="/faq" jsonLd={faqJsonLd(faqs)} />
             <PageHeader eyebrow="FAQ" title="Frequently asked questions" description="Everything you need to know about our products, purity and orders." />
             <div className="container-page py-10 lg:py-16">
                 <ul className="mx-auto max-w-3xl space-y-3">
