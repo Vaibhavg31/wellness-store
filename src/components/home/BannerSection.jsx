@@ -28,7 +28,7 @@ export function Banner({ banner, priority = false }) {
                 className="aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02] sm:aspect-[18/7]"
             />
             {hasCaption && (
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/70 to-transparent p-5 text-white sm:p-8">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 via-ink/50 to-transparent p-5 text-white sm:p-8">
                     {banner.subtitle && <p className="text-caption font-semibold uppercase tracking-widest">{banner.subtitle}</p>}
                     {banner.title && <p className="mt-1 font-display text-h3 text-white">{banner.title}</p>}
                     {banner.ctaLabel && <span className="mt-3 inline-block rounded-full bg-white px-5 py-2 text-small font-medium text-ink">{banner.ctaLabel}</span>}

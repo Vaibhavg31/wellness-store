@@ -7,6 +7,7 @@ import { useDebounce } from '@/hooks';
 import { useProducts } from '@/hooks/useApi';
 import { imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
+import { humanizeSlug } from '@/utils/products';
 
 export default function SearchOverlay({ isOpen, onClose }) {
     const panelRef = useDialog(isOpen, onClose);
@@ -69,7 +70,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
                                             <img src={imageUrl(p.images?.[0])} alt="" width="48" height="48" loading="lazy" className="size-12 shrink-0 rounded-md bg-canvas-alt object-cover" />
                                             <span className="min-w-0 flex-1">
                                                 <span className="block truncate text-small font-medium text-ink">{p.title}</span>
-                                                <span className="block text-caption text-muted">{p.category}</span>
+                                                <span className="block text-caption text-muted">{humanizeSlug(p.category)}</span>
                                             </span>
                                             <span className="text-small font-medium text-ink">{formatPrice(p.price)}</span>
                                         </Link>

@@ -17,13 +17,14 @@ import QuantityStepper from '@/components/ui/QuantityStepper';
 import SectionHeader from '@/components/ui/SectionHeader';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { getRelatedProducts } from '@/utils/filterProducts';
+import { humanizeSlug } from '@/utils/products';
 import { formatPrice, cn } from '@/utils/formatPrice';
 import { getProductTrustBadges } from '@/utils/productTrustBadges';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useToast, showCartToast } from '@/contexts/ToastContext';
-import { useBundles, useProduct, useProducts, useReviews, useBanners } from '@/hooks/useApi';
+import { useBundles, useCategories, useProduct, useProducts, useReviews, useBanners } from '@/hooks/useApi';
 import { recordProductView } from '@/hooks/useRecentlyViewed';
 
 function ProductSkeleton() {
@@ -47,6 +48,7 @@ export default function ProductDetailPage() {
     const { product, loading } = useProduct(id);
     const { products } = useProducts();
     const { bundles } = useBundles();
+    const { categories } = useCategories();
     const { reviews, refetch: refetchReviews } = useReviews(id);
     const { banners: productBanners } = useBanners('product', product?.id);
     const { addToCart } = useCart();
@@ -96,6 +98,7 @@ export default function ProductDetailPage() {
     const productBundles = bundles.filter((b) => b.items.some((i) => i.productId === product.id));
     const trustBadges = getProductTrustBadges(content, product);
     const wished = isInWishlist(product.id);
+    const categoryLabel = categories.find((c) => c.slug === product.category)?.label ?? humanizeSlug(product.category);
 
     // Pack-size variants each carry their own price/stock; products without variants use their own values.
     const variants = product.variants || [];
@@ -154,7 +157,7 @@ export default function ProductDetailPage() {
                 crumbs={[
                     { label: 'Home', href: '/' },
                     { label: 'Shop', href: '/shop' },
-                    { label: product.category, href: `/category/${product.category}` },
+                    { label: categoryLabel, href: `/category/${product.category}` },
                     { label: product.title },
                 ]}
             />
@@ -169,7 +172,7 @@ export default function ProductDetailPage() {
 
                 <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
                     <div ref={buyBoxRef}>
-                        <p className="eyebrow mb-2 capitalize">{product.category}</p>
+                        <p className="eyebrow mb-2">{categoryLabel}</p>
                         <h1 className="text-h2">{product.title}</h1>
                         {product.reviewCount > 0 && <Rating value={product.rating} count={`${product.reviewCount} reviews`} className="mt-3" />}
 

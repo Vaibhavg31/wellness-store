@@ -15,6 +15,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl } from '@/services/api';
 import { loginUrl } from '@/utils/authRedirect';
+import { humanizeSlug } from '@/utils/products';
 
 const removeButton = 'grid size-9 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-danger-tint hover:text-danger';
 
@@ -67,7 +68,7 @@ function LineEntry({ item, onRemove, onQuantity }) {
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <Link to={`/product/${product.id}`}><h3 className="line-clamp-2 font-sans text-body font-medium hover:text-primary">{product.title}</h3></Link>
-                        <p className="mt-0.5 text-caption capitalize text-muted">{product.variantLabel || product.category}</p>
+                        <p className="mt-0.5 text-caption text-muted">{product.variantLabel || humanizeSlug(product.category)}</p>
                     </div>
                     <button type="button" onClick={() => onRemove(product.id, product.title, product.variantId)} className={removeButton} aria-label={`Remove ${product.title}`}><Trash2 size={16} /></button>
                 </div>

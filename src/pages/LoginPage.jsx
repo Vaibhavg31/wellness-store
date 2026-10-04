@@ -261,7 +261,7 @@ function LoginScreen() {
                     </div>
                 ) : GOOGLE_ENABLED ? (
                     <p className={notice}>Google sign-in is turned off in store settings.</p>
-                ) : !isAdminAccess ? (
+                ) : !isAdminAccess && import.meta.env.DEV ? (
                     <p className={notice}>Add <code className="rounded bg-surface px-1 text-caption">VITE_GOOGLE_CLIENT_ID</code> to enable Google sign-in.</p>
                 ) : null}
 
