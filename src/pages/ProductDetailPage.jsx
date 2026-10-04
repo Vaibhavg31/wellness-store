@@ -8,6 +8,7 @@ import ReviewForm from '@/components/product/ReviewForm';
 import ProductCard from '@/components/product/ProductCard';
 import BundleCard from '@/components/product/BundleCard';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
+import DeliveryCheck from '@/components/product/DeliveryCheck';
 import { Banner } from '@/components/home/BannerSection';
 import Button from '@/components/ui/Button';
 import Price from '@/components/ui/Price';
@@ -17,7 +18,7 @@ import QuantityStepper from '@/components/ui/QuantityStepper';
 import SectionHeader from '@/components/ui/SectionHeader';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
-import { breadcrumbJsonLd, productJsonLd } from '@/utils/seoSchema';
+import { breadcrumbJsonLd, faqJsonLd, productJsonLd } from '@/utils/seoSchema';
 import { imageUrl } from '@/services/api';
 import { getRelatedProducts } from '@/utils/filterProducts';
 import { humanizeSlug } from '@/utils/products';
@@ -164,6 +165,7 @@ export default function ProductDetailPage() {
                 jsonLd={[
                     productJsonLd(product, { siteUrl: SITE_URL, brand: content.brandName, resolveImage: (img) => imageUrl(img), returnDays: content.delivery?.returnDays }),
                     breadcrumbJsonLd(SITE_URL, [{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }, { name: categoryLabel, path: `/category/${product.category}` }, { name: product.title }]),
+                    faqJsonLd(product.faqs),
                 ]}
             />
             <Breadcrumbs
@@ -221,6 +223,8 @@ export default function ProductDetailPage() {
                             <Button size="lg" variant="accent" disabled={outOfStock} onClick={handleBuyNow}>Buy now</Button>
                         </div>
                     </div>
+
+                    <DeliveryCheck price={price} />
 
                     {trustBadges.length > 0 && (
                         <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">

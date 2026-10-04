@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { useDialog } from '@/hooks/useDialog';
 import { useDebounce } from '@/hooks';
-import { useProducts } from '@/hooks/useApi';
+import { useCategories, useProducts } from '@/hooks/useApi';
 import { imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
 import { humanizeSlug } from '@/utils/products';
@@ -13,6 +13,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
     const panelRef = useDialog(isOpen, onClose);
     const navigate = useNavigate();
     const { products } = useProducts();
+    const { categories } = useCategories();
     const [query, setQuery] = useState('');
     const debounced = useDebounce(query.trim().toLowerCase(), 150);
 
@@ -57,6 +58,19 @@ export default function SearchOverlay({ isOpen, onClose }) {
                         <X size={18} />
                     </button>
                 </form>
+
+                {!debounced && categories.length > 0 && (
+                    <div className="mt-4 border-t border-line pt-4">
+                        <p className="mb-3 text-caption font-semibold uppercase tracking-wider text-muted">Shop by category</p>
+                        <ul className="flex flex-wrap gap-2">
+                            {categories.slice(0, 8).map((c) => (
+                                <li key={c.slug}>
+                                    <Link to={`/category/${c.slug}`} onClick={onClose} className="inline-flex min-h-10 items-center rounded-full border border-line-strong px-4 text-small font-medium text-ink transition-colors hover:border-primary hover:text-primary">{c.label}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
 
                 {debounced && (
                     <div className="mt-4 border-t border-line pt-4">

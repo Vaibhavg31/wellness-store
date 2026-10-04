@@ -8,6 +8,8 @@ const CHILD_TABLES = {
     badges: ['product_badges', 'badge'],
 };
 
+const EMPTY_CONTENT = { ingredients: [], howToUse: [], nutrition: { servingSize: '', rows: [] }, faqs: [] };
+
 /** Products — backed by `products` + child tables. Mirrors ProductRepository.php. */
 export class ProductRepository extends BaseRepository {
     tableName() { return 'products'; }
@@ -19,6 +21,7 @@ export class ProductRepository extends BaseRepository {
             children[key] = await this.fetchChildStrings(table, id, col);
         }
         children.variants = await this.fetchVariants(id);
+        Object.assign(children, (await this.fetchContentBatch([id]))[id] ?? EMPTY_CONTENT);
         return this.applyVariantOverrides({ ...this.scalarFields(row), ...children });
     }
 
@@ -58,12 +61,14 @@ export class ProductRepository extends BaseRepository {
             childrenByKey[key] = await this.fetchChildStringsBatch(table, col, ids);
         }
         const variantsById = await this.fetchVariantsBatch(ids);
+        const contentById = await this.fetchContentBatch(ids);
 
         return rows.map((row) => {
             const id = row.id;
             const children = {};
             for (const key of Object.keys(CHILD_TABLES)) children[key] = childrenByKey[key][id] || [];
             children.variants = variantsById[id] || [];
+            Object.assign(children, contentById[id] ?? EMPTY_CONTENT);
             return this.applyVariantOverrides({ ...this.scalarFields(row), ...children });
         });
     }
@@ -226,6 +231,69 @@ export class ProductRepository extends BaseRepository {
         }
     }
 
+    /**
+     * Product education content (ingredients, how-to-use steps, nutrition facts, FAQs) for many products
+     * in 4 queries. Returns { [productId]: { ingredients, howToUse, nutrition, faqs } }.
+     */
+    async fetchContentBatch(productIds) {
+        if (productIds.length === 0) return {};
+        const marks = productIds.map(() => '?').join(', ');
+        const q = (sql) => this.pool().query(sql, productIds).then(([rows]) => rows);
+        const [ingredients, steps, nutrition, faqs] = await Promise.all([
+            q(`SELECT product_id, name, benefit, image FROM product_ingredients WHERE product_id IN (${marks}) ORDER BY product_id, sort_order ASC, id ASC`),
+            q(`SELECT product_id, instruction FROM product_how_to_use WHERE product_id IN (${marks}) ORDER BY product_id, step_number ASC, id ASC`),
+            q(`SELECT product_id, serving_size, nutrient_name, value_per_serving, daily_value_percent FROM product_nutrition_facts WHERE product_id IN (${marks}) ORDER BY product_id, sort_order ASC, id ASC`),
+            q(`SELECT product_id, question, answer FROM product_faqs WHERE product_id IN (${marks}) ORDER BY product_id, sort_order ASC, id ASC`),
+        ]);
+        const out = {};
+        const slot = (id) => (out[id] ??= { ingredients: [], howToUse: [], nutrition: { servingSize: '', rows: [] }, faqs: [] });
+        for (const r of ingredients) slot(r.product_id).ingredients.push({ name: r.name, benefit: r.benefit ?? '', image: r.image ?? '' });
+        for (const r of steps) slot(r.product_id).howToUse.push(r.instruction);
+        for (const r of nutrition) {
+            const s = slot(r.product_id).nutrition;
+            if (r.serving_size && !s.servingSize) s.servingSize = r.serving_size;
+            s.rows.push({ name: r.nutrient_name, value: r.value_per_serving, dailyValue: r.daily_value_percent ?? '' });
+        }
+        for (const r of faqs) slot(r.product_id).faqs.push({ question: r.question, answer: r.answer });
+        return out;
+    }
+
+    /** Replace a product's education content. Only the keys present in `data` are touched. */
+    async replaceContent(productId, data) {
+        const pool = this.pool();
+        const clean = (v) => String(v ?? '').trim();
+        if ('ingredients' in data) {
+            await pool.query('DELETE FROM product_ingredients WHERE product_id = ?', [productId]);
+            const items = (Array.isArray(data.ingredients) ? data.ingredients : []).filter((i) => clean(i?.name));
+            for (const [i, item] of items.entries()) {
+                await pool.query('INSERT INTO product_ingredients (product_id, name, benefit, image, sort_order) VALUES (?, ?, ?, ?, ?)', [productId, clean(item.name), clean(item.benefit) || null, clean(item.image) || null, i]);
+            }
+        }
+        if ('howToUse' in data) {
+            await pool.query('DELETE FROM product_how_to_use WHERE product_id = ?', [productId]);
+            const steps = (Array.isArray(data.howToUse) ? data.howToUse : []).map(clean).filter(Boolean);
+            for (const [i, step] of steps.entries()) {
+                await pool.query('INSERT INTO product_how_to_use (product_id, step_number, instruction) VALUES (?, ?, ?)', [productId, i + 1, step]);
+            }
+        }
+        if ('nutrition' in data) {
+            await pool.query('DELETE FROM product_nutrition_facts WHERE product_id = ?', [productId]);
+            const n = data.nutrition && typeof data.nutrition === 'object' ? data.nutrition : {};
+            const rows = (Array.isArray(n.rows) ? n.rows : []).filter((r) => clean(r?.name) && clean(r?.value));
+            for (const [i, row] of rows.entries()) {
+                await pool.query('INSERT INTO product_nutrition_facts (product_id, serving_size, nutrient_name, value_per_serving, daily_value_percent, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
+                    [productId, clean(n.servingSize) || null, clean(row.name), clean(row.value), clean(row.dailyValue) || null, i]);
+            }
+        }
+        if ('faqs' in data) {
+            await pool.query('DELETE FROM product_faqs WHERE product_id = ?', [productId]);
+            const faqs = (Array.isArray(data.faqs) ? data.faqs : []).filter((f) => clean(f?.question) && clean(f?.answer));
+            for (const [i, faq] of faqs.entries()) {
+                await pool.query('INSERT INTO product_faqs (product_id, question, answer, sort_order) VALUES (?, ?, ?, ?)', [productId, clean(faq.question), clean(faq.answer), i]);
+            }
+        }
+    }
+
     async fetchChildStrings(table, productId, col) {
         const [rows] = await this.pool().query(`SELECT \`${col}\` AS val FROM \`${table}\` WHERE product_id = ? ORDER BY sort_order ASC`, [productId]);
         return rows.map((r) => r.val);
@@ -251,6 +319,7 @@ export class ProductRepository extends BaseRepository {
         await this.replaceChildStrings('product_features', id, 'feature', data.features || []);
         await this.replaceChildStrings('product_badges', id, 'badge', data.badges || []);
         if ('variants' in data) await this.replaceVariants(id, data.variants || []);
+        await this.replaceContent(id, data);
 
         return data;
     }
@@ -266,6 +335,7 @@ export class ProductRepository extends BaseRepository {
             if (phpKey in changes) await this.replaceChildStrings(table, id, col, changes[phpKey]);
         }
         if ('variants' in changes) await this.replaceVariants(id, changes.variants || []);
+        await this.replaceContent(id, changes);
 
         return this.getById(id);
     }

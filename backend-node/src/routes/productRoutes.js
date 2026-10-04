@@ -64,6 +64,10 @@ router.post('/products', asyncRoute(async (req, res) => {
         stock: Number.parseInt(body.stock, 10),
         images: body.images,
         variants: Array.isArray(body.variants) ? body.variants : [],
+        ingredients: body.ingredients ?? [],
+        howToUse: body.howToUse ?? [],
+        nutrition: body.nutrition ?? { servingSize: '', rows: [] },
+        faqs: body.faqs ?? [],
         isNew: Boolean(body.isNew ?? false),
         isBestSeller: Boolean(body.isBestSeller ?? false),
         isTrendingPinned: Boolean(body.isTrendingPinned ?? false),
@@ -94,7 +98,8 @@ router.put('/products/:id', asyncRoute(async (req, res) => {
 
     const allowed = ['title', 'price', 'originalPrice', 'discount', 'category', 'tags', 'rating', 'reviewCount',
         'description', 'features', 'badges', 'stock', 'images', 'isNew', 'isBestSeller', 'isTrendingPinned',
-        'orbitFeatured', 'orbitSortOrder', 'showTrustBadges', 'isPublished', 'codEnabled', 'onlinePaymentEnabled', 'variants'];
+        'orbitFeatured', 'orbitSortOrder', 'showTrustBadges', 'isPublished', 'codEnabled', 'onlinePaymentEnabled', 'variants',
+        'ingredients', 'howToUse', 'nutrition', 'faqs'];
 
     const changes = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
     if ('variants' in changes && !Array.isArray(changes.variants)) delete changes.variants;

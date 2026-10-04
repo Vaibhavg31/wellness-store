@@ -123,6 +123,8 @@ const STATIC_PAGES = [
     { path: '/faq', title: 'FAQs', description: 'Answers about Chikit products, purity and lab testing, delivery, returns and payments.', priority: '0.6', changefreq: 'monthly', schemas: [faqJsonLd(faqs)] },
     { path: '/reviews', title: 'Customer Reviews', description: 'Read verified customer reviews of Chikit Ayurvedic products.', priority: '0.5', changefreq: 'weekly' },
     { path: '/privacy', title: 'Privacy Policy', description: 'How Chikit collects, uses and protects your personal information when you shop with us.', priority: '0.2', changefreq: 'yearly' },
+    { path: '/shipping-policy', title: 'Shipping Policy', description: 'How Chikit ships your order: delivery charges, free-delivery threshold, order tracking and what to do if something goes wrong.', priority: '0.3', changefreq: 'yearly' },
+    { path: '/refund-policy', title: 'Returns & Refund Policy', description: 'Chikit return window, how to cancel an order and how refunds are issued.', priority: '0.3', changefreq: 'yearly' },
     { path: '/terms', title: 'Terms of Service', description: 'Terms of service for shopping at Chikit: orders, payments, shipping, returns and refunds.', priority: '0.2', changefreq: 'yearly' },
 ];
 STATIC_PAGES.forEach((p) => writePage(p.path, p));
@@ -153,6 +155,7 @@ for (const product of Array.isArray(products) ? products : []) {
         schemas: [
             productJsonLd(product, { siteUrl, brand, resolveImage, returnDays }),
             breadcrumbJsonLd(siteUrl, [{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }, { name: catLabel, path: `/category/${product.category}` }, { name: product.title }]),
+            faqJsonLd(product.faqs),
         ],
     });
     sitemapEntries.push({ loc: absoluteUrl(siteUrl, pathname), priority: '0.9', changefreq: 'weekly', image: product.images?.[0], imageTitle: product.title });

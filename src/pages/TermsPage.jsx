@@ -28,7 +28,7 @@ export default function TermsPage() {
                 },
                 {
                     title: 'Returns & refunds',
-                    body: <p>We offer a {delivery.returnDays}-day hassle-free return policy on unworn items in original packaging. To start a return, contact our support team with your order number.</p>,
+                    body: <p>We offer a {delivery.returnDays}-day return window on unopened items in original packaging. Full details, including damaged or incorrect items, are in our <Link to="/refund-policy" className="text-primary underline">Returns &amp; Refund Policy</Link>.</p>,
                 },
                 {
                     title: 'Intellectual property',

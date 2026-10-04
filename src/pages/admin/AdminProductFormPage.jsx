@@ -26,6 +26,7 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
 import { formatPrice } from '@/utils/formatPrice';
 import { resolveBadgeLabel } from '@/utils/productTrustBadges';
 import Button from '@/components/ui/Button';
+import ProductContentEditor from '@/components/admin/ProductContentEditor';
 import {
     fieldClass,
     FormLabel,
@@ -61,6 +62,10 @@ const DEFAULT_OPTIONAL = {
     tags: true,
     badges: true,
     features: false,
+    ingredients: false,
+    howToUse: false,
+    nutrition: false,
+    faqs: false,
     payment: true,
     variants: false,
 };
@@ -78,6 +83,10 @@ const emptyProduct = {
     reviewCount: 0,
     description: '',
     features: [''],
+    ingredients: [],
+    howToUse: [],
+    nutrition: { servingSize: '', rows: [] },
+    faqs: [],
     stock: '',
     images: [],
     cutoutImages: [],
@@ -149,6 +158,10 @@ export default function AdminProductFormPage() {
                     reviewCount: p.reviewCount,
                     description: p.description,
                     features: p.features.length ? p.features : [''],
+                    ingredients: p.ingredients ?? [],
+                    howToUse: p.howToUse ?? [],
+                    nutrition: p.nutrition ?? { servingSize: '', rows: [] },
+                    faqs: p.faqs ?? [],
                     stock: p.stock,
                     images: p.images,
                     cutoutImages: p.cutoutImages ?? [],
@@ -174,6 +187,10 @@ export default function AdminProductFormPage() {
                     tags: (p.tags?.length > 0) || p.isNew || p.isBestSeller,
                     badges: p.showTrustBadges !== false,
                     features: p.features?.some((f) => f.trim()),
+                    ingredients: (p.ingredients?.length ?? 0) > 0,
+                    howToUse: (p.howToUse?.length ?? 0) > 0,
+                    nutrition: (p.nutrition?.rows?.length ?? 0) > 0,
+                    faqs: (p.faqs?.length ?? 0) > 0,
                     payment: p.codEnabled === false || p.onlinePaymentEnabled === false,
                     variants: (p.variants?.length ?? 0) > 0,
                 });
@@ -482,6 +499,10 @@ export default function AdminProductFormPage() {
                 tags: form.tags.map((t) => normalizeTag(t)).filter(Boolean),
                 badges: form.badges.map((b) => normalizeTag(b)).filter(Boolean),
                 features: form.features.filter((f) => f.trim()),
+                ingredients: form.ingredients.filter((i) => i.name.trim()),
+                howToUse: form.howToUse.filter((s) => s.trim()),
+                nutrition: { servingSize: form.nutrition.servingSize.trim(), rows: form.nutrition.rows.filter((r) => r.name.trim() && r.value.trim()) },
+                faqs: form.faqs.filter((f) => f.question.trim() && f.answer.trim()),
                 discount: computedDiscount,
                 variants: cleanVariants,
                 cutoutImages: form.cutoutImages,
@@ -1201,6 +1222,8 @@ export default function AdminProductFormPage() {
                             <Plus size={14} /> Add feature
                         </button>
                     </OptionalSection>
+
+                    <ProductContentEditor form={form} update={update} optional={optional} setOptional={setOptionalSection} />
 
                     <OptionalSection
                         icon={CreditCard}

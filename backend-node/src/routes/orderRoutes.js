@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import { requireCustomer, requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError, sendCsv, HttpError } from '../lib/response.js';
 import { generateId } from '../lib/db.js';
+import { checkRateLimit } from '../lib/rateLimiter.js';
 import { exportTablePdf } from '../lib/exportHelper.js';
 import { revenueForOrder } from '../lib/orderRevenue.js';
 import * as addressBookHelper from '../lib/addressBookHelper.js';
@@ -581,6 +582,53 @@ router.post('/webhooks/razorpay', asyncRoute(async (req, res) => {
         sendError(res, 'Failed to process webhook', 500);
     }
 }, 'Failed to process webhook'));
+
+// ── Guest order tracking ────────────────────────────────────────────────
+// Public lookup for customers who ordered without signing in (or lost access): they must supply the order id
+// AND the email or phone number used on the order. Rate-limited, and every failure returns the same generic
+// 404 so the endpoint can't be used to discover which order ids exist.
+
+const digitsOnly = (value) => String(value ?? '').replace(/\D/g, '');
+const last10 = (value) => digitsOnly(value).slice(-10);
+
+function publicTrackingView(order) {
+    const o = enrichOrder(order);
+    return {
+        id: o.id,
+        status: o.status,
+        statusHistory: (o.statusHistory ?? []).map((h) => ({ status: h.status, at: h.at })),
+        createdAt: o.createdAt,
+        updatedAt: o.updatedAt,
+        payment: o.payment,
+        paymentStatus: o.paymentStatus,
+        subtotal: o.subtotal,
+        discountAmount: o.discountAmount,
+        deliveryFee: o.deliveryFee,
+        couponCode: o.couponCode,
+        total: o.total,
+        items: (o.items ?? []).map((i) => ({ title: i.title, image: i.image, quantity: i.quantity, price: i.price, variantLabel: i.variantLabel })),
+        shipping: { city: o.shipping?.city ?? '', state: o.shipping?.state ?? '', pincode: o.shipping?.pincode ?? '' },
+    };
+}
+
+router.post('/orders/track', asyncRoute(async (req, res) => {
+    const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+    if (!(await checkRateLimit(`track-${ip}`, 10, 900))) return sendError(res, 'Too many attempts. Please try again in a few minutes.', 429);
+
+    const orderId = String(req.body?.orderId ?? '').trim().replace(/^#/, '');
+    const contact = String(req.body?.contact ?? '').trim();
+    if (!orderId || !contact) return sendError(res, 'Enter your order ID and the email or phone number used on the order.', 400);
+
+    const notFound = () => sendError(res, "We couldn't find an order matching those details. Check the order ID and the email or phone number you used.", 404);
+    const order = await repo.getById(orderId);
+    if (!order) return notFound();
+
+    const emailMatch = contact.includes('@') && String(order.email ?? '').toLowerCase().trim() === contact.toLowerCase();
+    const phoneMatch = !contact.includes('@') && last10(contact).length === 10 && last10(order.shipping?.phone) === last10(contact);
+    if (!emailMatch && !phoneMatch) return notFound();
+
+    sendJson(res, publicTrackingView(order));
+}, 'Failed to look up order'));
 
 router.post('/orders/cancel-pending', asyncRoute(async (req, res) => {
     const payload = await requireCustomer(req);

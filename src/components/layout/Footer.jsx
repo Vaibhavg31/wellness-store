@@ -132,6 +132,9 @@ export default function Footer() {
                     <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
                         <li><Link to="/privacy" className="hover:text-primary">Privacy Policy</Link></li>
                         <li><Link to="/terms" className="hover:text-primary">Terms of Service</Link></li>
+                        <li><Link to="/track-order" className="hover:text-primary">Track order</Link></li>
+                        <li><Link to="/shipping-policy" className="hover:text-primary">Shipping</Link></li>
+                        <li><Link to="/refund-policy" className="hover:text-primary">Returns &amp; Refunds</Link></li>
                         <li>
                             {DEVELOPER_CREDIT}{' '}
                             <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="font-medium text-ink hover:text-primary">{DEVELOPER_NAME}</a>

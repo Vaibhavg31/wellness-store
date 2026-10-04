@@ -31,6 +31,9 @@ const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const FaqPage = lazy(() => import('@/pages/FaqPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const TermsPage = lazy(() => import('@/pages/TermsPage'));
+const ShippingPolicyPage = lazy(() => import('@/pages/ShippingPolicyPage'));
+const RefundPolicyPage = lazy(() => import('@/pages/RefundPolicyPage'));
+const TrackOrderPage = lazy(() => import('@/pages/TrackOrderPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 // Auth pages (standalone, no site chrome)
@@ -73,6 +76,9 @@ const STOREFRONT_ROUTES = [
     { path: 'faq', Page: FaqPage },
     { path: 'privacy', Page: PrivacyPage },
     { path: 'terms', Page: TermsPage },
+    { path: 'shipping-policy', Page: ShippingPolicyPage },
+    { path: 'refund-policy', Page: RefundPolicyPage },
+    { path: 'track-order', Page: TrackOrderPage },
 ];
 
 const AUTH_ROUTES = [
