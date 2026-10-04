@@ -234,6 +234,7 @@ export function AdminIconButton({ onClick, icon: Icon, variant = 'default', titl
             type="button"
             onClick={onClick}
             title={title}
+            aria-label={title}
             disabled={disabled}
             className={cn('p-2 rounded-lg transition-colors disabled:opacity-30 disabled:pointer-events-none', ICON_BTN_VARIANTS[variant], className)}
         >

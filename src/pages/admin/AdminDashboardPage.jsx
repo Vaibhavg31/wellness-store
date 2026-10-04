@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Star, MessageSquare, FolderOpen, ShoppingBag, PenLine, Tag, Gift, IndianRupee, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
+import { CheckCircle2, Package, Star, MessageSquare, FolderOpen, ShoppingBag, PenLine, Tag, Gift, IndianRupee, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
 import { api } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { formatPrice } from '@/utils/formatPrice';
@@ -31,6 +31,9 @@ export default function AdminDashboardPage() {
         bundles: 0,
         unread: 0,
         revenue: 0,
+        newOrders: 0,
+        toDispatch: 0,
+        pendingReviews: 0,
     });
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]);
@@ -72,6 +75,9 @@ export default function AdminDashboardPage() {
                 coupons: Array.isArray(couponArr) ? couponArr.filter((c) => c.isEnabled).length : 0,
                 bundles: Array.isArray(bundleArr) ? bundleArr.filter((b) => b.isPublished).length : 0,
                 unread: Array.isArray(feedbackArr) ? feedbackArr.filter((f) => !f.isRead).length : 0,
+                newOrders: Array.isArray(orderList) ? orderList.filter((o) => normalizeStatus(o.status) === 'placed').length : 0,
+                toDispatch: Array.isArray(orderList) ? orderList.filter((o) => normalizeStatus(o.status) === 'confirmed').length : 0,
+                pendingReviews: Array.isArray(reviewArr) ? reviewArr.filter((r) => !r.isApproved).length : 0,
                 revenue: sumOrderRevenue(Array.isArray(orderList) ? orderList : []),
             });
 
@@ -101,6 +107,15 @@ export default function AdminDashboardPage() {
         () => products.filter((p) => Number(p.stock ?? 0) <= 0).length,
         [products],
     );
+
+    // Everything that is waiting on the admin, with a deep link that opens the right filtered list.
+    const attention = useMemo(() => [
+        { key: 'new', count: stats.newOrders, label: 'new orders to confirm', icon: ShoppingBag, to: `${ADMIN_PATH}/orders?status=placed` },
+        { key: 'dispatch', count: stats.toDispatch, label: 'confirmed orders to dispatch', icon: Package, to: `${ADMIN_PATH}/orders?status=confirmed` },
+        { key: 'reviews', count: stats.pendingReviews, label: 'reviews awaiting approval', icon: Star, to: `${ADMIN_PATH}/reviews?status=pending` },
+        { key: 'feedback', count: stats.unread, label: 'unread messages', icon: MessageSquare, to: `${ADMIN_PATH}/feedback` },
+        { key: 'stock', count: lowStockProducts.length, label: 'products low or out of stock', icon: AlertTriangle, to: `${ADMIN_PATH}/products` },
+    ].filter((item) => item.count > 0), [stats, lowStockProducts.length]);
 
     const bestSellers = useMemo(() => {
         const totals = new Map();
@@ -138,6 +153,24 @@ export default function AdminDashboardPage() {
                 title="Dashboard"
                 subtitle="Overview of your Chikit store"
             />
+
+            <section aria-labelledby="needs-attention" className="rounded-xl border border-admin-border bg-admin-surface p-4 shadow-xs sm:p-5">
+                <h2 id="needs-attention" className="mb-3 font-sans text-body font-semibold">Needs your attention</h2>
+                {attention.length === 0 ? (
+                    <p className="flex items-center gap-2 text-small text-success"><CheckCircle2 size={18} aria-hidden="true" /> You&apos;re all caught up — nothing is waiting on you.</p>
+                ) : (
+                    <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                        {attention.map(({ key, count, label, icon: Icon, to }) => (
+                            <li key={key}>
+                                <Link to={to} className="flex items-center gap-3 rounded-lg border border-admin-border-light bg-admin-surface-alt px-3 py-2.5 transition-colors hover:border-primary/40 hover:bg-primary-soft">
+                                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary-tint text-primary"><Icon size={17} aria-hidden="true" /></span>
+                                    <span className="text-small text-ink"><strong className="font-semibold">{count}</strong> {label}</span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </section>
 
             <AdminPromoCard
                 to={`${ADMIN_PATH}/content`}

@@ -36,6 +36,19 @@ export default function Header() {
 
     useEffect(() => setMenuOpen(false), [pathname]);
 
+    // Press "/" anywhere (outside a text field) to open search, like most large stores.
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+            const el = document.activeElement;
+            if (el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable)) return;
+            e.preventDefault();
+            setSearchOpen(true);
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, []);
+
     return (
         <header className={cn('sticky top-0 z-50 border-b bg-canvas/95 backdrop-blur transition-shadow duration-300', scrolled ? 'border-line shadow-sm' : 'border-transparent')}>
             <div className="container-page flex h-16 items-center gap-4 lg:h-20">

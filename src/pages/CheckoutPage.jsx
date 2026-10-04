@@ -37,6 +37,16 @@ function normalizePhone(value) {
     return normalizeCheckoutPhone(value);
 }
 
+/** Pincode the shopper already checked on a product page — saves retyping it here (saved addresses still take priority). */
+function readSavedPincode() {
+    try {
+        const saved = localStorage.getItem('chikit-pincode') || '';
+        return /^d{6}$/.test(saved) ? saved : '';
+    } catch {
+        return '';
+    }
+}
+
 function clearOtpFlow() {
     try {
         sessionStorage.removeItem(OTP_FLOW_KEY);
@@ -100,7 +110,7 @@ export default function CheckoutPage() {
         city: '',
         state: '',
         landmark: '',
-        pincode: '',
+        pincode: readSavedPincode(),
         payment: defaultPayment,
     });
 

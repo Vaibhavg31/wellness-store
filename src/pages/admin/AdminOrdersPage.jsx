@@ -12,7 +12,7 @@ import {
     XCircle,
 } from 'lucide-react';
 import { formatIndianAddress } from '@/utils/formatAddress';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
@@ -53,6 +53,7 @@ import { printOrderStickers } from '@/utils/printOrderStickers';
 
 const STATUS_FILTER_OPTIONS = [
     { value: '', label: 'All statuses' },
+    { value: 'placed', label: 'New (placed)' },
     ...ADMIN_STATUS_OPTIONS.map((s) => ({ value: s.value, label: s.adminLabel })),
 ];
 
@@ -251,9 +252,10 @@ export default function AdminOrdersPage() {
     const [exporting, setExporting] = useState(false);
     const [exportModalOpen, setExportModalOpen] = useState(false);
 
+    const [searchParams] = useSearchParams();
     const [filters, setFilters] = useState({
-        search: '',
-        status: '',
+        search: searchParams.get('search') || '',
+        status: searchParams.get('status') || '',
         payment: '',
         source: '',
         from: '',
@@ -262,7 +264,7 @@ export default function AdminOrdersPage() {
         order: 'desc',
     });
 
-    const [searchInput, setSearchInput] = useState('');
+    const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
 
     useEffect(() => {
         const t = setTimeout(() => {
@@ -344,6 +346,23 @@ export default function AdminOrdersPage() {
             else next.add(id);
             return next;
         });
+    };
+
+    // One-click progress for a single order straight from the list (placed → confirmed → out for delivery → delivered).
+    const [advancingId, setAdvancingId] = useState('');
+    const advanceOrder = async (order) => {
+        const next = getNextStatus(order.status);
+        if (!adminToken || !next) return;
+        setAdvancingId(order.id);
+        setError('');
+        try {
+            await api.put(`/api/orders/${order.id}/status`, { status: next, note: `Moved to ${getStatusLabel(next)}` }, adminToken);
+            await fetchOrders(filters, { silent: true });
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Could not update the order');
+        } finally {
+            setAdvancingId('');
+        }
     };
 
     const bulkAction = async (status) => {
@@ -547,7 +566,7 @@ export default function AdminOrdersPage() {
                                             Date <ArrowUpDown size={12} />
                                         </button>
                                     </th>
-                                    <th className="p-4 font-medium text-admin-muted w-32" />
+                                    <th className="p-4 font-medium text-admin-muted w-56" />
                                 </tr>
                             </thead>
                             <tbody>
@@ -601,6 +620,17 @@ export default function AdminOrdersPage() {
                                             </td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">
+                                                    {getNextStatus(order.status) && !isTerminalStatus(order.status) && (
+                                                        <button
+                                                            type="button"
+                                                            disabled={advancingId === order.id}
+                                                            onClick={(e) => { e.stopPropagation(); advanceOrder(order); }}
+                                                            className="whitespace-nowrap rounded-full bg-primary px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-primary-hover disabled:bg-disabled disabled:text-subtle"
+                                                            title={`Move to ${getStatusLabel(getNextStatus(order.status))}`}
+                                                        >
+                                                            {advancingId === order.id ? '…' : getStatusLabel(getNextStatus(order.status))}
+                                                        </button>
+                                                    )}
                                                     <button
                                                         type="button"
                                                         onClick={(e) => { e.stopPropagation(); printStickers([order.id]); }}

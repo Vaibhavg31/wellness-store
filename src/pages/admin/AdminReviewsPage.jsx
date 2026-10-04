@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Check, X, Trash2, Star, MessageSquare, ShieldCheck } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Check, CheckCheck, X, Trash2, Star, MessageSquare, ShieldCheck } from 'lucide-react';
+import Button from '@/components/ui/Button';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import ProductSearchSelect from '@/components/admin/ProductSearchSelect';
@@ -40,7 +42,9 @@ export default function AdminReviewsPage() {
     const [reviews, setReviews] = useState([]);
     const [products, setProducts] = useState([]);
     const [productFilter, setProductFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('all');
+    const [searchParams] = useSearchParams();
+    const [statusFilter, setStatusFilter] = useState(searchParams.get('status') === 'pending' ? 'pending' : 'all');
+    const [approvingAll, setApprovingAll] = useState(false);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
 
@@ -105,6 +109,20 @@ export default function AdminReviewsPage() {
         fetchReviews();
     };
 
+    // Approve every pending review in one go (instead of clicking each one).
+    const approveAllPending = async () => {
+        const pending = reviews.filter((r) => !r.isApproved);
+        if (!adminToken || pending.length === 0) return;
+        if (!confirm(`Approve ${pending.length} pending review${pending.length === 1 ? '' : 's'}? They will appear on the website.`)) return;
+        setApprovingAll(true);
+        try {
+            await Promise.all(pending.map((r) => api.put(`/api/reviews/${r.id}/approve`, {}, adminToken)));
+        } finally {
+            setApprovingAll(false);
+            fetchReviews();
+        }
+    };
+
     const remove = async (id) => {
         if (!adminToken || !confirm('Delete this review?')) return;
         await api.delete(`/api/reviews/${id}`, adminToken);
@@ -129,6 +147,11 @@ export default function AdminReviewsPage() {
             <AdminPageHeader
                 title="Reviews"
                 subtitle="Moderate customer reviews before they appear on the website"
+                actions={pendingCount > 0 && (
+                    <Button variant="outline" size="sm" onClick={approveAllPending} loading={approvingAll}>
+                        <CheckCheck size={15} aria-hidden="true" /> Approve all pending ({pendingCount})
+                    </Button>
+                )}
             />
 
             <AdminSummaryGrid

@@ -1,14 +1,25 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { ExternalLink, LogOut, Menu } from 'lucide-react';
+import { ExternalLink, LogOut, Menu, Search } from 'lucide-react';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { loginUrl } from '@/utils/authRedirect';
 import PageTransition from '@/components/layout/PageTransition';
 import Logo from '@/components/ui/Logo';
 import Drawer from '@/components/ui/Drawer';
 import AdminNavLinks, { getAdminPageTitle } from '@/components/admin/AdminNavLinks';
+import AdminCommandPalette from '@/components/admin/AdminCommandPalette';
 
 const footerLink = 'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-small font-medium text-ink transition-colors hover:bg-primary-soft hover:text-primary';
+
+function SearchTrigger({ onOpen, className = '' }) {
+    return (
+        <button type="button" onClick={onOpen} className={`flex w-full items-center gap-2 rounded-lg border border-admin-border bg-admin-surface-alt px-3 py-2 text-small text-admin-muted transition-colors hover:border-primary/40 hover:text-ink ${className}`}>
+            <Search size={16} aria-hidden="true" />
+            <span className="flex-1 text-left">Quick search…</span>
+            <kbd className="hidden rounded border border-admin-border px-1.5 text-caption lg:block">Ctrl K</kbd>
+        </button>
+    );
+}
 
 function SidebarBrand() {
     return (
@@ -49,6 +60,9 @@ export default function AdminLayout() {
             {/* Desktop sidebar */}
             <aside className="fixed z-30 hidden h-full w-[15.5rem] flex-col border-r border-admin-border bg-admin-surface lg:flex">
                 <SidebarBrand />
+                <div className="px-2.5 pt-3">
+                    <AdminCommandPalette>{(open) => <SearchTrigger onOpen={open} />}</AdminCommandPalette>
+                </div>
                 <AdminNavLinks location={location} />
                 <SidebarFooter onSignOut={adminLogout} />
             </aside>

@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Package } from 'lucide-react';
+import { Copy, Plus, Pencil, Trash2, Eye, EyeOff, Package } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
@@ -17,6 +17,57 @@ import {
     AdminStatusPill,
     AdminErrorBanner,
 } from '@/components/admin/AdminUi';
+
+/** Stock that can be edited right in the list: type a number, press Enter or leave the field to save. */
+function StockCell({ product, onSave }) {
+    const [value, setValue] = useState(String(product.stock));
+    const [state, setState] = useState('idle'); // idle | saving | saved | error
+
+    useEffect(() => setValue(String(product.stock)), [product.stock]);
+
+    if (product.hasVariants) {
+        return <span className="tabular-nums" title="Stock is managed per option — open the product to edit">{product.stock}</span>;
+    }
+
+    const commit = async () => {
+        const next = Number.parseInt(value, 10);
+        if (!Number.isFinite(next) || next < 0) {
+            setValue(String(product.stock));
+            return;
+        }
+        if (next === Number(product.stock)) return;
+        setState('saving');
+        try {
+            await onSave(product, next);
+            setState('saved');
+            setTimeout(() => setState('idle'), 1500);
+        } catch {
+            setValue(String(product.stock));
+            setState('error');
+        }
+    };
+
+    return (
+        <span className="inline-flex items-center gap-2">
+            <input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onBlur={commit}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); if (e.key === 'Escape') { setValue(String(product.stock)); e.currentTarget.blur(); } }}
+                aria-label={`Stock for ${product.title}`}
+                className="admin-control w-20 px-2 py-1 text-sm tabular-nums"
+            />
+            <span className="w-4 text-caption" aria-live="polite">
+                {state === 'saving' && <span className="text-muted">…</span>}
+                {state === 'saved' && <span className="text-success">✓</span>}
+                {state === 'error' && <span className="text-danger" title="Could not save">!</span>}
+            </span>
+        </span>
+    );
+}
 
 export default function AdminProductsPage() {
     const { adminToken } = useAdminAuth();
@@ -65,6 +116,52 @@ export default function AdminProductsPage() {
             fetchProducts();
         } catch (err) {
             setLoadError(err instanceof Error ? err.message : 'Failed to delete product');
+        }
+    };
+
+    const saveStock = async (product, stock) => {
+        await api.put(`/api/products/${product.id}`, { stock }, adminToken);
+        setProducts((list) => list.map((p) => (p.id === product.id ? { ...p, stock } : p)));
+    };
+
+    // Clone a product (hidden, as "<title> (Copy)") so similar items don't have to be rebuilt from scratch.
+    const [duplicatingId, setDuplicatingId] = useState('');
+    const duplicateProduct = async (product) => {
+        if (!adminToken) return;
+        setDuplicatingId(product.id);
+        try {
+            await api.post('/api/products', {
+                title: `${product.title} (Copy)`,
+                price: product.price,
+                originalPrice: product.originalPrice,
+                category: product.category,
+                description: product.description,
+                stock: product.stock,
+                images: product.images,
+                tags: product.tags,
+                features: product.features,
+                badges: product.badges,
+                variants: (product.variants ?? []).map((v) => ({
+                    label: v.label, netQuantity: v.netQuantity ?? null, image: v.image ?? null, price: v.price,
+                    originalPrice: v.originalPrice, stock: v.stock, sku: null, isDefault: v.isDefault,
+                })),
+                ingredients: product.ingredients,
+                howToUse: product.howToUse,
+                nutrition: product.nutrition,
+                faqs: product.faqs,
+                showTrustBadges: product.showTrustBadges,
+                codEnabled: product.codEnabled,
+                onlinePaymentEnabled: product.onlinePaymentEnabled,
+                isNew: false,
+                isBestSeller: false,
+                isTrendingPinned: false,
+                isPublished: false,
+            }, adminToken);
+            await fetchProducts();
+        } catch (err) {
+            setLoadError(err instanceof Error ? err.message : 'Failed to duplicate product');
+        } finally {
+            setDuplicatingId('');
         }
     };
 
@@ -130,7 +227,7 @@ export default function AdminProductsPage() {
                                     <th className="p-4 text-left">Price</th>
                                     <th className="p-4 text-left">Stock</th>
                                     <th className="p-4 text-left">Status</th>
-                                    <th className="p-4 text-left w-24">Actions</th>
+                                    <th className="p-4 text-left w-32">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -154,7 +251,7 @@ export default function AdminProductsPage() {
                                             {product.hasVariants && <span className="text-admin-muted font-normal">From </span>}
                                             ₹{product.price}
                                         </td>
-                                        <td className="p-4 tabular-nums">{product.stock}</td>
+                                        <td className="p-4"><StockCell product={product} onSave={saveStock} /></td>
                                         <td className="p-4">
                                             <button type="button" onClick={() => togglePublish(product)}>
                                                 <AdminStatusPill tone={product.isPublished ? 'success' : 'muted'}>
@@ -175,6 +272,7 @@ export default function AdminProductsPage() {
                                                 >
                                                     <Pencil size={16} />
                                                 </Link>
+                                                <AdminIconButton onClick={() => duplicateProduct(product)} icon={Copy} title="Duplicate as hidden copy" disabled={duplicatingId === product.id} />
                                                 <AdminIconButton onClick={() => handleDelete(product.id)} icon={Trash2} variant="danger" title="Delete" />
                                             </div>
                                         </td>
