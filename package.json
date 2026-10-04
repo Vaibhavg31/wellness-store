@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "npm run dev",
     "dev": "concurrently -n web,api -c blue,magenta \"npm run dev:web\" \"npm run dev:server\"",
     "dev:prod-like": "concurrently -n web,api -c blue,magenta \"npm run dev:web:prod-like\" \"npm run dev:server:prod-like\"",
     "dev:otp": "concurrently -n web,api -c blue,magenta \"npm run dev:web:prod-like\" \"npm run dev:server:prod-like\"",

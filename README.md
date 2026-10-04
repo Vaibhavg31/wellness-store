@@ -24,8 +24,10 @@ A D2C Ayurveda/wellness e-commerce storefront with a **React (JavaScript)** fron
 ```bash
 npm install
 npm run db:setup     # creates the database and loads the starter shop (see below)
-npm run dev
+npm run dev         # (`npm start` does the same)
 ```
+
+Run `npm run db:setup` once per machine (it is safe to repeat); after that, `npm start` is all you need each day.
 
 `npm run dev` installs and starts the Node API (`backend-node/`) alongside the Vite dev server automatically.
 
