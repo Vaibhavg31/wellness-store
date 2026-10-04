@@ -12,6 +12,7 @@ import { cn } from '@/utils/formatPrice';
 const sizes = {
     sm: 'h-10',
     md: 'h-12',
+    header: 'h-10 lg:h-12',
     lg: 'h-16',
     xl: 'h-24 sm:h-28',
 };
