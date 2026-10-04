@@ -5,6 +5,7 @@ import { api } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { formatPrice } from '@/utils/formatPrice';
 import { sumOrderRevenue, orderCountsTowardRevenue } from '@/utils/orderRevenue';
+import DashboardCharts from '@/components/admin/charts/DashboardCharts';
 import { AdminPageHeader, AdminPromoCard, AdminQuickLink, AdminStatusPill, AdminEmptyState } from '@/components/admin/AdminUi';
 import { getStatusLabel, formatOrderDate, shortOrderId, normalizeStatus } from '@/constants/orders';
 
@@ -192,6 +193,8 @@ export default function AdminDashboardPage() {
                     />
                 ))}
             </div>
+
+            <DashboardCharts orders={orders} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
                 <div className="admin-table-shell p-4">
