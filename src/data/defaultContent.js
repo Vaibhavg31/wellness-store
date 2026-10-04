@@ -241,6 +241,7 @@ export const DEFAULT_SITE_CONTENT = {
         restockReminderDays: 30,
         expertChat: true,
         concerns: [], // [{ label, search, image }] → "Shop by concern" on the homepage
+        popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' }, // extra popup options; see AnnouncementPopup
     },
 
     seo: {

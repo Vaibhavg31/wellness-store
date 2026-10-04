@@ -12,6 +12,7 @@ import { DEFAULT_SITE_CONTENT } from '@/data/defaultContent';
 import { deepMerge } from '@/utils/deepMerge';
 import { prepareSiteContentForSave } from '@/utils/prepareSiteContentForSave';
 import Button from '@/components/ui/Button';
+import { PopupDialog } from '@/components/layout/AnnouncementPopup';
 import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
@@ -59,6 +60,8 @@ export default function AdminContentPage() {
     const [tab, setTab] = useState('brand');
     const [content, setContent] = useState(null);
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [previewing, setPreviewing] = useState(false);
     const contentRef = useRef(content);
     contentRef.current = content;
     const sectionsSavedToastRef = useRef(null);
@@ -88,6 +91,10 @@ export default function AdminContentPage() {
             setSaveError(err instanceof ApiError ? err.message : 'Failed to load content');
         });
     }, [resetBaseline]);
+
+    useEffect(() => {
+        api.get('/api/categories').then(setCategories).catch(() => {});
+    }, []);
 
     useEffect(() => {
         if (!adminToken) return;
@@ -722,6 +729,7 @@ export default function AdminContentPage() {
                                             { value: 'coupon', label: 'Coupon' },
                                             { value: 'festival', label: 'Festival / Sale' },
                                             { value: 'product', label: 'Product Spotlight' },
+                                            { value: 'category', label: 'Category Spotlight' },
                                         ]}
                                     />
                                 </AdminField>
@@ -771,6 +779,18 @@ export default function AdminContentPage() {
                                 </AdminField>
                             )}
 
+                            {content.popup.type === 'category' && (
+                                <AdminField label="Featured Category">
+                                    <AdminSelect
+                                        aria-label="Popup category"
+                                        value={content.extras.popup.categorySlug}
+                                        onChange={(e) => updateExtras({ popup: { ...content.extras.popup, categorySlug: e.target.value } })}
+                                        className="w-full"
+                                        options={[{ value: '', label: 'None' }, ...categories.map((c) => ({ value: c.slug, label: c.label }))]}
+                                    />
+                                </AdminField>
+                            )}
+
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <AdminField label="CTA Button Label">
                                     <Input value={content.popup.ctaLabel} onChange={(e) => update('popup', { ...content.popup, ctaLabel: e.target.value })} placeholder="Shop Now" />
@@ -790,6 +810,38 @@ export default function AdminContentPage() {
                                     className="w-32"
                                 />
                             </AdminField>
+
+                            <div className="grid sm:grid-cols-2 gap-4">
+                                <AdminField label="Start showing (optional)" hint="Leave empty to start right away.">
+                                    <Input type="datetime-local" value={content.extras.popup.startsAt} onChange={(e) => updateExtras({ popup: { ...content.extras.popup, startsAt: e.target.value } })} />
+                                </AdminField>
+                                <AdminField label="Stop showing (optional)" hint="Perfect for a sale: it switches itself off.">
+                                    <Input type="datetime-local" value={content.extras.popup.endsAt} onChange={(e) => updateExtras({ popup: { ...content.extras.popup, endsAt: e.target.value } })} />
+                                </AdminField>
+                            </div>
+
+                            <AdminField label="Where it appears" hint="It never shows in checkout, sign-in or this admin.">
+                                <AdminSelect
+                                    aria-label="Popup pages"
+                                    value={content.extras.popup.pages}
+                                    onChange={(e) => updateExtras({ popup: { ...content.extras.popup, pages: e.target.value } })}
+                                    className="w-full sm:w-72"
+                                    options={[{ value: 'all', label: 'Any storefront page' }, { value: 'home', label: 'Homepage only' }]}
+                                />
+                            </AdminField>
+
+                            <div className="flex items-center gap-3">
+                                <Button variant="outline" size="sm" onClick={() => setPreviewing(true)}>Preview popup</Button>
+                                <span className="text-caption text-admin-muted">Shows exactly what visitors see, using your unsaved edits.</span>
+                            </div>
+                            {previewing && (
+                                <PopupDialog
+                                    popup={content.popup}
+                                    product={products.find((p) => p.id === content.popup.productId) ?? null}
+                                    category={categories.find((c) => c.slug === content.extras.popup.categorySlug) ?? null}
+                                    onDismiss={() => setPreviewing(false)}
+                                />
+                            )}
                         </AdminSection>
                     )}
 

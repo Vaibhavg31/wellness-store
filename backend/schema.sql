@@ -732,7 +732,7 @@ CREATE TABLE `site_settings` (
   `video_banner_width` int(10) UNSIGNED DEFAULT NULL COMMENT 'Detected pixel width of the uploaded video, for reserving layout space without shift',
   `video_banner_height` int(10) UNSIGNED DEFAULT NULL COMMENT 'Detected pixel height of the uploaded video',
   `popup_enabled` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Site-wide on-load announcement popup — off by default, admin opts in',
-  `popup_type` varchar(20) NOT NULL DEFAULT 'info' COMMENT '"info", "coupon", "festival", or "product"',
+  `popup_type` varchar(20) NOT NULL DEFAULT 'info' COMMENT '"info", "coupon", "festival", "product", or "category"',
   `popup_title` varchar(255) NOT NULL DEFAULT '',
   `popup_message` text NOT NULL,
   `popup_image` text NOT NULL,

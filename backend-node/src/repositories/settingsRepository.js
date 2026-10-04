@@ -104,8 +104,12 @@ const DEFAULTS = {
         restockReminderDays: 30,
         expertChat: true,
         concerns: [],
+        // Extra popup options (the core popup fields live in their own columns): category target, schedule, pages.
+        popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' },
     },
 };
+
+const LOCAL_DATETIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 
 /** Extras are stored as JSON; keep only known keys, with sane types and bounds. */
 function sanitizeExtras(input) {
@@ -127,6 +131,12 @@ function sanitizeExtras(input) {
             .map((c) => ({ label: String(c?.label ?? '').trim().slice(0, 40), search: String(c?.search ?? '').trim().slice(0, 60), image: String(c?.image ?? '').trim().slice(0, 300) }))
             .filter((c) => c.label)
             .slice(0, 8),
+        popup: {
+            categorySlug: String(e.popup?.categorySlug ?? '').trim().slice(0, 64),
+            startsAt: LOCAL_DATETIME.test(e.popup?.startsAt ?? '') ? e.popup.startsAt : '',
+            endsAt: LOCAL_DATETIME.test(e.popup?.endsAt ?? '') ? e.popup.endsAt : '',
+            pages: e.popup?.pages === 'home' ? 'home' : 'all',
+        },
     };
 }
 
