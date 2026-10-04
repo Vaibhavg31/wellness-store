@@ -2,6 +2,7 @@ import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Heart, ShoppingBag } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
+import FadeImage from '@/components/ui/FadeImage';
 import Price from '@/components/ui/Price';
 import Rating from '@/components/ui/Rating';
 import { useCart } from '@/contexts/CartContext';
@@ -54,11 +55,12 @@ function ProductCard({ product, priority = false }) {
         <article className="group relative flex h-full flex-col">
             <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-canvas-alt">
                 <Link to={href} tabIndex={-1} aria-hidden="true" className="block size-full">
-                    <img
+                    <FadeImage
                         src={imageUrl(primary, 480)}
                         alt=""
                         width="480"
                         height="600"
+                        instant={priority}
                         loading={priority ? 'eager' : 'lazy'}
                         decoding="async"
                         className={cn('size-full object-cover transition-[transform,opacity] duration-500 group-hover:scale-105', secondary && 'group-hover:opacity-0')}

@@ -106,6 +106,8 @@ const DEFAULTS = {
         concerns: [],
         // Extra popup options (the core popup fields live in their own columns): category target, schedule, pages.
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' },
+        // Spin-the-wheel popup: slices (no couponId = "better luck next time"), weights are relative odds.
+        spin: { cooldownDays: 30, segments: [] },
     },
 };
 
@@ -136,6 +138,17 @@ function sanitizeExtras(input) {
             startsAt: LOCAL_DATETIME.test(e.popup?.startsAt ?? '') ? e.popup.startsAt : '',
             endsAt: LOCAL_DATETIME.test(e.popup?.endsAt ?? '') ? e.popup.endsAt : '',
             pages: e.popup?.pages === 'home' ? 'home' : 'all',
+        },
+        spin: {
+            cooldownDays: Math.min(365, Math.max(0, Number.parseInt(e.spin?.cooldownDays ?? d.spin.cooldownDays, 10) || 0)),
+            segments: (Array.isArray(e.spin?.segments) ? e.spin.segments : [])
+                .map((s) => ({
+                    label: String(s?.label ?? '').trim().slice(0, 24),
+                    couponId: String(s?.couponId ?? '').trim().slice(0, 64),
+                    weight: Math.min(100, Math.max(0, Number.parseInt(s?.weight ?? 10, 10) || 0)),
+                }))
+                .filter((s) => s.label)
+                .slice(0, 8),
         },
     };
 }

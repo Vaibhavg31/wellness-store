@@ -61,6 +61,7 @@ export default function AdminContentPage() {
     const [content, setContent] = useState(null);
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [coupons, setCoupons] = useState([]);
     const [previewing, setPreviewing] = useState(false);
     const contentRef = useRef(content);
     contentRef.current = content;
@@ -100,6 +101,9 @@ export default function AdminContentPage() {
         if (!adminToken) return;
         api.get('/api/products/admin/all', adminToken)
             .then(setProducts)
+            .catch(() => {});
+        api.get('/api/coupons/admin/all', adminToken)
+            .then(setCoupons)
             .catch(() => {});
     }, [adminToken]);
 
@@ -730,6 +734,7 @@ export default function AdminContentPage() {
                                             { value: 'festival', label: 'Festival / Sale' },
                                             { value: 'product', label: 'Product Spotlight' },
                                             { value: 'category', label: 'Category Spotlight' },
+                                            { value: 'spin', label: 'Spin the Wheel (win a discount)' },
                                         ]}
                                     />
                                 </AdminField>
@@ -791,6 +796,41 @@ export default function AdminContentPage() {
                                 </AdminField>
                             )}
 
+                            {content.popup.type === 'spin' && (
+                                <div className="space-y-3 rounded-lg border border-admin-border p-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-ink">Wheel slices</p>
+                                        <p className="text-caption text-admin-muted">2 to 8 slices. A slice with a coupon wins that coupon; a slice with no coupon is “Better luck next time”. Weight is the relative chance (a 40 slice is twice as likely as a 20). The result is chosen on the server, and a coupon that has expired or run out is skipped automatically.</p>
+                                    </div>
+                                    {content.extras.spin.segments.map((segment, index) => {
+                                        const patch = (change) => updateExtras({ spin: { ...content.extras.spin, segments: content.extras.spin.segments.map((s, i) => (i === index ? { ...s, ...change } : s)) } });
+                                        return (
+                                            <div key={index} className="grid gap-3 sm:grid-cols-[1fr_1fr_5.5rem_auto] sm:items-end">
+                                                <AdminField label="Label on wheel"><Input value={segment.label} maxLength={24} placeholder="10% OFF" onChange={(e) => patch({ label: e.target.value })} /></AdminField>
+                                                <AdminField label="Prize">
+                                                    <AdminSelect
+                                                        aria-label={`Slice ${index + 1} prize`}
+                                                        value={segment.couponId}
+                                                        onChange={(e) => patch({ couponId: e.target.value })}
+                                                        className="w-full"
+                                                        options={[{ value: '', label: 'No prize (better luck)' }, ...coupons.map((c) => ({ value: c.id, label: `${c.code}${c.isEnabled ? '' : ' (disabled)'}` }))]}
+                                                    />
+                                                </AdminField>
+                                                <AdminField label="Weight"><Input type="number" min={0} max={100} value={segment.weight} onChange={(e) => patch({ weight: Number(e.target.value) || 0 })} /></AdminField>
+                                                <Button variant="outline" size="sm" onClick={() => updateExtras({ spin: { ...content.extras.spin, segments: content.extras.spin.segments.filter((_, i) => i !== index) } })}>Remove</Button>
+                                            </div>
+                                        );
+                                    })}
+                                    {content.extras.spin.segments.length < 8 && (
+                                        <Button variant="outline" size="sm" className="w-fit" onClick={() => updateExtras({ spin: { ...content.extras.spin, segments: [...content.extras.spin.segments, { label: '', couponId: '', weight: 10 }] } })}>Add slice</Button>
+                                    )}
+                                    {content.extras.spin.segments.length < 2 && <p className="text-caption text-danger">Add at least 2 slices or the wheel will not appear.</p>}
+                                    <AdminField label="Spin again after (days)" hint="Per browser. 0 means one spin ever. Spins are also limited to 5 per day per network.">
+                                        <Input type="number" min={0} max={365} className="w-32" value={content.extras.spin.cooldownDays} onChange={(e) => updateExtras({ spin: { ...content.extras.spin, cooldownDays: Number(e.target.value) || 0 } })} />
+                                    </AdminField>
+                                </div>
+                            )}
+
                             <div className="grid sm:grid-cols-2 gap-4">
                                 <AdminField label="CTA Button Label">
                                     <Input value={content.popup.ctaLabel} onChange={(e) => update('popup', { ...content.popup, ctaLabel: e.target.value })} placeholder="Shop Now" />
@@ -839,6 +879,8 @@ export default function AdminContentPage() {
                                     popup={content.popup}
                                     product={products.find((p) => p.id === content.popup.productId) ?? null}
                                     category={categories.find((c) => c.slug === content.extras.popup.categorySlug) ?? null}
+                                    segments={content.extras.spin.segments}
+                                    preview
                                     onDismiss={() => setPreviewing(false)}
                                 />
                             )}

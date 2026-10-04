@@ -18,7 +18,7 @@ const iconButton =
 function CountBadge({ count }) {
     if (!count) return null;
     return (
-        <span className="absolute right-0.5 top-0.5 grid min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-semibold leading-5 text-white" aria-hidden="true">
+        <span key={count} className="absolute right-0.5 top-0.5 grid min-w-5 animate-pop place-items-center rounded-full bg-primary px-1 text-[11px] font-semibold leading-5 text-white" aria-hidden="true">
             {count > 99 ? '99+' : count}
         </span>
     );

@@ -10,6 +10,7 @@ import { loginUrl } from '@/utils/authRedirect';
 import ScrollToTop from '@/components/layout/ScrollToTop';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
+import RouteProgress from '@/components/layout/RouteProgress';
 import PageLoader from '@/components/layout/PageLoader';
 import MainLayout from '@/layouts/MainLayout';
 import Seo from '@/components/seo/Seo';
@@ -126,6 +127,7 @@ export default function App() {
                                 <BrowserRouter>
                                     <ToastProvider>
                                         <ScrollToTop />
+                                        <RouteProgress />
                                         <AnnouncementPopup />
                                         <Routes>
                                             <Route element={<MainLayout />}>

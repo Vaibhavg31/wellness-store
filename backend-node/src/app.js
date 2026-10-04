@@ -19,6 +19,7 @@ import newsletterRoutes from './routes/newsletterRoutes.js';
 import mediaRoutes from './routes/mediaRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
+import spinRoutes from './routes/spinRoutes.js';
 import bundleRoutes from './routes/bundleRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -83,6 +84,7 @@ export function createApp() {
     app.use('/api', mediaRoutes);
     app.use('/api', productRoutes);
     app.use('/api', couponRoutes);
+    app.use('/api', spinRoutes);
     app.use('/api', bundleRoutes);
     app.use('/api', authRoutes);
     app.use('/api', userRoutes);
