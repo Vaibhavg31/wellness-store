@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import Logo from '@/components/ui/Logo';
+import AuthShell from '@/components/auth/AuthShell';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { api } from '@/services/api';
@@ -43,34 +42,28 @@ export default function ResetPasswordPage() {
 
     if (!token || !email) {
         return (
-            <div className="min-h-screen flex items-center justify-center px-6 bg-canvas">
-                <div className="text-center max-w-md">
-                    <h1 className="font-display text-2xl mb-4">Invalid reset link</h1>
-                    <Link to="/forgot-password" className="text-primary hover:text-primary-hover">Request a new link</Link>
+            <AuthShell backTo="/login" backLabel="← Back to sign in">
+                <div className="text-center">
+                    <h1 className="mb-4 text-h3">Invalid reset link</h1>
+                    <Link to="/forgot-password" className="font-medium text-primary hover:underline">Request a new link</Link>
                 </div>
-            </div>
+            </AuthShell>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-canvas">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-                <Logo size="md" showHover className="mx-auto mb-8" />
-                <h1 className="font-display text-3xl text-ink text-center mb-8">Set new password</h1>
-
-                {done ? (
-                    <p className="text-center text-ink">Password updated. Redirecting to sign in…</p>
-                ) : (
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <Input label="New password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
-                        <Input label="Confirm password" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={8} autoComplete="new-password" />
-                        {error && <p className="text-sm text-red-600 text-center" role="alert">{error}</p>}
-                        <Button variant="turmeric" size="lg" className="w-full" type="submit" disabled={loading}>
-                            {loading ? 'Updating…' : 'Update password'}
-                        </Button>
-                    </form>
-                )}
-            </motion.div>
-        </div>
+        <AuthShell backTo="/login" backLabel="← Back to sign in">
+            <h1 className="mb-8 text-center text-h2">Set new password</h1>
+            {done ? (
+                <p className="rounded-lg bg-success-tint p-5 text-center text-ink" role="status">Password updated. Redirecting to sign in…</p>
+            ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input label="New password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete="new-password" />
+                    <Input label="Confirm password" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={8} autoComplete="new-password" />
+                    {error && <p className="text-center text-small text-danger" role="alert">{error}</p>}
+                    <Button size="lg" className="w-full" type="submit" loading={loading}>Update password</Button>
+                </form>
+            )}
+        </AuthShell>
     );
 }

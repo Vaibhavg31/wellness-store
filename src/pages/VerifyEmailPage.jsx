@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { CheckCircle, XCircle } from 'lucide-react';
-import Logo from '@/components/ui/Logo';
+import AuthShell from '@/components/auth/AuthShell';
 import Button from '@/components/ui/Button';
 import { api } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -78,63 +77,38 @@ export default function VerifyEmailPage() {
     }, [token, email, verifyKey, login]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-canvas">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md text-center"
-            >
-                <Logo size="md" showHover className="mx-auto mb-8" />
-
+        <AuthShell backTo={null}>
+            <div className="text-center" aria-live="polite">
                 {status === 'loading' && (
                     <>
-                        <h1 className="font-display text-3xl text-ink mb-3">Verifying your email…</h1>
-                        <p className="text-muted text-sm">Please wait a moment.</p>
+                        <h1 className="mb-3 text-h2">Verifying your email…</h1>
+                        <p className="text-small text-muted">Please wait a moment.</p>
                     </>
                 )}
 
                 {status === 'success' && (
                     <>
-                        <CheckCircle size={48} className="text-primary mx-auto mb-4" />
-                        <h1 className="font-display text-3xl text-ink mb-3">You&apos;re signed in</h1>
-                        <p className="text-muted text-sm mb-8">{message}</p>
-                        <Button
-                            variant="turmeric"
-                            size="lg"
-                            className="w-full"
-                            type="button"
-                            onClick={() => navigate(redirectTo, { replace: true })}
-                        >
-                            Continue shopping
-                        </Button>
+                        <CheckCircle size={48} className="mx-auto mb-4 text-success" aria-hidden="true" />
+                        <h1 className="mb-3 text-h2">You&apos;re signed in</h1>
+                        <p className="mb-8 text-small text-muted">{message}</p>
+                        <Button size="lg" className="w-full" onClick={() => navigate(redirectTo, { replace: true })}>Continue shopping</Button>
                     </>
                 )}
 
                 {(status === 'error' || status === 'invalid') && (
                     <>
-                        <XCircle size={48} className="text-primary mx-auto mb-4" />
-                        <h1 className="font-display text-3xl text-ink mb-3">
-                            {status === 'invalid' ? 'Invalid link' : 'Verification failed'}
-                        </h1>
-                        <p className="text-muted text-sm mb-8">
-                            {status === 'invalid'
-                                ? 'This verification link is missing required information.'
-                                : message}
-                        </p>
+                        <XCircle size={48} className="mx-auto mb-4 text-danger" aria-hidden="true" />
+                        <h1 className="mb-3 text-h2">{status === 'invalid' ? 'Invalid link' : 'Verification failed'}</h1>
+                        <p className="mb-8 text-small text-muted">{status === 'invalid' ? 'This verification link is missing required information.' : message}</p>
                         <div className="space-y-3">
-                            <Link
-                                to={`/verify-email-pending?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(redirectTo)}`}
-                                className="block"
-                            >
-                                <Button variant="turmeric" size="lg" className="w-full">Request a new link</Button>
+                            <Link to={`/verify-email-pending?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(redirectTo)}`} className="block">
+                                <Button size="lg" className="w-full">Request a new link</Button>
                             </Link>
-                            <Link to="/login" className="block text-sm text-primary hover:text-primary-hover">
-                                Back to sign in
-                            </Link>
+                            <Link to="/login" className="block text-small font-medium text-primary hover:underline">Back to sign in</Link>
                         </div>
                     </>
                 )}
-            </motion.div>
-        </div>
+            </div>
+        </AuthShell>
     );
 }

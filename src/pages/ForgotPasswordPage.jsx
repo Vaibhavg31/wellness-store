@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import Logo from '@/components/ui/Logo';
+import AuthShell from '@/components/auth/AuthShell';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { api } from '@/services/api';
@@ -27,30 +26,19 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-canvas">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-                <Logo size="md" showHover className="mx-auto mb-8" />
-                <h1 className="font-display text-3xl text-ink text-center mb-2">Forgot password</h1>
-                <p className="text-muted text-sm text-center mb-8">
-                    Enter your email and we&apos;ll send a secure reset link if an account exists.
-                </p>
+        <AuthShell backTo="/login" backLabel="← Back to sign in">
+            <h1 className="mb-2 text-center text-h2">Forgot password</h1>
+            <p className="mb-8 text-center text-small text-muted">Enter your email and we&apos;ll send a secure reset link if an account exists.</p>
 
-                {sent ? (
-                    <div className="p-5 rounded-2xl bg-primary/5 border border-primary/15 text-center">
-                        <p className="text-ink mb-4">Check your inbox for a reset link. It expires in 1 hour.</p>
-                        <Link to="/login" className="text-primary hover:text-primary-hover text-sm">Back to sign in</Link>
-                    </div>
-                ) : (
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-                        {error && <p className="text-sm text-red-600 text-center" role="alert">{error}</p>}
-                        <Button variant="turmeric" size="lg" className="w-full" type="submit" disabled={loading}>
-                            {loading ? 'Sending…' : 'Send reset link'}
-                        </Button>
-                        <Link to="/login" className="block text-center text-sm text-muted hover:text-primary">← Back to sign in</Link>
-                    </form>
-                )}
-            </motion.div>
-        </div>
+            {sent ? (
+                <p className="rounded-lg bg-success-tint p-5 text-center text-ink" role="status">Check your inbox for a reset link. It expires in 1 hour.</p>
+            ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+                    {error && <p className="text-center text-small text-danger" role="alert">{error}</p>}
+                    <Button size="lg" className="w-full" type="submit" loading={loading}>Send reset link</Button>
+                </form>
+            )}
+        </AuthShell>
     );
 }
