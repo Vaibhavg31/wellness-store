@@ -1,42 +1,62 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
 import Skeleton from '@/components/ui/Skeleton';
 import { useSiteContent } from '@/contexts/SiteContentContext';
-import { useCategories } from '@/hooks/useApi';
+import { useCategoryPlan } from '@/hooks/useCategoryPlan';
 import { imageUrl } from '@/services/api';
+import { jumpToShelf, shelfId, shelfSpy, useShelfSpy } from '@/utils/shelfSpy';
 import { cn } from '@/utils/formatPrice';
 
-const shelfId = (slug) => `shelf-${slug}`;
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** Which shelf is currently under the sticky bar, so its chip can be highlighted. */
-function useActiveShelf(slugs) {
-    const [active, setActive] = useState(slugs[0] ?? '');
+/**
+ * Watches which shelf is in the reading band of the screen and publishes it, so the header's category bar (and the
+ * phone chip bar) highlight it. Scrolling above the first shelf clears the highlight. Ignored briefly after a click
+ * so the highlight goes straight to the chosen category instead of flickering through the ones in between.
+ */
+function useShelfScrollSpy(slugs) {
     const key = slugs.join('|');
 
     useEffect(() => {
         if (slugs.length === 0 || !('IntersectionObserver' in window)) return undefined;
-        const visible = new Map();
+        shelfSpy.set({ slugs });
+        const inBand = new Set();
+
+        const refresh = () => {
+            if (Date.now() < shelfSpy.get().lockUntil) return;
+            const ordered = slugs.filter((slug) => inBand.has(slug));
+            if (ordered.length > 0) {
+                shelfSpy.set({ active: ordered[0] });
+                return;
+            }
+            const first = document.getElementById(shelfId(slugs[0]));
+            if (first && first.getBoundingClientRect().top > window.innerHeight * 0.5) shelfSpy.set({ active: '' });
+        };
+
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach((entry) => visible.set(entry.target.dataset.slug, entry.isIntersecting ? entry.boundingClientRect.top : null));
-                // The first (top-most) shelf that is inside the reading band wins.
-                const inBand = [...visible.entries()].filter(([, top]) => top !== null).sort((a, b) => a[1] - b[1]);
-                if (inBand.length) setActive(inBand[0][0]);
+                entries.forEach((entry) => (entry.isIntersecting ? inBand.add(entry.target.dataset.slug) : inBand.delete(entry.target.dataset.slug)));
+                refresh();
             },
-            { rootMargin: '-30% 0px -60% 0px' },
+            { rootMargin: '-25% 0px -65% 0px' },
         );
         slugs.forEach((slug) => {
             const node = document.getElementById(shelfId(slug));
             if (node) observer.observe(node);
         });
-        return () => observer.disconnect();
+        // When a click-lock ends, settle on whatever is actually in view.
+        const settle = () => refresh();
+        window.addEventListener('scrollend', settle);
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scrollend', settle);
+            shelfSpy.reset();
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [key]);
-
-    return [active, setActive];
 }
 
 function Shelf({ shelf }) {
@@ -49,7 +69,7 @@ function Shelf({ shelf }) {
     };
 
     return (
-        <section id={shelfId(category.slug)} data-slug={category.slug} aria-labelledby={`${shelfId(category.slug)}-title`} className="scroll-mt-36 py-8 first:pt-4 lg:scroll-mt-44 lg:py-10">
+        <section id={shelfId(category.slug)} data-slug={category.slug} aria-labelledby={`${shelfId(category.slug)}-title`} className="scroll-mt-36 py-8 first:pt-4 lg:scroll-mt-28 lg:py-10">
             <div className="container-page">
                 <div className="mb-5 flex items-end justify-between gap-4">
                     <div className="min-w-0">
@@ -77,10 +97,10 @@ function Shelf({ shelf }) {
                             </Link>
                         </li>
                     </ul>
-                    <button type="button" onClick={() => scrollBy(-1)} aria-label={`Scroll ${category.label} left`} className="absolute -left-4 top-[38%] hidden size-10 place-items-center rounded-full bg-surface shadow-md transition-opacity hover:bg-canvas-alt lg:grid lg:opacity-0 lg:group-hover/shelf:opacity-100 focus-visible:opacity-100">
+                    <button type="button" onClick={() => scrollBy(-1)} aria-label={`Scroll ${category.label} left`} className="absolute -left-4 top-[38%] hidden size-10 place-items-center rounded-full bg-surface shadow-md transition-opacity hover:bg-canvas-alt focus-visible:opacity-100 lg:grid lg:opacity-0 lg:group-hover/shelf:opacity-100">
                         <ChevronLeft size={20} />
                     </button>
-                    <button type="button" onClick={() => scrollBy(1)} aria-label={`Scroll ${category.label} right`} className="absolute -right-4 top-[38%] hidden size-10 place-items-center rounded-full bg-surface shadow-md transition-opacity hover:bg-canvas-alt lg:grid lg:opacity-0 lg:group-hover/shelf:opacity-100 focus-visible:opacity-100">
+                    <button type="button" onClick={() => scrollBy(1)} aria-label={`Scroll ${category.label} right`} className="absolute -right-4 top-[38%] hidden size-10 place-items-center rounded-full bg-surface shadow-md transition-opacity hover:bg-canvas-alt focus-visible:opacity-100 lg:grid lg:opacity-0 lg:group-hover/shelf:opacity-100">
                         <ChevronRight size={20} />
                     </button>
                 </div>
@@ -90,37 +110,30 @@ function Shelf({ shelf }) {
 }
 
 /**
- * Products grouped by category, front and centre on the homepage: a sticky bar of category chips (tap to jump to
- * that shelf; the chip for the shelf on screen is highlighted) over one swipeable shelf per category.
- * Which categories show, their order and each shelf's subtitle come from the admin (Content → Homepage); with
- * nothing configured, every category that has products is shown.
+ * Products grouped by category, front and centre on the homepage: one swipeable shelf per category, in the order set
+ * in the admin. A category with no products is never shown (the categories API leaves it out). The header's category
+ * bar highlights the shelf being read; on phones, where that bar is in the menu, a sticky chip bar does the same job.
  */
 export default function CategoryShelves({ products, loading }) {
     const { content } = useSiteContent();
-    const { categories } = useCategories();
-    const { mode, limit, items } = content.extras.shelves;
+    const { plan } = useCategoryPlan();
+    const { limit } = content.extras.shelves;
     const chipBar = useRef(null);
+    const { active } = useShelfSpy();
 
-    const shelves = useMemo(() => {
-        const plan = mode === 'custom' && items.length > 0
-            ? items.map((item) => ({ slug: item.categorySlug, subtitle: item.subtitle }))
-            : categories.map((c) => ({ slug: c.slug, subtitle: '' }));
-        return plan
-            .map(({ slug, subtitle }) => {
-                const category = categories.find((c) => c.slug === slug);
-                const inCategory = products.filter((p) => p.category === slug);
-                return category && inCategory.length > 0 ? { category, subtitle, products: inCategory.slice(0, limit) } : null;
-            })
-            .filter(Boolean);
-    }, [categories, products, mode, items, limit]);
+    const shelves = useMemo(() => plan
+        .map((item) => {
+            const inCategory = products.filter((p) => p.category === item.slug);
+            return inCategory.length > 0 ? { category: item, subtitle: item.subtitle, products: inCategory.slice(0, limit) } : null;
+        })
+        .filter(Boolean), [plan, products, limit]);
 
-    const slugs = shelves.map((s) => s.category.slug);
-    const [active, setActive] = useActiveShelf(slugs);
+    useShelfScrollSpy(shelves.map((s) => s.category.slug));
 
-    // Keep the active chip visible inside the horizontally scrolling bar without moving the page.
+    // Keep the active chip visible inside the horizontally scrolling phone bar without moving the page.
     useEffect(() => {
         const bar = chipBar.current;
-        const chip = bar?.querySelector(`[data-chip="${active}"]`);
+        const chip = active ? bar?.querySelector(`[data-chip="${active}"]`) : null;
         if (bar && chip) bar.scrollTo({ left: chip.offsetLeft - bar.clientWidth / 2 + chip.clientWidth / 2, behavior: reducedMotion() ? 'auto' : 'smooth' });
     }, [active]);
 
@@ -134,14 +147,9 @@ export default function CategoryShelves({ products, loading }) {
     }
     if (shelves.length === 0) return null;
 
-    const jump = (slug) => {
-        setActive(slug);
-        document.getElementById(shelfId(slug))?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
-    };
-
     return (
         <div className="bg-canvas">
-            <nav aria-label="Shop by category" className="sticky top-[65px] z-30 border-b border-line bg-canvas/95 backdrop-blur lg:top-[81px]">
+            <nav aria-label="Shop by category" className="sticky top-[65px] z-30 border-b border-line bg-canvas/95 backdrop-blur lg:hidden">
                 <div className="container-page">
                     <ul ref={chipBar} className="scrollbar-none flex gap-2 overflow-x-auto py-3">
                         {shelves.map(({ category }) => {
@@ -151,7 +159,7 @@ export default function CategoryShelves({ products, loading }) {
                                     <button
                                         type="button"
                                         data-chip={category.slug}
-                                        onClick={() => jump(category.slug)}
+                                        onClick={() => jumpToShelf(category.slug)}
                                         aria-current={selected ? 'true' : undefined}
                                         className={cn(
                                             'inline-flex h-11 items-center gap-2 rounded-full border pr-4 text-small font-medium transition-colors',

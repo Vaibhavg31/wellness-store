@@ -4,6 +4,7 @@ import { Heart, Menu, Search, ShoppingBag } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import AccountMenu from '@/components/layout/AccountMenu';
 import MobileNav from '@/components/layout/MobileNav';
+import CategoryNav from '@/components/layout/CategoryNav';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
@@ -58,26 +59,7 @@ export default function Header() {
 
                 <Logo size="header" linkToHome priority />
 
-                <nav aria-label="Main navigation" className="ml-8 hidden lg:block">
-                    <ul className="flex items-center gap-1">
-                        {links.map((link) => (
-                            <li key={link.href}>
-                                <NavLink
-                                    to={link.href}
-                                    end={link.href === '/'}
-                                    className={({ isActive }) =>
-                                        cn(
-                                            'relative rounded-full px-4 py-2 text-small font-medium transition-colors',
-                                            isActive ? 'bg-primary-tint text-primary-deep' : 'text-ink hover:bg-primary-soft hover:text-primary',
-                                        )
-                                    }
-                                >
-                                    {link.label}
-                                </NavLink>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
+                <CategoryNav />
 
                 <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
                     <button type="button" className={iconButton} onClick={() => setSearchOpen(true)} aria-label="Search">

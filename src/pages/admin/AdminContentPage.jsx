@@ -471,8 +471,8 @@ export default function AdminContentPage() {
                 return (
                     <div className="space-y-4 pt-3">
                         <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
-                            Puts products first: a sticky bar of category buttons, and under it one swipeable row of products per category.
-                            Drag this section higher or lower in the list above to place it.
+                            Puts products first: one swipeable row of products per category. The category bar at the top highlights the row being read as the shopper scrolls (on phones, a sticky strip does this).
+                            This list also decides which categories appear in the top bar. Categories with no products are hidden automatically. Drag this section higher or lower in the list above to place it.
                         </p>
                         <AdminField label="Which categories">
                             <AdminSelect
@@ -687,6 +687,40 @@ export default function AdminContentPage() {
 
                     {tab === 'homepage' && (
                         <>
+                            <AdminSection
+                                title="Top navigation bar"
+                                description="What shoppers see in the bar at the top of every page. Products first: your categories. About, FAQ and Contact stay in the footer and the phone menu."
+                            >
+                                <AdminField label="Bar shows">
+                                    <AdminSelect
+                                        aria-label="Top bar mode"
+                                        value={content.extras.nav.mode}
+                                        onChange={(e) => updateExtras({ nav: { ...content.extras.nav, mode: e.target.value } })}
+                                        className="w-full sm:w-96"
+                                        options={[
+                                            { value: 'categories', label: 'My categories (recommended — product first)' },
+                                            { value: 'links', label: 'My own list of links (About, FAQ, …)' },
+                                        ]}
+                                    />
+                                </AdminField>
+                                {content.extras.nav.mode === 'categories' && (
+                                    <>
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input type="checkbox" className="h-4 w-4 accent-primary" checked={content.extras.nav.showAll} onChange={(e) => updateExtras({ nav: { ...content.extras.nav, showAll: e.target.checked } })} />
+                                            <span className="text-sm text-ink">Show “All products” as the first item</span>
+                                        </label>
+                                        <AdminField label="Categories shown before “More”" hint="On wide screens. Smaller laptops show up to 4; the rest go under “More”.">
+                                            <Input type="number" min={2} max={10} className="w-28" value={content.extras.nav.maxVisible} onChange={(e) => updateExtras({ nav: { ...content.extras.nav, maxVisible: Number(e.target.value) || 6 } })} />
+                                        </AdminField>
+                                        <p className="text-caption text-admin-muted">
+                                            Which categories appear, and their order, follow the “Category Shelves” section below — so the top bar and the homepage always match.
+                                            A category with no products is hidden automatically. Rename, reorder or hide categories in{' '}
+                                            <Link to={`${ADMIN_PATH}/categories`} className="text-primary font-medium hover:underline">Categories</Link>.
+                                        </p>
+                                    </>
+                                )}
+                            </AdminSection>
+
                             <AdminSection title="Homepage Sections" description="Drag a row to reorder it, use the switch to show/hide it, and click a section's name to open its content editor right here. Reordering and show/hide save immediately — no need to press Save for those.">
                                 <SectionToggles
                                     sections={content.sections}

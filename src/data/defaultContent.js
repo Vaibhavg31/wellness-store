@@ -245,6 +245,7 @@ export const DEFAULT_SITE_CONTENT = {
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' }, // extra popup options; see AnnouncementPopup
         spin: { cooldownDays: 30, segments: [] }, // spin-the-wheel slices: [{ label, couponId, weight }]
         shelves: { mode: 'auto', limit: 8, items: [] }, // homepage category shelves: custom items = [{ categorySlug, subtitle }]
+        nav: { mode: 'categories', showAll: true, maxVisible: 6 }, // top bar: 'categories' (product-first) or 'links' (custom list)
         offerTab: {
             enabled: false,
             tabLabel: 'Get 10% OFF',
