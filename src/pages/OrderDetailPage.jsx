@@ -64,7 +64,7 @@ export default function OrderDetailPage() {
     if (error || !order) {
         return (
             <div className="container-page py-16">
-                <EmptyState icon={Package} title="Order not found" description={error || 'This order may not exist or belongs to another account.'} actionLabel="Back to orders" actionHref="/orders" />
+                <EmptyState as="h1" icon={Package} title="Order not found" description={error || 'This order may not exist or belongs to another account.'} actionLabel="Back to orders" actionHref="/orders" />
             </div>
         );
     }

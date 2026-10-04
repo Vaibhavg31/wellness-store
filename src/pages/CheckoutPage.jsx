@@ -376,7 +376,7 @@ export default function CheckoutPage() {
     if (items.length === 0 && !placed) {
         return (
             <div className="container-page py-16">
-                <EmptyState icon={ShoppingBag} title="Nothing to checkout" description="Add items to your bag and come back when you're ready." actionLabel="Continue shopping" actionHref="/shop" />
+                <EmptyState as="h1" icon={ShoppingBag} title="Nothing to checkout" description="Add items to your bag and come back when you're ready." actionLabel="Continue shopping" actionHref="/shop" />
             </div>
         );
     }

@@ -30,7 +30,7 @@ export default function WishlistPage() {
     if (items.length === 0) {
         return (
             <div className="container-page py-16">
-                <EmptyState icon={Heart} title="Your wishlist is empty" description="Save products you love and return anytime. Your wishlist is stored on this device." actionLabel="Explore the shop" actionHref="/shop" />
+                <EmptyState as="h1" icon={Heart} title="Your wishlist is empty" description="Save products you love and return anytime. Your wishlist is stored on this device." actionLabel="Explore the shop" actionHref="/shop" />
             </div>
         );
     }

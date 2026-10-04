@@ -24,7 +24,7 @@ export const CATEGORIES = [
     {
         id: 'protein',
         label: 'Protein & Fitness',
-        image: 'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=600&q=80',
+        image: 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600&q=80',
     },
     {
         id: 'vitamins',
@@ -102,7 +102,7 @@ export const INSTAGRAM_IMAGES = [
     'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=80',
     'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&q=80',
     'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80',
-    'https://images.unsplash.com/photo-1579722820258-8bf84d6e8f74?w=400&q=80',
+    'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80',
     'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80',
     'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80',
 ];

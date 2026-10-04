@@ -115,7 +115,6 @@ export default function App() {
                                 <BrowserRouter>
                                     <ToastProvider>
                                         <ScrollToTop />
-                                        <WhatsAppButton />
                                         <AnnouncementPopup />
                                         <Routes>
                                             <Route element={<MainLayout />}>
@@ -141,6 +140,8 @@ export default function App() {
 
                                             <Route path="*" element={lazyElement(NotFoundPage)} />
                                         </Routes>
+                                        {/* Last in DOM order so the skip link stays the first keyboard tab stop */}
+                                        <WhatsAppButton />
                                     </ToastProvider>
                                 </BrowserRouter>
                             </WishlistProvider>

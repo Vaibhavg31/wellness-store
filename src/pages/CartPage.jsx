@@ -120,7 +120,7 @@ export default function CartPage() {
     if (items.length === 0) {
         return (
             <div className="container-page py-16">
-                <EmptyState icon={ShoppingBag} title="Your bag is empty" description="Browse freely and add items. No sign-in needed until checkout." actionLabel="Explore the shop" actionHref="/shop" />
+                <EmptyState as="h1" icon={ShoppingBag} title="Your bag is empty" description="Browse freely and add items. No sign-in needed until checkout." actionLabel="Explore the shop" actionHref="/shop" />
             </div>
         );
     }
