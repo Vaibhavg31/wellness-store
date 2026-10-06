@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import { ADMIN_PATH } from '@/contexts/AuthContext';
+import { PREVIEW_PATH } from '@/utils/productPreview';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
 import { cn } from '@/utils/formatPrice';
 
@@ -29,7 +30,7 @@ export default function WhatsAppButton() {
     const { getWhatsAppUrl } = useWhatsApp();
     const fieldFocused = useFieldFocused();
 
-    if (pathname.startsWith(ADMIN_PATH)) return null;
+    if (pathname.startsWith(ADMIN_PATH) || pathname.startsWith(PREVIEW_PATH)) return null;
 
     return (
         <a

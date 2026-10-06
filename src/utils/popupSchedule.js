@@ -10,7 +10,7 @@ export function isWithinSchedule(startsAt, endsAt, now = Date.now()) {
 }
 
 // Routes where a popup would interrupt the task in hand (paying, signing in) or isn't the storefront at all.
-const BLOCKED_PREFIXES = ['/checkout', '/login', '/register', '/signup', '/forgot-password', '/reset-password', '/verify-email'];
+const BLOCKED_PREFIXES = ['/product-preview', '/checkout', '/login', '/register', '/signup', '/forgot-password', '/reset-password', '/verify-email'];
 
 export function popupAllowedOn(pathname, pages, adminPath) {
     if (adminPath && pathname.startsWith(adminPath)) return false;

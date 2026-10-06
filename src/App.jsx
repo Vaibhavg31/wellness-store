@@ -11,6 +11,7 @@ import ScrollToTop from '@/components/layout/ScrollToTop';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
 import RouteProgress from '@/components/layout/RouteProgress';
+import { PREVIEW_PATH } from '@/utils/productPreview';
 import PageLoader from '@/components/layout/PageLoader';
 import MainLayout from '@/layouts/MainLayout';
 import Seo from '@/components/seo/Seo';
@@ -36,6 +37,7 @@ const ShippingPolicyPage = lazy(() => import('@/pages/ShippingPolicyPage'));
 const RefundPolicyPage = lazy(() => import('@/pages/RefundPolicyPage'));
 const TrackOrderPage = lazy(() => import('@/pages/TrackOrderPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const ProductPreviewFramePage = lazy(() => import('@/pages/ProductPreviewFramePage'));
 
 // Auth pages (standalone, no site chrome)
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
@@ -150,6 +152,8 @@ export default function App() {
                                                     <Route key={path} path={path} element={lazyElement(Page)} />
                                                 ))}
                                             </Route>
+
+                                            <Route path={PREVIEW_PATH} element={lazyElement(ProductPreviewFramePage, { noindex: true, title: 'Product preview' })} />
 
                                             <Route path="*" element={lazyElement(NotFoundPage, { noindex: true, title: 'Page not found' })} />
                                         </Routes>

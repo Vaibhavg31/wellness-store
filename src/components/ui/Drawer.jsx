@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { useDialog } from '@/hooks/useDialog';
 import { cn } from '@/utils/formatPrice';
 
-export default function Drawer({ isOpen, onClose, children, title, subtitle, side = 'right', wide = false, admin = false }) {
+export default function Drawer({ isOpen, onClose, children, title, subtitle, side = 'right', wide = false, size, flush = false, admin = false }) {
     const panelRef = useDialog(isOpen, onClose);
     if (!isOpen) return null;
 
@@ -19,7 +19,7 @@ export default function Drawer({ isOpen, onClose, children, title, subtitle, sid
                 className={cn(
                     'absolute top-0 flex h-dvh w-full flex-col bg-surface shadow-lg focus:outline-none',
                     side === 'right' ? 'right-0 animate-slide-in-right' : 'left-0',
-                    wide ? 'max-w-xl' : 'max-w-md',
+                    size === 'xl' ? 'max-w-[min(72rem,100vw)]' : (size === 'lg' || wide) ? 'max-w-xl' : 'max-w-md',
                 )}
             >
                 <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line px-5 py-4 sm:px-6">
@@ -31,7 +31,7 @@ export default function Drawer({ isOpen, onClose, children, title, subtitle, sid
                         <X size={18} />
                     </button>
                 </div>
-                <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6 sm:py-6">{children}</div>
+                <div className={cn('min-h-0 flex-1', flush ? 'overflow-hidden' : 'overflow-y-auto overscroll-contain px-5 py-5 sm:px-6 sm:py-6')}>{children}</div>
             </div>
         </div>,
         document.body,

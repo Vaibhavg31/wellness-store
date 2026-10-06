@@ -5,6 +5,7 @@ import {
     Boxes,
     CreditCard,
     Eraser,
+    Eye,
     ImageIcon,
     Layers,
     ListChecks,
@@ -27,6 +28,8 @@ import { formatPrice } from '@/utils/formatPrice';
 import { resolveBadgeLabel } from '@/utils/productTrustBadges';
 import Button from '@/components/ui/Button';
 import ProductContentEditor from '@/components/admin/ProductContentEditor';
+import ProductPreviewDrawer from '@/components/admin/ProductPreviewDrawer';
+import { draftToProduct } from '@/utils/productDraft';
 import {
     fieldClass,
     FormLabel,
@@ -135,6 +138,7 @@ export default function AdminProductFormPage() {
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
     const [optional, setOptional] = useState(DEFAULT_OPTIONAL);
+    const [previewOpen, setPreviewOpen] = useState(false);
 
     const setOptionalSection = (key, value) => {
         setOptional((o) => ({ ...o, [key]: value }));
@@ -220,6 +224,12 @@ export default function AdminProductFormPage() {
         if (!Number.isFinite(price) || !Number.isFinite(originalPrice) || originalPrice <= price) return 0;
         return Math.round(((originalPrice - price) / originalPrice) * 100);
     }, [price, originalPrice]);
+
+    // What the shop page would look like if this form were saved right now (only built while the preview is open).
+    const previewDraft = useMemo(
+        () => (previewOpen ? draftToProduct(form, { variantsOn: optional.variants }) : { product: null, missing: [] }),
+        [previewOpen, form, optional.variants],
+    );
 
     const handleImageUpload = async (e) => {
         if (!adminToken || !e.target.files?.length) return;
@@ -541,11 +551,16 @@ export default function AdminProductFormPage() {
                             : 'Update product details, images, and store settings.'}
                     </p>
                 </div>
-                <Link to={`${ADMIN_PATH}/products`}>
-                    <Button variant="outline" size="sm" className="normal-case tracking-normal">
-                        Back to products
+                <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="outline" size="sm" className="normal-case tracking-normal" onClick={() => setPreviewOpen(true)}>
+                        <Eye size={15} aria-hidden="true" /> Preview page
                     </Button>
-                </Link>
+                    <Link to={`${ADMIN_PATH}/products`}>
+                        <Button variant="outline" size="sm" className="normal-case tracking-normal">
+                            Back to products
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -1295,12 +1310,21 @@ export default function AdminProductFormPage() {
                             </span>
                         </div>
                     </div>
-                    <div className="flex gap-2 shrink-0">
+                    <div className="flex shrink-0 flex-wrap gap-2">
                         <Button
                             type="button"
                             variant="outline"
                             size="lg"
-                            className="normal-case tracking-normal"
+                            className="w-full normal-case tracking-normal sm:w-auto"
+                            onClick={() => setPreviewOpen(true)}
+                        >
+                            <Eye size={16} aria-hidden="true" /> Preview page
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="lg"
+                            className="flex-1 normal-case tracking-normal sm:flex-none"
                             onClick={() => navigate(`${ADMIN_PATH}/products`)}
                         >
                             Cancel
@@ -1311,13 +1335,17 @@ export default function AdminProductFormPage() {
                             loading={saving}
                             disabled={uploading}
                             size="lg"
-                            className="sm:min-w-[180px] normal-case tracking-normal"
+                            className="flex-1 normal-case tracking-normal sm:min-w-[180px] sm:flex-none"
                         >
                             {isNew ? 'Create product' : 'Save changes'}
                         </Button>
                     </div>
                 </div>
             </form>
+
+            {previewOpen && (
+                <ProductPreviewDrawer isOpen onClose={() => setPreviewOpen(false)} product={previewDraft.product} missing={previewDraft.missing} />
+            )}
         </div>
     );
 }
