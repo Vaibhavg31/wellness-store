@@ -1,383 +1,132 @@
+/*
+ * Chikit — coming-soon page.
+ * The Ayurveda photo fills the screen and fades softly into the shop's cream around the middle, so the official
+ * (plum) logo sits directly on the page, exactly as it does on the store: no badge, no box, no recolouring.
+ * Brand tokens: plum #602460, turmeric gold, warm cream, Poppins. Gold is used as a fill, or as the darker
+ * "gold ink" when it is text on cream.
+ */
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 400; font-display: swap; src: url("/assets/fonts/poppins-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 500; font-display: swap; src: url("/assets/fonts/poppins-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 600; font-display: swap; src: url("/assets/fonts/poppins-600-normal.woff2") format("woff2"); }
+
 :root {
-  --ink: #f6ecf2;
-  --ink-dim: rgba(246, 236, 242, 0.68);
-  --accent-deep: #3c1636;
-  --accent: #9a4f89;
-  --accent-bright: #e6b8da;
-  --bg-deep: #0c0710;
+  --plum: #602460;
+  --plum-hover: #4E1C4E;
+  --plum-deep: #431A43;
+  --plum-tint: #F1E4F2;
+  --plum-soft: #9A4F89;
+  --gold: #C08A3E;
+  --gold-light: #E9C58A;
+  --gold-ink: #8A5A1E;
+  --cream: #FDF9F4;
+  --ink: #241720;
+  --muted: #6B5D68;
+  --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-}
-
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
 body {
   margin: 0;
   min-height: 100svh;
-  background: var(--bg-deep);
+  background: var(--cream);
   color: var(--ink);
-  font-family: "Jost", sans-serif;
+  font-family: var(--font-sans);
+  line-height: 1.7;
   overflow-x: hidden;
   position: relative;
   isolation: isolate;
+  -webkit-font-smoothing: antialiased;
 }
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--plum); outline-offset: 4px; border-radius: 10px; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-/* ---------- background photo ---------- */
-
-.bg {
-  position: fixed;
-  inset: 0;
-  z-index: -3;
-  overflow: hidden;
-}
-
-.bg img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 58% 32%;
-  transform: scale(1.03);
-}
-
+/* ---------- background: the photo, fading into cream where the words are ---------- */
+.bg { position: fixed; inset: 0; z-index: -3; overflow: hidden; background: var(--cream); }
+.bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; transform: scale(1.03); }
 .bg__overlay {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 50% 42%, rgba(20, 8, 18, 0.2), rgba(14, 6, 13, 0.52) 100%),
-    linear-gradient(180deg, rgba(16, 6, 15, 0.58) 0%, rgba(12, 6, 12, 0.12) 22%, rgba(12, 6, 12, 0.14) 55%, rgba(14, 5, 13, 0.74) 100%),
-    linear-gradient(200deg, rgba(58, 20, 48, 0.22), rgba(8, 15, 11, 0.28));
+    radial-gradient(ellipse 60% 58% at 50% 50%, rgba(253, 249, 244, 1) 0%, rgba(253, 249, 244, 0.97) 34%, rgba(253, 249, 244, 0.8) 66%, rgba(253, 249, 244, 0.64) 100%),
+    radial-gradient(48rem 30rem at -6% -8%, rgba(96, 36, 96, 0.10), transparent 62%),
+    radial-gradient(44rem 28rem at 108% 108%, rgba(192, 138, 62, 0.14), transparent 60%);
 }
-
 .grain {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.045;
-  mix-blend-mode: overlay;
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.035; mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-
-/* ---------- bokeh particles (subtle, layered over photo) ---------- */
-
-#scene {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
+#scene { position: fixed; inset: 0; z-index: -2; width: 100%; height: 100%; pointer-events: none; }
 
 /* ---------- layout ---------- */
-
 .stage {
-  position: relative;
-  z-index: 1;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 6vh 6vw;
-  gap: clamp(1.6rem, 5vh, 3.2rem);
+  position: relative; z-index: 1; min-height: 100svh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  padding: 6vh 1.5rem; gap: clamp(1.6rem, 5vh, 3rem);
 }
+.status { display: flex; flex-direction: column; align-items: center; width: 100%; }
 
-.reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  animation: rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: calc(var(--d) * 0.13s + 0.15s);
-}
+/* ---------- the official logo, straight on the page ---------- */
+.brand { display: inline-block; border-radius: 12px; }
+.brand img { width: clamp(13rem, 46vw, 23rem); height: auto; aspect-ratio: 975 / 320; }
 
-@keyframes rise {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.brandmark {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.wordmark-row {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.6rem, 2vw, 1.1rem);
-}
-
-.leaf-icon {
-  width: clamp(2.2rem, 6vw, 3.6rem);
-  height: clamp(2.2rem, 6vw, 3.6rem);
-  fill: none;
-  stroke: var(--accent-bright);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
-  flex-shrink: 0;
-  animation: iconGlow 4.5s ease-in-out infinite;
-}
-
-@keyframes iconGlow {
-  0%, 100% { filter: drop-shadow(0 2px 10px rgba(230, 184, 218, 0.15)); }
-  50% { filter: drop-shadow(0 2px 18px rgba(230, 184, 218, 0.5)); }
-}
-
-.wordmark {
-  margin: 0;
-  font-family: "Cormorant Garamond", serif;
-  font-weight: 700;
-  font-size: clamp(3.4rem, 12vw, 8.2rem);
-  letter-spacing: 0.06em;
-  line-height: 1;
-  background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 60%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 6px 34px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 40px rgba(230, 184, 218, 0.25));
-  padding-bottom: 0.1em;
-}
-
-.divider {
-  display: block;
-  width: 3.5rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
-  position: relative;
-  overflow: hidden;
-}
-
-.divider::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, #fff, transparent);
-  transform: translateX(-100%);
-  animation: dividerShine 3.6s ease-in-out 1.4s infinite;
-}
-
-@keyframes dividerShine {
-  0%, 40% { transform: translateX(-100%); }
-  60%, 100% { transform: translateX(100%); }
-}
-
-.subtitle {
-  margin: 0;
-  font-size: 0.76rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
-  font-weight: 400;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
-}
-
-.status {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.15rem;
-  max-width: 40rem;
-}
-
+/* ---------- words ---------- */
 .eyebrow {
-  margin: 0;
-  font-size: 0.76rem;
-  letter-spacing: 0.5em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
-  font-weight: 400;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+  display: inline-flex; align-items: center; gap: 1rem; margin: 0 0 1rem;
+  font-size: clamp(0.72rem, 2.4vw, 0.85rem); font-weight: 500; letter-spacing: 0.34em; text-transform: uppercase; color: var(--gold-ink);
 }
-
+.eyebrow::before, .eyebrow::after { content: ""; width: clamp(1.4rem, 6vw, 2.6rem); height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.eyebrow::after { transform: scaleX(-1); }
 .headline {
-  margin: 0;
-  font-family: "Jost", sans-serif;
-  font-weight: 600;
-  font-size: clamp(1.9rem, 5.5vw, 3.4rem);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--ink);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  margin: 0 0 clamp(1.6rem, 4vh, 2.4rem);
+  font-size: clamp(1.6rem, 9vw, 5.6rem); font-weight: 600; line-height: 1.05; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
 }
+.tagline { margin: clamp(1.4rem, 3.4vh, 2rem) 0 0; max-width: 28rem; font-size: clamp(1rem, 0.9rem + 0.5vw, 1.15rem); color: var(--muted); }
 
-/* ---------- progress bar ---------- */
-
-.progress {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55rem;
-  width: min(340px, 65vw);
-  margin-top: 0.2rem;
-}
-
+/* ---------- loader bar ---------- */
+.progress { display: flex; align-items: center; gap: 1rem; width: min(32rem, 100%); }
 .progress__track {
-  position: relative;
-  width: 100%;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(246, 236, 242, 0.16);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
-  overflow-x: hidden;
-  overflow-y: visible;
+  position: relative; flex: 1; height: 0.5rem; border-radius: 999px;
+  background: rgba(96, 36, 96, 0.13); box-shadow: inset 0 1px 2px rgba(67, 26, 67, 0.18);
 }
-
 .progress__fill {
-  position: absolute;
-  inset: 0;
-  width: 0%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 100%);
-  transition: width 2.1s cubic-bezier(0.65, 0, 0.35, 1);
-  box-shadow: 0 0 12px rgba(230, 184, 218, 0.4);
+  position: relative; height: 100%; width: 0; border-radius: inherit;
+  background: linear-gradient(90deg, var(--plum), var(--plum-soft));
+  box-shadow: 0 0 14px rgba(96, 36, 96, 0.32);
+  transition: width 2.1s var(--ease);
 }
-
+.progress__fill::after { /* soft light travelling along the bar, so it always feels alive */
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%);
+  background-size: 220% 100%; animation: sheen 2.8s linear infinite;
+}
 .progress__dot {
-  position: absolute;
-  right: -3px;
-  top: 50%;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  transform: translate(50%, -50%);
-  background: var(--accent-bright);
-  box-shadow: 0 0 0 0 rgba(230, 184, 218, 0.55);
-  animation: pulseDot 2s ease-out infinite;
+  position: absolute; right: -0.45rem; top: 50%; width: 0.95rem; height: 0.95rem; transform: translateY(-50%);
+  border-radius: 50%; background: #fff; border: 3px solid var(--plum); box-shadow: 0 2px 8px rgba(96, 36, 96, 0.4); z-index: 1;
 }
+.progress__value { min-width: 3.2ch; text-align: right; font-size: 1.1rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--plum); }
 
-@keyframes pulseDot {
-  0% { box-shadow: 0 0 0 0 rgba(230, 184, 218, 0.55); }
-  70% { box-shadow: 0 0 0 8px rgba(230, 184, 218, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(230, 184, 218, 0); }
-}
+/* ---------- entrance (starts once the loading screen has gone) ---------- */
+.js .reveal { opacity: 0; transform: translateY(18px); }
+.is-ready .reveal { animation: rise 1.1s var(--ease) both; animation-delay: calc(var(--d, 0) * 0.13s + 0.1s); }
+.is-ready .bg img { animation: settle 2.4s var(--ease) both; }
 
-.progress__glow {
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  width: 36px;
-  left: -60px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
-  filter: blur(7px);
-  animation: shimmer 2.8s ease-in-out infinite;
-  animation-delay: 2.2s;
-}
+@keyframes rise { to { opacity: 1; transform: none; } }
+@keyframes settle { from { transform: scale(1.09); } to { transform: scale(1.03); } }
+@keyframes sheen { from { background-position: 120% 0; } to { background-position: -120% 0; } }
 
-@keyframes shimmer {
-  0% { left: -60px; }
-  55%, 100% { left: 110%; }
-}
-
-.progress__value {
-  font-size: 0.72rem;
-  letter-spacing: 0.3em;
-  color: var(--accent-bright);
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- tagline ---------- */
-
-.tagline {
-  margin: 0;
-  color: var(--ink-dim);
-  font-weight: 300;
-  font-size: clamp(0.9rem, 1.8vw, 1.08rem);
-  line-height: 1.6;
-  letter-spacing: 0.02em;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
-}
-
-/* ---------- responsive ---------- */
-
-@media (max-width: 640px) {
-  .bg img {
-    object-position: 68% 58%;
-    transform: scale(1.08);
-  }
-
-  .stage {
-    padding: 5vh 5.5vw;
-    gap: clamp(1.2rem, 4vh, 2.2rem);
-  }
-}
-
-@media (max-width: 380px) {
-  .wordmark {
-    letter-spacing: 0.03em;
-  }
-
-  .subtitle {
-    letter-spacing: 0.3em;
-  }
-}
-
-/* Short/landscape viewports: split into two columns instead of shrinking
-   everything into an unreadable, scrolling stack. */
-@media (orientation: landscape) and (max-height: 520px) {
-  .stage {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(2rem, 6vw, 4.5rem);
-    padding: 3vh 5vw;
-    text-align: left;
-  }
-
-  .brandmark {
-    align-items: flex-start;
-    flex-shrink: 0;
-  }
-
-  .status {
-    align-items: flex-start;
-    text-align: left;
-    gap: 0.7rem;
-  }
-
-  .divider {
-    margin-left: 0;
-  }
-
-  .wordmark {
-    font-size: clamp(2.2rem, 6.5vw, 3.6rem);
-  }
-
-  .progress {
-    align-items: flex-start;
-    width: min(280px, 32vw);
-  }
-
-  .tagline br {
-    display: none;
-  }
-
-  .tagline {
-    font-size: 0.82rem;
-  }
+/* ---------- small phones in landscape, and very short screens ---------- */
+@media (max-height: 520px) {
+  .stage { padding-block: 4vh; gap: 1rem; }
+  .brand img { width: clamp(9rem, 26vh, 14rem); }
+  .headline { margin-bottom: 1rem; font-size: clamp(1.8rem, 7vh, 3rem); }
+  .tagline { margin-top: 0.9rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .progress__glow,
-  .progress__dot,
-  .leaf-icon,
-  .divider::after {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
+  .reveal, .js .reveal { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .is-ready .bg img, .progress__fill::after { animation: none !important; }
+  .progress__fill { transition: none; }
 }

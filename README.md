@@ -1,70 +1,67 @@
 # Chikit — Coming Soon
 
-Static, dependency-free landing page for **chikit.in** (Ayurvedic wellness brand).
-No build step required — plain HTML/CSS/JS in `index.html` + `assets/`.
+The page visitors see at **https://chikit.in** until the store opens. Plain HTML, CSS and JavaScript: no build
+step, no dependencies, nothing to install. It is published by **GitHub Pages** straight from this branch (`master`).
 
-> The full Chikit store (React + backend) will be rebuilt on this branch step by
-> step. The previous full storefront template lives on the
-> `archive/full-wellness-store` branch for reference. This branch (`master`)
-> starts from the coming-soon page only.
+The full store (React + Node + MySQL) lives on the `redesign/ui-from-scratch` branch and is not served from here.
 
-## Run locally
+## What is on the page
 
-Just open `index.html` in a browser, or serve it:
+- A full-screen Ayurveda photo that fades softly into the shop's cream around the middle, with film grain and drifting gold dust.
+- The official Chikit logo, untouched, sitting directly on the page (the logo is plum, so the page around it is light).
+- "Preparing for launch / Coming Soon", a plum loader bar with its percentage, and a short tagline.
+- A loading screen (logo + progress line) that fades away, then the page rises in.
+- Brand fonts (Poppins), self-hosted: nothing is loaded from other websites.
+- Works from 320px phones to wide monitors, in landscape, with JavaScript off, and respects "reduce motion".
+- Lighthouse: Performance 99-100, Accessibility 100, Best Practices 100, SEO 100. About 135-170 KB in total.
+
+No date and no email address are shown on the page.
+
+## How the loader bar works
+
+The bar fills in step with the days leading up to the opening. The dates are only used to work out how far along
+the bar is; they are never displayed. Edit the `CONFIG` block at the top of `assets/script.js`:
+
+```js
+const CONFIG = {
+  progressStart: "2026-09-29T00:00:00+05:30",
+  progressEnd: "2026-10-30T00:00:00+05:30",
+  floor: 8,       // the bar is never emptier than this (%)
+  ceiling: 96,    // ...and never completes until the real opening
+};
+```
+
+## Run it on your computer
+
+Open `index.html`, or serve the folder so root-relative links (`/assets/...`) work:
 
 ```bash
 npx serve .
 ```
 
-## Structure
+## Files
 
 ```
-index.html          # page markup
-assets/style.css     # layout, theme, animations
-assets/script.js      # bokeh particle background, progress bar, notify form
-assets/favicon.svg
-.github/workflows/deploy.yml   # CI: pushes this folder to S3 + invalidates CloudFront
+index.html           page markup, loading-screen styles, share/SEO tags
+404.html             branded "page not found"
+assets/style.css     layout, theme, animations
+assets/script.js     loader bar, floating light, loading screen
+assets/brand/        official logo (webp)
+assets/fonts/        Poppins, self-hosted
+assets/images/       hero photo in three sizes (webp)
+og-image.png         picture shown when the link is shared
+site.webmanifest, favicon*, apple-touch-icon.png, robots.txt, sitemap.xml
+CNAME                custom domain for GitHub Pages (chikit.in) - do not delete
+.nojekyll            tells GitHub Pages to publish the files exactly as they are
 ```
 
-## Deploying to AWS (free tier)
+## Publishing
 
-This repo ships a GitHub Actions workflow (`.github/workflows/deploy.yml`) that
-syncs this folder straight to an S3 bucket on every push to `master`, and
-optionally invalidates a CloudFront distribution. It does **not** run yet —
-it needs AWS credentials and a bucket, which aren't set up here.
+Every push to `master` updates the live site within a minute or two (Settings → Pages: "Deploy from a branch",
+`master`, `/ (root)`). Keep the `CNAME` file: removing it disconnects the chikit.in domain.
+DNS for the domain is managed at GoDaddy and should keep pointing at GitHub Pages while this page is live.
 
-### One-time AWS setup (do this in your AWS account)
+## When the store opens
 
-1. **S3 bucket** — create a bucket (e.g. `chikit-site`), enable **Static
-   website hosting**, set `index.html` as the index document.
-2. **Bucket policy** — allow public read (or, better, keep it private and
-   front it with CloudFront using an Origin Access Control).
-3. **CloudFront (recommended)** — create a distribution pointing at the S3
-   bucket, attach your `chikit.in` domain + an ACM certificate (free), and
-   point your domain's DNS at the CloudFront distribution.
-4. **IAM user for CI** — create an IAM user (or OIDC role) with permission
-   to `s3:PutObject`/`s3:DeleteObject`/`s3:ListBucket` on the bucket and
-   `cloudfront:CreateInvalidation` on the distribution. Generate an access
-   key for it.
-
-### Wire it up to this repo
-
-Add these as **GitHub repo secrets** (Settings → Secrets and variables →
-Actions):
-
-| Secret | Value |
-|---|---|
-| `AWS_ACCESS_KEY_ID` | from the IAM user above |
-| `AWS_SECRET_ACCESS_KEY` | from the IAM user above |
-| `AWS_REGION` | e.g. `ap-south-1` |
-| `AWS_S3_BUCKET` | your bucket name, e.g. `chikit-site` |
-| `AWS_CLOUDFRONT_DISTRIBUTION_ID` | optional — leave unset to skip the invalidation step |
-
-Once those secrets exist, every push to `master` deploys automatically.
-Nothing else in this repo needs to change.
-
-## Not included (on purpose)
-
-No backend pipeline yet. The PHP backend (and its planned migration to
-Node) stays parked on `archive/full-wellness-store` until the store rebuild
-begins — this branch is frontend-only, coming-soon page only.
+Replace this page by deploying the store (see the `redesign/ui-from-scratch` branch) and then pointing the
+domain at its hosting. Do not change the GoDaddy DNS records before the new hosting is ready.
