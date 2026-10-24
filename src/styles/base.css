@@ -45,6 +45,17 @@
   .card-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
   .scrollbar-none::-webkit-scrollbar { display: none; }
 
+  /* Price slider: plum fill up to the thumb, quiet track after it. */
+  .price-range { -webkit-appearance: none; appearance: none; height: 2.25rem; background: transparent; cursor: pointer; }
+  .price-range::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: linear-gradient(to right, var(--color-primary) var(--fill, 100%), var(--color-line) var(--fill, 100%)); }
+  .price-range::-moz-range-track { height: 4px; border-radius: 999px; background: var(--color-line); }
+  .price-range::-moz-range-progress { height: 4px; border-radius: 999px; background: var(--color-primary); }
+  .price-range::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border-radius: 50%; background: var(--color-surface); border: 2px solid var(--color-primary); box-shadow: var(--shadow-sm); }
+  .price-range::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--color-surface); border: 2px solid var(--color-primary); box-shadow: var(--shadow-sm); }
+  .price-range:focus-visible { outline: none; }
+  .price-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgb(96 36 96 / 0.2); }
+  .price-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgb(96 36 96 / 0.2); }
+
   /* Scroll reveal — transform + opacity only. */
   .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s var(--ease-out-soft), transform 0.6s var(--ease-out-soft); transition-delay: var(--reveal-delay, 0ms); }
   .reveal.is-visible { opacity: 1; transform: none; }
