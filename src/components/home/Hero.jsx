@@ -28,8 +28,9 @@ function buildStageItems(products, hero) {
     const rest = withImage
         .filter((p) => !pinned.includes(p))
         .sort((a, b) => (b.isBestSeller || b.isNew ? 1 : 0) - (a.isBestSeller || a.isNew ? 1 : 0));
-    return [...pinned, ...rest].slice(0, 4).map((p) => ({
+    return [...pinned, ...rest].slice(0, 5).map((p) => ({
         id: p.id,
+        product: p,
         title: p.title,
         price: p.price,
         originalPrice: p.originalPrice,
@@ -113,7 +114,7 @@ export default function Hero({ products, loading = false }) {
             <LazyMotion features={domAnimation}>
                 <section className="relative overflow-hidden bg-canvas" onPointerMove={onPointerMove} onPointerLeave={() => spotOpacity.set(0)}>
                     <m.div className="pointer-events-none absolute inset-0" style={{ background: spot, opacity: spotOpacity }} aria-hidden="true" />
-                    <div className="container-page relative grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-2 lg:gap-16 lg:py-20">
+                    <div className="container-page relative grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-[1fr_1.1fr] lg:gap-12 lg:py-16">
                         <div>
                             {hero.badge && (
                                 <m.p {...rise(0.05)} className="mb-5 inline-flex items-center gap-2 rounded-full bg-primary-tint px-4 py-1.5 text-caption font-semibold text-primary-deep">

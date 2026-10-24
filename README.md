@@ -231,8 +231,7 @@ Every homepage block is managed in **Admin → Content → Homepage** (drag to r
 database ships in "client demo" form: **Category shelves**, **Customer reviews** and **Instagram** are switched off
 (they look thin until real products, reviews and an Instagram account exist). Turn them on there once the client
 has reviewed the demo; nothing needs to be redeployed. The animated hero ring is chosen under Content → Hero
-("Hero Picture Style"): framed product tiles circle a featured disc, so any uploaded photo (with or without a background)
-looks right; a product's **Cutout image** (Admin → Product → Cutout images) is used on the disc when it has one.
+("Hero Picture Style"): an Ayurvedic medallion (turning lotus mandala, ring of promises, brand mark) with products standing on a tilted orbit around it. It turns by itself, by cursor tilt, by scroll and by drag; the product in front lights the stage in its own colour and fills the info card (with add-to-bag). A product's **Cutout image** (Admin → Product → Cutout images) stands out of an arch window; any other photo (with or without a background) is clipped into the same arch, so uploads always look right.
 
 **Your Day, Ritualised** is a scroll-driven story (morning, midday, evening, night), one product per moment with
 add-to-bag and a one-tap "whole ritual". Its copy and product ids live in `src/data/dayRitual.js`; prices and stock
