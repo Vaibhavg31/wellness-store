@@ -33,11 +33,16 @@
       #splash .sp-inner { display: grid; justify-items: center; gap: 28px; }
       #splash .sp-logo { display: block; width: min(260px, 64vw); height: auto; aspect-ratio: 1000 / 305; clip-path: inset(0 100% 0 0); }
       #splash .sp-logo.sp-on { animation: sp-reveal 0.9s cubic-bezier(0.65, 0, 0.25, 1) forwards; }
+      #splash .sp-mark { position: relative; display: block; line-height: 0; }
+      #splash .sp-sheen { position: absolute; inset: 0; overflow: hidden; pointer-events: none; -webkit-mask: url(/brand/chikit-logo-480.webp) center / contain no-repeat; mask: url(/brand/chikit-logo-480.webp) center / contain no-repeat; }
+      #splash .sp-sheen::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 45%; background: linear-gradient(100deg, transparent, rgba(255,255,255,0.9) 50%, transparent); transform: translateX(-120%) skewX(-16deg); }
+      #splash .sp-on-wrap .sp-sheen::before { animation: sp-sheen 2.6s ease-in-out 0.9s infinite; }
+      @keyframes sp-sheen { from { transform: translateX(-120%) skewX(-16deg); } 55%, to { transform: translateX(330%) skewX(-16deg); } }
       #splash .sp-bar { width: 140px; height: 3px; border-radius: 9px; background: #F1E4F2; overflow: hidden; }
       #splash .sp-bar i { display: block; height: 100%; background: #602460; transform: scaleX(0); transform-origin: left; transition: transform 0.5s ease-out; }
       #splash .sp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
       @keyframes sp-reveal { to { clip-path: inset(0 0 0 0); } }
-      @media (prefers-reduced-motion: reduce) { #splash { transition: none; } #splash .sp-logo { animation: none; clip-path: none; } #splash .sp-bar i { transition: none; } }
+      @media (prefers-reduced-motion: reduce) { #splash { transition: none; } #splash .sp-logo { animation: none; clip-path: none; } #splash .sp-sheen { display: none; } #splash .sp-bar i { transition: none; } }
     </style>
     <noscript><style>#splash { display: none; }</style></noscript>
 
@@ -62,7 +67,7 @@
   <body>
     <div id="splash" role="status" aria-live="polite">
       <div class="sp-inner">
-        <img class="sp-logo" src="/brand/chikit-logo-480.webp" width="1000" height="305" alt="Chikit" fetchpriority="high" />
+        <span class="sp-mark"><img class="sp-logo" src="/brand/chikit-logo-480.webp" width="1000" height="305" alt="Chikit" fetchpriority="high" /><span class="sp-sheen" aria-hidden="true"></span></span>
         <span class="sp-bar" aria-hidden="true"><i></i></span>
         <span class="sp-sr">Loading Chikit</span>
       </div>
@@ -83,7 +88,7 @@
         root.classList.add('sp-lock');
         // The logo is painted in left to right the moment its picture has arrived.
         var logo = splash.querySelector('.sp-logo');
-        function showLogo() { logo.classList.add('sp-on'); }
+        function showLogo() { logo.classList.add('sp-on'); splash.classList.add('sp-on-wrap'); }
         if (logo.complete && logo.naturalWidth) showLogo(); else { logo.addEventListener('load', showLogo); setTimeout(showLogo, 1500); }
         var start = performance.now();
         var bar = splash.querySelector('.sp-bar i');

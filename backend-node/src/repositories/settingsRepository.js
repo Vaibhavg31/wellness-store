@@ -52,7 +52,7 @@ const DEFAULTS = {
     ],
     sections: {
         bannerSlider: true, hero: true, brandMarquee: true, categories: true, featured: true, banners: true,
-        trending: true, bundles: true, doshaQuiz: true, categoryShelves: true, videoBanner: true,
+        dayRitual: true, trending: true, bundles: true, doshaQuiz: true, categoryShelves: true, videoBanner: true,
         whyChoose: true, certifiedBanner: true, reviews: true, instagram: true, newsletter: true, promoBanner: true,
     },
     promo: { enabled: true, text: 'Use code', code: 'WELCOME10', suffix: 'for 10% off your first order', href: '/shop' },
