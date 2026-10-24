@@ -117,6 +117,7 @@ function LineItemRow({ item, index, products, onChange, onRemove, canRemove }) {
                 <div className="lg:col-span-2">
                     <FormLabel required>Qty</FormLabel>
                     <input
+                        aria-label="Quantity"
                         type="number"
                         min="1"
                         value={item.quantity}

@@ -25,7 +25,7 @@ const STATUS_FILTERS = [
 
 function StarRating({ rating }) {
     return (
-        <span className="inline-flex items-center gap-0.5 text-accent" aria-label={`${rating} out of 5 stars`}>
+        <span role="img" className="inline-flex items-center gap-0.5 text-accent" aria-label={`${rating} out of 5 stars`}>
             {Array.from({ length: 5 }, (_, i) => (
                 <Star
                     key={i}
