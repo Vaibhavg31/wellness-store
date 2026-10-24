@@ -154,9 +154,10 @@ One set of rules so every screen feels the same. New pages and components should
 | --- | --- | --- |
 | Moving to another page | The current page **stays on screen** until the next one is ready. A thin plum progress bar shows the wait (it also covers redirects such as sign-in). The new page fades in (0.35 s). There is never a blank "loading" screen between pages. | `App.jsx` (persistent `Suspense`), `RouteProgress`, `PageTransition` |
 | Page code | Each page is lazy-loaded, but its code is warmed when a link is hovered, focused or touched, and during idle time. Skipped on data-saver / 2G. | `src/utils/routeLoaders.js` |
-| Store ↔ sign-in ↔ admin | These are separate layouts: the new one cross-fades in from the page colour. | `RouteGroup` |
+| Store ↔ sign-in ↔ admin | Separate layouts that swap cleanly, with no fading through a blank frame. Sign-in screens are **solid and crisp**: the card swipes in from the side (rises on phones), never fades. | `RouteGroup`, `AuthShell` |
+| Sign in ⇄ Sign up | A real card swipe: both cards sit side by side on a track that slides, the box height follows, and typed values carry over. | `SwipePanels` |
 | Data loading inside a page | A skeleton with the same shape as the final content, then a fade into the real content (never a spinner, never a jump). | `Skeleton`, `animate-fade-in` |
-| Content that changes size (tabs, errors, steps) | The container's height glides; new fields fade up. | `AutoHeight` |
+| Content that changes size (errors, steps) | The container's height glides. | `AutoHeight` |
 | Buttons that submit | Spinner inside the button; it stays busy until the next screen replaces it. | `Button loading` |
 | Drawers, dialogs, search | Slide / fade **in and out** (200–300 ms); focus is trapped and restored. | `Drawer`, `Modal`, `usePresence` |
 | Reduced motion | All of the above shorten to nothing automatically. | `base.css` |

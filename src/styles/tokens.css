@@ -93,6 +93,9 @@
   --animate-confetti: confetti 1.1s var(--ease-out-soft) both;
   --animate-breathe: breathe 2.2s ease-in-out infinite;
   --animate-loader-slide: loader-slide 1.3s ease-in-out infinite;
+  --animate-swipe-in: swipe-in 0.55s var(--ease-out-soft) both;
+  --animate-swipe-in-left: swipe-in-left 0.55s var(--ease-out-soft) both;
+  --animate-rise-in: rise-in 0.5s var(--ease-out-soft) both;
   --animate-fade-out: fade-out 0.2s ease-in both;
   --animate-fade-down: fade-down 0.2s ease-in both;
   --animate-slide-in-left: slide-in-left 0.3s var(--ease-out-soft) both;
@@ -110,6 +113,9 @@
   @keyframes pop { 0% { transform: scale(0.4); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
   @keyframes breathe { 0%, 100% { opacity: 0.55; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
   @keyframes loader-slide { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
+  @keyframes swipe-in { from { transform: translateX(56px); } to { transform: none; } }
+  @keyframes swipe-in-left { from { transform: translateX(-56px); } to { transform: none; } }
+  @keyframes rise-in { from { transform: translateY(28px); } to { transform: none; } }
   @keyframes fade-out { to { opacity: 0; } }
   @keyframes fade-down { to { opacity: 0; transform: translateY(8px); } }
   @keyframes slide-in-left { from { transform: translateX(-100%); } to { transform: none; } }

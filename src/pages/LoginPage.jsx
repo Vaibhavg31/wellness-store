@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { ShoppingBag, Shield, Star, Leaf } from 'lucide-react';
 import AuthShell from '@/components/auth/AuthShell';
+import AutoHeight from '@/components/ui/AutoHeight';
+import SwipePanels from '@/components/ui/SwipePanels';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth, ADMIN_PATH } from '@/contexts/AuthContext';
@@ -197,57 +199,66 @@ function LoginScreen() {
     return (
         <AuthShell
             aside={aside}
+            animateHeight={false}
             backTo={isCheckoutLogin ? '/cart' : isAdminAccess ? '/' : '/shop'}
             backLabel={isCheckoutLogin ? '← Back to bag' : isAdminAccess ? '← Back to store' : 'Continue shopping without signing in →'}
         >
             <div className="space-y-6">
-                <div className="animate-fade-in text-center" key={mode}>
-                    {isCheckoutLogin && (
-                        <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-tint px-3 py-1 text-caption font-semibold text-primary-deep">
-                            <ShoppingBag size={14} aria-hidden="true" /> Checkout login
-                        </p>
-                    )}
-                    <h1 className="text-h2">
-                        {isCheckoutLogin ? 'Sign in to buy' : isAdminAccess ? 'Studio access' : mode === 'signin' ? 'Sign in' : 'Create account'}
-                    </h1>
-                    <p className="mt-2 text-small text-muted">
-                        {isAdminAccess
-                            ? `Sign in with your admin Google account to open ${BRAND_NAME} Studio`
-                            : mode === 'signup'
-                                ? 'Enter your details — we will email you a secure link to verify and sign in'
-                                : 'Use email and password, or continue with Google'}
-                    </p>
-                </div>
-
-                {!isAdminAccess && (
+                {isAdminAccess ? (
+                    <div className="text-center">
+                        <h1 className="text-h2">Studio access</h1>
+                        <p className="mt-2 text-small text-muted">{`Sign in with your admin Google account to open ${BRAND_NAME} Studio`}</p>
+                    </div>
+                ) : (
                     <>
                         <div className="relative flex rounded-full bg-canvas-alt p-1" role="tablist" aria-label="Sign in or sign up">
                             <span
                                 aria-hidden="true"
-                                className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-primary shadow-sm transition-transform duration-300 ease-[var(--ease-out-soft)]"
+                                className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-primary shadow-sm transition-transform duration-500 ease-[var(--ease-out-soft)]"
                                 style={{ transform: mode === 'signup' ? 'translateX(100%)' : 'none' }}
                             />
                             <button type="button" role="tab" aria-selected={mode === 'signin'} onClick={() => { setMode('signin'); setError(''); }} className={tabClass(mode === 'signin')}>Sign in</button>
                             <button type="button" role="tab" aria-selected={mode === 'signup'} onClick={() => { setMode('signup'); setError(''); }} className={tabClass(mode === 'signup')}>Sign up</button>
                         </div>
 
-                        <form onSubmit={handleEmailSubmit} className="space-y-4">
-                            {mode === 'signup' && <div className="animate-fade-up"><Input label="Full name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" /></div>}
-                            <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-                            <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} />
-                            {mode === 'signup' && <div className="animate-fade-up"><Input label="Confirm password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} autoComplete="new-password" /></div>}
-                            {mode === 'signin' && (
-                                <div className="flex items-center justify-between text-small">
-                                    <label className="flex cursor-pointer items-center gap-2 text-muted">
-                                        <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="size-4 rounded border-line-strong accent-primary" />
-                                        Remember me
-                                    </label>
-                                    <Link to="/forgot-password" className="font-medium text-primary hover:underline">Forgot password?</Link>
+                        {/* Two cards side by side; switching tabs swipes the track. Fields are shared, so nothing typed is lost. */}
+                        <SwipePanels index={mode === 'signin' ? 0 : 1}>
+                            {['signin', 'signup'].map((panel) => (
+                                <div key={panel} className="space-y-6">
+                                    <div className="text-center">
+                                        {isCheckoutLogin && (
+                                            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-tint px-3 py-1 text-caption font-semibold text-primary-deep">
+                                                <ShoppingBag size={14} aria-hidden="true" /> Checkout login
+                                            </p>
+                                        )}
+                                        <h1 className="text-h2">{panel === 'signin' ? (isCheckoutLogin ? 'Sign in to buy' : 'Sign in') : 'Create account'}</h1>
+                                        <p className="mt-2 text-small text-muted">
+                                            {panel === 'signup'
+                                                ? 'Enter your details — we will email you a secure link to verify and sign in'
+                                                : 'Use email and password, or continue with Google'}
+                                        </p>
+                                    </div>
+
+                                    <form onSubmit={handleEmailSubmit} className="space-y-4">
+                                        {panel === 'signup' && <Input label="Full name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />}
+                                        <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+                                        <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={panel === 'signin' ? 'current-password' : 'new-password'} />
+                                        {panel === 'signup' && <Input label="Confirm password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} autoComplete="new-password" />}
+                                        {panel === 'signin' && (
+                                            <div className="flex items-center justify-between text-small">
+                                                <label className="flex cursor-pointer items-center gap-2 text-muted">
+                                                    <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="size-4 rounded border-line-strong accent-primary" />
+                                                    Remember me
+                                                </label>
+                                                <Link to="/forgot-password" className="font-medium text-primary hover:underline">Forgot password?</Link>
+                                            </div>
+                                        )}
+                                        {panel === 'signup' && <p className="text-center text-caption text-muted">We&apos;ll send a magic link to verify your email. Click it to complete sign-in.</p>}
+                                        <Button size="lg" className="w-full" type="submit" loading={loading}>{panel === 'signin' ? 'Sign in with email' : 'Create account'}</Button>
+                                    </form>
                                 </div>
-                            )}
-                            {mode === 'signup' && <p className="text-center text-caption text-muted">We&apos;ll send a magic link to verify your email. Click it to complete sign-in.</p>}
-                            <Button size="lg" className="w-full" type="submit" loading={loading}>{mode === 'signin' ? 'Sign in with email' : 'Create account'}</Button>
-                        </form>
+                            ))}
+                        </SwipePanels>
 
                         {googleSignInEnabled && (
                             <div className="flex items-center gap-3" aria-hidden="true">
@@ -277,7 +288,7 @@ function LoginScreen() {
                     <p className={notice}>Add <code className="rounded bg-surface px-1 text-caption">VITE_GOOGLE_CLIENT_ID</code> to enable Google sign-in.</p>
                 ) : null}
 
-                {error && <p className="rounded-lg bg-danger-tint p-3 text-center text-small text-danger" role="alert">{error}</p>}
+                <AutoHeight>{error && <p className="rounded-lg bg-danger-tint p-3 text-center text-small text-danger" role="alert">{error}</p>}</AutoHeight>
 
                 <p className="text-center text-caption text-muted">
                     By signing in you agree to our <Link to="/terms" className="underline">Terms</Link> &amp; <Link to="/privacy" className="underline">Privacy Policy</Link>
