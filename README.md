@@ -130,7 +130,7 @@ src/                    # React source (JavaScript .jsx / .js)
 ├── layouts/            # MainLayout (storefront shell)
 ├── pages/              # Route pages (storefront, auth, admin/)
 ├── contexts/ hooks/ services/ utils/ data/ constants/       # State, data layer, helpers
-public/brand/           # Official Chikit logo (webp renditions of the supplied artwork)
+public/brand/           # Official Chikit logo with ™ (renditions of CHIKIT/chikit final file/CHIKIT-FINAL-FILE.png), plus favicons and og-image
 CHIKIT/                 # Original brand source files (.ai/.eps/.pdf/.cdr/.png)
 
 dist/                   # Built frontend (after npm run build)

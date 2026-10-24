@@ -6,7 +6,7 @@ import { cn } from '@/utils/formatPrice';
  * The artwork is untouched; only its file format/size is optimised.
  * Single-colour plum on transparent — always place it on a light surface
  * (canvas / surface / primary-tint) and leave clear space around it
- * (the link padding below). Intrinsic ratio 975×320 is declared to prevent
+ * (the link padding below). Intrinsic ratio 1000×305 is declared to prevent
  * layout shift.
  */
 const sizes = {
@@ -21,14 +21,14 @@ export default function Logo({ size = 'md', className, linkToHome = false, prior
     const img = (
         <img
             src="/brand/chikit-logo.webp"
-            srcSet="/brand/chikit-logo-480.webp 480w, /brand/chikit-logo.webp 975w"
+            srcSet="/brand/chikit-logo-480.webp 480w, /brand/chikit-logo.webp 1000w"
             sizes="(max-width: 640px) 160px, 240px"
-            width="975"
-            height="320"
-            alt="Chikit — Ayurveda and Wellness"
+            width="1000"
+            height="305"
+            alt="Chikit™ — Ayurveda and Wellness"
             decoding="async"
             fetchPriority={priority ? 'high' : undefined}
-            className={cn('aspect-[975/320] w-auto object-contain', sizes[size], className)}
+            className={cn('aspect-[1000/305] w-auto object-contain', sizes[size], className)}
             draggable={false}
         />
     );
