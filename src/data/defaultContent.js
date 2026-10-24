@@ -164,7 +164,7 @@ export const DEFAULT_SITE_CONTENT = {
 
     featured: {
         collectionTitle: 'Featured Collection',
-        stylesTitle: 'Trending Now',
+        stylesTitle: 'Our bestsellers',
         viewAllLabel: 'View All',
         productCount: 8,
     },

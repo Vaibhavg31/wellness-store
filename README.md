@@ -205,7 +205,15 @@ rule — the exact syntax depends on your host).
 
 ## Admin Panel
 
-Access at `/wellness-studio` (not linked on the public site).
+Access at `/chikit-studio` (set by `ADMIN_PATH` in `config.json`; not linked on the public site). In development, sign in on the normal login page with the admin email and `ADMIN_DEV_PASSWORD` from `config.json`.
+
+### Homepage sections and the client demo
+
+Every homepage block is managed in **Admin → Content → Homepage** (drag to reorder, switch on/off). The starter
+database ships in "client demo" form: **Category shelves**, **Customer reviews** and **Instagram** are switched off
+(they look thin until real products, reviews and an Instagram account exist). Turn them on there once the client
+has reviewed the demo; nothing needs to be redeployed. The animated hero ring is chosen under Content → Hero
+("Hero Picture Style"); a product floats on it when it has a **Cutout image** (Admin → Product → Cutout images).
 
 ## Phone OTP (checkout)
 

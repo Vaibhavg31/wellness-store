@@ -137,7 +137,7 @@ export default function Footer() {
                         <li><Link to="/refund-policy" className="inline-flex min-h-9 items-center hover:text-primary">Returns &amp; Refunds</Link></li>
                         <li>
                             {DEVELOPER_CREDIT}{' '}
-                            <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="font-medium text-ink hover:text-primary">{DEVELOPER_NAME}</a>
+                            <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center px-1 font-medium text-ink hover:text-primary">{DEVELOPER_NAME}</a>
                         </li>
                     </ul>
                 </div>

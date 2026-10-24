@@ -72,7 +72,7 @@ const DEFAULTS = {
     },
     videoBanner: { videoUrl: '', poster: '', title: '', subtitle: '', ctaLabel: '', ctaHref: '', fit: 'cover', width: null, height: null },
     marquee: { items: ['FSSAI & GMP Certified', 'Authentic Ayurvedic Formulations', 'Lab Tested Purity', 'Free Delivery Above ₹1999', '7-Day Easy Returns'] },
-    featured: { collectionTitle: 'Featured Collection', stylesTitle: 'Trending Now', viewAllLabel: 'View All', productCount: 8 },
+    featured: { collectionTitle: 'Featured Collection', stylesTitle: 'Our bestsellers', viewAllLabel: 'View All', productCount: 8 },
     whyChoose: { subtitle: 'Why Choose Us', title: 'Ayurveda You Can Trust', description: 'From sourcing to lab testing, every step is built around Ayurvedic tradition and transparency.', benefits: [], ctaText: "Stay connected with us on Instagram and WhatsApp. We're always happy to help." },
     certifiedBanner: { badge: 'FSSAI & GMP Certified', title: 'Purity You Can Verify', description: 'Every product is manufactured in certified facilities and third-party lab tested before it reaches you.', ctaLabel: 'See Our Certifications', ctaHref: '/about', image: '' },
     newsletter: { badge: 'Exclusive Access', title: 'Join the Chikit Circle', description: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.', buttonLabel: 'Subscribe', disclaimer: 'No spam. Unsubscribe anytime.', successMessage: 'Thank you for subscribing!' },
