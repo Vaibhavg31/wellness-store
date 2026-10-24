@@ -75,18 +75,19 @@ export const DEFAULT_SITE_CONTENT = {
 
     navLinks: NAV_LINKS,
 
+    // Homepage order, top to bottom (the admin can reorder or hide any of these).
     sections: {
         bannerSlider: true,
         hero: true,
-        categoryShelves: true,
         brandMarquee: true,
-        videoBanner: true,
-        banners: true,
-        featured: true,
-        trending: true,
         categories: true,
-        doshaQuiz: true,
+        featured: true,
+        banners: true,
+        trending: true,
         bundles: true,
+        doshaQuiz: true,
+        categoryShelves: true,
+        videoBanner: true,
         whyChoose: true,
         certifiedBanner: true,
         reviews: true,
@@ -182,7 +183,7 @@ export const DEFAULT_SITE_CONTENT = {
         description: 'Every product is manufactured in certified facilities and third-party lab tested before it reaches you.',
         ctaLabel: 'See Our Certifications',
         ctaHref: '/about',
-        image: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=700&q=80',
+        image: '/catalog/home/certified.webp',
     },
 
     newsletter: {
@@ -211,7 +212,7 @@ export const DEFAULT_SITE_CONTENT = {
             `${BRAND_NAME} was founded with a simple yet powerful vision: to make authentic, lab-tested Ayurvedic wellness accessible to every household.`,
             'Every product we make is thoughtfully sourced and rigorously tested, combining traditional Ayurvedic knowledge with modern quality standards.',
         ],
-        storyImage: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=800&q=80',
+        storyImage: '/catalog/home/about-story.webp',
         missionTitle: 'Our Mission',
         missionText: 'To make authentic, lab-tested Ayurvedic wellness accessible to every household.',
         visionTitle: 'Our Vision',

@@ -207,6 +207,8 @@ export const api = {
  */
 export function imageUrl(path, width) {
     if (!path) return '';
+    // Bundled artwork (public/catalog) is served by the storefront itself, not by the API host.
+    if (path.startsWith('/catalog/')) return path;
     if (path.startsWith('http')) {
         if (width && path.includes('images.unsplash.com')) {
             const url = new URL(path);

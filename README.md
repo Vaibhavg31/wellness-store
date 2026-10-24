@@ -131,6 +131,8 @@ src/                    # React source (JavaScript .jsx / .js)
 ├── pages/              # Route pages (storefront, auth, admin/)
 ├── contexts/ hooks/ services/ utils/ data/ constants/       # State, data layer, helpers
 public/brand/           # Official Chikit logo with ™ (renditions of CHIKIT/chikit final file/CHIKIT-FINAL-FILE.png), plus favicons and og-image
+public/catalog/         # Dummy catalogue artwork: original Chikit-branded packshots, banners, Instagram tiles, brand film
+scripts/catalog-art/     # Generator for public/catalog (npm i --no-save puppeteer-core sharp; node scripts/catalog-art/build.mjs)
 CHIKIT/                 # Original brand source files (.ai/.eps/.pdf/.cdr/.png)
 
 dist/                   # Built frontend (after npm run build)

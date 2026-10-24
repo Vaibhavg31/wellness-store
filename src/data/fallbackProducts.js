@@ -13,10 +13,7 @@ export const FALLBACK_PRODUCTS = [
         description: 'Lab-tested whey isolate with 25g protein per serving, no added sugar.',
         features: ['FSSAI Certified', 'Lab Tested Purity'],
         stock: 24,
-        images: [
-            'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=900&q=85',
-            'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=900&q=85',
-        ],
+        images: ['/catalog/products/protein-1.webp', '/catalog/products/protein-2.webp'],
         isNew: true,
         isBestSeller: true,
         isPublished: true,
@@ -34,9 +31,7 @@ export const FALLBACK_PRODUCTS = [
         description: 'Daily immunity and bone-health support in an easy liquid dose.',
         features: ['No Preservatives', 'Lab Tested'],
         stock: 18,
-        images: [
-            'https://images.unsplash.com/photo-1550572017-edd951b55104?w=900&q=85',
-        ],
+        images: ['/catalog/products/multivitamin-1.webp', '/catalog/products/multivitamin-2.webp'],
         isNew: false,
         isBestSeller: true,
         isPublished: true,
@@ -54,9 +49,7 @@ export const FALLBACK_PRODUCTS = [
         description: 'Traditional Ayurvedic stress and energy support, standardized extract.',
         features: ['Ayurvedic', 'GMP Certified'],
         stock: 30,
-        images: [
-            'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=900&q=85',
-        ],
+        images: ['/catalog/products/triphala-1.webp', '/catalog/products/triphala-2.webp'],
         isNew: true,
         isBestSeller: false,
         isPublished: true,
@@ -74,9 +67,7 @@ export const FALLBACK_PRODUCTS = [
         description: 'Nutrient-dense superfood powder, easy to blend into any daily routine.',
         features: ['100% Natural', 'No Additives'],
         stock: 22,
-        images: [
-            'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=900&q=85',
-        ],
+        images: ['/catalog/products/greens-1.webp', '/catalog/products/greens-2.webp'],
         isNew: false,
         isBestSeller: true,
         isPublished: true,
@@ -94,9 +85,7 @@ export const FALLBACK_PRODUCTS = [
         description: 'A clean, dairy-free blend of pea and rice protein for everyday fuel.',
         features: ['Vegan', 'Lab Tested'],
         stock: 15,
-        images: [
-            'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=900&q=85',
-        ],
+        images: ['/catalog/products/protein-1.webp', '/catalog/products/protein-2.webp'],
         isNew: true,
         isBestSeller: false,
         isPublished: true,
@@ -114,9 +103,7 @@ export const FALLBACK_PRODUCTS = [
         description: 'A complete daily blend of essential vitamins and minerals.',
         features: ['FSSAI Certified', 'No Fillers'],
         stock: 12,
-        images: [
-            'https://images.unsplash.com/photo-1550572017-edd951b55104?w=900&q=85',
-        ],
+        images: ['/catalog/products/multivitamin-1.webp', '/catalog/products/multivitamin-2.webp'],
         isNew: false,
         isBestSeller: true,
         isPublished: true,
@@ -134,9 +121,7 @@ export const FALLBACK_PRODUCTS = [
         description: 'High-potency curcumin for everyday joint and immune support.',
         features: ['Ayurvedic', 'Lab Tested'],
         stock: 40,
-        images: [
-            'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=900&q=85',
-        ],
+        images: ['/catalog/products/triphala-1.webp', '/catalog/products/triphala-2.webp'],
         isNew: false,
         isBestSeller: false,
         isPublished: true,
@@ -154,20 +139,12 @@ export const FALLBACK_PRODUCTS = [
         description: 'Omega-rich seed mix for smoothies, salads, and everyday nutrition.',
         features: ['100% Natural', 'No Additives'],
         stock: 35,
-        images: [
-            'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=900&q=85',
-        ],
+        images: ['/catalog/products/greens-1.webp', '/catalog/products/greens-2.webp'],
         isNew: true,
         isBestSeller: true,
         isPublished: true,
     },
 ];
 
-/** Hero stage — high-res real product/lifestyle stills for the photography carousel. */
-export const HERO_PRODUCT_IMAGES = [
-    'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=1200&q=90',
-    'https://images.unsplash.com/photo-1550572017-edd951b55104?w=1200&q=90',
-    'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=1200&q=90',
-    'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=1200&q=90',
-    'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=1200&q=90',
-];
+/** Hero stage — bundled Chikit packshot lineup. */
+export const HERO_PRODUCT_IMAGES = ['/catalog/home/hero.webp'];

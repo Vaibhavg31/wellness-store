@@ -24,22 +24,22 @@ export const CATEGORIES = [
     {
         id: 'protein',
         label: 'Protein & Fitness',
-        image: 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600&q=80',
+        image: '/catalog/categories/protein.webp',
     },
     {
         id: 'vitamins',
         label: 'Vitamins & Immunity',
-        image: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=600&q=80',
+        image: '/catalog/categories/vitamins.webp',
     },
     {
         id: 'herbal',
         label: 'Herbal & Ayurvedic',
-        image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&q=80',
+        image: '/catalog/categories/digestive-health.webp',
     },
     {
         id: 'superfoods',
         label: 'Superfoods',
-        image: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=600&q=80',
+        image: '/catalog/categories/superfoods.webp',
     },
 ];
 export const BENEFITS = [
@@ -99,10 +99,10 @@ export const FAQS = [
 export const DELIVERY_FEE = 99;
 export const FREE_DELIVERY_THRESHOLD = 1999;
 export const INSTAGRAM_IMAGES = [
-    'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=80',
-    'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&q=80',
-    'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80',
-    'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&q=80',
-    'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80',
-    'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80',
+    '/catalog/instagram/post-1.webp',
+    '/catalog/instagram/post-2.webp',
+    '/catalog/instagram/post-3.webp',
+    '/catalog/instagram/post-4.webp',
+    '/catalog/instagram/post-5.webp',
+    '/catalog/instagram/post-6.webp',
 ];

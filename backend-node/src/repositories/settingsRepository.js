@@ -51,12 +51,10 @@ const DEFAULTS = {
         { label: 'Contact', href: '/contact' },
     ],
     sections: {
-        bannerSlider: true, hero: true, categoryShelves: true, brandMarquee: true, videoBanner: true, banners: true,
-        featured: true, trending: true, categories: true, doshaQuiz: true, bundles: true,
-        whyChoose: true, certifiedBanner: true,
-        reviews: true, instagram: true, newsletter: true, promoBanner: true,
-    },
-    promo: { enabled: true, text: '✦ Free delivery on orders above ₹1,999. Use code', code: 'WELCOME10', suffix: 'for 10% off your first order', href: '/shop' },
+        bannerSlider: true, hero: true, brandMarquee: true, categories: true, featured: true, banners: true,
+        trending: true, bundles: true, doshaQuiz: true, categoryShelves: true, videoBanner: true,
+        whyChoose: true, certifiedBanner: true, reviews: true, instagram: true, newsletter: true, promoBanner: true,
+    },    promo: { enabled: true, text: '✦ Free delivery on orders above ₹1,999. Use code', code: 'WELCOME10', suffix: 'for 10% off your first order', href: '/shop' },
     hero: {
         badge: 'FSSAI & Lab Tested',
         headline: 'Ancient Wisdom for',

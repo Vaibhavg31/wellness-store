@@ -40,7 +40,7 @@ const publicAssetBase = trimSlash(env.VITE_API_URL || siteUrl);
 const adminPath = env.ADMIN_PATH || '/chikit-studio';
 
 const esc = (s = '') => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const resolveImage = (img) => (!img ? absoluteUrl(siteUrl, '/og-image.png') : /^https?:\/\//i.test(img) ? img : `${publicAssetBase}${img}`);
+const resolveImage = (img) => (!img ? absoluteUrl(siteUrl, '/og-image.png') : /^https?:\/\//i.test(img) ? img : img.startsWith('/catalog/') ? absoluteUrl(siteUrl, img) : `${publicAssetBase}${img}`);
 
 async function getJson(pathname) {
     try {
