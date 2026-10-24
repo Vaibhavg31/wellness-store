@@ -47,6 +47,7 @@ const SECTION_LABELS = {
     featured: 'Featured Collection',
     trending: 'Trending Now',
     categories: 'Shop by Category',
+    doshaQuiz: 'Find Your Prakriti Quiz (Ayurveda body-type quiz)',
     bundles: 'Bundle & Save Offers',
     whyChoose: 'Why Choose Us',
     certifiedBanner: 'Certified Banner (FSSAI/GMP)',
@@ -594,6 +595,13 @@ export default function AdminContentPage() {
                     <p className="text-sm text-admin-muted pt-3">
                         Shows categories with at least one product, managed in{' '}
                         <Link to={`${ADMIN_PATH}/categories`} className="text-primary font-medium hover:underline">Categories</Link>. No extra content to configure here.
+                    </p>
+                );
+
+            case 'doshaQuiz':
+                return (
+                    <p className="text-sm text-admin-muted pt-3">
+                        An interactive four-question Ayurveda quiz that tells visitors their Prakriti (Vata, Pitta or Kapha) and suggests products from your catalogue by category. Nothing to edit here; use the toggle to show or hide it, and drag it to reorder.
                     </p>
                 );
 

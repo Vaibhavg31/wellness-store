@@ -8,6 +8,7 @@ import ConcernShelf from '@/components/home/ConcernShelf';
 import CategoryShelves from '@/components/home/CategoryShelves';
 import ProductSection from '@/components/home/ProductSection';
 import BundleSection from '@/components/home/BundleSection';
+import DoshaQuiz from '@/components/home/DoshaQuiz';
 import WhyChoose from '@/components/home/WhyChoose';
 import CertifiedBanner from '@/components/home/CertifiedBanner';
 import Testimonials from '@/components/home/Testimonials';
@@ -40,6 +41,7 @@ function buildSections({ products, loading, trending, featured }) {
         ),
         trending: () => <ProductSection eyebrow="Customer favourites" title="Trending now" products={trending} count={4} tint />,
         categories: () => <><CategoryGrid /><ConcernShelf /></>,
+        doshaQuiz: () => <DoshaQuiz products={products} loading={loading} />,
         bundles: () => <BundleSection />,
         whyChoose: () => <WhyChoose />,
         certifiedBanner: () => <CertifiedBanner />,

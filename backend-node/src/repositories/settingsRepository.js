@@ -52,7 +52,7 @@ const DEFAULTS = {
     ],
     sections: {
         bannerSlider: true, hero: true, categoryShelves: true, brandMarquee: true, videoBanner: true, banners: true,
-        featured: true, trending: true, categories: true, bundles: true,
+        featured: true, trending: true, categories: true, doshaQuiz: true, bundles: true,
         whyChoose: true, certifiedBanner: true,
         reviews: true, instagram: true, newsletter: true, promoBanner: true,
     },

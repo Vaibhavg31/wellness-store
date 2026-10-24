@@ -85,6 +85,7 @@ export const DEFAULT_SITE_CONTENT = {
         featured: true,
         trending: true,
         categories: true,
+        doshaQuiz: true,
         bundles: true,
         whyChoose: true,
         certifiedBanner: true,
