@@ -155,7 +155,7 @@ One set of rules so every screen feels the same. New pages and components should
 | Moving to another page | The current page **stays on screen** until the next one is ready. A thin plum progress bar shows the wait (it also covers redirects such as sign-in). The new page fades in (0.35 s). There is never a blank "loading" screen between pages. | `App.jsx` (persistent `Suspense`), `RouteProgress`, `PageTransition` |
 | Page code | Each page is lazy-loaded, but its code is warmed when a link is hovered, focused or touched, and during idle time. Skipped on data-saver / 2G. | `src/utils/routeLoaders.js` |
 | Store ↔ sign-in ↔ admin | Separate layouts that swap cleanly, with no fading through a blank frame. Sign-in screens are **solid and crisp**: the card swipes in from the side (rises on phones), never fades. | `RouteGroup`, `AuthShell` |
-| Sign in ⇄ Sign up | A real card swipe: both cards sit side by side on a track that slides, the box height follows, and typed values carry over. | `SwipePanels` |
+| Sign in ⇄ Sign up | Large screens: one wide card whose solid brand panel slides from one side to the other, uncovering the other form. Phones: a card swipe between the two forms. Typed values carry over. | `AuthSlider`, `SwipePanels` |
 | Data loading inside a page | A skeleton with the same shape as the final content, then a fade into the real content (never a spinner, never a jump). | `Skeleton`, `animate-fade-in` |
 | Content that changes size (errors, steps) | The container's height glides. | `AutoHeight` |
 | Buttons that submit | Spinner inside the button; it stays busy until the next screen replaces it. | `Button loading` |
@@ -231,7 +231,16 @@ Every homepage block is managed in **Admin → Content → Homepage** (drag to r
 database ships in "client demo" form: **Category shelves**, **Customer reviews** and **Instagram** are switched off
 (they look thin until real products, reviews and an Instagram account exist). Turn them on there once the client
 has reviewed the demo; nothing needs to be redeployed. The animated hero ring is chosen under Content → Hero
-("Hero Picture Style"); a product floats on it when it has a **Cutout image** (Admin → Product → Cutout images).
+("Hero Picture Style"): framed product tiles circle a featured disc, so any uploaded photo (with or without a background)
+looks right; a product's **Cutout image** (Admin → Product → Cutout images) is used on the disc when it has one.
+
+**Your Day, Ritualised** is a scroll-driven story (morning, midday, evening, night), one product per moment with
+add-to-bag and a one-tap "whole ritual". Its copy and product ids live in `src/data/dayRitual.js`; prices and stock
+are always live, and it hides itself if fewer than three of its products are available. Toggle or reorder it in the
+same Homepage list.
+
+Product photos are shown whole on the card background (`object-contain` + multiply), so white-background packshots
+blend in and lifestyle photos are never cropped.
 
 ## Phone OTP (checkout)
 

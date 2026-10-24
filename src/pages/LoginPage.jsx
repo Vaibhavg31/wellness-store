@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { ShoppingBag, Shield, Star, Leaf } from 'lucide-react';
 import AuthShell from '@/components/auth/AuthShell';
+import AuthSlider from '@/components/auth/AuthSlider';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import AutoHeight from '@/components/ui/AutoHeight';
 import SwipePanels from '@/components/ui/SwipePanels';
 import Input from '@/components/ui/Input';
@@ -50,6 +52,8 @@ function LoginScreen() {
     const [adminPass, setAdminPass] = useState('');
     const [showStudioLogin, setShowStudioLogin] = useState(false);
 
+    const wide = useMediaQuery('(min-width: 1024px)') && !isAdminAccess;
+
     useEffect(() => {
         const el = googleBtnRef.current;
         if (!el) return undefined;
@@ -58,7 +62,7 @@ function LoginScreen() {
         const ro = new ResizeObserver(update);
         ro.observe(el);
         return () => ro.disconnect();
-    }, []);
+    }, [wide, mode]);
 
     useEffect(() => {
         if (isAdmin) navigate(ADMIN_PATH, { replace: true });
@@ -193,6 +197,102 @@ function LoginScreen() {
         </>
     );
 
+    /** One sign-in / sign-up form (heading, fields, submit). The fields are shared, so nothing typed is lost when switching. */
+    const renderPanel = (panel) => (
+        <div className="space-y-6">
+            <div className="text-center">
+                {isCheckoutLogin && (
+                    <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-tint px-3 py-1 text-caption font-semibold text-primary-deep">
+                        <ShoppingBag size={14} aria-hidden="true" /> Checkout login
+                    </p>
+                )}
+                {mode === panel ? <h1 className="text-h2">{panel === 'signin' ? (isCheckoutLogin ? 'Sign in to buy' : 'Sign in') : 'Create account'}</h1> : <p className="text-h2 font-display">{panel === 'signin' ? 'Sign in' : 'Create account'}</p>}
+                <p className="mt-2 text-small text-muted">
+                    {panel === 'signup'
+                        ? 'Enter your details — we will email you a secure link to verify and sign in'
+                        : 'Use email and password, or continue with Google'}
+                </p>
+            </div>
+
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
+                {panel === 'signup' && <Input label="Full name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />}
+                <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+                <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={panel === 'signin' ? 'current-password' : 'new-password'} />
+                {panel === 'signup' && <Input label="Confirm password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} autoComplete="new-password" />}
+                {panel === 'signin' && (
+                    <div className="flex items-center justify-between text-small">
+                        <label className="flex cursor-pointer items-center gap-2 text-muted">
+                            <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="size-4 rounded border-line-strong accent-primary" />
+                            Remember me
+                        </label>
+                        <Link to="/forgot-password" className="font-medium text-primary hover:underline">Forgot password?</Link>
+                    </div>
+                )}
+                {panel === 'signup' && <p className="text-center text-caption text-muted">We&apos;ll send a magic link to verify your email. Click it to complete sign-in.</p>}
+                <Button size="lg" className="w-full" type="submit" loading={loading}>{panel === 'signin' ? 'Sign in with email' : 'Create account'}</Button>
+            </form>
+        </div>
+    );
+    const googleBlock = googleSignInEnabled ? (
+        <div ref={googleBtnRef} className="flex w-full justify-center">
+            <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Google sign-in was cancelled or blocked')}
+                theme="outline"
+                size="large"
+                text="continue_with"
+                shape="pill"
+                width={googleWidth}
+            />
+        </div>
+    ) : null;
+    const orDivider = googleSignInEnabled && (
+        <div className="flex items-center gap-3" aria-hidden="true">
+            <span className="h-px flex-1 bg-line" />
+            <span className="text-caption uppercase tracking-wider text-muted">or</span>
+            <span className="h-px flex-1 bg-line" />
+        </div>
+    );
+    const errorBlock = <AutoHeight>{error && <p className="rounded-lg bg-danger-tint p-3 text-center text-small text-danger" role="alert">{error}</p>}</AutoHeight>;
+    const terms = (
+        <p className="text-center text-caption text-muted">
+            By signing in you agree to our <Link to="/terms" className="underline">Terms</Link> &amp; <Link to="/privacy" className="underline">Privacy Policy</Link>
+        </p>
+    );
+    const switchMode = (next) => { setMode(next); setError(''); };
+    const backProps = {
+        backTo: isCheckoutLogin ? '/cart' : isAdminAccess ? '/' : '/shop',
+        backLabel: isCheckoutLogin ? '← Back to bag' : isAdminAccess ? '← Back to store' : 'Continue shopping without signing in →',
+    };
+
+    // Large screens: one wide card whose brand panel slides between the two forms.
+    if (wide) {
+        const column = (panel) => (
+            <div className="space-y-6">
+                {renderPanel(panel)}
+                {orDivider}
+                {mode === panel && googleBlock}
+                {mode === panel && errorBlock}
+                {terms}
+            </div>
+        );
+        return (
+            <AuthShell wide animateHeight={false} {...backProps}>
+                <AuthSlider
+                    mode={mode}
+                    onMode={switchMode}
+                    signin={column('signin')}
+                    signup={column('signup')}
+                    points={['FSSAI certified', '4.9★ rated by customers', 'Lab-tested purity']}
+                    copy={{
+                        signin: { title: 'New to Chikit?', body: 'Create an account to save your addresses, track orders and check out in seconds.', action: 'Create account' },
+                        signup: { title: 'Welcome back', body: 'Already have an account? Sign in to pick up right where you left off.', action: 'Sign in' },
+                    }}
+                />
+            </AuthShell>
+        );
+    }
+
     const tabClass = (active) => `relative z-10 flex-1 rounded-full py-2.5 text-small font-medium transition-colors duration-300 ${active ? 'text-white' : 'text-muted hover:text-ink'}`;
     const notice = 'rounded-lg bg-accent-tint p-4 text-center text-small text-ink';
 
@@ -223,41 +323,7 @@ function LoginScreen() {
 
                         {/* Two cards side by side; switching tabs swipes the track. Fields are shared, so nothing typed is lost. */}
                         <SwipePanels index={mode === 'signin' ? 0 : 1}>
-                            {['signin', 'signup'].map((panel) => (
-                                <div key={panel} className="space-y-6">
-                                    <div className="text-center">
-                                        {isCheckoutLogin && (
-                                            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-tint px-3 py-1 text-caption font-semibold text-primary-deep">
-                                                <ShoppingBag size={14} aria-hidden="true" /> Checkout login
-                                            </p>
-                                        )}
-                                        <h1 className="text-h2">{panel === 'signin' ? (isCheckoutLogin ? 'Sign in to buy' : 'Sign in') : 'Create account'}</h1>
-                                        <p className="mt-2 text-small text-muted">
-                                            {panel === 'signup'
-                                                ? 'Enter your details — we will email you a secure link to verify and sign in'
-                                                : 'Use email and password, or continue with Google'}
-                                        </p>
-                                    </div>
-
-                                    <form onSubmit={handleEmailSubmit} className="space-y-4">
-                                        {panel === 'signup' && <Input label="Full name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />}
-                                        <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-                                        <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={panel === 'signin' ? 'current-password' : 'new-password'} />
-                                        {panel === 'signup' && <Input label="Confirm password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} autoComplete="new-password" />}
-                                        {panel === 'signin' && (
-                                            <div className="flex items-center justify-between text-small">
-                                                <label className="flex cursor-pointer items-center gap-2 text-muted">
-                                                    <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="size-4 rounded border-line-strong accent-primary" />
-                                                    Remember me
-                                                </label>
-                                                <Link to="/forgot-password" className="font-medium text-primary hover:underline">Forgot password?</Link>
-                                            </div>
-                                        )}
-                                        {panel === 'signup' && <p className="text-center text-caption text-muted">We&apos;ll send a magic link to verify your email. Click it to complete sign-in.</p>}
-                                        <Button size="lg" className="w-full" type="submit" loading={loading}>{panel === 'signin' ? 'Sign in with email' : 'Create account'}</Button>
-                                    </form>
-                                </div>
-                            ))}
+                            {['signin', 'signup'].map((panel) => <div key={panel}>{renderPanel(panel)}</div>)}
                         </SwipePanels>
 
                         {googleSignInEnabled && (

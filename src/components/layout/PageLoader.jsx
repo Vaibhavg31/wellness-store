@@ -8,7 +8,7 @@ export default function PageLoader({ message = 'Loading…', fullscreen = false 
     return (
         <div className={`grid place-items-center bg-canvas ${fullscreen ? 'min-h-dvh' : 'min-h-[60vh]'}`} role="status" aria-live="polite">
             <div className="flex flex-col items-center gap-6">
-                <Logo size="lg" className="animate-breathe" />
+                <Logo size="lg" className="animate-breathe" shine="loop" />
                 <span className="relative block h-[3px] w-28 overflow-hidden rounded-full bg-primary-tint" aria-hidden="true">
                     <span className="absolute inset-y-0 left-0 w-1/2 animate-loader-slide rounded-full bg-primary" />
                 </span>

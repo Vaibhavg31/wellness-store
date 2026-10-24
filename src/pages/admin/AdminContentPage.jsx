@@ -47,6 +47,7 @@ const SECTION_LABELS = {
     featured: 'Featured Collection',
     trending: 'Trending Now',
     categories: 'Shop by Category',
+    dayRitual: 'Your Day, Ritualised (scroll story with shop-the-routine)',
     doshaQuiz: 'Find Your Prakriti Quiz (Ayurveda body-type quiz)',
     bundles: 'Bundle & Save Offers',
     whyChoose: 'Why Choose Us',
@@ -614,6 +615,13 @@ export default function AdminContentPage() {
                     <p className="text-sm text-admin-muted pt-3">
                         Shows categories with at least one product, managed in{' '}
                         <Link to={`${ADMIN_PATH}/categories`} className="text-primary font-medium hover:underline">Categories</Link>. No extra content to configure here.
+                    </p>
+                );
+
+            case 'dayRitual':
+                return (
+                    <p className="text-sm text-admin-muted pt-3">
+                        A scroll-driven story through one day (morning, midday, evening, night). Each moment features one product from your catalogue with an add-to-bag button, and the last offers the whole routine in one tap. It skips any product that is missing or out of stock, and hides itself if fewer than three are available. Use the toggle to show or hide it, and drag it to reorder.
                     </p>
                 );
 

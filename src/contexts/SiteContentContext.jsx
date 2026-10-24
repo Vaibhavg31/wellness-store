@@ -36,7 +36,22 @@ export function SiteContentProvider({ children }) {
         // backend SettingsRepository::fetchSections) — deepMerge would otherwise
         // fall back to DEFAULT_SITE_CONTENT's fixed key order, so keep the API's order.
         if (raw?.sections) {
-            merged.sections = raw.sections;
+            // Sections added in a newer release may be missing from an older saved list (or an older API): slot each
+            // in right after the default section that precedes it, enabled.
+            const ordered = Object.keys(raw.sections);
+            const defaults = Object.keys(DEFAULT_SITE_CONTENT.sections);
+            const sections = { ...raw.sections };
+            defaults.forEach((key, i) => {
+                if (key in sections) return;
+                let at = 0;
+                for (let j = i - 1; j >= 0; j -= 1) {
+                    const found = ordered.indexOf(defaults[j]);
+                    if (found !== -1) { at = found + 1; break; }
+                }
+                ordered.splice(at, 0, key);
+                sections[key] = DEFAULT_SITE_CONTENT.sections[key];
+            });
+            merged.sections = Object.fromEntries(ordered.map((key) => [key, sections[key]]));
         }
         return merged;
     }, [raw]);

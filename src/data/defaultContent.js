@@ -83,6 +83,7 @@ export const DEFAULT_SITE_CONTENT = {
         categories: true,
         featured: true,
         banners: true,
+        dayRitual: true,
         trending: true,
         bundles: true,
         doshaQuiz: true,

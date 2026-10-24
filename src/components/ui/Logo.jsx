@@ -17,8 +17,8 @@ const sizes = {
     xl: 'h-24 sm:h-28',
 };
 
-export default function Logo({ size = 'md', className, linkToHome = false, priority = false }) {
-    const img = (
+export default function Logo({ size = 'md', className, linkToHome = false, priority = false, shine }) {
+    const picture = (
         <img
             src="/brand/chikit-logo.webp"
             srcSet="/brand/chikit-logo-480.webp 480w, /brand/chikit-logo.webp 1000w"
@@ -32,6 +32,13 @@ export default function Logo({ size = 'md', className, linkToHome = false, prior
             draggable={false}
         />
     );
+    // `shine`: 'hover' (light passes over it on hover), 'intro' (once, a moment after it appears) or 'loop' (loaders).
+    const img = shine ? (
+        <span className="logo-shine" data-shine={shine}>
+            {picture}
+            <span className="logo-sheen" aria-hidden="true" />
+        </span>
+    ) : picture;
     if (!linkToHome) return img;
     return (
         <Link to="/" className="inline-flex flex-shrink-0 rounded-sm p-1" aria-label="Chikit home">

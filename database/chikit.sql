@@ -831,17 +831,18 @@ INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_or
 INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('categories',1,3);
 INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('featured',1,4);
 INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('banners',1,5);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('trending',1,6);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('bundles',1,7);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('doshaQuiz',1,8);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('categoryShelves',0,9);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('videoBanner',1,10);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('whyChoose',1,11);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('certifiedBanner',1,12);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('reviews',0,13);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('instagram',0,14);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('newsletter',1,15);
-INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('promoBanner',1,16);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('dayRitual',1,6);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('trending',1,7);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('bundles',1,8);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('doshaQuiz',1,9);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('categoryShelves',0,10);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('videoBanner',1,11);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('whyChoose',1,12);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('certifiedBanner',1,13);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('reviews',0,14);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('instagram',0,15);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('newsletter',1,16);
+INSERT IGNORE INTO `site_section_toggles` (`section_key`, `is_enabled`, `sort_order`) VALUES ('promoBanner',1,17);
 
 -- site_nav_links
 INSERT IGNORE INTO `site_nav_links` (`id`, `label`, `href`, `sort_order`) VALUES (439,'Home','/',0);

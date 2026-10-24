@@ -59,7 +59,7 @@ export default function Header() {
                     <Menu size={22} />
                 </button>
 
-                <Logo size="header" linkToHome priority />
+                <Logo size="header" linkToHome priority shine="hover" />
 
                 <CategoryNav variant="desktop" />
 
