@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Mail, MessageCircle } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import Logo from '@/components/ui/Logo';
 import Button from '@/components/ui/Button';
 import InstagramIcon from '@/components/ui/InstagramIcon';
@@ -88,7 +89,7 @@ export default function Footer() {
                         )}
                         <li>
                             <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="grid size-10 place-items-center rounded-full bg-surface text-primary shadow-xs transition-colors hover:bg-primary hover:text-white" aria-label="WhatsApp">
-                                <MessageCircle size={18} />
+                                <WhatsAppIcon size={18} />
                             </a>
                         </li>
                         {contact?.email && (

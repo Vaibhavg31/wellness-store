@@ -1,4 +1,4 @@
-import { MessageCircle } from 'lucide-react';
+import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
 
@@ -17,7 +17,7 @@ export default function ExpertChat({ product }) {
                     rel="noopener noreferrer"
                     className="mt-6 flex items-center gap-3 rounded-lg border border-line bg-surface p-4 text-small hover:border-primary"
                 >
-                    <MessageCircle size={20} className="shrink-0 text-primary" aria-hidden="true" />
+                    <WhatsAppIcon size={22} className="shrink-0 text-[#25D366]" />
                     <span><strong className="font-semibold text-ink">Not sure if it&apos;s right for you?</strong> <span className="text-muted">Ask our team on WhatsApp.</span></span>
                 </a>
             )}

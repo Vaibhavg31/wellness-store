@@ -63,10 +63,10 @@ function ProductCard({ product, priority = false }) {
                         instant={priority}
                         loading={priority ? 'eager' : 'lazy'}
                         decoding="async"
-                        className={cn('size-full object-cover transition-[transform,opacity] duration-500 group-hover:scale-105', secondary && 'group-hover:opacity-0')}
+                        className={cn('size-full object-contain mix-blend-multiply transition-[transform,opacity] duration-500 group-hover:scale-105', secondary && 'group-hover:opacity-0')}
                     />
                     {secondary && (
-                        <img src={imageUrl(secondary, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" className="absolute inset-0 size-full scale-105 object-cover opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-100 group-hover:opacity-100" />
+                        <img src={imageUrl(secondary, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" className="absolute inset-0 size-full scale-105 object-contain mix-blend-multiply opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-100 group-hover:opacity-100" />
                     )}
                 </Link>
 

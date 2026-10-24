@@ -27,7 +27,7 @@ export default function ProductGallery({ images, title, tags = [] }) {
                     height="800"
                     fetchPriority="high"
                     decoding="async"
-                    className="size-full animate-fade-in object-cover"
+                    className="size-full animate-fade-in object-contain mix-blend-multiply"
                 />
                 {tags.length > 0 && (
                     <div className="absolute left-4 top-4 flex flex-col gap-2">
@@ -47,7 +47,7 @@ export default function ProductGallery({ images, title, tags = [] }) {
                                 aria-current={selected === i}
                                 className={cn('size-16 overflow-hidden rounded-md border-2 transition-[border-color,opacity] sm:size-20', selected === i ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100')}
                             >
-                                <img src={imageUrl(img, 160)} alt="" width="80" height="80" loading="lazy" className="size-full object-cover" />
+                                <img src={imageUrl(img, 160)} alt="" width="80" height="80" loading="lazy" className="size-full bg-canvas-alt object-contain mix-blend-multiply" />
                             </button>
                         </li>
                     ))}

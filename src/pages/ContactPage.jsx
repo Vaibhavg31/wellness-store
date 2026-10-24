@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
-import { Clock, Mail, MessageCircle, Phone } from 'lucide-react';
+import { Clock, Mail, Phone } from 'lucide-react';
+import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import PageHeader from '@/components/ui/PageHeader';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
@@ -80,7 +81,7 @@ export default function ContactPage() {
                 <div className="order-first space-y-8 lg:order-none">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <a href={getWhatsAppUrl('Hi! I would like to get in touch.')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-lg border border-line bg-surface p-5 transition-shadow hover:shadow-md">
-                            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-success text-white"><MessageCircle size={22} aria-hidden="true" /></span>
+                            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-[#25D366] text-white"><WhatsAppIcon size={26} /></span>
                             <span>
                                 <span className="block text-caption font-semibold uppercase tracking-wider text-success">WhatsApp · fastest</span>
                                 <span className="font-medium text-ink">{contact.whatsappDisplay}</span>

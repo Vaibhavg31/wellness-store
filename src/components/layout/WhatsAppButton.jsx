@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
+import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import { ADMIN_PATH } from '@/contexts/AuthContext';
 import { PREVIEW_PATH } from '@/utils/productPreview';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
@@ -43,12 +43,12 @@ export default function WhatsAppButton() {
             className={cn(
                 // Product pages already carry an inline "ask us on WhatsApp" prompt, and the bubble would sit on the buy buttons on phones.
                 pathname.startsWith('/product/') ? 'max-lg:hidden bottom-6' : 'bottom-4 sm:bottom-6',
-                'safe-area-pb fixed right-4 z-40 grid size-12 place-items-center rounded-full bg-success text-white shadow-md sm:right-6 sm:size-14',
+                'safe-area-pb fixed right-4 z-40 grid size-12 place-items-center rounded-full bg-[#25D366] text-white shadow-lg sm:right-6 sm:size-14',
                 'transition-[opacity,transform] duration-300 hover:scale-105',
                 fieldFocused && 'pointer-events-none translate-y-4 opacity-0',
             )}
         >
-            <MessageCircle size={24} aria-hidden="true" />
+            <WhatsAppIcon size={30} />
         </a>
         </aside>
     );
