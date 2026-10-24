@@ -1,10 +1,9 @@
 import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Heart, ShoppingBag } from 'lucide-react';
+import { Check, Heart, ShoppingBag, Star } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import FadeImage from '@/components/ui/FadeImage';
 import Price from '@/components/ui/Price';
-import Rating from '@/components/ui/Rating';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast, showCartToast } from '@/contexts/ToastContext';
@@ -103,14 +102,22 @@ function ProductCard({ product, priority = false }) {
                 </button>
             </div>
 
-            <div className="flex flex-1 flex-col gap-1.5 pt-3">
-                <h3 className="min-h-[2.6rem] font-sans text-[0.9375rem] font-medium leading-snug">
+            <div className="flex flex-1 flex-col gap-1 pt-3">
+                <h3 className="font-sans text-[0.9375rem] font-medium leading-snug">
                     <Link to={href} className="line-clamp-2 transition-colors after:absolute after:inset-0 after:content-[''] hover:text-primary">
                         {product.title}
                     </Link>
                 </h3>
-                {product.reviewCount > 0 && <Rating value={product.rating} count={product.reviewCount} size={13} />}
-                <Price price={product.price} originalPrice={product.originalPrice} className="mt-auto" />
+                <div className="mt-auto flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 pt-1">
+                    <Price price={product.price} originalPrice={product.originalPrice} />
+                    {product.reviewCount > 0 && (
+                        <p className="flex items-center gap-1 text-caption text-muted" aria-label={`Rated ${product.rating} out of 5 from ${product.reviewCount} reviews`}>
+                            <Star size={13} strokeWidth={0} className="self-center fill-accent" aria-hidden="true" />
+                            <span className="font-semibold text-ink">{Number(product.rating).toFixed(1)}</span>
+                            <span>({product.reviewCount})</span>
+                        </p>
+                    )}
+                </div>
             </div>
 
         </article>

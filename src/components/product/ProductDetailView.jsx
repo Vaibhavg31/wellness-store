@@ -161,14 +161,11 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
             />
 
             <div className="container-page grid gap-10 pb-12 lg:grid-cols-2 lg:gap-16 lg:pb-20">
-                <div>
+                <div className={cn('min-w-0 lg:sticky lg:self-start', preview ? 'lg:top-6' : 'lg:top-28')}>
                     <ProductGallery images={galleryImages} title={product.title} tags={product.tags} />
-                    {productBanners.length > 0 && (
-                        <div className="mt-6 space-y-4">{productBanners.map((b) => <Banner key={b.id} banner={b} />)}</div>
-                    )}
                 </div>
 
-                <div className={cn('min-w-0 lg:sticky lg:self-start', preview ? 'lg:top-6' : 'lg:top-28')}>
+                <div className="min-w-0">
                     <div ref={buyBoxRef}>
                         <p className="eyebrow mb-2">{categoryLabel}</p>
                         <h1 className="text-h2">{product.title}</h1>
@@ -212,7 +209,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                     <DeliveryCheck price={price} />
 
                     {trustBadges.length > 0 && (
-                        <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        <ul className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] gap-3">
                             {trustBadges.map(({ icon: Icon, label }) => (
                                 <li key={label} className="flex flex-col items-center gap-2 rounded-lg bg-canvas-alt p-3 text-center">
                                     <Icon size={20} className="text-primary" aria-hidden="true" />
@@ -226,6 +223,10 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                     <ExpertChat product={product} />
                 </div>
             </div>
+
+            {productBanners.length > 0 && (
+                <div className="container-page grid gap-4 pb-12 lg:pb-20">{productBanners.map((b) => <Banner key={b.id} banner={b} />)}</div>
+            )}
 
             {productBundles.length > 0 && (
                 <section className="section bg-canvas-alt">

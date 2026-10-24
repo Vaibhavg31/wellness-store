@@ -17,21 +17,21 @@ export default function ProductGallery({ images, title, tags = [] }) {
     }
 
     return (
-        <div className="min-w-0">
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-canvas-alt">
+        <div className="mx-auto min-w-0 lg:max-w-[min(100%,calc((100svh-13rem)*0.8))]">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-canvas-alt">
                 <img
                     key={selected}
                     src={imageUrl(images[selected], 900)}
                     alt={title}
                     width="800"
-                    height="800"
+                    height="1000"
                     fetchPriority="high"
                     decoding="async"
                     className="size-full animate-fade-in object-contain mix-blend-multiply"
                 />
                 {tags.length > 0 && (
                     <div className="absolute left-4 top-4 flex flex-col gap-2">
-                        {tags.map((tag) => <Badge key={tag} variant={TAG_VARIANT[tag] ?? 'bestseller'}>{tag}</Badge>)}
+                        {tags.slice(0, 1).map((tag) => <Badge key={tag} variant={TAG_VARIANT[tag] ?? 'bestseller'}>{tag}</Badge>)}
                     </div>
                 )}
             </div>
