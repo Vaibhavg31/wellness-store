@@ -105,6 +105,7 @@ function LineItemRow({ item, index, products, onChange, onRemove, canRemove }) {
                 <div className="lg:col-span-2">
                     <FormLabel required>Price (₹)</FormLabel>
                     <input
+                        aria-label="Price"
                         type="number"
                         min="0"
                         step="0.01"
@@ -671,6 +672,7 @@ export default function AdminDirectOrdersPage() {
                                 <div>
                                     <FormLabel>Discount (₹)</FormLabel>
                                     <input
+                                        aria-label="Discount (₹)"
                                         type="number"
                                         min="0"
                                         step="0.01"
@@ -683,6 +685,7 @@ export default function AdminDirectOrdersPage() {
                                 <div>
                                     <FormLabel>Delivery fee (₹)</FormLabel>
                                     <input
+                                        aria-label="Delivery fee (₹)"
                                         type="number"
                                         min="0"
                                         step="0.01"
@@ -833,7 +836,7 @@ export default function AdminDirectOrdersPage() {
                             </p>
                         </div>
                         <div className="relative w-full sm:w-72">
-                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-admin-muted/80" />
+                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-admin-muted" />
                             <input
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}

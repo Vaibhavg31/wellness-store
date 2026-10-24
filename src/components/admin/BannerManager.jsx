@@ -261,7 +261,7 @@ export default function BannerManager({ filterTarget, productId }) {
                             </div>
                         ) : (
                             <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors">
-                                <Upload size={24} className="text-admin-muted/80" />
+                                <Upload size={24} className="text-admin-muted" />
                                 <span className="text-sm text-admin-muted">{uploading ? 'Uploading…' : 'Click to upload image'}</span>
                                 <span className="text-xs text-admin-muted px-4 text-center">
                                     Best size 1920×730px (a wide 21:8 banner). Other wide photos are cropped to fit, so keep

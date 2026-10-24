@@ -75,9 +75,9 @@ export default function AdminLayout() {
                 </div>
             </Drawer>
 
-            <main className="min-h-screen flex-1 bg-admin-bg lg:ml-[15.5rem]">
+            <main className="min-h-screen min-w-0 flex-1 bg-admin-bg lg:ml-[15.5rem]">
                 {/* Mobile top bar */}
-                <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-admin-border bg-admin-surface/95 px-4 py-3 backdrop-blur lg:hidden">
+                <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-admin-border bg-admin-surface/95 px-4 py-3 lg:hidden">
                     <button
                         type="button"
                         onClick={() => setMobileNavOpen(true)}
@@ -88,7 +88,7 @@ export default function AdminLayout() {
                         <Menu size={22} strokeWidth={1.75} />
                     </button>
                     <Link to={ADMIN_PATH} className="shrink-0" aria-label="Admin dashboard"><Logo size="sm" /></Link>
-                    <p className="ml-auto truncate text-small font-semibold text-ink">{pageTitle}</p>
+                    <h1 className="ml-auto truncate font-sans text-small font-semibold text-ink">{pageTitle}</h1>
                 </header>
 
                 <div className="max-w-[1440px] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">

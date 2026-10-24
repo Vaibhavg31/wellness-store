@@ -21,7 +21,7 @@ function ReviewList({ reviews }) {
                         <div className="mt-2 flex gap-2">
                             {review.images.map((src) => (
                                 <a key={src} href={imageUrl(src)} target="_blank" rel="noopener noreferrer" className="block size-14 overflow-hidden rounded-md border border-line">
-                                    <img src={imageUrl(src)} alt="Customer photo" width="56" height="56" loading="lazy" className="size-full object-cover" />
+                                    <img src={imageUrl(src)} alt="Customer photo" width="56" height="56" loading="lazy" onError={(e) => { e.currentTarget.parentElement.hidden = true; }} className="size-full object-cover" />
                                 </a>
                             ))}
                         </div>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Gift, Shield, ShoppingBag, Trash2, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
+import PopularPicks from '@/components/shop/PopularPicks';
 import QuantityStepper from '@/components/ui/QuantityStepper';
 import PageHeader from '@/components/ui/PageHeader';
 import CheckoutSteps from '@/components/checkout/CheckoutSteps';
@@ -122,6 +123,7 @@ export default function CartPage() {
         return (
             <div className="container-page py-16">
                 <EmptyState as="h1" icon={ShoppingBag} title="Your bag is empty" description="Browse freely and add items. No sign-in needed until checkout." actionLabel="Explore the shop" actionHref="/shop" />
+                <PopularPicks />
             </div>
         );
     }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Children, cloneElement, isValidElement, useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion, Reorder, useDragControls } from 'framer-motion';
 import { Plus, Trash2, Upload, GripVertical, ChevronDown, AlertTriangle, CheckCircle2, Film, X } from 'lucide-react';
 import Input from '@/components/ui/Input';
@@ -15,21 +15,26 @@ export function AdminSection({ title, description, children }) {
     );
 }
 
+/** Labels its control: a single input/select/textarea is linked with htmlFor, anything else becomes a labelled group. */
 export function AdminField({ label, hint, children }) {
+    const id = useId();
+    const only = Children.count(children) === 1 && isValidElement(children) ? children : null;
+    const labellable = Boolean(only) && (typeof only.type !== 'string' || ['input', 'select', 'textarea'].includes(only.type));
     return (
-        <div className="mb-4">
-            <label className="block text-xs tracking-[0.12em] uppercase text-admin-muted mb-2 font-medium">
+        <div className="mb-4" {...(!labellable && { role: 'group', 'aria-labelledby': `${id}-label` })}>
+            <label id={`${id}-label`} htmlFor={labellable ? only.props.id ?? id : undefined} className="block text-xs tracking-[0.12em] uppercase text-admin-muted mb-2 font-medium">
                 {label}
             </label>
-            {children}
-            {hint && <p className="text-[11px] text-admin-muted/70 mt-1">{hint}</p>}
+            {labellable ? cloneElement(only, { id: only.props.id ?? id }) : children}
+            {hint && <p className="text-[11px] text-admin-muted mt-1">{hint}</p>}
         </div>
     );
 }
 
-export function AdminTextarea({ value, onChange, rows = 3, placeholder }) {
+export function AdminTextarea({ value, onChange, rows = 3, placeholder, id }) {
     return (
         <textarea
+            id={id}
             value={value}
             onChange={onChange}
             rows={rows}
@@ -493,7 +498,7 @@ function SectionAccordionRow({ itemKey, label, enabled, onToggle, expanded, onTo
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                     <span
                         onPointerDown={(e) => dragControls.start(e)}
-                        className="text-admin-muted/60 hover:text-primary cursor-grab active:cursor-grabbing p-1 -m-1 touch-none flex-shrink-0"
+                        className="text-admin-muted hover:text-primary cursor-grab active:cursor-grabbing p-1 -m-1 touch-none flex-shrink-0"
                         aria-label={`Drag to reorder ${label}`}
                         role="button"
                         tabIndex={-1}

@@ -1,4 +1,4 @@
-import { Suspense, lazy, useMemo } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Leaf, ShieldCheck, Star } from 'lucide-react';
 import { LazyMotion, MotionConfig, domAnimation, m, useMotionTemplate, useMotionValue, useSpring } from 'framer-motion';
@@ -14,8 +14,9 @@ const BADGE_ICONS = { shield: ShieldCheck, star: Star, sparkles: Leaf };
 const EASE = [0.22, 1, 0.36, 1];
 const rise = (delay) => ({ initial: { opacity: 0, y: 22 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.7, ease: EASE } });
 
-/** Bundled packshots have a matching transparent cut-out (public/catalog/cutouts); other images show as photo cards. */
+/** The product's own cut-out (Admin → Product → Cutout images) if it has one, else the bundled demo cut-out; otherwise a photo card. */
 const cutoutFor = (product) => {
+    if (product.cutoutImages?.[0]) return product.cutoutImages[0];
     const match = /^\/catalog\/products\/([a-z]+)-1\.webp$/.exec(product.images?.[0] ?? '');
     return match ? `/catalog/cutouts/${match[1]}.webp` : null;
 };
@@ -46,6 +47,34 @@ function RevealWords({ text, delay = 0 }) {
             <m.span className="inline-block" initial={{ y: '115%' }} animate={{ y: 0 }} transition={{ delay: delay + i * 0.08, duration: 0.85, ease: EASE }}>{word}</m.span>
         </span>
     ));
+}
+
+/**
+ * Keeps the animated ring mounted only while it is on or near the screen. Its many composited layers make scrolling
+ * past it costly on slower machines, so far away it is swapped for an empty box of the same height (no layout jump).
+ */
+function StageGate({ children }) {
+    const ref = useRef(null);
+    const height = useRef(0);
+    const [near, setNear] = useState(true);
+
+    useEffect(() => {
+        const node = ref.current;
+        if (!node || !('IntersectionObserver' in window)) return undefined;
+        const observer = new IntersectionObserver(([entry]) => setNear(entry.isIntersecting), { rootMargin: '120% 0px' });
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        const node = ref.current;
+        if (!near || !node) return undefined;
+        const observer = new ResizeObserver(() => { height.current = node.offsetHeight; });
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [near]);
+
+    return <div ref={ref} style={near ? undefined : { minHeight: height.current }}>{near ? children : null}</div>;
 }
 
 function StagePlaceholder({ image }) {
@@ -127,9 +156,11 @@ export default function Hero({ products, loading = false }) {
 
                         {showStage ? (
                             <m.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.9, ease: EASE }} className="min-w-0">
-                                <Suspense fallback={<StagePlaceholder image={image} />}>
-                                    <HeroStage items={stageItems} />
-                                </Suspense>
+                                <StageGate>
+                                    <Suspense fallback={<StagePlaceholder image={image} />}>
+                                        <HeroStage items={stageItems} />
+                                    </Suspense>
+                                </StageGate>
                             </m.div>
                         ) : (
                             <div className="relative mx-auto w-full max-w-lg lg:max-w-none">

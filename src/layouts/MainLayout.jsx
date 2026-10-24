@@ -5,6 +5,7 @@ import PageTransition from '@/components/layout/PageTransition';
 import CartDrawer from '@/components/cart/CartDrawer';
 import SiteSchema from '@/components/seo/SiteSchema';
 import OfferTab from '@/components/offer/OfferTab';
+import BackToTop from '@/components/layout/BackToTop';
 
 export default function MainLayout() {
     return (
@@ -21,6 +22,7 @@ export default function MainLayout() {
             </main>
             <Footer />
             <OfferTab />
+            <BackToTop />
         </div>
     );
 }

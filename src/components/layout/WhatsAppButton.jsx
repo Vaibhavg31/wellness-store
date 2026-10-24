@@ -33,6 +33,7 @@ export default function WhatsAppButton() {
     if (pathname.startsWith(ADMIN_PATH) || pathname.startsWith(PREVIEW_PATH)) return null;
 
     return (
+        <aside aria-label="Chat with us">
         <a
             href={getWhatsAppUrl()}
             target="_blank"
@@ -47,5 +48,6 @@ export default function WhatsAppButton() {
         >
             <MessageCircle size={24} aria-hidden="true" />
         </a>
+        </aside>
     );
 }

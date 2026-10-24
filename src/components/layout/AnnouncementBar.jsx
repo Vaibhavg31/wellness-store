@@ -55,6 +55,8 @@ export default function AnnouncementBar() {
 
     return (
         <div
+            role="region"
+            aria-label="Announcements"
             className="relative bg-primary-tint text-center text-small text-primary-deep"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}

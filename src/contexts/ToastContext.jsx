@@ -24,7 +24,8 @@ export function ToastProvider({ children }) {
         setTimeout(() => dismissToast(id), duration);
     }, [dismissToast]);
 
-    const value = useMemo(() => ({ showToast }), [showToast]);
+    const dismissAll = useCallback(() => setToasts((prev) => (prev.length ? [] : prev)), []);
+    const value = useMemo(() => ({ showToast, dismissAll }), [showToast, dismissAll]);
 
     return (
         <ToastContext.Provider value={value}>

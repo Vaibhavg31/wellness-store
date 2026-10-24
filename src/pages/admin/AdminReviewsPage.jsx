@@ -175,6 +175,7 @@ export default function AdminReviewsPage() {
                     placeholder="Search by name, email, comment, product…"
                 />
                 <select
+                    aria-label="Filter by status"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="text-sm border border-admin-border rounded-lg px-3 py-2 bg-admin-surface min-w-[9rem]"
@@ -255,7 +256,7 @@ export default function AdminReviewsPage() {
                                                 <div className="flex gap-1.5 mt-2">
                                                     {review.images.map((src) => (
                                                         <a key={src} href={imageUrl(src)} target="_blank" rel="noopener noreferrer" className="block w-10 h-10 rounded-md overflow-hidden border border-admin-border flex-shrink-0">
-                                                            <img src={imageUrl(src)} alt="Review attachment" className="w-full h-full object-cover" />
+                                                            <img src={imageUrl(src)} alt="Review attachment" onError={(e) => { e.currentTarget.parentElement.hidden = true; }} className="w-full h-full object-cover" />
                                                         </a>
                                                     ))}
                                                 </div>

@@ -391,7 +391,7 @@ export default function AdminBundlesPage() {
                         <div className="rounded-xl border border-admin-border bg-admin-surface-alt p-3 flex items-center justify-between text-sm">
                             <span className="text-admin-muted">Customer sees</span>
                             <div className="flex items-center gap-3">
-                                <span className="text-admin-muted/80 line-through">{formatPrice(preview.subtotal)}</span>
+                                <span className="text-admin-muted line-through">{formatPrice(preview.subtotal)}</span>
                                 <span className="font-semibold text-ink">{formatPrice(bundlePrice)}</span>
                                 {discountAmount > 0 && (
                                     <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">

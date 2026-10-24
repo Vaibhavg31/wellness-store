@@ -602,6 +602,7 @@ export default function AdminProductFormPage() {
                         <div>
                             <FormLabel required>Category</FormLabel>
                             <select
+                                aria-label="Category"
                                 value={form.category}
                                 onChange={(e) => update('category', e.target.value)}
                                 required
@@ -673,7 +674,7 @@ export default function AdminProductFormPage() {
                                 <span className="font-semibold text-ink">{formatPrice(price)}</span>
                                 {originalPrice > price && (
                                     <>
-                                        <span className="text-admin-muted/80 line-through">{formatPrice(originalPrice)}</span>
+                                        <span className="text-admin-muted line-through">{formatPrice(originalPrice)}</span>
                                         <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                                             {computedDiscount}% off
                                         </span>
@@ -946,7 +947,7 @@ export default function AdminProductFormPage() {
                         <div className="mt-4 pt-4 border-t border-admin-border-light">
                             <p className="text-xs font-medium text-admin-muted mb-2.5 flex items-center gap-1.5">
                                 <Eraser size={12} /> Background-removed cutouts
-                                <span className="text-admin-muted/70 font-normal">— used automatically in round product containers (e.g. the homepage Orbit Ring)</span>
+                                <span className="text-admin-muted font-normal">— used automatically in round product containers (e.g. the homepage Orbit Ring)</span>
                             </p>
                             <div
                                 className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3"

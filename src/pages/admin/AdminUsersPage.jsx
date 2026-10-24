@@ -91,7 +91,7 @@ function UserProfileSection({ user }) {
                     />
                 ) : (
                     <div className="w-14 h-14 rounded-full bg-admin-surface border border-admin-border flex items-center justify-center">
-                        <User size={24} className="text-admin-muted/80" />
+                        <User size={24} className="text-admin-muted" />
                     </div>
                 )}
                 <div>
@@ -544,7 +544,7 @@ export default function AdminUsersPage() {
                                                     <img src={user.avatar} alt="" className="w-9 h-9 rounded-full object-cover" />
                                                 ) : (
                                                     <div className="w-9 h-9 rounded-full bg-admin-surface flex items-center justify-center">
-                                                        <User size={16} className="text-admin-muted/80" />
+                                                        <User size={16} className="text-admin-muted" />
                                                     </div>
                                                 )}
                                                 <div>
@@ -562,13 +562,13 @@ export default function AdminUsersPage() {
                                         </td>
                                         <td className="p-4">
                                             <p className="text-ink flex items-center gap-1 truncate max-w-[12rem]">
-                                                <Mail size={12} className="text-admin-muted/80 flex-shrink-0" />
+                                                <Mail size={12} className="text-admin-muted flex-shrink-0" />
                                                 {user.email}
                                             </p>
                                         </td>
                                         <td className="p-4">
                                             <p className="text-ink flex items-center gap-1">
-                                                <Phone size={12} className="text-admin-muted/80" />
+                                                <Phone size={12} className="text-admin-muted" />
                                                 {user.phone || '—'}
                                             </p>
                                             {user.phoneVerified ? (

@@ -49,8 +49,7 @@ function OrbitItem({ item, index, size, footY, base, controls, active, onSelect,
     const y = useTransform(state, (s) => s.y);
     const scale = useTransform(state, (s) => s.scale);
     const zIndex = useTransform(state, (s) => 1000 + Math.round(s.z));
-    const opacity = useTransform(state, (s) => clamp(0.4 + 0.6 * s.depth ** 0.6, 0, 1) * clamp(s.spread * 1.6, 0, 1));
-    const filter = useTransform(state, (s) => `brightness(${(0.8 + 0.2 * s.depth).toFixed(3)})`);
+    const opacity = useTransform(state, (s) => clamp(0.35 + 0.65 * s.depth ** 0.6, 0, 1) * clamp(s.spread * 1.6, 0, 1));
     const height = (size * 4) / 3;
 
     const handleClick = (event) => {
@@ -63,7 +62,7 @@ function OrbitItem({ item, index, size, footY, base, controls, active, onSelect,
     return (
         <m.div
             className="absolute left-1/2"
-            style={{ width: size, height, top: footY - height, marginLeft: -size / 2, transformOrigin: '50% 100%', x, y, scale, zIndex, opacity, filter, willChange: 'transform, opacity' }}
+            style={{ width: size, height, top: footY - height, marginLeft: -size / 2, transformOrigin: '50% 100%', x, y, scale, zIndex, opacity, willChange: 'transform, opacity' }}
         >
             <Link
                 to={item.href}
@@ -309,12 +308,12 @@ export default function HeroStage({ items }) {
                 {/* in front of the packs: bigger, faster drift gives the depth */}
                 <Drift depth={34} pointer={pointer} className="-bottom-[1%] left-[4%] z-[2100] w-[24%]">
                     <m.div animate={reduced ? undefined : { y: [0, -8, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}>
-                        <Leaf className="text-success/80 blur-[1px]" style={{ transform: 'rotate(-12deg)' }} />
+                        <Leaf className="text-success/80" style={{ transform: 'rotate(-12deg)' }} />
                     </m.div>
                 </Drift>
                 <Drift depth={28} pointer={pointer} className="-bottom-[2%] right-[6%] z-[2100] w-[18%]">
                     <m.div animate={reduced ? undefined : { y: [0, -6, 0] }} transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}>
-                        <Leaf className="text-success/70 blur-[1.5px]" style={{ transform: 'rotate(188deg)' }} />
+                        <Leaf className="text-success/70" style={{ transform: 'rotate(188deg)' }} />
                     </m.div>
                 </Drift>
                 {[['12%', '18%', 0], ['84%', '40%', 0.9], ['70%', '10%', 1.7], ['20%', '60%', 2.4], ['90%', '66%', 1.2]].map(([left, top, delay]) => (

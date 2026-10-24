@@ -21,7 +21,7 @@ export default function ExpertChat({ product }) {
                     <span><strong className="font-semibold text-ink">Not sure if it&apos;s right for you?</strong> <span className="text-muted">Ask our team on WhatsApp.</span></span>
                 </a>
             )}
-            {disclaimer && <p className="mt-6 text-caption text-subtle">{disclaimer}</p>}
+            {disclaimer && <p className="mt-6 text-caption text-muted">{disclaimer}</p>}
         </>
     );
 }

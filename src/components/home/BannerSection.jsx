@@ -141,7 +141,7 @@ export function BannerSlider() {
                     </button>
                     <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
                         {banners.map((banner, i) => (
-                            <button key={banner.id} type="button" onClick={() => go(i)} aria-label={`Go to slide ${i + 1}`} aria-current={i === index} className={`h-2 rounded-full shadow-sm transition-[width,background-color] duration-300 ${i === index ? 'w-6 bg-white' : 'w-2 bg-white/60'}`} />
+                            <button key={banner.id} type="button" onClick={() => go(i)} aria-label={`Go to slide ${i + 1}`} aria-current={i === index} className={`relative h-2 rounded-full shadow-sm transition-[width,background-color] duration-300 before:absolute before:-inset-x-1.5 before:-inset-y-3 before:content-[''] ${i === index ? 'w-6 bg-white' : 'w-2 bg-white/60'}`} />
                         ))}
                     </div>
                 </>

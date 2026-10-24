@@ -165,7 +165,7 @@ export default function AdminCategoriesPage() {
                                                 />
                                             ) : (
                                                 <div className="w-14 h-14 rounded-xl border border-admin-border bg-canvas-alt flex items-center justify-center">
-                                                    <FolderOpen size={18} className="text-admin-muted/60" />
+                                                    <FolderOpen size={18} className="text-admin-muted" />
                                                 </div>
                                             )}
                                         </td>
@@ -249,7 +249,7 @@ export default function AdminCategoriesPage() {
                             </div>
                         ) : (
                             <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-admin-border bg-admin-surface-alt py-10 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors">
-                                <Upload size={24} className="text-admin-muted/80" />
+                                <Upload size={24} className="text-admin-muted" />
                                 <span className="text-sm text-admin-muted">{uploading ? 'Uploading…' : 'Click to upload image'}</span>
                                 <span className="text-xs text-admin-muted">JPG, PNG, WebP · max 5MB</span>
                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />

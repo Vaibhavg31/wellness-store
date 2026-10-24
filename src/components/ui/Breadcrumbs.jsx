@@ -5,11 +5,11 @@ import { ChevronRight } from 'lucide-react';
 export default function Breadcrumbs({ crumbs, className }) {
     return (
         <nav aria-label="Breadcrumb" className={className}>
-            <ol className="flex flex-wrap items-center gap-1 text-small text-muted">
+            <ol className="flex items-center gap-1 text-small text-muted">
                 {crumbs.map((crumb, i) => (
-                    <li key={crumb.label} className="flex items-center gap-1">
+                    <li key={crumb.label} className={`flex items-center gap-1 ${crumb.href ? 'shrink-0' : 'min-w-0'}`}>
                         {i > 0 && <ChevronRight size={14} aria-hidden="true" />}
-                        {crumb.href ? <Link to={crumb.href} className="hover:text-primary">{crumb.label}</Link> : <span aria-current="page" className="text-ink">{crumb.label}</span>}
+                        {crumb.href ? <Link to={crumb.href} className="inline-flex min-h-9 items-center hover:text-primary">{crumb.label}</Link> : <span aria-current="page" className="truncate text-ink">{crumb.label}</span>}
                     </li>
                 ))}
             </ol>

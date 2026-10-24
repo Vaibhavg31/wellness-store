@@ -24,7 +24,7 @@ const SUMMARY_COLS = {
 };
 
 export const adminControlClass =
-    'admin-control text-sm text-ink placeholder:text-admin-muted/70';
+    'admin-control text-sm text-ink placeholder:text-admin-muted';
 
 export function AdminPageHeader({ title, subtitle, actions }) {
     return (
@@ -105,12 +105,13 @@ export function AdminSearchInput({ value, onChange, placeholder, className }) {
     );
 }
 
-export function AdminSelect({ value, onChange, options, className, 'aria-label': ariaLabel }) {
+export function AdminSelect({ value, onChange, options, className, id, 'aria-label': ariaLabel }) {
     return (
         <select
+            id={id}
             value={value}
             onChange={onChange}
-            aria-label={ariaLabel}
+            aria-label={ariaLabel ?? (id ? undefined : options[0]?.label)}
             className={cn(adminControlClass, 'min-w-[9rem] py-2 px-3 cursor-pointer', className)}
         >
             {options.map((o) => (
@@ -131,6 +132,7 @@ export function AdminDateInput({ value, onChange, label, title, className, min, 
                     value={value}
                     onChange={onChange}
                     title={title || label}
+                    aria-label={title || label}
                     min={min}
                     max={max}
                     className={cn(adminControlClass, 'admin-date-input py-2 pl-8 pr-2')}
@@ -236,7 +238,7 @@ export function AdminIconButton({ onClick, icon: Icon, variant = 'default', titl
             title={title}
             aria-label={title}
             disabled={disabled}
-            className={cn('p-2 rounded-lg transition-colors disabled:opacity-30 disabled:pointer-events-none', ICON_BTN_VARIANTS[variant], className)}
+            className={cn('inline-grid size-9 place-items-center rounded-lg transition-colors disabled:opacity-30 disabled:pointer-events-none', ICON_BTN_VARIANTS[variant], className)}
         >
             <Icon size={size} />
         </button>

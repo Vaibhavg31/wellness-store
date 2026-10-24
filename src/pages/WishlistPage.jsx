@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Heart, ShoppingBag } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
+import PopularPicks from '@/components/shop/PopularPicks';
 import PageHeader from '@/components/ui/PageHeader';
 import SearchField from '@/components/shop/SearchField';
 import ProductGrid from '@/components/shop/ProductGrid';
@@ -31,6 +32,7 @@ export default function WishlistPage() {
         return (
             <div className="container-page py-16">
                 <EmptyState as="h1" icon={Heart} title="Your wishlist is empty" description="Save products you love and return anytime. Your wishlist is stored on this device." actionLabel="Explore the shop" actionHref="/shop" />
+                <PopularPicks />
             </div>
         );
     }

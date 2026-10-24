@@ -13,7 +13,7 @@ import { hasInstagramUrl } from '@/utils/socialLinks';
 import { DEVELOPER_CREDIT, DEVELOPER_NAME, DEVELOPER_URL } from '@/constants';
 
 const COLLECTION_LIMIT = 6;
-const linkClass = 'text-small text-muted transition-colors hover:text-primary';
+const linkClass = 'inline-flex min-h-9 items-center text-small text-muted transition-colors hover:text-primary';
 
 function NewsletterForm() {
     const { showToast } = useToast();
@@ -130,11 +130,11 @@ export default function Footer() {
                 <div className="container-page flex flex-col items-center justify-between gap-3 py-5 text-caption text-muted sm:flex-row">
                     <p>© {new Date().getFullYear()} {content.brandName}. All rights reserved.</p>
                     <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
-                        <li><Link to="/privacy" className="hover:text-primary">Privacy Policy</Link></li>
-                        <li><Link to="/terms" className="hover:text-primary">Terms of Service</Link></li>
-                        <li><Link to="/track-order" className="hover:text-primary">Track order</Link></li>
-                        <li><Link to="/shipping-policy" className="hover:text-primary">Shipping</Link></li>
-                        <li><Link to="/refund-policy" className="hover:text-primary">Returns &amp; Refunds</Link></li>
+                        <li><Link to="/privacy" className="inline-flex min-h-9 items-center hover:text-primary">Privacy Policy</Link></li>
+                        <li><Link to="/terms" className="inline-flex min-h-9 items-center hover:text-primary">Terms of Service</Link></li>
+                        <li><Link to="/track-order" className="inline-flex min-h-9 items-center hover:text-primary">Track order</Link></li>
+                        <li><Link to="/shipping-policy" className="inline-flex min-h-9 items-center hover:text-primary">Shipping</Link></li>
+                        <li><Link to="/refund-policy" className="inline-flex min-h-9 items-center hover:text-primary">Returns &amp; Refunds</Link></li>
                         <li>
                             {DEVELOPER_CREDIT}{' '}
                             <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="font-medium text-ink hover:text-primary">{DEVELOPER_NAME}</a>

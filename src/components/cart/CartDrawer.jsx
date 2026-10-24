@@ -35,8 +35,11 @@ export default function CartDrawer() {
         couponCode, couponDetails, autoAppliedCoupon, applyCoupon, removeCoupon,
     } = useCart();
     const { isAuthenticated } = useAuth();
-    const { showToast } = useToast();
+    const { showToast, dismissAll } = useToast();
     const [publicOffers, setPublicOffers] = useState([]);
+
+    // The "Added to bag" toast has done its job once the bag itself is open.
+    useEffect(() => { if (isDrawerOpen) dismissAll(); }, [isDrawerOpen, dismissAll]);
     const [applying, setApplying] = useState(false);
 
     useEffect(() => {

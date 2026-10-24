@@ -71,7 +71,7 @@ export function OptionalSection({ icon: Icon, title, description, enabled, onTog
                 <div className="flex items-center gap-2.5 shrink-0 pl-1">
                     <span
                         className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${
-                            enabled ? 'text-primary' : 'text-admin-muted/70'
+                            enabled ? 'text-primary' : 'text-admin-muted'
                         }`}
                     >
                         {enabled ? 'On' : 'Off'}
