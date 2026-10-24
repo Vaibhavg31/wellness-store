@@ -22,7 +22,7 @@ export default function ProductGrid({ products, emptyMessage = 'No products foun
         return <p className="py-20 text-center text-muted">{emptyMessage}</p>;
     }
     return (
-        <ul className={GRID}>
+        <ul className={`${GRID} animate-fade-in`}>
             {products.map((product, i) => (
                 <li key={product.id}>
                     <ProductCard product={product} priority={i < 4} />

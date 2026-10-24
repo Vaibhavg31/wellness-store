@@ -86,7 +86,7 @@
   --animate-slide-in-right: slide-in-right 0.3s var(--ease-out-soft) both;
   --animate-shimmer: shimmer 1.6s linear infinite;
   --animate-draw-check: draw-check 0.5s 0.15s ease-out forwards;
-  --animate-page-in: page-in 0.45s var(--ease-out-soft) both;
+  --animate-page-in: page-in 0.35s var(--ease-out-soft) both;
   --animate-pop: pop 0.4s var(--ease-out-soft) both;
   --animate-edge-in-right: edge-in-right 0.6s var(--ease-out-soft) both;
   --animate-edge-in-left: edge-in-left 0.6s var(--ease-out-soft) both;
@@ -98,7 +98,7 @@
   --animate-twinkle: twinkle 3.4s ease-in-out infinite;
 
   @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-  @keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes page-in { from { opacity: 0.35; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   @keyframes edge-in-right { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: none; } }
   @keyframes edge-in-left { from { opacity: 0; transform: translateX(-100%); } to { opacity: 1; transform: none; } }
   @keyframes confetti { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); } }

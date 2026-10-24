@@ -1,21 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const MIN_VISIBLE_MS = 380;
+const MIN_VISIBLE_MS = 300;
 const GIVE_UP_MS = 10000;
 
-/** Same-origin link click that would change the page (not a new tab, download, hash jump or modified click). */
-function isPageNavigation(event) {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
-    const anchor = event.target instanceof Element ? event.target.closest('a[href]') : null;
-    if (!anchor || (anchor.target && anchor.target !== '_self') || anchor.hasAttribute('download')) return false;
-    const url = new URL(anchor.href, window.location.href);
-    return url.origin === window.location.origin && url.pathname !== window.location.pathname;
-}
-
 /**
- * Thin brand-coloured bar at the very top: starts the instant an in-app link is clicked (so a slow page chunk
- * feels responsive) and completes when the new route has rendered. Transform + opacity only.
+ * Thin brand-coloured bar at the very top. It starts the instant the app changes page (any link, the back button, or
+ * a redirect after sign-in: they all go through history.pushState / popstate) and completes when the new page has
+ * rendered. While it runs the OLD page stays on screen, so a slow page chunk never shows a blank loading screen.
+ * Transform + opacity only.
  */
 export default function RouteProgress() {
     const { pathname } = useLocation();
@@ -36,16 +29,21 @@ export default function RouteProgress() {
     };
 
     useEffect(() => {
-        // Capture phase sees the click before the router does. The router then calls preventDefault() to take the
-        // navigation over in-app; by the next tick, a prevented click on a page link means a route change is under way.
-        const onClick = (event) => {
-            if (isPageNavigation(event)) setTimeout(() => { if (event.defaultPrevented) start(); }, 0);
+        const originalPush = window.history.pushState;
+        const originalReplace = window.history.replaceState;
+        const wrap = (original) => function changeHistory(state, title, url) {
+            try {
+                if (url != null && new URL(url, window.location.href).pathname !== window.location.pathname) start();
+            } catch { /* malformed URL: the router will deal with it */ }
+            return original.apply(this, arguments);
         };
+        window.history.pushState = wrap(originalPush);
+        window.history.replaceState = wrap(originalReplace);
         const onPopState = () => start();
-        document.addEventListener('click', onClick, true);
         window.addEventListener('popstate', onPopState);
         return () => {
-            document.removeEventListener('click', onClick, true);
+            window.history.pushState = originalPush;
+            window.history.replaceState = originalReplace;
             window.removeEventListener('popstate', onPopState);
             clearTimers();
         };

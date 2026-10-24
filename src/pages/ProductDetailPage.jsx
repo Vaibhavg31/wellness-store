@@ -36,5 +36,6 @@ export default function ProductDetailPage() {
         );
     }
 
-    return <ProductDetailView product={product} reviews={reviews} refetchReviews={refetchReviews} productBanners={productBanners} />;
+    // Fades in over the skeleton instead of popping in.
+    return <div className="animate-fade-in"><ProductDetailView product={product} reviews={reviews} refetchReviews={refetchReviews} productBanners={productBanners} /></div>;
 }

@@ -88,15 +88,18 @@ function LoginScreen() {
         }
 
         setLoading(true);
+        let leaving = false; // once we are heading to another page, keep the button busy until this screen is replaced
         try {
             if (mode === 'signin') {
                 const res = await loginWithEmail(email, password, rememberMe);
+                leaving = true;
                 goAfterLogin(res.role, res.redirect, res.user?.name);
                 return;
             }
 
             const res = await registerWithEmail(email, password, name.trim(), confirmPassword);
             if (res.pendingVerification) {
+                leaving = true;
                 navigate(
                     `/verify-email-pending?email=${encodeURIComponent(res.email || email)}&redirect=${encodeURIComponent(redirectTo)}`,
                     { replace: true },
@@ -104,9 +107,11 @@ function LoginScreen() {
                 return;
             }
 
+            leaving = true;
             goAfterLogin('customer', null, res.user?.name);
         } catch (err) {
             if (err instanceof ApiError && err.code === 'EMAIL_NOT_VERIFIED') {
+                leaving = true;
                 navigate(
                     `/verify-email-pending?email=${encodeURIComponent(err.email || email)}&redirect=${encodeURIComponent(redirectTo)}`,
                     { replace: true },
@@ -115,7 +120,7 @@ function LoginScreen() {
             }
             setError(err instanceof Error ? err.message : 'Sign-in failed');
         } finally {
-            setLoading(false);
+            if (!leaving) setLoading(false);
         }
     };
 
@@ -123,13 +128,15 @@ function LoginScreen() {
         e.preventDefault();
         setError('');
         setLoading(true);
+        let leaving = false;
         try {
             await adminLogin(adminUser, adminPass);
+            leaving = true;
             navigate(ADMIN_PATH, { replace: true });
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Invalid studio credentials');
         } finally {
-            setLoading(false);
+            if (!leaving) setLoading(false);
         }
     };
 
@@ -184,7 +191,7 @@ function LoginScreen() {
         </>
     );
 
-    const tabClass = (active) => `flex-1 rounded-full py-2.5 text-small font-medium transition-colors ${active ? 'bg-primary text-white' : 'text-muted hover:text-ink'}`;
+    const tabClass = (active) => `relative z-10 flex-1 rounded-full py-2.5 text-small font-medium transition-colors duration-300 ${active ? 'text-white' : 'text-muted hover:text-ink'}`;
     const notice = 'rounded-lg bg-accent-tint p-4 text-center text-small text-ink';
 
     return (
@@ -194,7 +201,7 @@ function LoginScreen() {
             backLabel={isCheckoutLogin ? '← Back to bag' : isAdminAccess ? '← Back to store' : 'Continue shopping without signing in →'}
         >
             <div className="space-y-6">
-                <div className="text-center">
+                <div className="animate-fade-in text-center" key={mode}>
                     {isCheckoutLogin && (
                         <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-tint px-3 py-1 text-caption font-semibold text-primary-deep">
                             <ShoppingBag size={14} aria-hidden="true" /> Checkout login
@@ -214,16 +221,21 @@ function LoginScreen() {
 
                 {!isAdminAccess && (
                     <>
-                        <div className="flex rounded-full bg-canvas-alt p-1" role="tablist" aria-label="Sign in or sign up">
+                        <div className="relative flex rounded-full bg-canvas-alt p-1" role="tablist" aria-label="Sign in or sign up">
+                            <span
+                                aria-hidden="true"
+                                className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-primary shadow-sm transition-transform duration-300 ease-[var(--ease-out-soft)]"
+                                style={{ transform: mode === 'signup' ? 'translateX(100%)' : 'none' }}
+                            />
                             <button type="button" role="tab" aria-selected={mode === 'signin'} onClick={() => { setMode('signin'); setError(''); }} className={tabClass(mode === 'signin')}>Sign in</button>
                             <button type="button" role="tab" aria-selected={mode === 'signup'} onClick={() => { setMode('signup'); setError(''); }} className={tabClass(mode === 'signup')}>Sign up</button>
                         </div>
 
                         <form onSubmit={handleEmailSubmit} className="space-y-4">
-                            {mode === 'signup' && <Input label="Full name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />}
+                            {mode === 'signup' && <div className="animate-fade-up"><Input label="Full name" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" /></div>}
                             <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
                             <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} />
-                            {mode === 'signup' && <Input label="Confirm password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} autoComplete="new-password" />}
+                            {mode === 'signup' && <div className="animate-fade-up"><Input label="Confirm password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} autoComplete="new-password" /></div>}
                             {mode === 'signin' && (
                                 <div className="flex items-center justify-between text-small">
                                     <label className="flex cursor-pointer items-center gap-2 text-muted">

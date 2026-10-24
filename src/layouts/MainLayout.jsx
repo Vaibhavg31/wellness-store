@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import PageLoader from '@/components/layout/PageLoader';
 import AnnouncementBar from '@/components/layout/AnnouncementBar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -18,7 +20,9 @@ export default function MainLayout() {
             <Header />
             <CartDrawer />
             <main id="main" className="min-h-[100dvh] flex-1">
-                <PageTransition />
+                <Suspense fallback={<PageLoader />}>
+                    <PageTransition />
+                </Suspense>
             </main>
             <Footer />
             <OfferTab />

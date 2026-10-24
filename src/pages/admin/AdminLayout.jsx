@@ -3,6 +3,8 @@ import { Link, Navigate, useLocation } from 'react-router-dom';
 import { ExternalLink, LogOut, Menu, Search } from 'lucide-react';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { loginUrl } from '@/utils/authRedirect';
+import { Suspense } from 'react';
+import PageLoader from '@/components/layout/PageLoader';
 import PageTransition from '@/components/layout/PageTransition';
 import Logo from '@/components/ui/Logo';
 import Drawer from '@/components/ui/Drawer';
@@ -92,7 +94,9 @@ export default function AdminLayout() {
                 </header>
 
                 <div className="max-w-[1440px] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">
-                    <PageTransition />
+                    <Suspense fallback={<PageLoader />}>
+                        <PageTransition />
+                    </Suspense>
                 </div>
             </main>
         </div>

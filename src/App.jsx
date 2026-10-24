@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from '@/contexts/CartContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
@@ -13,55 +13,57 @@ import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
 import RouteProgress from '@/components/layout/RouteProgress';
 import { PREVIEW_PATH } from '@/utils/productPreview';
 import PageLoader from '@/components/layout/PageLoader';
+import RouteGroup from '@/components/layout/RouteGroup';
+import { installRoutePrefetch, pageLoaders } from '@/utils/routeLoaders';
 import MainLayout from '@/layouts/MainLayout';
 import Seo from '@/components/seo/Seo';
 import HomePage from '@/pages/HomePage';
 
 // Storefront pages
-const ShopPage = lazy(() => import('@/pages/ShopPage'));
-const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
-const CategoryPage = lazy(() => import('@/pages/CategoryPage'));
-const ReviewsPage = lazy(() => import('@/pages/ReviewsPage'));
-const CartPage = lazy(() => import('@/pages/CartPage'));
-const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'));
-const WishlistPage = lazy(() => import('@/pages/WishlistPage'));
-const AccountPage = lazy(() => import('@/pages/AccountPage'));
-const OrdersPage = lazy(() => import('@/pages/OrdersPage'));
-const OrderDetailPage = lazy(() => import('@/pages/OrderDetailPage'));
-const AboutPage = lazy(() => import('@/pages/AboutPage'));
-const ContactPage = lazy(() => import('@/pages/ContactPage'));
-const FaqPage = lazy(() => import('@/pages/FaqPage'));
-const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
-const TermsPage = lazy(() => import('@/pages/TermsPage'));
-const ShippingPolicyPage = lazy(() => import('@/pages/ShippingPolicyPage'));
-const RefundPolicyPage = lazy(() => import('@/pages/RefundPolicyPage'));
-const TrackOrderPage = lazy(() => import('@/pages/TrackOrderPage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
-const ProductPreviewFramePage = lazy(() => import('@/pages/ProductPreviewFramePage'));
+const ShopPage = lazy(pageLoaders.ShopPage);
+const ProductDetailPage = lazy(pageLoaders.ProductDetailPage);
+const CategoryPage = lazy(pageLoaders.CategoryPage);
+const ReviewsPage = lazy(pageLoaders.ReviewsPage);
+const CartPage = lazy(pageLoaders.CartPage);
+const CheckoutPage = lazy(pageLoaders.CheckoutPage);
+const WishlistPage = lazy(pageLoaders.WishlistPage);
+const AccountPage = lazy(pageLoaders.AccountPage);
+const OrdersPage = lazy(pageLoaders.OrdersPage);
+const OrderDetailPage = lazy(pageLoaders.OrderDetailPage);
+const AboutPage = lazy(pageLoaders.AboutPage);
+const ContactPage = lazy(pageLoaders.ContactPage);
+const FaqPage = lazy(pageLoaders.FaqPage);
+const PrivacyPage = lazy(pageLoaders.PrivacyPage);
+const TermsPage = lazy(pageLoaders.TermsPage);
+const ShippingPolicyPage = lazy(pageLoaders.ShippingPolicyPage);
+const RefundPolicyPage = lazy(pageLoaders.RefundPolicyPage);
+const TrackOrderPage = lazy(pageLoaders.TrackOrderPage);
+const NotFoundPage = lazy(pageLoaders.NotFoundPage);
+const ProductPreviewFramePage = lazy(pageLoaders.ProductPreviewFramePage);
 
 // Auth pages (standalone, no site chrome)
-const LoginPage = lazy(() => import('@/pages/LoginPage'));
-const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
-const VerifyEmailPage = lazy(() => import('@/pages/VerifyEmailPage'));
-const VerifyEmailPendingPage = lazy(() => import('@/pages/VerifyEmailPendingPage'));
+const LoginPage = lazy(pageLoaders.LoginPage);
+const ForgotPasswordPage = lazy(pageLoaders.ForgotPasswordPage);
+const ResetPasswordPage = lazy(pageLoaders.ResetPasswordPage);
+const VerifyEmailPage = lazy(pageLoaders.VerifyEmailPage);
+const VerifyEmailPendingPage = lazy(pageLoaders.VerifyEmailPendingPage);
 
 // Admin
-const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
-const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
-const AdminProductsPage = lazy(() => import('@/pages/admin/AdminProductsPage'));
-const AdminProductFormPage = lazy(() => import('@/pages/admin/AdminProductFormPage'));
-const AdminCategoriesPage = lazy(() => import('@/pages/admin/AdminCategoriesPage'));
-const AdminReviewsPage = lazy(() => import('@/pages/admin/AdminReviewsPage'));
-const AdminFeedbackPage = lazy(() => import('@/pages/admin/AdminFeedbackPage'));
-const AdminOrdersPage = lazy(() => import('@/pages/admin/AdminOrdersPage'));
-const AdminDirectOrdersPage = lazy(() => import('@/pages/admin/AdminDirectOrdersPage'));
-const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
-const AdminSettingsPage = lazy(() => import('@/pages/admin/AdminSettingsPage'));
-const AdminContentPage = lazy(() => import('@/pages/admin/AdminContentPage'));
-const AdminMediaPage = lazy(() => import('@/pages/admin/AdminMediaPage'));
-const AdminCouponsPage = lazy(() => import('@/pages/admin/AdminCouponsPage'));
-const AdminBundlesPage = lazy(() => import('@/pages/admin/AdminBundlesPage'));
+const AdminLayout = lazy(pageLoaders.AdminLayout);
+const AdminDashboardPage = lazy(pageLoaders.AdminDashboardPage);
+const AdminProductsPage = lazy(pageLoaders.AdminProductsPage);
+const AdminProductFormPage = lazy(pageLoaders.AdminProductFormPage);
+const AdminCategoriesPage = lazy(pageLoaders.AdminCategoriesPage);
+const AdminReviewsPage = lazy(pageLoaders.AdminReviewsPage);
+const AdminFeedbackPage = lazy(pageLoaders.AdminFeedbackPage);
+const AdminOrdersPage = lazy(pageLoaders.AdminOrdersPage);
+const AdminDirectOrdersPage = lazy(pageLoaders.AdminDirectOrdersPage);
+const AdminUsersPage = lazy(pageLoaders.AdminUsersPage);
+const AdminSettingsPage = lazy(pageLoaders.AdminSettingsPage);
+const AdminContentPage = lazy(pageLoaders.AdminContentPage);
+const AdminMediaPage = lazy(pageLoaders.AdminMediaPage);
+const AdminCouponsPage = lazy(pageLoaders.AdminCouponsPage);
+const AdminBundlesPage = lazy(pageLoaders.AdminBundlesPage);
 
 const STOREFRONT_ROUTES = [
     { path: 'shop', Page: ShopPage },
@@ -110,16 +112,18 @@ const ADMIN_ROUTES = [
 ];
 
 // Private, transactional and admin routes are kept out of search results.
+// There is deliberately no <Suspense> here: the persistent boundaries (below, and inside each layout) let the current
+// page stay on screen while the next page's code loads, instead of flashing a loading screen between pages.
 const lazyElement = (Page, { noindex = false, title } = {}) => (
     <>
         {noindex && <Seo noindex title={title} />}
-        <Suspense fallback={<PageLoader />}>
-            <Page />
-        </Suspense>
+        <Page />
     </>
 );
 
 export default function App() {
+    useEffect(() => installRoutePrefetch(), []);
+
     return (
             <AuthProvider>
                 <SignOutTransitionProvider>
@@ -131,6 +135,8 @@ export default function App() {
                                         <ScrollToTop />
                                         <RouteProgress />
                                         <AnnouncementPopup />
+                                        <Suspense fallback={<PageLoader fullscreen />}>
+                                        <RouteGroup>
                                         <Routes>
                                             <Route element={<MainLayout />}>
                                                 <Route index element={<HomePage />} />
@@ -157,6 +163,8 @@ export default function App() {
 
                                             <Route path="*" element={lazyElement(NotFoundPage, { noindex: true, title: 'Page not found' })} />
                                         </Routes>
+                                        </RouteGroup>
+                                        </Suspense>
                                         {/* Last in DOM order so the skip link stays the first keyboard tab stop */}
                                         <WhatsAppButton />
                                     </ToastProvider>
