@@ -101,6 +101,8 @@ const DEFAULTS = {
         announcements: [],
         restockReminderDays: 30,
         expertChat: true,
+        // Hero picture: 'orbit' = the animated, cursor-reactive product ring; 'image' = one still image.
+        heroVisual: 'orbit',
         concerns: [],
         // Extra popup options (the core popup fields live in their own columns): category target, schedule, pages.
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' },
@@ -147,6 +149,7 @@ function sanitizeExtras(input) {
             .slice(0, 6),
         restockReminderDays: Math.min(365, Math.max(0, Number.parseInt(e.restockReminderDays ?? d.restockReminderDays, 10) || 0)),
         expertChat: e.expertChat === undefined ? d.expertChat : Boolean(e.expertChat),
+        heroVisual: e.heroVisual === 'image' ? 'image' : 'orbit',
         concerns: (Array.isArray(e.concerns) ? e.concerns : [])
             .map((c) => ({ label: String(c?.label ?? '').trim().slice(0, 40), search: String(c?.search ?? '').trim().slice(0, 60), image: String(c?.image ?? '').trim().slice(0, 300) }))
             .filter((c) => c.label)

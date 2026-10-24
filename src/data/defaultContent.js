@@ -243,6 +243,7 @@ export const DEFAULT_SITE_CONTENT = {
         announcements: [],
         restockReminderDays: 30,
         expertChat: true,
+        heroVisual: 'orbit', // 'orbit' (animated product ring) or 'image' (one still picture)
         concerns: [], // [{ label, search, image }] → "Shop by concern" on the homepage
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' }, // extra popup options; see AnnouncementPopup
         spin: { cooldownDays: 30, segments: [] }, // spin-the-wheel slices: [{ label, couponId, weight }]

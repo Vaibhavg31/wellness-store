@@ -53,12 +53,12 @@ try {
         await page.setViewport({ width: def.w, height: def.h, deviceScaleFactor: 1 });
         await page.goto(`http://localhost:${PORT}/?scene=${id}`);
         await page.evaluate(() => window.__ready);
-        const png = await (await page.$('#scene')).screenshot({ type: 'png', omitBackground: false });
+        const png = await (await page.$('#scene')).screenshot({ type: 'png', omitBackground: Boolean(def.transparent) });
         const isTmp = def.out.startsWith('video/');
         const dest = isTmp ? path.join(tmpDir, path.basename(def.out)) : path.join(outRoot, def.out);
         fs.mkdirSync(path.dirname(dest), { recursive: true });
         if (dest.endsWith('.png')) fs.writeFileSync(dest, png);
-        else await sharp(png).webp({ quality: def.quality }).toFile(dest);
+        else await sharp(png).webp({ quality: def.quality, alphaQuality: 100 }).toFile(dest);
         console.log(`✓ ${id} → ${isTmp ? dest : path.relative(publicDir, dest)}`);
     }
 } finally {

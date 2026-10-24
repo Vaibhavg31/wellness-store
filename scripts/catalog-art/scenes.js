@@ -390,9 +390,16 @@ export function videoFrame(n) {
     return scene(W, H, body);
 }
 
+/** One pack on a transparent 600x800 canvas (soft contact shadow only): used for the floating hero orbit. */
+export function cutout(key) {
+    const P = PRODUCTS[key]; const W = 600; const H = 800;
+    const w = Math.min(500, 690 / RATIO[P.kind]);
+    return `<div class="scene" id="scene" style="width:${W}px;height:${H}px">${pack(P, w, W / 2, 60).html}</div>`;
+}
+
 /* ---------- registry (id -> builder, output path, size) ---------- */
 export const SCENES = {};
-const reg = (id, build, w, h, out, quality = 86) => { SCENES[id] = { build, w, h, out, quality }; };
+const reg = (id, build, w, h, out, quality = 86, transparent = false) => { SCENES[id] = { build, w, h, out, quality, transparent }; };
 Object.keys(PRODUCTS).forEach((k) => {
     reg(`${k}-1`, () => productFront(k), 900, 1125, `products/${k}-1.webp`);
     reg(`${k}-2`, () => productBenefits(k), 900, 1125, `products/${k}-2.webp`);
@@ -404,10 +411,12 @@ reg('hero', hero, 1080, 1200, 'home/hero.webp');
 for (let n = 0; n < 6; n++) reg(`insta-${n}`, () => insta(n), 800, 800, `instagram/post-${n + 1}.webp`);
 reg('certified', certified, 1050, 700, 'home/certified.webp');
 reg('about', about, 800, 1000, 'home/about-story.webp');
+Object.keys(PRODUCTS).forEach((k) => reg(`cut-${k}`, () => cutout(k), 600, 800, `cutouts/${k}.webp`, 92, true));
 for (let n = 0; n < 4; n++) reg(`vf-${n}`, () => videoFrame(n), 1280, 720, `video/frame-${n + 1}.png`);
 
 const id = new URLSearchParams(location.search).get('scene') || 'aloe-1';
 const def = SCENES[id];
 if (def) document.body.insertAdjacentHTML('beforeend', def.build());
 window.__ready = Promise.all([document.fonts.ready, ...[...document.images].map((i) => i.decode().catch(() => {}))]);
-window.__scenes = Object.fromEntries(Object.entries(SCENES).map(([k, v]) => [k, { w: v.w, h: v.h, out: v.out, quality: v.quality }]));
+if (def?.transparent) document.body.style.background = 'transparent';
+window.__scenes = Object.fromEntries(Object.entries(SCENES).map(([k, v]) => [k, { w: v.w, h: v.h, out: v.out, quality: v.quality, transparent: v.transparent }]));
