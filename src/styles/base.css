@@ -33,8 +33,8 @@
   @media (min-width: 640px)  { .container-page { padding-inline: 1.5rem; } }
   @media (min-width: 1024px) { .container-page { padding-inline: 2rem; } }
 
-  .section { padding-block: 3.5rem; }
-  @media (min-width: 1024px) { .section { padding-block: 6rem; } }
+  .section { padding-block: 3rem; }
+  @media (min-width: 1024px) { .section { padding-block: 5rem; } }
 
   .eyebrow { font-size: var(--text-caption); font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-accent-ink); }
   .skeleton { position: relative; overflow: hidden; background: var(--color-canvas-alt); }

@@ -10,7 +10,7 @@ export default function ConcernShelf() {
     if (concerns.length === 0) return null;
 
     return (
-        <section className="section">
+        <section className="section bg-canvas-alt pt-4 lg:pt-6">
             <div className="container-page">
                 <SectionHeader eyebrow="Shop by concern" title="Start with what you want to improve" />
                 <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

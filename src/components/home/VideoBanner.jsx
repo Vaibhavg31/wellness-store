@@ -16,6 +16,7 @@ export default function VideoBanner() {
     const [muted, setMuted] = useState(true);
 
     if (!banner?.videoUrl) return null;
+    // The caption is a small card rather than a dark gradient: readable on any footage and never muddies the picture.
 
     const fit = banner.fit === 'contain' ? 'object-contain' : 'object-cover';
     const aspectRatio = banner.width && banner.height ? `${banner.width} / ${banner.height}` : '16 / 9';
@@ -46,11 +47,11 @@ export default function VideoBanner() {
                     </video>
 
                     {hasText && (
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 via-ink/40 to-transparent p-5 text-white sm:p-10">
-                            {banner.subtitle && <p className="eyebrow !text-accent-hover">{banner.subtitle}</p>}
-                            {banner.title && <p className="mt-1 max-w-xl font-display text-h2 text-white">{banner.title}</p>}
+                        <div className="absolute bottom-4 left-4 max-w-[min(22rem,calc(100%-2rem))] rounded-lg bg-canvas/95 p-5 shadow-md sm:bottom-8 sm:left-8 sm:p-6">
+                            {banner.subtitle && <p className="eyebrow">{banner.subtitle}</p>}
+                            {banner.title && <p className="mt-1 font-display text-h3 leading-tight text-ink">{banner.title}</p>}
                             {banner.ctaLabel && banner.ctaHref && (
-                                <Link to={banner.ctaHref} className="mt-4 inline-block"><Button variant="accent">{banner.ctaLabel}</Button></Link>
+                                <Link to={banner.ctaHref} className="mt-4 inline-block"><Button size="sm">{banner.ctaLabel}</Button></Link>
                             )}
                         </div>
                     )}

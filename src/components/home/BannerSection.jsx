@@ -151,13 +151,41 @@ export function BannerSlider() {
 }
 
 /** Stacked promo banners (target "stacked"). */
+function PromoCard({ banner }) {
+    return (
+        <BannerLink href={banner.ctaHref} className="group relative block h-full overflow-hidden rounded-xl bg-canvas-alt shadow-sm ring-1 ring-line transition-shadow duration-300 hover:shadow-md">
+            <img
+                src={imageUrl(banner.image, 1200)}
+                alt={banner.title || 'Promotional banner'}
+                width="1200"
+                height="750"
+                loading="lazy"
+                decoding="async"
+                className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+            <div className="relative flex items-center bg-surface sm:absolute sm:inset-0 sm:bg-transparent sm:bg-gradient-to-r sm:from-canvas/80 sm:via-canvas/25 sm:to-transparent">
+                <div className="p-5 sm:max-w-[46%] sm:p-8">
+                    {banner.subtitle && <p className="eyebrow mb-2">{banner.subtitle}</p>}
+                    {banner.title && <p className="font-display text-h3 leading-tight text-ink">{banner.title}</p>}
+                    {banner.ctaLabel && <span className="mt-4 inline-flex min-h-10 items-center rounded-full bg-primary px-5 text-small font-medium text-white transition-colors group-hover:bg-primary-hover">{banner.ctaLabel}</span>}
+                </div>
+            </div>
+        </BannerLink>
+    );
+}
+
+/** Promo banners (target "stacked"): two calm cards side by side on desktop; an odd last one spans the full row. */
 export function PromoBanners() {
     const { banners, loading } = useBanners('stacked');
     if (loading || banners.length === 0) return null;
     return (
-        <section className="bg-canvas py-6 sm:py-10">
-            <div className="container-page grid gap-6">
-                {banners.map((b) => <Banner key={b.id} banner={b} />)}
+        <section className="bg-canvas py-8 sm:py-12">
+            <div className="container-page grid gap-5 md:grid-cols-2 lg:gap-6">
+                {banners.map((b) => (
+                    <div key={b.id} className="md:[&:last-child:nth-child(odd)]:col-span-2">
+                        <PromoCard banner={b} />
+                    </div>
+                ))}
             </div>
         </section>
     );

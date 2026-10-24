@@ -25,7 +25,7 @@ const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
 /** Projects one pack on the ring for the current ring angle, cursor tilt and stage width. */
 function project(base, [angle, spread, tiltX, tiltY, width]) {
-    const R = width * 0.37;
+    const R = width * 0.36;
     const P = width * 2.4;
     const th = (base + angle) * RAD;
     const c = Math.cos(th);
@@ -251,7 +251,7 @@ export default function HeroStage({ items }) {
         if (event.key === 'ArrowLeft') { event.preventDefault(); stepBy(-1); }
     };
 
-    const size = stageWidth * 0.34;
+    const size = stageWidth * 0.3;
     const footY = stageWidth * 0.74;
     const controls = { angle, spread, tiltX, tiltY, width };
     const current = items[active] ?? items[0];
@@ -278,9 +278,6 @@ export default function HeroStage({ items }) {
                     <div className="size-full rounded-full" style={{ background: 'radial-gradient(closest-side, #fff 0%, var(--color-primary-tint) 62%, rgb(241 228 242 / 0) 100%)' }} />
                 </Drift>
                 <div className="pointer-events-none absolute inset-[3%] animate-orbit-spin rounded-full border border-dashed border-primary/25" aria-hidden="true" />
-                <div className="pointer-events-none absolute inset-[13%] animate-orbit-spin-reverse rounded-full border border-accent/40" aria-hidden="true">
-                    <span className="absolute -top-1.5 left-1/2 size-3 -translate-x-1/2 rounded-full bg-accent shadow-sm" />
-                </div>
                 <div className="pointer-events-none absolute inset-0 rounded-full opacity-70" style={{ background: glow }} aria-hidden="true" />
                 <img src="/brand/chikit-icon.png" alt="" width="240" height="240" className="pointer-events-none absolute left-[33%] top-[16%] w-[34%] animate-orbit-spin-reverse opacity-[0.09]" draggable={false} />
 
@@ -303,21 +300,6 @@ export default function HeroStage({ items }) {
                 {/* the ring */}
                 {items.map((item, index) => (
                     <OrbitItem key={item.id} item={item} index={index} size={size} footY={footY} base={index * step} controls={controls} active={index === active} onSelect={goTo} dragged={dragged} />
-                ))}
-
-                {/* in front of the packs: bigger, faster drift gives the depth */}
-                <Drift depth={34} pointer={pointer} className="-bottom-[1%] left-[4%] z-[2100] w-[24%]">
-                    <m.div animate={reduced ? undefined : { y: [0, -8, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}>
-                        <Leaf className="text-success/80" style={{ transform: 'rotate(-12deg)' }} />
-                    </m.div>
-                </Drift>
-                <Drift depth={28} pointer={pointer} className="-bottom-[2%] right-[6%] z-[2100] w-[18%]">
-                    <m.div animate={reduced ? undefined : { y: [0, -6, 0] }} transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}>
-                        <Leaf className="text-success/70" style={{ transform: 'rotate(188deg)' }} />
-                    </m.div>
-                </Drift>
-                {[['12%', '18%', 0], ['84%', '40%', 0.9], ['70%', '10%', 1.7], ['20%', '60%', 2.4], ['90%', '66%', 1.2]].map(([left, top, delay]) => (
-                    <span key={`${left}${top}`} aria-hidden="true" className="pointer-events-none absolute z-[2200] size-1.5 animate-twinkle rounded-full bg-accent" style={{ left, top, animationDelay: `${delay}s` }} />
                 ))}
 
                 <AnimatePresence>

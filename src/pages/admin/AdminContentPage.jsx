@@ -324,7 +324,7 @@ export default function AdminContentPage() {
                         <AdminField label="Featured Product ID" hint="Pins a product to the small featured-product card and its CTA. Leave empty to hide that card.">
                             <Input value={content.hero.featuredProductId} onChange={(e) => update('hero', { ...content.hero, featuredProductId: e.target.value })} />
                         </AdminField>
-                        <AdminField label="Hero Photos" hint="Products shown first on the animated ring (up to 4). Any slot left on Auto is filled with your best sellers and new arrivals, up to 6 in total.">
+                        <AdminField label="Hero Photos" hint="Products shown first on the animated ring (up to 4). Any slot left on Auto is filled with your best sellers and new arrivals, up to 5 in total.">
                             <div className="grid grid-cols-2 gap-3">
                                 {[0, 1, 2, 3].map((slot) => (
                                     <AdminSelect

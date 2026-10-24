@@ -20,7 +20,7 @@ function badgesFor(product) {
         ...(product.isNew && !tags.includes('New') ? [{ label: 'New', variant: 'new' }] : []),
         ...(product.isBestSeller && !tags.includes('Best Seller') ? [{ label: 'Best Seller', variant: 'bestseller' }] : []),
         ...(product.discount > 0 && !tags.includes('Sale') ? [{ label: `-${product.discount}%`, variant: 'sale' }] : []),
-    ].slice(0, 2);
+    ].slice(0, 1); // one badge only: a calmer card
 }
 
 function ProductCard({ product, priority = false }) {
@@ -104,7 +104,7 @@ function ProductCard({ product, priority = false }) {
             </div>
 
             <div className="flex flex-1 flex-col gap-1.5 pt-3">
-                <h3 className="font-sans text-body font-medium leading-snug">
+                <h3 className="min-h-[2.6rem] font-sans text-[0.9375rem] font-medium leading-snug">
                     <Link to={href} className="line-clamp-2 transition-colors after:absolute after:inset-0 after:content-[''] hover:text-primary">
                         {product.title}
                     </Link>

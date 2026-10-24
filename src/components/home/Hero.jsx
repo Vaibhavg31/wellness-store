@@ -28,7 +28,7 @@ function buildStageItems(products, hero) {
     const rest = withImage
         .filter((p) => !pinned.includes(p))
         .sort((a, b) => (b.isBestSeller || b.isNew ? 1 : 0) - (a.isBestSeller || a.isNew ? 1 : 0));
-    return [...pinned, ...rest].slice(0, 6).map((p) => ({
+    return [...pinned, ...rest].slice(0, 5).map((p) => ({
         id: p.id,
         title: p.title,
         price: p.price,

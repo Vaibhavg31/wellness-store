@@ -186,15 +186,6 @@ function capsules(cx, cy, n, c1, c2, size = 62, spread = 150, seed = 5) {
     }
     return out;
 }
-function tablets(cx, cy, n, color, size = 40, spread = 150, seed = 7) {
-    let out = ''; let s = seed;
-    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-    for (let i = 0; i < n; i++) {
-        const a = rnd() * Math.PI * 2; const r = rnd() * spread;
-        out += ball(cx + Math.cos(a) * r * 1.5, cy + Math.sin(a) * r * 0.45, size * (0.85 + rnd() * 0.3), color);
-    }
-    return out;
-}
 function scoop(x, y, w, rot = -18) {
     return abs(`left:${x}px;top:${y}px;width:${w}px;height:${w * 0.62}px;transform:rotate(${rot}deg)`,
         `<svg viewBox="0 0 100 62" width="100%" height="100%"><defs><linearGradient id="sc" x1="0" x2="1"><stop offset="0" stop-color="#E8E0D4"/><stop offset=".5" stop-color="#FFFFFF"/><stop offset="1" stop-color="#CFC4B4"/></linearGradient></defs>
@@ -203,10 +194,13 @@ function scoop(x, y, w, rot = -18) {
 }
 
 /* ---------- scene chrome ---------- */
-function studio(w, h, [c1, c2], { arch = true, floor = 0.15, floorColor } = {}) {
+/** One calm studio colour for the whole catalogue: identity comes from the pack, with only a hint of tint in the arch. */
+const NEUTRAL = ['#F8F3EA', '#EADFCE'];
+
+function studio(w, h, [c1, c2], { arch = true, floor = 0.15, floorColor, tint } = {}) {
     const fl = floorColor || darken(c2, 0.06);
     let s = `<div class="abs" style="inset:0;background:radial-gradient(110% 80% at 50% 28%,${lighten(c1, 0.35)} 0,${c1} 46%,${c2} 100%)"></div>`;
-    if (arch) s += `<div class="arch" style="left:${w * 0.2}px;width:${w * 0.6}px;bottom:${h * floor}px;height:${h * 0.66}px;background:linear-gradient(180deg,${lighten(c1, 0.55)},${lighten(c2, 0.35)});opacity:.75"></div>`;
+    if (arch) s += `<div class="arch" style="left:${w * 0.2}px;width:${w * 0.6}px;bottom:${h * floor}px;height:${h * 0.66}px;background:linear-gradient(180deg,${tint ? mix(tint, '#ffffff', 0.25) : lighten(c1, 0.55)},${tint ? mix(tint, '#ffffff', 0.7) : lighten(c2, 0.35)});opacity:${tint ? 0.9 : 0.75}"></div>`;
     s += `<div class="abs" style="left:0;right:0;bottom:0;height:${h * floor}px;background:linear-gradient(180deg,${mix(fl, '#fff', 0.1)},${darken(fl, 0.07)});box-shadow:0 -2px 10px rgba(60,30,50,.08)"></div>`;
     s += `<div class="abs" style="left:0;right:0;bottom:${h * floor - 1}px;height:2px;background:rgba(255,255,255,.55)"></div>`;
     return s;
@@ -214,29 +208,13 @@ function studio(w, h, [c1, c2], { arch = true, floor = 0.15, floorColor } = {}) 
 const scene = (w, h, body) => `<div class="scene" id="scene" style="width:${w}px;height:${h}px">${body}</div>`;
 
 /* ---------- product scenes (900x1125, key content inside the central square so 1:1 crops stay good) ---------- */
-function propsFor(key, W, floorY) {
-    const fy = floorY; // y (from top) of the floor line
-    switch (key) {
-        case 'aloe': return leaf(W * 0.08, fy - 150, 230, -28, '#5E9A32') + leaf(W * 0.7, fy - 130, 240, 205, '#76B040', 0) + ball(W * 0.74, fy + 22, 64, '#9CCB4E') + ball(W * 0.82, fy + 8, 46, '#B6D96A');
-        case 'biotin': return gummies(W * 0.5, fy + 36, 22, ['#E85A82', '#F28AA6', '#F6B1C3'], 52, 190) + leaf(W * 0.06, fy - 110, 190, -20, '#6AA84F');
-        case 'facewash': return sprig(W * 0.14, fy - 40, 170, -30, '#3E8E5A', 5) + sprig(W * 0.84, fy - 20, 150, 200, '#4E9C68', 4) + ball(W * 0.72, fy + 26, 46, '#CFE9DA');
-        case 'fatburner': return capsules(W * 0.5, fy + 40, 14, '#5B8F3A', '#F4EBCF', 66, 190) + tablets(W * 0.2, fy + 24, 6, '#6B4A2B', 30, 70) + leaf(W * 0.8, fy - 100, 220, 210, '#5E8E3E');
-        case 'hairoil': return leaf(W * 0.08, fy - 120, 220, -24, '#6C8F3E') + ball(W * 0.78, fy + 20, 60, '#2A1A12') + ball(W * 0.84, fy + 4, 44, '#3A2518') + leaf(W * 0.72, fy - 90, 200, 200, '#7DA04A');
-        case 'immunity': return citrus(W * 0.07, fy + 8, 150) + citrus(W * 0.74, fy + 22, 120, '#F0932B') + leaf(W * 0.12, fy - 70, 200, -25, '#5E9A32') + ball(W * 0.62, fy + 40, 40, '#7FB34A');
-        case 'multivitamin': return gummies(W * 0.5, fy + 36, 26, ['#F6A21E', '#F9C74F', '#F3722C', '#FFD97A'], 50, 200) + citrus(W * 0.08, fy + 18, 120, '#F6A83B') + leaf(W * 0.78, fy - 80, 190, 205, '#6AA84F');
-        case 'protein': return scoop(W * 0.62, fy + 18, 190, -12) + leaf(W * 0.06, fy - 110, 220, -26, '#6B8F4E') + ball(W * 0.2, fy + 32, 44, '#6B3F20') + ball(W * 0.27, fy + 44, 34, '#7B4B2A');
-        case 'greens': return leaf(W * 0.06, fy - 120, 240, -28, '#4F8A3A') + leaf(W * 0.74, fy - 110, 240, 208, '#68A445') + ball(W * 0.8, fy + 28, 52, '#7FB34A') + ball(W * 0.1, fy + 34, 42, '#5E9A32');
-        case 'triphala': return tablets(W * 0.5, fy + 42, 18, '#6B3F1F', 40, 190) + ball(W * 0.08, fy + 14, 70, '#8A5A2B') + ball(W * 0.84, fy + 20, 64, '#9A6A32') + leaf(W * 0.72, fy - 70, 190, 205, '#6C8F3E');
-        default: return '';
-    }
-}
 const PACK_W = { bottle: 275, jar: 480, tub: 530, tube: 310, pouch: 410, oil: 285, carton: 0 };
 const RATIO = { bottle: 2.5, jar: 1.18, tub: 1.18, tube: 2.2, pouch: 1.5, oil: 2.3, carton: 1.5 };
 
 export function productFront(key) {
     const P = PRODUCTS[key]; const W = 900; const H = 1125;
-    const floorH = H * 0.16; const floorY = H - floorH;
-    let body = studio(W, H, P.bg, { floor: 0.16 });
+    const floorH = H * 0.16;
+    let body = studio(W, H, NEUTRAL, { floor: 0.16, tint: P.tint });
     const w = PACK_W[P.kind];
     const pk = pack(P, w, W / 2 + (P.kind === 'oil' ? -125 : 0), floorH - 6);
     body += pk.html;
@@ -244,19 +222,17 @@ export function productFront(key) {
         const carton = pack({ ...P, kind: 'carton' }, 225, W / 2 + 175, floorH - 6);
         body += carton.html;
     }
-    body += propsFor(key, W, floorY);
     return scene(W, H, body);
 }
 
 export function productBenefits(key) {
     const P = PRODUCTS[key]; const W = 900; const H = 1125;
-    const c1 = lighten(P.bg[0], 0.45); const c2 = P.bg[0];
-    let body = `<div class="abs" style="inset:0;background:linear-gradient(160deg,${c1},${c2})"></div>`;
-    body += `<div class="blob" style="left:${-W * 0.2}px;top:${H * 0.55}px;width:${W * 0.9}px;height:${W * 0.9}px;background:${P.bg[1]};opacity:.55"></div>`;
+    let body = `<div class="abs" style="inset:0;background:linear-gradient(160deg,#FBF7F0,${NEUTRAL[1]})"></div>`;
+    body += `<div class="blob" style="left:${-W * 0.2}px;top:${H * 0.55}px;width:${W * 0.9}px;height:${W * 0.9}px;background:${P.tint};opacity:.7"></div>`;
     body += `<div class="txt serif" style="left:60px;top:${H * 0.145}px;font-size:46px;line-height:1.1;color:#241720">${P.l1}<br><span style="color:${P.accent}">${P.l2}</span></div>`;
     const w = Math.min(PACK_W[P.kind] * 0.95, 380, 560 / RATIO[P.kind]);
     const fy = H * 0.205;
-    body += leaf(20, H - fy - 170, 210, -26, '#5E9A32') + (P.kind === 'oil' ? pack({ ...P, kind: 'carton' }, 190, 330, fy).html : '');
+    body += (P.kind === 'oil' ? pack({ ...P, kind: 'carton' }, 190, 330, fy).html : '');
     body += pack(P, w, 210, fy).html;
     let rows = '';
     P.benefits.forEach(([ic, text], i) => {
@@ -281,9 +257,8 @@ const CATS = {
 };
 export function categoryTile(slug) {
     const C = CATS[slug]; const W = 800; const H = 800;
-    const floorH = H * 0.14; let body = studio(W, H, C.bg, { floor: 0.14, arch: true });
+    const floorH = H * 0.14; let body = studio(W, H, NEUTRAL, { floor: 0.14, arch: true, tint: PRODUCTS[C.items[0][0]].tint });
     C.items.forEach(([k, w, fx]) => { body += pack(PRODUCTS[k], w, W * fx, floorH - 4).html; });
-    body += C.props(W, H - floorH);
     return scene(W, H, body);
 }
 
@@ -308,7 +283,7 @@ export function hero() {
 const BANNERS = [
     { bg: ['#E59A2E', '#B8691A'], glow: '#FFD488', wide: [['immunity', 190, 0.6], ['multivitamin', 300, 0.745], ['immunity', 165, 0.88]], mob: [['immunity', 215, 0.2], ['multivitamin', 300, 0.52], ['immunity', 175, 0.83]],
         props: (W, H, f, m) => leaf(W * (m ? 0.02 : 0.45), H * (m ? 0.2 : 0.3), m ? 230 : 250, -22, '#6AA84F') + leaf(W * (m ? 0.74 : 0.93), H * (m ? 0.16 : 0.2), m ? 220 : 230, 205, '#6AA84F') + citrus(W * (m ? 0.04 : 0.5), H - f - 20, m ? 120 : 130) + citrus(W * (m ? 0.86 : 0.96), H - f - 10, 90, '#F0932B') },
-    { bg: ['#2F6B34', '#1C4524'], glow: '#7FBF6A', wide: [['protein', 360, 0.62], ['greens', 290, 0.765], ['aloe', 180, 0.9]], mob: [['protein', 330, 0.24], ['greens', 270, 0.58], ['aloe', 170, 0.85]],
+    { bg: ['#2F6B34', '#1C4524'], glow: '#7FBF6A', wide: [['protein', 350, 0.595], ['greens', 280, 0.775], ['aloe', 175, 0.915]], mob: [['protein', 330, 0.24], ['greens', 270, 0.58], ['aloe', 170, 0.85]],
         props: (W, H, f, m) => leaf(W * (m ? 0.02 : 0.46), H * (m ? 0.22 : 0.28), m ? 230 : 250, -22, '#7FBF6A') + leaf(W * (m ? 0.74 : 0.94), H * (m ? 0.14 : 0.18), m ? 220 : 230, 205, '#5E9A32') + (m ? '' : scoop(W * 0.5, H - f - 6, 150, -10)) },
     { bg: ['#B04A78', '#7A2A55'], glow: '#F3A8C6', wide: [['hairoil', 215, 0.6], ['facewash', 190, 0.72], ['biotin', 300, 0.86]], mob: [['hairoil', 200, 0.2], ['facewash', 175, 0.45], ['biotin', 300, 0.76]],
         props: (W, H, f, m) => leaf(W * (m ? 0.02 : 0.45), H * (m ? 0.22 : 0.3), m ? 230 : 250, -22, '#9BC47A') + leaf(W * (m ? 0.76 : 0.95), H * (m ? 0.14 : 0.2), m ? 220 : 220, 205, '#9BC47A') + gummies(W * (m ? 0.5 : 0.8), H - f + (m ? -10 : 24), 12, ['#F28AA6', '#F6B1C3'], 40, 120) },
@@ -333,14 +308,13 @@ export function bannerMobile(n) {
 }
 
 const PROMOS = [
-    { bg: ['#E9F3DC', '#BCD9A0'], items: [['aloe', 185, 0.64], ['triphala', 300, 0.8]], props: (W, H, f) => leaf(W * 0.52, H * 0.3, 210, -20, '#5E9A32') + ball(W * 0.9, H - f + 8, 50, '#9CCB4E') },
-    { bg: ['#F3E8F4', '#D6BAD9'], items: [['protein', 390, 0.64], ['greens', 310, 0.82]], props: (W, H, f) => leaf(W * 0.5, H * 0.3, 210, -20, '#6B8F4E') + scoop(W * 0.9, H - f + 4, 150, -12) },
+    { tint: '#E7F2D8', items: [['aloe', 185, 0.69], ['triphala', 255, 0.885]] },
+    { tint: '#F1E4F2', items: [['protein', 310, 0.68], ['greens', 205, 0.915]] },
 ];
 export function promo(n) {
-    const B = PROMOS[n]; const W = 1800; const H = 700; const f = 210;
-    let body = studio(W, H, B.bg, { arch: false, floor: f / H });
-    body += `<div class="arch" style="left:${W * 0.5}px;width:${W * 0.42}px;bottom:${f}px;height:${H * 0.62}px;background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.2))"></div>`;
-    body += B.props(W, H, f);
+    const B = PROMOS[n]; const W = 1200; const H = 750; const f = 130;
+    let body = studio(W, H, NEUTRAL, { arch: false, floor: f / H });
+    body += `<div class="arch" style="left:${W * 0.5}px;width:${W * 0.48}px;bottom:${f}px;height:${H * 0.72}px;background:linear-gradient(180deg,${mix(B.tint, '#ffffff', 0.2)},${mix(B.tint, '#ffffff', 0.7)});opacity:.9"></div>`;
     body += lineup(B.items.map(([k, w, fx]) => [k, w, W * fx, 0]), W, f);
     return scene(W, H, body);
 }
@@ -366,27 +340,26 @@ export function certified() {
     body += `<div class="abs" style="left:0;right:0;bottom:0;height:${f}px;background:linear-gradient(180deg,#E8D6E9,#D6BCD8)"></div>`;
     body += lineup([['triphala', 225, W * 0.25], ['protein', 270, W * 0.5], ['aloe', 150, W * 0.74]], W, f);
     body += `<div class="abs" style="right:46px;top:46px;width:150px;height:150px;border-radius:50%;background:#602460;color:#fff;display:grid;place-items:center;text-align:center;box-shadow:0 10px 28px rgba(67,26,67,.3);border:5px solid #F1E4F2"><div><div style="width:34px;height:34px;margin:0 auto 4px">${ICON.shield}</div><div style="font-size:15px;font-weight:600;letter-spacing:.08em">LAB<br>TESTED</div></div></div>`;
-    return scene(W, H, body + leaf(W * 0.02, H * 0.5, 200, -25, '#79A85A'));
+    return scene(W, H, body);
 }
 export function about() {
     const W = 800; const H = 1000; const f = 140;
     let body = studio(W, H, ['#F6EBF6', '#E3CCE5'], { floor: f / H });
     body += lineup([['hairoil', 210, W * 0.22], ['protein', 330, W * 0.55], ['greens', 270, W * 0.84, 0]], W, f);
-    body += leaf(W * 0.02, H * 0.4, 260, -28, '#6B9A4E') + leaf(W * 0.62, H * 0.18, 260, 205, '#79A85A') + citrus(W * 0.06, H - f + 8, 110);
     return scene(W, H, body);
 }
 export function videoFrame(n) {
-    const W = 1280; const H = 720; const f = 80;
+    const W = 1280; const H = 720; const f = 90;
     const sets = [
-        ['#F3E8F4', '#DCC5DE', [['protein', 330, 0.36], ['greens', 280, 0.62], ['aloe', 190, 0.8]]],
-        ['#FDEBD2', '#F7CD92', [['immunity', 230, 0.34], ['multivitamin', 300, 0.58], ['immunity', 190, 0.78]]],
-        ['#E2F1E8', '#BFE0CD', [['facewash', 190, 0.34], ['hairoil', 220, 0.56], ['biotin', 300, 0.78]]],
-        ['#E9F3DC', '#CFE5B6', [['aloe', 220, 0.36], ['triphala', 300, 0.6], ['fatburner', 280, 0.82]]],
+        ['#F1E4F2', [['protein', 270, 0.59], ['greens', 215, 0.78], ['aloe', 140, 0.92]]],
+        ['#FCEBD3', [['immunity', 160, 0.59], ['multivitamin', 260, 0.77], ['immunity', 140, 0.92]]],
+        ['#DDF0E6', [['hairoil', 165, 0.58], ['facewash', 150, 0.72], ['biotin', 250, 0.88]]],
+        ['#E7F2D8', [['aloe', 155, 0.58], ['triphala', 255, 0.76], ['fatburner', 200, 0.915]]],
     ];
-    const [a, b, items] = sets[n];
-    let body = studio(W, H, [a, b], { floor: f / H });
+    const [tint, items] = sets[n];
+    let body = studio(W, H, NEUTRAL, { floor: f / H, arch: false });
+    body += `<div class="arch" style="left:${W * 0.46}px;width:${W * 0.52}px;bottom:${f}px;height:${H * 0.74}px;background:linear-gradient(180deg,${mix(tint, '#ffffff', 0.2)},${mix(tint, '#ffffff', 0.7)});opacity:.9"></div>`;
     body += lineup(items.map(([k, w, fx]) => [k, w, W * fx, 0]), W, f);
-    body += leaf(W * 0.03, H * 0.45, 220, -28, '#6B9A4E') + leaf(W * 0.9, H * 0.4, 220, 208, '#79A85A');
     return scene(W, H, body);
 }
 
@@ -407,7 +380,7 @@ Object.keys(PRODUCTS).forEach((k) => {
 Object.keys(CATS).forEach((s) => reg(`cat-${s}`, () => categoryTile(s), 800, 800, `categories/${s}.webp`));
 reg('hero', hero, 1080, 1200, 'home/hero.webp');
 [0, 1, 2].forEach((n) => { reg(`banner-${n}`, () => bannerWide(n), 1920, 720, `banners/slide-${n + 1}.webp`, 84); reg(`banner-m-${n}`, () => bannerMobile(n), 900, 1125, `banners/slide-${n + 1}-mobile.webp`, 84); });
-[0, 1].forEach((n) => reg(`promo-${n}`, () => promo(n), 1800, 700, `banners/promo-${n + 1}.webp`, 84));
+[0, 1].forEach((n) => reg(`promo-${n}`, () => promo(n), 1200, 750, `banners/promo-${n + 1}.webp`, 84));
 for (let n = 0; n < 6; n++) reg(`insta-${n}`, () => insta(n), 800, 800, `instagram/post-${n + 1}.webp`);
 reg('certified', certified, 1050, 700, 'home/certified.webp');
 reg('about', about, 800, 1000, 'home/about-story.webp');
