@@ -8,7 +8,7 @@ The full store (React + Node + MySQL) lives on the `redesign/ui-from-scratch` br
 ## What is on the page
 
 - A full-screen Ayurveda photo that fades softly into the shop's cream around the middle, with film grain and drifting gold dust.
-- The official Chikit logo, untouched, sitting directly on the page (the logo is plum, so the page around it is light).
+- The final Chikit logo (with the ™ mark), untouched, sitting directly on the page (the logo is plum, so the page around it is light).
 - "Preparing for launch / Coming Soon", a plum loader bar with its percentage, and a short tagline.
 - A loading screen (logo + progress line) that fades away, then the page rises in.
 - Brand fonts (Poppins), self-hosted: nothing is loaded from other websites.
@@ -46,7 +46,7 @@ index.html           page markup, loading-screen styles, share/SEO tags
 404.html             branded "page not found"
 assets/style.css     layout, theme, animations
 assets/script.js     loader bar, floating light, loading screen
-assets/brand/        official logo (webp)
+assets/brand/        final logo with ™ (webp)
 assets/fonts/        Poppins, self-hosted
 assets/images/       hero photo in three sizes (webp)
 og-image.png         picture shown when the link is shared

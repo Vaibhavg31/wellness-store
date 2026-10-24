@@ -70,7 +70,7 @@ a { color: inherit; }
 
 /* ---------- the official logo, straight on the page ---------- */
 .brand { display: inline-block; border-radius: 12px; }
-.brand img { width: clamp(13rem, 46vw, 23rem); height: auto; aspect-ratio: 975 / 320; }
+.brand img { width: clamp(13rem, 46vw, 23rem); height: auto; aspect-ratio: 1000 / 305; }
 
 /* ---------- words ---------- */
 .eyebrow {
