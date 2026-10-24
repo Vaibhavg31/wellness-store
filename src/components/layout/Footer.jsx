@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Mail, MessageCircle } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import Button from '@/components/ui/Button';
@@ -57,6 +57,9 @@ function NewsletterForm() {
 
 export default function Footer() {
     const { content } = useSiteContent();
+    const { pathname } = useLocation();
+    // The home page already ends with its own sign-up card, so the footer does not repeat it right underneath.
+    const homeHasSignup = pathname === '/' && content.sections?.newsletter !== false;
     const { social, footer, contact } = content;
     const { categories } = useCategories();
     const { getWhatsAppUrl } = useWhatsApp();
@@ -118,7 +121,7 @@ export default function Footer() {
                     </div>
                 </nav>
 
-                <div className="sm:col-span-2 lg:col-span-4">
+                <div className={homeHasSignup ? 'hidden' : 'sm:col-span-2 lg:col-span-4'}>
                     <h2 className="mb-2 font-sans text-small font-semibold text-ink">{footer.newsletterTitle}</h2>
                     <p className="mb-4 text-small text-muted">{footer.newsletterDescription}</p>
                     <NewsletterForm />

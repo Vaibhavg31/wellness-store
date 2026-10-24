@@ -49,23 +49,28 @@ export default function VideoBanner() {
     return (
         <section className="bg-canvas py-6 sm:py-10">
             <div className="container-page">
-                <div ref={frameRef} className="relative overflow-hidden rounded-xl bg-ink" style={{ aspectRatio }}>
-                    <video
-                        ref={videoRef}
-                        className={`absolute inset-0 size-full ${fit}`}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        preload="none"
-                        poster={banner.poster ? imageUrl(banner.poster, 1200) : undefined}
-                        aria-label={banner.title || 'Promotional video'}
-                    >
-                        {near && <source src={imageUrl(banner.videoUrl)} type={videoType(banner.videoUrl)} />}
-                    </video>
-
+                <div className="relative overflow-hidden rounded-xl border border-line bg-canvas sm:border-0 sm:bg-ink">
+                    <div ref={frameRef} className="relative" style={{ aspectRatio }}>
+                        <video
+                            ref={videoRef}
+                            className={`absolute inset-0 size-full ${fit}`}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            preload="none"
+                            poster={banner.poster ? imageUrl(banner.poster, 1200) : undefined}
+                            aria-label={banner.title || 'Promotional video'}
+                        >
+                            {near && <source src={imageUrl(banner.videoUrl)} type={videoType(banner.videoUrl)} />}
+                        </video>
+    
+                        <button type="button" onClick={toggleMute} aria-label={muted ? 'Unmute video' : 'Mute video'} className="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-surface/90 text-ink shadow-md hover:bg-surface">
+                            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                        </button>
+                    </div>
                     {hasText && (
-                        <div className="absolute bottom-4 left-4 max-w-[min(22rem,calc(100%-2rem))] rounded-lg bg-canvas/95 p-5 shadow-md sm:bottom-8 sm:left-8 sm:p-6">
+                        <div className="bg-canvas p-5 sm:absolute sm:bottom-8 sm:left-8 sm:max-w-sm sm:rounded-lg sm:p-6 sm:shadow-md">
                             {banner.subtitle && <p className="eyebrow">{banner.subtitle}</p>}
                             {banner.title && <p className="mt-1 font-display text-h3 leading-tight text-ink">{banner.title}</p>}
                             {banner.ctaLabel && banner.ctaHref && (
@@ -73,10 +78,6 @@ export default function VideoBanner() {
                             )}
                         </div>
                     )}
-
-                    <button type="button" onClick={toggleMute} aria-label={muted ? 'Unmute video' : 'Mute video'} className="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-surface/90 text-ink shadow-md hover:bg-surface">
-                        {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                    </button>
                 </div>
             </div>
         </section>

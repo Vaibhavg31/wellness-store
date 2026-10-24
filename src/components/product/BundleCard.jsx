@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Gift, Plus, ShoppingBag } from 'lucide-react';
+import { Check, Plus, ShoppingBag } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
-import { formatPrice, cn } from '@/utils/formatPrice';
+import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl } from '@/services/api';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
 
-/** "Buy these together and save" offer: item thumbnails, combined price vs. separate, one-click add. */
-export default function BundleCard({ bundle, compact = false }) {
+/**
+ * "Buy these together and save" kit: the products shown large and side by side on one calm panel, the saving as the
+ * single badge, then name, contents, combined price against buying separately, and a one-click add.
+ */
+export default function BundleCard({ bundle }) {
     const { addBundleToCart, isBundleInCart } = useCart();
     const { showToast } = useToast();
     const [justAdded, setJustAdded] = useState(false);
@@ -17,6 +19,7 @@ export default function BundleCard({ bundle, compact = false }) {
     const { pricing, items } = bundle;
     const inCart = isBundleInCart(bundle.id) || justAdded;
     const outOfStock = items.some((i) => (i.product.stock ?? 0) < i.quantity);
+    const saves = pricing.discountAmount > 0;
 
     const handleAdd = () => {
         if (outOfStock || inCart) return;
@@ -29,42 +32,43 @@ export default function BundleCard({ bundle, compact = false }) {
     };
 
     return (
-        <div className={cn('flex h-full flex-col rounded-lg border border-line bg-surface', compact ? 'p-4' : 'p-5 sm:p-6')}>
-            <div className="mb-3 flex items-center gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-tint text-accent-ink"><Gift size={18} aria-hidden="true" /></span>
-                <div className="min-w-0">
-                    <h3 className="truncate font-sans text-body font-semibold">{bundle.title}</h3>
-                    {bundle.subtitle && <p className="truncate text-caption text-muted">{bundle.subtitle}</p>}
+        <article className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-surface transition-shadow duration-300 hover:shadow-md">
+            <div className="relative flex min-h-[15rem] items-center bg-canvas px-4 pb-4 pt-12 sm:min-h-[16rem] sm:px-5">
+                {saves && <span className="absolute left-3 top-3 z-10 rounded-full bg-primary px-3 py-1 text-caption font-semibold text-white">Save {pricing.savingsPercent}%</span>}
+                <ul className="flex w-full items-center justify-center gap-1.5">
+                    {items.map((item, i) => (
+                        <li key={item.productId} className="flex min-w-0 flex-1 items-center gap-1.5">
+                            {i > 0 && <span className="-mx-3.5 z-10 grid size-6 shrink-0 place-items-center rounded-full bg-surface text-primary shadow-sm" aria-hidden="true"><Plus size={14} strokeWidth={2.5} /></span>}
+                            <Link to={`/product/${item.productId}`} title={item.product.title} className="block aspect-square min-w-0 flex-1 overflow-hidden rounded-md bg-canvas-alt">
+                                <img src={imageUrl(item.product.image)} alt={item.product.title} width="160" height="160" loading="lazy" className="size-full object-cover transition-transform duration-500 hover:scale-105" />
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <div className="flex flex-1 flex-col p-5 sm:p-6">
+                {bundle.subtitle && <p className="eyebrow mb-2">{bundle.subtitle}</p>}
+                <h3 className="text-h4">{bundle.title}</h3>
+                <p className="mt-2 text-small text-muted">
+                    {items.map((item) => `${item.quantity > 1 ? `${item.quantity} × ` : ''}${item.product.title}`).join('  ·  ')}
+                </p>
+
+                <div className="mt-auto pt-5">
+                    <p className="mb-4 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                        <span className="font-display text-h3 text-ink">{formatPrice(pricing.bundlePrice)}</span>
+                        {saves && (
+                            <>
+                                <span className="text-small text-muted line-through">{formatPrice(pricing.subtotal)}</span>
+                                <span className="text-small font-semibold text-success">You save {formatPrice(Math.round(pricing.discountAmount))}</span>
+                            </>
+                        )}
+                    </p>
+                    <Button onClick={handleAdd} disabled={outOfStock || inCart} className="w-full">
+                        {inCart ? <><Check size={16} /> In your bag</> : outOfStock ? 'Out of stock' : <><ShoppingBag size={16} /> Add bundle to bag</>}
+                    </Button>
                 </div>
             </div>
-
-            {bundle.description && <p className="mb-4 line-clamp-2 text-small text-muted">{bundle.description}</p>}
-
-            <ul className="mb-4 flex items-center gap-2 overflow-x-auto pb-1">
-                {items.map((item, i) => (
-                    <li key={item.productId} className="flex shrink-0 items-center gap-2">
-                        {i > 0 && <Plus size={14} className="text-subtle" aria-hidden="true" />}
-                        <Link to={`/product/${item.productId}`} title={item.product.title} className="block size-16 overflow-hidden rounded-md border border-line bg-canvas-alt">
-                            <img src={imageUrl(item.product.image)} alt={item.product.title} width="64" height="64" loading="lazy" className="size-full object-cover" />
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-
-            <div className="mt-auto">
-                <p className="mb-4 flex flex-wrap items-baseline gap-2">
-                    <span className="font-display text-h3 text-ink">{formatPrice(pricing.bundlePrice)}</span>
-                    {pricing.discountAmount > 0 && (
-                        <>
-                            <span className="text-small text-muted line-through">{formatPrice(pricing.subtotal)}</span>
-                            <Badge variant="tint">Save {pricing.savingsPercent}%</Badge>
-                        </>
-                    )}
-                </p>
-                <Button onClick={handleAdd} disabled={outOfStock || inCart} className="w-full">
-                    {inCart ? <><Check size={16} /> In your bag</> : outOfStock ? 'Out of stock' : <><ShoppingBag size={16} /> Add bundle</>}
-                </Button>
-            </div>
-        </div>
+        </article>
     );
 }

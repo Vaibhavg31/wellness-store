@@ -55,7 +55,7 @@ export default function OfferTab() {
     return (
         <>
             {!hidden && (
-                <div className={cn('fixed top-[60%] z-40 flex -translate-y-1/2 flex-col items-center gap-2', right ? 'right-0 animate-edge-in-right' : 'left-0 animate-edge-in-left')}>
+                <div className={cn('fixed top-[72%] z-40 sm:top-[60%] flex -translate-y-1/2 flex-col items-center gap-2', right ? 'right-0 animate-edge-in-right' : 'left-0 animate-edge-in-left')}>
                     <button
                         type="button"
                         onClick={hide}

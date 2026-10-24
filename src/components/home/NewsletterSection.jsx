@@ -50,7 +50,7 @@ export default function NewsletterSection() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Your email address"
                                 autoComplete="email"
-                                className="h-12 min-w-0 flex-1 rounded-full bg-surface px-5 text-body text-ink placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent"
+                                className="h-12 w-full min-w-0 rounded-full sm:flex-1 bg-surface px-5 text-body text-ink placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent"
                             />
                             <Button type="submit" variant="accent" size="lg" loading={loading}>{nl.buttonLabel}</Button>
                         </form>

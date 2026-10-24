@@ -53,7 +53,7 @@ export default function Header() {
     }, []);
 
     return (
-        <header className={cn('sticky top-0 z-50 border-b bg-canvas/95 transition-shadow duration-300', scrolled ? 'border-line shadow-sm' : 'border-transparent')}>
+        <header className={cn('sticky top-0 z-50 border-b bg-canvas transition-shadow duration-300', scrolled ? 'border-line shadow-sm' : 'border-transparent')}>
             <div className="container-page flex h-16 items-center gap-4 lg:h-20">
                 <button type="button" className={cn(iconButton, 'lg:hidden -ml-2')} onClick={() => setMenuOpen(true)} aria-label="Open menu">
                     <Menu size={22} />
