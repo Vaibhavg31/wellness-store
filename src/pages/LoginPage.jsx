@@ -4,6 +4,7 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { ShoppingBag, Shield, Star, Leaf } from 'lucide-react';
 import AuthShell from '@/components/auth/AuthShell';
 import AuthSlider from '@/components/auth/AuthSlider';
+import AuthPhone from '@/components/auth/AuthPhone';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import AutoHeight from '@/components/ui/AutoHeight';
 import SwipePanels from '@/components/ui/SwipePanels';
@@ -290,6 +291,30 @@ function LoginScreen() {
                     }}
                 />
             </AuthShell>
+        );
+    }
+
+    // Phones and tablets: a brand header with the message for each side, the switch on its edge, the form card below.
+    if (!isAdminAccess) {
+        const checkoutCopy = { eyebrow: 'Almost there', title: 'One step from checkout', body: 'Sign in or create an account to save your address book and check out in seconds.' };
+        const copy = isCheckoutLogin
+            ? { signin: checkoutCopy, signup: checkoutCopy }
+            : {
+                signin: { eyebrow: 'Welcome back', title: 'Good to see you again', body: 'Sign in to pick up right where you left off.' },
+                signup: { eyebrow: 'New to Chikit?', title: 'Start your wellness ritual', body: 'Create an account and unlock:' },
+            };
+        return (
+            <AuthPhone mode={mode} onMode={switchMode} copy={copy} {...backProps}>
+                <div className="space-y-6">
+                    <SwipePanels index={mode === 'signin' ? 0 : 1}>
+                        {['signin', 'signup'].map((panel) => <div key={panel}>{renderPanel(panel)}</div>)}
+                    </SwipePanels>
+                    {orDivider}
+                    {googleBlock}
+                    {errorBlock}
+                    {terms}
+                </div>
+            </AuthPhone>
         );
     }
 
