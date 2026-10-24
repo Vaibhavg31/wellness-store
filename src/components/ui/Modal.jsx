@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useDialog } from '@/hooks/useDialog';
+import { usePresence } from '@/hooks/usePresence';
 import { cn } from '@/utils/formatPrice';
 
 const sizes = {
@@ -11,18 +12,19 @@ const sizes = {
 
 export default function Modal({ isOpen, onClose, children, title, size = 'md' }) {
     const panelRef = useDialog(isOpen, onClose);
-    if (!isOpen) return null;
+    const { mounted, closing } = usePresence(isOpen);
+    if (!mounted) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 animate-fade-in bg-ink/50" onClick={onClose} aria-hidden="true" />
+        <div className={cn('fixed inset-0 z-[100] flex items-center justify-center p-4', closing && 'pointer-events-none')}>
+            <div className={cn('absolute inset-0 bg-ink/50', closing ? 'animate-fade-out' : 'animate-fade-in')} onClick={onClose} aria-hidden="true" />
             <div
                 ref={panelRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label={title}
                 tabIndex={-1}
-                className={cn('relative flex max-h-[90dvh] w-full animate-fade-up flex-col rounded-xl bg-surface shadow-lg focus:outline-none', sizes[size])}
+                className={cn('relative flex max-h-[90dvh] w-full flex-col rounded-xl bg-surface shadow-lg focus:outline-none', closing ? 'animate-fade-down' : 'animate-fade-up', sizes[size])}
             >
                 <div className="flex items-center justify-between gap-4 border-b border-line px-6 py-4">
                     {title && <h3 className="text-h4">{title}</h3>}

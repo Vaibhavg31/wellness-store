@@ -1,15 +1,17 @@
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useDialog } from '@/hooks/useDialog';
+import { usePresence } from '@/hooks/usePresence';
 import { cn } from '@/utils/formatPrice';
 
 export default function Drawer({ isOpen, onClose, children, title, subtitle, side = 'right', wide = false, size, flush = false, admin = false }) {
     const panelRef = useDialog(isOpen, onClose);
-    if (!isOpen) return null;
+    const { mounted, closing } = usePresence(isOpen);
+    if (!mounted) return null;
 
     return createPortal(
-        <div className={cn('fixed inset-0 z-[100]', admin && 'admin-panel')}>
-            <div className="absolute inset-0 animate-fade-in bg-ink/50" onClick={onClose} aria-hidden="true" />
+        <div className={cn('fixed inset-0 z-[100]', admin && 'admin-panel', closing && 'pointer-events-none')}>
+            <div className={cn('absolute inset-0 bg-ink/50', closing ? 'animate-fade-out' : 'animate-fade-in')} onClick={onClose} aria-hidden="true" />
             <div
                 ref={panelRef}
                 role="dialog"
@@ -18,7 +20,9 @@ export default function Drawer({ isOpen, onClose, children, title, subtitle, sid
                 tabIndex={-1}
                 className={cn(
                     'absolute top-0 flex h-dvh w-full flex-col bg-surface shadow-lg focus:outline-none',
-                    side === 'right' ? 'right-0 animate-slide-in-right' : 'left-0',
+                    side === 'right'
+                        ? cn('right-0', closing ? 'animate-slide-out-right' : 'animate-slide-in-right')
+                        : cn('left-0', closing ? 'animate-slide-out-left' : 'animate-slide-in-left'),
                     size === 'xl' ? 'max-w-[min(72rem,100vw)]' : (size === 'lg' || wide) ? 'max-w-xl' : 'max-w-md',
                 )}
             >

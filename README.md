@@ -146,6 +146,23 @@ Components use the generated Tailwind utilities (`bg-primary`, `text-ink`, `roun
 official logo. Gold (`accent`) is a fill colour only: pair it with `ink` text, never white.
 Use the logo only through `components/ui/Logo.jsx`, always on a light surface.
 
+## Motion and loading patterns
+
+One set of rules so every screen feels the same. New pages and components should follow them.
+
+| Moment | What happens | Where |
+| --- | --- | --- |
+| Moving to another page | The current page **stays on screen** until the next one is ready. A thin plum progress bar shows the wait (it also covers redirects such as sign-in). The new page fades in (0.35 s). There is never a blank "loading" screen between pages. | `App.jsx` (persistent `Suspense`), `RouteProgress`, `PageTransition` |
+| Page code | Each page is lazy-loaded, but its code is warmed when a link is hovered, focused or touched, and during idle time. Skipped on data-saver / 2G. | `src/utils/routeLoaders.js` |
+| Store ↔ sign-in ↔ admin | These are separate layouts: the new one cross-fades in from the page colour. | `RouteGroup` |
+| Data loading inside a page | A skeleton with the same shape as the final content, then a fade into the real content (never a spinner, never a jump). | `Skeleton`, `animate-fade-in` |
+| Content that changes size (tabs, errors, steps) | The container's height glides; new fields fade up. | `AutoHeight` |
+| Buttons that submit | Spinner inside the button; it stays busy until the next screen replaces it. | `Button loading` |
+| Drawers, dialogs, search | Slide / fade **in and out** (200–300 ms); focus is trapped and restored. | `Drawer`, `Modal`, `usePresence` |
+| Reduced motion | All of the above shorten to nothing automatically. | `base.css` |
+
+Only `transform` and `opacity` are animated, so everything stays on the compositor and scrolling stays smooth.
+
 ## Deployment
 
 ### 1. Build frontend on your computer

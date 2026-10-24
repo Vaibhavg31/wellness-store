@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { useDialog } from '@/hooks/useDialog';
+import { usePresence } from '@/hooks/usePresence';
 import { useDebounce } from '@/hooks';
 import { useCategories, useProducts } from '@/hooks/useApi';
 import { imageUrl } from '@/services/api';
@@ -24,7 +25,8 @@ export default function SearchOverlay({ isOpen, onClose }) {
             .slice(0, 6);
     }, [products, debounced]);
 
-    if (!isOpen) return null;
+    const { mounted, closing } = usePresence(isOpen);
+    if (!mounted) return null;
 
     const submit = (event) => {
         event.preventDefault();
@@ -34,15 +36,15 @@ export default function SearchOverlay({ isOpen, onClose }) {
     };
 
     return createPortal(
-        <div className="fixed inset-0 z-[100]">
-            <div className="absolute inset-0 animate-fade-in bg-ink/50" onClick={onClose} aria-hidden="true" />
+        <div className={closing ? 'pointer-events-none fixed inset-0 z-[100]' : 'fixed inset-0 z-[100]'}>
+            <div className={`absolute inset-0 bg-ink/50 ${closing ? 'animate-fade-out' : 'animate-fade-in'}`} onClick={onClose} aria-hidden="true" />
             <div
                 ref={panelRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Search products"
                 tabIndex={-1}
-                className="relative mx-auto mt-0 w-full max-w-2xl animate-fade-up bg-surface p-4 shadow-lg focus:outline-none sm:mt-20 sm:rounded-xl sm:p-6"
+                className={`relative mx-auto mt-0 w-full max-w-2xl bg-surface p-4 shadow-lg focus:outline-none sm:mt-20 sm:rounded-xl sm:p-6 ${closing ? 'animate-fade-down' : 'animate-fade-up'}`}
             >
                 <form onSubmit={submit} className="flex items-center gap-3" role="search">
                     <Search size={20} className="shrink-0 text-muted" aria-hidden="true" />
