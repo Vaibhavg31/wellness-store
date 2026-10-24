@@ -77,12 +77,9 @@ function StageGate({ children }) {
     return <div ref={ref} style={near ? undefined : { minHeight: height.current }}>{near ? children : null}</div>;
 }
 
-function StagePlaceholder({ image }) {
-    return (
-        <div className="mx-auto aspect-square w-full max-w-[34rem]">
-            {image && <img src={imageUrl(image, 800)} alt="" width="720" height="800" fetchPriority="high" decoding="async" className="size-full rounded-xl object-cover opacity-70" />}
-        </div>
-    );
+/** Holds the ring's space while its code loads; no picture, so nothing competes with the first screen's real images. */
+function StagePlaceholder() {
+    return <div className="skeleton mx-auto aspect-square w-full max-w-[34rem] rounded-full" aria-hidden="true" />;
 }
 
 export default function Hero({ products, loading = false }) {
@@ -157,7 +154,7 @@ export default function Hero({ products, loading = false }) {
                         {showStage ? (
                             <m.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.9, ease: EASE }} className="min-w-0">
                                 <StageGate>
-                                    <Suspense fallback={<StagePlaceholder image={image} />}>
+                                    <Suspense fallback={<StagePlaceholder />}>
                                         <HeroStage items={stageItems} />
                                     </Suspense>
                                 </StageGate>

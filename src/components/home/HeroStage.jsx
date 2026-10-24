@@ -279,7 +279,7 @@ export default function HeroStage({ items }) {
                 </Drift>
                 <div className="pointer-events-none absolute inset-[3%] animate-orbit-spin rounded-full border border-dashed border-primary/25" aria-hidden="true" />
                 <div className="pointer-events-none absolute inset-0 rounded-full opacity-70" style={{ background: glow }} aria-hidden="true" />
-                <img src="/brand/chikit-icon.png" alt="" width="240" height="240" className="pointer-events-none absolute left-[33%] top-[16%] w-[34%] animate-orbit-spin-reverse opacity-[0.09]" draggable={false} />
+                <img src="/brand/chikit-icon.webp" alt="" width="160" height="160" className="pointer-events-none absolute left-[33%] top-[16%] w-[34%] animate-orbit-spin-reverse opacity-[0.09]" draggable={false} />
 
                 {/* podium */}
                 <div className="pointer-events-none absolute left-[9%] right-[9%] rounded-[50%] bg-gradient-to-b from-surface to-primary-tint shadow-lg ring-1 ring-line" style={{ top: footY - stageWidth * 0.062, height: stageWidth * 0.124 }} aria-hidden="true" />

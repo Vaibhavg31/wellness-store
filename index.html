@@ -10,11 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <meta name="theme-color" content="#602460" />
-    <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/lora-600-normal.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/poppins-400-normal.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/poppins-500-normal.woff2" crossorigin />
-    <link rel="preload" as="image" href="/brand/chikit-logo-480.webp" type="image/webp" />
+    <link rel="preload" as="image" href="/brand/chikit-logo-480.webp" type="image/webp" fetchpriority="high" />
 
     <link rel="manifest" href="/site.webmanifest" />
 
@@ -26,7 +25,21 @@
       #root > .shell img { display: block; width: auto; height: 2.5rem; aspect-ratio: 1000 / 305; }
       @media (min-width: 640px) { #root > .shell > div { padding-inline: 1.5rem; } }
       @media (min-width: 1024px) { #root > .shell > div { height: 5rem; padding-inline: 2rem; } #root > .shell img { height: 3rem; } }
+
+      /* First-visit splash: logo painted in, a real progress bar, then a solid shutter reveal (no fading). */
+      html.sp-lock { overflow: hidden; }
+      #splash { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; background: #FDF9F4; transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1); will-change: transform; }
+      #splash.sp-out { transform: translateY(-100%); }
+      #splash .sp-inner { display: grid; justify-items: center; gap: 28px; }
+      #splash .sp-logo { display: block; width: min(260px, 64vw); height: auto; aspect-ratio: 1000 / 305; clip-path: inset(0 100% 0 0); }
+      #splash .sp-logo.sp-on { animation: sp-reveal 0.9s cubic-bezier(0.65, 0, 0.25, 1) forwards; }
+      #splash .sp-bar { width: 140px; height: 3px; border-radius: 9px; background: #F1E4F2; overflow: hidden; }
+      #splash .sp-bar i { display: block; height: 100%; background: #602460; transform: scaleX(0); transform-origin: left; transition: transform 0.5s ease-out; }
+      #splash .sp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      @keyframes sp-reveal { to { clip-path: inset(0 0 0 0); } }
+      @media (prefers-reduced-motion: reduce) { #splash { transition: none; } #splash .sp-logo { animation: none; clip-path: none; } #splash .sp-bar i { transition: none; } }
     </style>
+    <noscript><style>#splash { display: none; }</style></noscript>
 
     <!--seo:start-->
     <!-- Generic defaults. React's <Seo> removes these and supplies per-page tags; scripts/seo-postbuild.mjs
@@ -47,7 +60,74 @@
     <!--seo:end-->
   </head>
   <body>
+    <div id="splash" role="status" aria-live="polite">
+      <div class="sp-inner">
+        <img class="sp-logo" src="/brand/chikit-logo-480.webp" width="1000" height="305" alt="Chikit" fetchpriority="high" />
+        <span class="sp-bar" aria-hidden="true"><i></i></span>
+        <span class="sp-sr">Loading Chikit</span>
+      </div>
+    </div>
     <div id="root"><div class="shell border-b border-transparent bg-canvas"><div class="container-page flex h-16 items-center lg:h-20"><img src="/brand/chikit-logo-480.webp" width="1000" height="305" alt="Chikit" class="aspect-[1000/305] h-10 w-auto lg:h-12" /></div></div></div>
+        <script>
+      /* Splash controller. Shown once per browser session. A fast load never sees it (it is removed at once if the page is
+         ready within 350 ms); otherwise it stays until fonts, the app and the first screen's pictures are really ready
+         (at least 1 s so it does not flash, at most 4.5 s so it never traps anyone), then slides away. */
+      (function () {
+        var splash = document.getElementById('splash');
+        if (!splash) return;
+        var root = document.documentElement;
+        try {
+          if (sessionStorage.getItem('chikit-splash') === '1') { splash.remove(); return; }
+          sessionStorage.setItem('chikit-splash', '1');
+        } catch (e) { /* storage blocked: just show it */ }
+        root.classList.add('sp-lock');
+        // The logo is painted in left to right the moment its picture has arrived.
+        var logo = splash.querySelector('.sp-logo');
+        function showLogo() { logo.classList.add('sp-on'); }
+        if (logo.complete && logo.naturalWidth) showLogo(); else { logo.addEventListener('load', showLogo); setTimeout(showLogo, 1500); }
+        var start = performance.now();
+        var bar = splash.querySelector('.sp-bar i');
+        var ready = { fonts: false, app: false, pictures: false };
+        var progress = 0;
+        var finished = false;
+        function remove() { root.classList.remove('sp-lock'); splash.remove(); }
+        function finish() {
+          if (finished) return;
+          finished = true;
+          var elapsed = performance.now() - start;
+          if (elapsed < 350) { remove(); return; }
+          setTimeout(function () {
+            splash.classList.add('sp-out');
+            setTimeout(remove, 850);
+          }, Math.max(0, 1000 - elapsed));
+        }
+        function update() {
+          var done = (ready.fonts ? 1 : 0) + (ready.app ? 1 : 0) + (ready.pictures ? 1 : 0);
+          var value = 0.1 + 0.9 * (done / 3);
+          if (value > progress) { progress = value; bar.style.transform = 'scaleX(' + value + ')'; }
+          if (done === 3) finish();
+        }
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ready.fonts = true; update(); });
+        else ready.fonts = true;
+        (function poll() {
+          if (!ready.app && !document.querySelector('#root > .shell')) ready.app = true;
+          if (ready.app && !ready.pictures) {
+            var shown = [].slice.call(document.querySelectorAll('#root img')).filter(function (img) {
+              var r = img.getBoundingClientRect();
+              return r.width > 0 && r.top < window.innerHeight && r.bottom > 0;
+            }).slice(0, 3);
+            var waiting = [].slice.call(document.querySelectorAll('#root .skeleton')).some(function (el) {
+              var r = el.getBoundingClientRect();
+              return r.width > 0 && r.top < window.innerHeight && r.bottom > 0;
+            });
+            if (!waiting && (shown.length ? shown.every(function (img) { return img.complete && img.naturalWidth > 0; }) : performance.now() - start > 1500)) ready.pictures = true;
+          }
+          update();
+          if (!finished) setTimeout(poll, 100);
+        })();
+        setTimeout(function () { ready.fonts = ready.app = ready.pictures = true; update(); }, 4500);
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

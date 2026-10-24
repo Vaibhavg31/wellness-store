@@ -8,6 +8,10 @@ import { imageUrl } from '@/services/api';
 
 const isExternal = (href) => /^https?:\/\//i.test(href);
 
+// The slider's phone shape is only known once banners arrive; remember it so the placeholder matches next time (no layout jump).
+const PHONE_RATIO_KEY = 'chikit-slider-phone';
+const savedPhoneRatio = () => { try { return localStorage.getItem(PHONE_RATIO_KEY) || 'aspect-[4/5]'; } catch { return 'aspect-[4/5]'; } };
+
 function BannerLink({ href, children, className }) {
     if (!href) return <div className={className}>{children}</div>;
     if (isExternal(href)) {
@@ -89,6 +93,7 @@ export function BannerSlider() {
     const [paused, setPaused] = useState(false);
     const count = banners.length;
     const phoneRatio = banners.length > 0 && banners.every((b) => b.mobileImage) ? 'aspect-[4/5]' : 'aspect-[16/10]';
+    useEffect(() => { if (!loading && count > 0) { try { localStorage.setItem(PHONE_RATIO_KEY, phoneRatio); } catch { /* storage blocked */ } } }, [loading, count, phoneRatio]);
 
     const go = useCallback((next) => {
         const track = trackRef.current;
@@ -109,7 +114,9 @@ export function BannerSlider() {
     }, [mode, autoplaySeconds, count, paused, index, go]);
 
     if (mode === 'video') return video.url ? <TopVideo video={video} /> : null;
-    if (loading || count === 0) return null;
+    // Reserve the space while banners load, so the page below does not jump down when they arrive.
+    if (loading) return <section className="bg-canvas" aria-busy="true" aria-label="Loading promotions"><div className={`skeleton w-full rounded-none ${savedPhoneRatio()} sm:aspect-[21/8]`} /></section>;
+    if (count === 0) return null;
 
     return (
         <section

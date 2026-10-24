@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Volume2, VolumeX } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -13,7 +13,25 @@ export default function VideoBanner() {
     const { content } = useSiteContent();
     const banner = content.videoBanner;
     const videoRef = useRef(null);
+    const frameRef = useRef(null);
     const [muted, setMuted] = useState(true);
+    const [near, setNear] = useState(false);
+
+    // The film sits far down the page: do not download it (half a megabyte) until the visitor is about to reach it.
+    useEffect(() => {
+        const node = frameRef.current;
+        if (!node) return undefined;
+        if (!('IntersectionObserver' in window)) { setNear(true); return undefined; }
+        const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setNear(true); observer.disconnect(); } }, { rootMargin: '600px 0px' });
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [banner?.videoUrl]);
+
+    useEffect(() => {
+        if (!near || !videoRef.current) return;
+        videoRef.current.load();
+        videoRef.current.play().catch(() => {}); // autoplay can be blocked (e.g. low-power mode): the poster stays
+    }, [near]);
 
     if (!banner?.videoUrl) return null;
     // The caption is a small card rather than a dark gradient: readable on any footage and never muddies the picture.
@@ -31,7 +49,7 @@ export default function VideoBanner() {
     return (
         <section className="bg-canvas py-6 sm:py-10">
             <div className="container-page">
-                <div className="relative overflow-hidden rounded-xl bg-ink" style={{ aspectRatio }}>
+                <div ref={frameRef} className="relative overflow-hidden rounded-xl bg-ink" style={{ aspectRatio }}>
                     <video
                         ref={videoRef}
                         className={`absolute inset-0 size-full ${fit}`}
@@ -39,11 +57,11 @@ export default function VideoBanner() {
                         loop
                         muted
                         playsInline
-                        preload="metadata"
+                        preload="none"
                         poster={banner.poster ? imageUrl(banner.poster, 1200) : undefined}
                         aria-label={banner.title || 'Promotional video'}
                     >
-                        <source src={imageUrl(banner.videoUrl)} type={videoType(banner.videoUrl)} />
+                        {near && <source src={imageUrl(banner.videoUrl)} type={videoType(banner.videoUrl)} />}
                     </video>
 
                     {hasText && (
