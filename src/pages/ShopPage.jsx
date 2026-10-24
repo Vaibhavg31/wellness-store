@@ -115,6 +115,7 @@ export default function ShopPage() {
         <>
             <Seo title="Shop Ayurvedic Wellness Products" description="Shop lab-tested, clean-label Ayurvedic supplements, juices, gummies and personal care from Chikit. Free delivery above the threshold, easy returns and COD." path="/shop" />
             <PageHeader
+                compact
                 crumbs={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
                 title="Shop all"
                 description="Lab-tested, clean-label Ayurvedic wellness — filter by category, tag or price."

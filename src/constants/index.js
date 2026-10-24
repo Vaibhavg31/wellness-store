@@ -96,8 +96,8 @@ export const FAQS = [
         answer: 'Yes, all our products are manufactured in FSSAI & GMP certified facilities.',
     },
 ];
-export const DELIVERY_FEE = 99;
-export const FREE_DELIVERY_THRESHOLD = 1999;
+export const DELIVERY_FEE = 49;
+export const FREE_DELIVERY_THRESHOLD = 999;
 export const INSTAGRAM_IMAGES = [
     '/catalog/instagram/post-1.webp',
     '/catalog/instagram/post-2.webp',

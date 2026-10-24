@@ -77,7 +77,7 @@ export default function ContactPage() {
                     </form>
                 )}
 
-                <div className="space-y-8">
+                <div className="order-first space-y-8 lg:order-none">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <a href={getWhatsAppUrl('Hi! I would like to get in touch.')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-lg border border-line bg-surface p-5 transition-shadow hover:shadow-md">
                             <span className="grid size-12 shrink-0 place-items-center rounded-full bg-success text-white"><MessageCircle size={22} aria-hidden="true" /></span>

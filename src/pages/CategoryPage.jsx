@@ -42,6 +42,7 @@ export default function CategoryPage() {
                 />
             )}
             <PageHeader
+                compact
                 crumbs={[{ label: 'Home', href: '/' }, { label: 'Shop', href: '/shop' }, { label: category?.label ?? '…' }]}
                 eyebrow="Collection"
                 title={category?.label ?? 'Loading…'}

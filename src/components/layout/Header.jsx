@@ -8,6 +8,7 @@ import CategoryNav from '@/components/layout/CategoryNav';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useScrollPosition } from '@/hooks';
 import { cn } from '@/utils/formatPrice';
 
@@ -30,6 +31,7 @@ export default function Header() {
     const { itemCount: cartCount, openCartDrawer } = useCart();
     const { itemCount: wishlistCount } = useWishlist();
     const scrolled = useScrollPosition();
+    const direction = useScrollDirection();
     const { pathname } = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -77,7 +79,12 @@ export default function Header() {
                 </div>
             </div>
 
-            <CategoryNav variant="phone" />
+            {/* On phones the category strip slides away while reading down and returns on the way up (more room for the product). */}
+            <div className={cn('grid transition-[grid-template-rows,opacity] duration-300 ease-[var(--ease-out-soft)] lg:block', direction === 'down' ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100')} aria-hidden={direction === 'down' ? 'true' : undefined} inert={direction === 'down' ? true : undefined}>
+                <div className="min-h-0 overflow-hidden lg:overflow-visible">
+                    <CategoryNav variant="phone" />
+                </div>
+            </div>
 
             <MobileNav isOpen={menuOpen} onClose={() => setMenuOpen(false)} links={links} />
             {searchOpen && (

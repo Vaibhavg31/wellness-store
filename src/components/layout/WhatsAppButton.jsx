@@ -41,7 +41,9 @@ export default function WhatsAppButton() {
             aria-label="Chat on WhatsApp"
             tabIndex={fieldFocused ? -1 : 0}
             className={cn(
-                'safe-area-pb fixed bottom-4 right-4 z-40 grid size-12 place-items-center rounded-full bg-success text-white shadow-md sm:bottom-6 sm:right-6 sm:size-14',
+                // Product pages already carry an inline "ask us on WhatsApp" prompt, and the bubble would sit on the buy buttons on phones.
+                pathname.startsWith('/product/') ? 'max-lg:hidden bottom-6' : 'bottom-4 sm:bottom-6',
+                'safe-area-pb fixed right-4 z-40 grid size-12 place-items-center rounded-full bg-success text-white shadow-md sm:right-6 sm:size-14',
                 'transition-[opacity,transform] duration-300 hover:scale-105',
                 fieldFocused && 'pointer-events-none translate-y-4 opacity-0',
             )}

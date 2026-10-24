@@ -4,6 +4,7 @@ import { Gift, Shield, ShoppingBag, Trash2, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import PopularPicks from '@/components/shop/PopularPicks';
+import PaymentAssurance from '@/components/product/PaymentAssurance';
 import QuantityStepper from '@/components/ui/QuantityStepper';
 import PageHeader from '@/components/ui/PageHeader';
 import CheckoutSteps from '@/components/checkout/CheckoutSteps';
@@ -165,6 +166,7 @@ export default function CartPage() {
                             <CouponInput compact />
                             <PriceBreakdown />
                             <Link to="/checkout" className="block"><Button size="lg" className="w-full">Proceed to checkout</Button></Link>
+                            <PaymentAssurance className="justify-center" />
                             <p className="flex items-center justify-center gap-2 text-caption text-muted"><Shield size={14} className="text-primary" aria-hidden="true" /> Secure checkout · COD available</p>
                             <Link to="/shop" className="block text-center text-small text-muted hover:text-primary">Continue shopping</Link>
                         </div>

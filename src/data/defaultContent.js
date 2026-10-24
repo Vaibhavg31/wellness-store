@@ -98,7 +98,7 @@ export const DEFAULT_SITE_CONTENT = {
 
     promo: {
         enabled: true,
-        text: '✦ Free delivery on orders above ₹1,999. Use code',
+        text: 'Use code',
         code: 'WELCOME10',
         suffix: 'for 10% off your first order',
         href: '/shop',

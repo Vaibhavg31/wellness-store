@@ -9,16 +9,20 @@ const SiteContentContext = createContext({
     refetch: () => {},
 });
 
+const CACHE_KEY = 'chikit-site-content-v1';
+const readCache = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch { return null; } };
+
 export function SiteContentProvider({ children }) {
-    const [raw, setRaw] = useState(null);
+    // Start from the last copy we saw (refreshed below), so returning visitors never see placeholder text flip to the real text.
+    const [raw, setRaw] = useState(readCache);
     const [loading, setLoading] = useState(true);
 
     const fetchContent = useCallback(() => {
         setLoading(true);
         api
             .get('/api/settings')
-            .then((data) => setRaw(data))
-            .catch(() => setRaw(null))
+            .then((data) => { setRaw(data); try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* storage full or blocked */ } })
+            .catch(() => { /* keep whatever we already have (cached or defaults) */ })
             .finally(() => setLoading(false));
     }, []);
 

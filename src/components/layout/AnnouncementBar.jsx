@@ -50,14 +50,14 @@ export default function AnnouncementBar() {
 
     const current = messages[index % count];
     const body = current.href
-        ? <Link to={current.href} className="inline-block px-10 py-2.5 hover:underline">{current.node}</Link>
-        : <span className="inline-block px-10 py-2.5">{current.node}</span>;
+        ? <Link to={current.href} className="inline-block px-9 py-2 hover:underline sm:px-10 sm:py-2.5">{current.node}</Link>
+        : <span className="inline-block px-9 py-2 sm:px-10 sm:py-2.5">{current.node}</span>;
 
     return (
         <div
             role="region"
             aria-label="Announcements"
-            className="relative bg-primary-tint text-center text-small text-primary-deep"
+            className="relative bg-primary-tint text-center text-caption text-primary-deep sm:text-small"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
             onFocus={() => setPaused(true)}
