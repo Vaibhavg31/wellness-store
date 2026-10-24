@@ -28,7 +28,7 @@ function buildStageItems(products, hero) {
     const rest = withImage
         .filter((p) => !pinned.includes(p))
         .sort((a, b) => (b.isBestSeller || b.isNew ? 1 : 0) - (a.isBestSeller || a.isNew ? 1 : 0));
-    return [...pinned, ...rest].slice(0, 5).map((p) => ({
+    return [...pinned, ...rest].slice(0, 4).map((p) => ({
         id: p.id,
         title: p.title,
         price: p.price,
@@ -152,7 +152,7 @@ export default function Hero({ products, loading = false }) {
                         </div>
 
                         {showStage ? (
-                            <m.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.9, ease: EASE }} className="min-w-0">
+                            <m.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 0.9, ease: EASE }} className="order-first min-w-0 lg:order-none">
                                 <StageGate>
                                     <Suspense fallback={<StagePlaceholder />}>
                                         <HeroStage items={stageItems} />

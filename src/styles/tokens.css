@@ -103,6 +103,7 @@
   --animate-slide-out-left: slide-out-left 0.22s cubic-bezier(0.4, 0, 1, 1) both;
   --animate-orbit-spin: orbit-spin 70s linear infinite;
   --animate-orbit-spin-reverse: orbit-spin 110s linear infinite reverse;
+  --animate-orbit-sheen: orbit-sheen 6s ease-in-out 1.5s infinite;
   --animate-twinkle: twinkle 3.4s ease-in-out infinite;
 
   @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
@@ -111,6 +112,7 @@
   @keyframes edge-in-left { from { opacity: 0; transform: translateX(-100%); } to { opacity: 1; transform: none; } }
   @keyframes confetti { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); } }
   @keyframes pop { 0% { transform: scale(0.4); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  @keyframes orbit-sheen { 0% { transform: translateX(0) skewX(-18deg); } 55%, 100% { transform: translateX(420%) skewX(-18deg); } }
   @keyframes breathe { 0%, 100% { opacity: 0.55; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
   @keyframes loader-slide { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
   @keyframes swipe-in { from { transform: translateX(56px); } to { transform: none; } }

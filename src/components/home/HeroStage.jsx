@@ -10,8 +10,10 @@ import { imageUrl } from '@/services/api';
 import { cn } from '@/utils/formatPrice';
 
 /**
- * Hero "orbit stage": product packs stand on a slowly turning podium. The ring auto-rotates, tilts toward the
- * cursor, can be dragged or flicked (it coasts to a stop), and clicking a side pack swings it to the front.
+ * Hero "orbit stage": framed product tiles circle a featured disc. The ring auto-rotates, tilts toward the cursor,
+ * can be dragged or flicked (it coasts to a stop), and clicking a side tile swings it to the front, where the disc
+ * takes on that product. Tiles are photo cards (cover-fit, white frame), so any uploaded photo, with or without a
+ * background, looks right.
  *
  * Positions are projected by hand (3D maths -> translate + scale) instead of CSS preserve-3d, so stacking order,
  * Safari and the tilt all behave. Only transform / opacity / filter change per frame, and nothing re-renders
@@ -19,19 +21,19 @@ import { cn } from '@/utils/formatPrice';
  */
 
 const RAD = Math.PI / 180;
-const AUTO_SPEED = 9; // degrees per second
+const AUTO_SPEED = 12; // degrees per second
 const DEG_PER_PX = 0.32;
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
 /** Projects one pack on the ring for the current ring angle, cursor tilt and stage width. */
 function project(base, [angle, spread, tiltX, tiltY, width]) {
-    const R = width * 0.36;
+    const R = width * 0.37;
     const P = width * 2.4;
     const th = (base + angle) * RAD;
     const c = Math.cos(th);
     const x = Math.sin(th) * R * spread;
     const z = c * R * spread;
-    const y = c * R * 0.1 * spread; // the near side sits a little lower, like a ring seen from slightly above
+    const y = c * R * 0.08 * spread; // the near side sits a little lower, like a ring seen from slightly above
     const cx = Math.cos(tiltX * RAD); const sx = Math.sin(tiltX * RAD);
     const cy = Math.cos(tiltY * RAD); const sy = Math.sin(tiltY * RAD);
     const x1 = x * cy + z * sy;
@@ -42,14 +44,14 @@ function project(base, [angle, spread, tiltX, tiltY, width]) {
     return { x: x1 * p, y: y2 * p, scale: p * (0.3 + 0.7 * spread), z: z2, depth: (c + 1) / 2, spread };
 }
 
-function OrbitItem({ item, index, size, footY, base, controls, active, onSelect, dragged }) {
+function OrbitItem({ item, index, size, base, controls, active, onSelect, dragged, reduced }) {
     const { angle, spread, tiltX, tiltY, width } = controls;
     const state = useTransform([angle, spread, tiltX, tiltY, width], (values) => project(base, values));
     const x = useTransform(state, (s) => s.x);
     const y = useTransform(state, (s) => s.y);
     const scale = useTransform(state, (s) => s.scale);
     const zIndex = useTransform(state, (s) => 1000 + Math.round(s.z));
-    const opacity = useTransform(state, (s) => clamp(0.35 + 0.65 * s.depth ** 0.6, 0, 1) * clamp(s.spread * 1.6, 0, 1));
+    const opacity = useTransform(state, (s) => clamp(0.4 + 0.6 * s.depth ** 0.6, 0, 1) * clamp(s.spread * 1.6, 0, 1));
     const height = (size * 4) / 3;
 
     const handleClick = (event) => {
@@ -61,34 +63,25 @@ function OrbitItem({ item, index, size, footY, base, controls, active, onSelect,
 
     return (
         <m.div
-            className="absolute left-1/2"
-            style={{ width: size, height, top: footY - height, marginLeft: -size / 2, transformOrigin: '50% 100%', x, y, scale, zIndex, opacity, willChange: 'transform, opacity' }}
+            className="absolute left-1/2 top-1/2"
+            style={{ width: size, height, marginLeft: -size / 2, marginTop: -height / 2, x, y, scale, zIndex, opacity, willChange: 'transform, opacity' }}
         >
-            <Link
-                to={item.href}
-                onClick={handleClick}
-                aria-label={active ? item.title : `${item.title}: bring to front`}
-                className="block size-full rounded-lg outline-offset-4"
-                draggable={false}
+            <m.div
+                className="size-full"
+                animate={reduced ? undefined : { y: [0, -8, 0] }}
+                transition={{ duration: 4 + index * 0.6, repeat: Infinity, ease: 'easeInOut', delay: index * 0.35 }}
             >
-                {item.cutout ? (
-                    <img src={imageUrl(item.cutout)} alt="" width="600" height="800" decoding="async" draggable={false} className="size-full object-contain" />
-                ) : (
-                    <span className="block size-full overflow-hidden rounded-xl border border-line bg-surface shadow-lg">
-                        <img src={imageUrl(item.image, 480)} alt="" width="480" height="640" decoding="async" draggable={false} className="size-full object-cover" />
-                    </span>
-                )}
-            </Link>
+                <Link
+                    to={item.href}
+                    onClick={handleClick}
+                    aria-label={active ? item.title : `${item.title}: bring to front`}
+                    className="block size-full overflow-hidden rounded-2xl border-4 border-surface bg-surface shadow-lg outline-offset-4"
+                    draggable={false}
+                >
+                    <img src={imageUrl(item.image, 480)} alt="" width="480" height="640" decoding="async" draggable={false} className="size-full object-cover" />
+                </Link>
+            </m.div>
         </m.div>
-    );
-}
-
-function Leaf({ className, style }) {
-    return (
-        <svg viewBox="0 0 100 60" aria-hidden="true" className={className} style={style}>
-            <path d="M2,30 C20,0 72,0 98,30 C72,60 20,60 2,30 Z" fill="currentColor" />
-            <path d="M2,30 L94,30" stroke="#fff" strokeWidth="1.2" opacity=".35" />
-        </svg>
     );
 }
 
@@ -251,8 +244,7 @@ export default function HeroStage({ items }) {
         if (event.key === 'ArrowLeft') { event.preventDefault(); stepBy(-1); }
     };
 
-    const size = stageWidth * 0.3;
-    const footY = stageWidth * 0.74;
+    const size = stageWidth * 0.27;
     const controls = { angle, spread, tiltX, tiltY, width };
     const current = items[active] ?? items[0];
 
@@ -271,7 +263,7 @@ export default function HeroStage({ items }) {
                 onPointerCancel={endDrag}
                 onPointerEnter={() => { live.current.hover = true; }}
                 onPointerLeave={() => { live.current.hover = false; }}
-                className="relative isolate mx-auto aspect-square w-full max-w-[34rem] cursor-grab touch-pan-y select-none rounded-xl outline-offset-4 active:cursor-grabbing"
+                className="relative isolate mx-auto aspect-square w-full max-w-[21rem] sm:max-w-[34rem] cursor-grab touch-pan-y select-none rounded-xl outline-offset-4 active:cursor-grabbing"
             >
                 {/* light and atmosphere */}
                 <Drift depth={14} pointer={pointer} className="inset-[6%]">
@@ -281,25 +273,36 @@ export default function HeroStage({ items }) {
                 <div className="pointer-events-none absolute inset-0 rounded-full opacity-70" style={{ background: glow }} aria-hidden="true" />
                 <img src="/brand/chikit-icon.webp" alt="" width="160" height="160" className="pointer-events-none absolute left-[33%] top-[16%] w-[34%] animate-orbit-spin-reverse opacity-[0.09]" draggable={false} />
 
-                {/* podium */}
-                <div className="pointer-events-none absolute left-[9%] right-[9%] rounded-[50%] bg-gradient-to-b from-surface to-primary-tint shadow-lg ring-1 ring-line" style={{ top: footY - stageWidth * 0.062, height: stageWidth * 0.124 }} aria-hidden="true" />
-                <div className="pointer-events-none absolute left-[22%] right-[22%] rounded-[50%] bg-ink/10 blur-md" style={{ top: footY + stageWidth * 0.05, height: stageWidth * 0.05 }} aria-hidden="true" />
-
-                {/* behind the packs */}
-                <Drift depth={-18} pointer={pointer} className="left-[2%] top-[34%] w-[26%]">
-                    <m.div animate={reduced ? undefined : { y: [0, -10, 0], rotate: [-24, -18, -24] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
-                        <Leaf className="text-success/55" style={{ transform: 'rotate(-24deg)' }} />
+                {/* the featured disc: sits in front of the ring and shows whatever is at the front */}
+                <div className="pointer-events-none absolute left-1/2 top-1/2 z-[2000] aspect-square w-[42%] -translate-x-1/2 -translate-y-1/2">
+                    <m.div className="relative size-full" animate={reduced ? undefined : { y: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
+                        <div className="size-full rounded-full bg-gradient-to-br from-primary-tint via-accent to-primary p-[3px] shadow-lg">
+                            <div className="relative size-full overflow-hidden rounded-full border-4 border-surface bg-surface">
+                                <AnimatePresence initial={false}>
+                                    <m.img
+                                        key={current.id}
+                                        src={imageUrl(current.cutout ?? current.image, 600)}
+                                        alt=""
+                                        width="600"
+                                        height="600"
+                                        draggable={false}
+                                        initial={{ opacity: 0, scale: 1.06 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.45 }}
+                                        className={cn('absolute inset-0 size-full', current.cutout ? 'bg-canvas-alt object-contain p-[8%]' : 'object-cover')}
+                                    />
+                                </AnimatePresence>
+                                {!reduced && <span className="absolute inset-y-0 -left-1/2 w-1/2 animate-orbit-sheen bg-gradient-to-r from-transparent via-white/45 to-transparent" aria-hidden="true" />}
+                            </div>
+                        </div>
+                        <div className="absolute -inset-[12%] animate-orbit-spin rounded-full border border-dashed border-primary/30" aria-hidden="true" />
                     </m.div>
-                </Drift>
-                <Drift depth={-12} pointer={pointer} className="right-[3%] top-[22%] w-[20%]">
-                    <m.div animate={reduced ? undefined : { y: [0, 8, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}>
-                        <Leaf className="text-success/45" style={{ transform: 'rotate(200deg)' }} />
-                    </m.div>
-                </Drift>
+                </div>
 
                 {/* the ring */}
                 {items.map((item, index) => (
-                    <OrbitItem key={item.id} item={item} index={index} size={size} footY={footY} base={index * step} controls={controls} active={index === active} onSelect={goTo} dragged={dragged} />
+                    <OrbitItem key={item.id} item={item} index={index} size={size} base={index * step} controls={controls} active={index === active} onSelect={goTo} dragged={dragged} reduced={reduced} />
                 ))}
 
                 <AnimatePresence>
@@ -315,7 +318,7 @@ export default function HeroStage({ items }) {
             </div>
 
             {/* what is at the front right now */}
-            <div className="mx-auto mt-5 flex max-w-[34rem] items-center justify-between gap-3 rounded-lg bg-surface p-3 pl-4 shadow-md ring-1 ring-line" aria-live="polite">
+            <div className="mx-auto mt-4 flex max-w-[21rem] sm:mt-5 sm:max-w-[34rem] items-center justify-between gap-3 rounded-lg bg-surface p-3 pl-4 shadow-md ring-1 ring-line" aria-live="polite">
                 <AnimatePresence mode="wait" initial={false}>
                     <m.div key={current.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22 }} className="min-w-0">
                         <span className="eyebrow block">{current.eyebrow}</span>

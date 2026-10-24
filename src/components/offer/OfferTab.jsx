@@ -55,27 +55,31 @@ export default function OfferTab() {
     return (
         <>
             {!hidden && (
-                <div className={cn('fixed top-[72%] z-40 sm:top-[60%] flex -translate-y-1/2 flex-col items-center gap-2', right ? 'right-0 animate-edge-in-right' : 'left-0 animate-edge-in-left')}>
-                    <button
-                        type="button"
-                        onClick={hide}
-                        aria-label="Hide offer tab"
-                        className={cn('grid size-7 place-items-center rounded-full bg-surface text-ink shadow-md hover:bg-canvas-alt', right ? 'mr-1' : 'ml-1')}
-                    >
-                        <X size={14} />
-                    </button>
+                <div className={cn(
+                    // Phones: a compact pill at the bottom-left (clear of the chat button). Larger screens: the slim edge tab.
+                    'fixed bottom-4 left-4 z-40 flex animate-fade-up items-center gap-1.5 sm:bottom-auto sm:top-[60%] sm:-translate-y-1/2 sm:flex-col sm:gap-2 sm:animate-none',
+                    right ? 'sm:left-auto sm:right-0 sm:animate-edge-in-right' : 'sm:left-0 sm:animate-edge-in-left',
+                )}>
                     <button
                         type="button"
                         onClick={() => setOpen(true)}
                         aria-haspopup="dialog"
                         className={cn(
-                            'flex items-center gap-2 bg-primary px-2 py-3 text-caption font-semibold tracking-wide text-white shadow-lg transition-colors hover:bg-primary-hover sm:px-3 sm:py-4 sm:text-small',
-                            right ? 'rounded-l-xl' : 'rounded-r-xl',
+                            'flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-small font-semibold tracking-wide text-white shadow-lg transition-colors hover:bg-primary-hover',
+                            'sm:order-2 sm:rounded-none sm:px-3 sm:py-4 sm:[writing-mode:vertical-rl]',
+                            right ? 'sm:rotate-180 sm:rounded-l-xl' : 'sm:rounded-r-xl',
                         )}
-                        style={{ writingMode: 'vertical-rl', transform: right ? 'rotate(180deg)' : undefined }}
                     >
-                        <Gift size={16} aria-hidden="true" className={right ? '' : '-rotate-90'} />
+                        <Gift size={16} aria-hidden="true" className={right ? '' : 'sm:-rotate-90'} />
                         {unlocked ? 'Your code' : offer.tabLabel}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={hide}
+                        aria-label="Hide offer tab"
+                        className={cn('grid size-9 place-items-center rounded-full bg-surface text-ink shadow-md hover:bg-canvas-alt sm:order-1 sm:size-7', right ? 'sm:mr-1' : 'sm:ml-1')}
+                    >
+                        <X size={14} />
                     </button>
                 </div>
             )}
