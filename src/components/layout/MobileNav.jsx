@@ -13,7 +13,7 @@ function CategoryRow({ category, onClose }) {
     return (
         <Link
             to={link.to}
-            onClick={(event) => { link.onClick(event); onClose(); }}
+            onClick={onClose}
             aria-current={link.current ? 'true' : undefined}
             className={cn(row, link.current ? 'bg-primary-tint text-primary-deep' : 'text-ink hover:bg-primary-soft')}
         >

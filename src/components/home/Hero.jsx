@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Leaf, ShieldCheck, Star } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { LazyMotion, MotionConfig, domAnimation, m, useMotionTemplate, useMotionValue, useSpring } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import Magnetic from '@/components/ui/Magnetic';
@@ -10,7 +10,6 @@ import { imageUrl } from '@/services/api';
 
 const HeroStage = lazy(() => import('@/components/home/HeroStage'));
 
-const BADGE_ICONS = { shield: ShieldCheck, star: Star, sparkles: Leaf };
 const EASE = [0.22, 1, 0.36, 1];
 const rise = (delay) => ({ initial: { opacity: 0, y: 22 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.7, ease: EASE } });
 
@@ -114,7 +113,7 @@ export default function Hero({ products, loading = false }) {
             <LazyMotion features={domAnimation}>
                 <section className="relative overflow-hidden bg-canvas" onPointerMove={onPointerMove} onPointerLeave={() => spotOpacity.set(0)}>
                     <m.div className="pointer-events-none absolute inset-0" style={{ background: spot, opacity: spotOpacity }} aria-hidden="true" />
-                    <div className="container-page relative grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-[1fr_1.1fr] lg:gap-12 lg:py-16">
+                    <div className="container-page relative grid items-center gap-10 py-8 sm:py-12 lg:grid-cols-[1fr_1.1fr] lg:gap-12 lg:py-8">
                         <div>
                             {hero.badge && (
                                 <m.p {...rise(0.05)} className="mb-5 inline-flex items-center gap-2 rounded-full bg-primary-tint px-4 py-1.5 text-caption font-semibold text-primary-deep">
@@ -138,18 +137,6 @@ export default function Hero({ products, loading = false }) {
                                     <Link to="/about"><Button size="lg" variant="outline">Our story</Button></Link>
                                 </Magnetic>
                             </m.div>
-                            {hero.trustBadges?.length > 0 && (
-                                <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
-                                    {hero.trustBadges.map((badge, i) => {
-                                        const Icon = BADGE_ICONS[badge.icon] ?? Leaf;
-                                        return (
-                                            <m.li key={badge.label} {...rise(0.7 + i * 0.08)} className="flex items-center gap-2 text-small font-medium text-ink">
-                                                <Icon size={18} className="text-accent-ink" aria-hidden="true" /> {badge.label}
-                                            </m.li>
-                                        );
-                                    })}
-                                </ul>
-                            )}
                         </div>
 
                         {showStage ? (

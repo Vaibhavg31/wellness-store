@@ -3,50 +3,36 @@ import Seo from '@/components/seo/Seo';
 import TrustStrip from '@/components/home/TrustStrip';
 import VideoBanner from '@/components/home/VideoBanner';
 import { BannerSlider, PromoBanners } from '@/components/home/BannerSection';
-import CategoryGrid from '@/components/home/CategoryGrid';
-import ConcernShelf from '@/components/home/ConcernShelf';
-import CategoryShelves from '@/components/home/CategoryShelves';
-import ProductSection from '@/components/home/ProductSection';
+import ShopByNeed from '@/components/home/ShopByNeed';
+import RangeRail from '@/components/home/RangeRail';
 import BundleSection from '@/components/home/BundleSection';
 import DayRitual from '@/components/home/DayRitual';
 import DoshaQuiz from '@/components/home/DoshaQuiz';
 import WhyChoose from '@/components/home/WhyChoose';
-import CertifiedBanner from '@/components/home/CertifiedBanner';
 import Testimonials from '@/components/home/Testimonials';
 import InstagramGallery from '@/components/home/InstagramGallery';
 import NewsletterSection from '@/components/home/NewsletterSection';
-import { useProducts, useTrendingProducts } from '@/hooks/useApi';
+import { useProducts } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 
 /**
  * One entry per admin-toggleable homepage section (site_section_toggles.section_key).
  * Order and visibility come from the admin's saved settings; this map only supplies the component.
+ * Each block has its own shape on purpose, so the page keeps changing pace as it scrolls.
  */
-function buildSections({ products, loading, trending, featured }) {
+function buildSections({ products, loading }) {
     return {
         hero: () => <Hero products={products} loading={loading} />,
         brandMarquee: () => <TrustStrip />,
         videoBanner: () => <VideoBanner />,
-        categoryShelves: () => <CategoryShelves products={products} loading={loading} />,
+        categories: () => <ShopByNeed />,
+        categoryShelves: () => <RangeRail products={products} loading={loading} />,
         banners: () => <PromoBanners />,
         bannerSlider: () => <BannerSlider />,
-        featured: () => (
-            <ProductSection
-                eyebrow={featured.stylesTitle}
-                title={featured.collectionTitle}
-                products={products}
-                loading={loading}
-                count={featured.productCount}
-                viewAllLabel={featured.viewAllLabel}
-            />
-        ),
-        trending: () => <ProductSection eyebrow="Customer favourites" title="Trending now" products={trending} count={4} tint />,
-        categories: () => <><CategoryGrid /><ConcernShelf /></>,
         dayRitual: () => <DayRitual products={products} />,
         doshaQuiz: () => <DoshaQuiz products={products} loading={loading} />,
         bundles: () => <BundleSection />,
         whyChoose: () => <WhyChoose />,
-        certifiedBanner: () => <CertifiedBanner />,
         reviews: () => <Testimonials />,
         instagram: () => <InstagramGallery />,
         newsletter: () => <NewsletterSection />,
@@ -55,10 +41,9 @@ function buildSections({ products, loading, trending, featured }) {
 
 export default function HomePage() {
     const { products, loading } = useProducts();
-    const { products: trending } = useTrendingProducts();
     const { content } = useSiteContent();
     const sections = content.sections ?? {};
-    const renderers = buildSections({ products, loading, trending, featured: content.featured });
+    const renderers = buildSections({ products, loading });
 
     return (
         <>

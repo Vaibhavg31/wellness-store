@@ -77,23 +77,20 @@ export const DEFAULT_SITE_CONTENT = {
 
     // Homepage order, top to bottom (the admin can reorder or hide any of these).
     sections: {
-        bannerSlider: true,
         hero: true,
         brandMarquee: true,
         categories: true,
-        featured: true,
-        banners: true,
+        categoryShelves: true,
         dayRitual: true,
-        trending: true,
+        bannerSlider: true,
         bundles: true,
         doshaQuiz: true,
-        categoryShelves: true,
-        videoBanner: true,
         whyChoose: true,
-        certifiedBanner: true,
         reviews: true,
-        instagram: true,
         newsletter: true,
+        banners: false,
+        videoBanner: false,
+        instagram: false,
         promoBanner: true,
     },
 
@@ -164,9 +161,9 @@ export const DEFAULT_SITE_CONTENT = {
     },
 
     featured: {
-        collectionTitle: 'Featured Collection',
-        stylesTitle: 'Our bestsellers',
-        viewAllLabel: 'View All',
+        collectionTitle: 'Shop the range',
+        stylesTitle: 'The Chikit range',
+        viewAllLabel: 'View all',
         productCount: 8,
     },
 

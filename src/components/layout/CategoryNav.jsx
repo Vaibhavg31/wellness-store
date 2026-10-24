@@ -3,7 +3,6 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
-import { jumpToShelf, useShelfSpy } from '@/utils/shelfSpy';
 import { cn } from '@/utils/formatPrice';
 
 const pill = 'relative z-10 block whitespace-nowrap rounded-full px-4 py-2 text-small font-medium transition-colors duration-200';
@@ -11,41 +10,24 @@ const pillIdle = 'text-ink hover:text-primary';
 const pillActive = 'text-primary-deep';
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/**
- * Behaviour shared by every category link (this strip and the mobile drawer): on the homepage the link scrolls to
- * that category's shelf; anywhere else it opens the category page. Also reports whether it is "current": the shelf
- * being read on the homepage, or the category page being viewed.
- */
+/** Shared by every category link (this strip and the mobile drawer): where it goes and whether it is the page being viewed. */
 export function useCategoryLink(slug) {
     const { pathname } = useLocation();
-    const { slugs, active } = useShelfSpy();
-    const onHome = pathname === '/';
-    const hasShelf = onHome && slugs.includes(slug);
-    const current = hasShelf ? active === slug : pathname === `/category/${slug}`;
-
-    const onClick = (event) => {
-        if (!hasShelf || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
-        event.preventDefault();
-        jumpToShelf(slug);
-    };
-    return { to: `/category/${slug}`, current, onClick };
+    return { to: `/category/${slug}`, current: pathname === `/category/${slug}` };
 }
 
-/** The category being read on the homepage, or the category page being viewed ('' when neither). */
+/** The category page being viewed ('' when none). */
 function useCurrentSlug() {
     const { pathname } = useLocation();
-    const { slugs, active } = useShelfSpy();
-    if (pathname === '/') return slugs.length > 0 ? active : '';
     return pathname.startsWith('/category/') ? decodeURIComponent(pathname.split('/')[2] ?? '') : '';
 }
 
 function CategoryLink({ category, current, itemRef }) {
-    const { to, onClick } = useCategoryLink(category.slug);
+    const { to } = useCategoryLink(category.slug);
     return (
         <Link
             ref={itemRef}
             to={to}
-            onClick={onClick}
             aria-current={current ? 'true' : undefined}
             className={cn(pill, current ? pillActive : pillIdle)}
         >
@@ -56,8 +38,7 @@ function CategoryLink({ category, current, itemRef }) {
 
 /**
  * The category strip used in the header. "Shop" is pinned first; the categories sit in a row that slides sideways,
- * and as the visitor scrolls the homepage it moves on its own to keep the category being read in view while a
- * rounded highlight glides under it. Used twice: inline in the header on desktop, and as the second row of the
+ * and a rounded highlight glides under the category page being viewed. Used twice: inline in the header on desktop, and as the second row of the
  * header on phones. `variant` only changes sizing.
  */
 export default function CategoryNav({ variant = 'desktop' }) {

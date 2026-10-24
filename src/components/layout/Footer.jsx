@@ -14,6 +14,10 @@ import { hasInstagramUrl } from '@/utils/socialLinks';
 import { DEVELOPER_CREDIT, DEVELOPER_NAME, DEVELOPER_URL } from '@/constants';
 
 const COLLECTION_LIMIT = 6;
+
+/** Pages every shopper may need, linked from the footer whatever the admin's menu holds. */
+const COMPANY_LINKS = [{ label: 'Our story', href: '/about' }, { label: 'Reviews', href: '/reviews' }];
+const HELP_LINKS = [{ label: 'Track your order', href: '/track-order' }, { label: 'FAQ', href: '/faq' }, { label: 'Contact us', href: '/contact' }];
 const linkClass = 'inline-flex min-h-9 items-center text-small text-muted transition-colors hover:text-primary';
 
 function NewsletterForm() {
@@ -65,6 +69,8 @@ export default function Footer() {
     const { categories } = useCategories();
     const { getWhatsAppUrl } = useWhatsApp();
     const instagramUrl = social.instagramUrl?.trim();
+    const known = new Set(['/', '/shop', ...COMPANY_LINKS.map((l) => l.href), ...HELP_LINKS.map((l) => l.href)]);
+    const companyLinks = [...COMPANY_LINKS, ...(content.navLinks ?? []).filter((l) => !known.has(l.href) && !l.href.startsWith('/category'))];
 
     const collections = (categories.length > 0
         ? categories.map((c) => ({ id: c.slug || c.id, label: c.label }))
@@ -102,27 +108,35 @@ export default function Footer() {
                     </ul>
                 </div>
 
-                <nav aria-label="Footer" className="grid grid-cols-2 gap-8 lg:col-span-4">
+                <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-5">
                     <div>
-                        <h2 className="mb-4 font-sans text-small font-semibold text-ink">Explore</h2>
-                        <ul className="space-y-2.5">
-                            {(content.navLinks ?? []).map((item) => (
-                                <li key={item.href}><Link to={item.href} className={linkClass}>{item.label}</Link></li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div>
-                        <h2 className="mb-4 font-sans text-small font-semibold text-ink">Collections</h2>
-                        <ul className="space-y-2.5">
+                        <h2 className="mb-4 font-sans text-small font-semibold text-ink">Shop</h2>
+                        <ul className="space-y-1">
                             {collections.map((cat) => (
                                 <li key={cat.id}><Link to={`/category/${cat.id}`} className={linkClass}>{cat.label}</Link></li>
                             ))}
                             <li><Link to="/shop" className={`${linkClass} font-medium text-primary`}>Shop all</Link></li>
                         </ul>
                     </div>
+                    <div>
+                        <h2 className="mb-4 font-sans text-small font-semibold text-ink">Company</h2>
+                        <ul className="space-y-1">
+                            {companyLinks.map((item) => (
+                                <li key={item.href}><Link to={item.href} className={linkClass}>{item.label}</Link></li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 className="mb-4 font-sans text-small font-semibold text-ink">Help</h2>
+                        <ul className="space-y-1">
+                            {HELP_LINKS.map((item) => (
+                                <li key={item.href}><Link to={item.href} className={linkClass}>{item.label}</Link></li>
+                            ))}
+                        </ul>
+                    </div>
                 </nav>
 
-                <div className={homeHasSignup ? 'hidden' : 'sm:col-span-2 lg:col-span-4'}>
+                <div className={homeHasSignup ? 'hidden' : 'sm:col-span-2 lg:col-span-3'}>
                     <h2 className="mb-2 font-sans text-small font-semibold text-ink">{footer.newsletterTitle}</h2>
                     <p className="mb-4 text-small text-muted">{footer.newsletterDescription}</p>
                     <NewsletterForm />
@@ -136,7 +150,6 @@ export default function Footer() {
                     <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
                         <li><Link to="/privacy" className="inline-flex min-h-9 items-center hover:text-primary">Privacy Policy</Link></li>
                         <li><Link to="/terms" className="inline-flex min-h-9 items-center hover:text-primary">Terms of Service</Link></li>
-                        <li><Link to="/track-order" className="inline-flex min-h-9 items-center hover:text-primary">Track order</Link></li>
                         <li><Link to="/shipping-policy" className="inline-flex min-h-9 items-center hover:text-primary">Shipping</Link></li>
                         <li><Link to="/refund-policy" className="inline-flex min-h-9 items-center hover:text-primary">Returns &amp; Refunds</Link></li>
                         <li>

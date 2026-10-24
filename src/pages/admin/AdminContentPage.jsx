@@ -43,15 +43,12 @@ const SECTION_LABELS = {
     brandMarquee: 'Brand Marquee',
     banners: 'Image Banners (Stacked)',
     bannerSlider: 'Full-width Banner Slider',
-    categoryShelves: 'Category Shelves (products by category)',
-    featured: 'Featured Collection',
-    trending: 'Trending Now',
-    categories: 'Shop by Category',
+    categoryShelves: 'The Range (filterable product rail)',
+    categories: 'Shop by Need (tiles)',
     dayRitual: 'Your Day, Ritualised (scroll story with shop-the-routine)',
     doshaQuiz: 'Find Your Prakriti Quiz (Ayurveda body-type quiz)',
     bundles: 'Bundle & Save Offers',
-    whyChoose: 'Why Choose Us',
-    certifiedBanner: 'Certified Banner (FSSAI/GMP)',
+    whyChoose: 'Our Promise (trust + certifications)',
     reviews: 'Customer Reviews',
     instagram: 'Instagram Gallery',
     newsletter: 'Newsletter',
@@ -441,18 +438,6 @@ export default function AdminContentPage() {
                     </div>
                 );
 
-            case 'featured':
-                return (
-                    <div className="space-y-4 pt-3">
-                        <AdminField label="Collection Title">
-                            <Input value={content.featured.collectionTitle} onChange={(e) => update('featured', { ...content.featured, collectionTitle: e.target.value })} />
-                        </AdminField>
-                        <AdminField label="Styles Section Title">
-                            <Input value={content.featured.stylesTitle} onChange={(e) => update('featured', { ...content.featured, stylesTitle: e.target.value })} />
-                        </AdminField>
-                    </div>
-                );
-
             case 'whyChoose':
                 return (
                     <div className="space-y-4 pt-3">
@@ -466,22 +451,13 @@ export default function AdminContentPage() {
                             <AdminTextarea value={content.whyChoose.description} onChange={(e) => update('whyChoose', { ...content.whyChoose, description: e.target.value })} />
                         </AdminField>
                         <BenefitEditor benefits={content.whyChoose.benefits} onChange={(benefits) => update('whyChoose', { ...content.whyChoose, benefits })} />
-                    </div>
-                );
-
-            case 'certifiedBanner':
-                return (
-                    <div className="space-y-4 pt-3">
-                        <AdminField label="Badge">
-                            <Input value={content.certifiedBanner.badge} onChange={(e) => update('certifiedBanner', { ...content.certifiedBanner, badge: e.target.value })} />
+                        <ImageUploadField label="Picture (shown in an arch beside the list)" value={content.certifiedBanner.image} onChange={(v) => update('certifiedBanner', { ...content.certifiedBanner, image: v })} adminToken={adminToken} />
+                        <AdminField label="Link label">
+                            <Input value={content.certifiedBanner.ctaLabel} onChange={(e) => update('certifiedBanner', { ...content.certifiedBanner, ctaLabel: e.target.value })} />
                         </AdminField>
-                        <AdminField label="Title">
-                            <Input value={content.certifiedBanner.title} onChange={(e) => update('certifiedBanner', { ...content.certifiedBanner, title: e.target.value })} />
+                        <AdminField label="Link URL">
+                            <Input value={content.certifiedBanner.ctaHref} onChange={(e) => update('certifiedBanner', { ...content.certifiedBanner, ctaHref: e.target.value })} />
                         </AdminField>
-                        <AdminField label="Description">
-                            <AdminTextarea value={content.certifiedBanner.description} onChange={(e) => update('certifiedBanner', { ...content.certifiedBanner, description: e.target.value })} rows={4} />
-                        </AdminField>
-                        <ImageUploadField label="Banner Image" value={content.certifiedBanner.image} onChange={(v) => update('certifiedBanner', { ...content.certifiedBanner, image: v })} adminToken={adminToken} />
                     </div>
                 );
 
@@ -542,21 +518,19 @@ export default function AdminContentPage() {
                     </div>
                 );
 
-            case 'trending':
-                return (
-                    <p className="text-sm text-admin-muted pt-3">
-                        Shows products marked "Trending" in{' '}
-                        <Link to={`${ADMIN_PATH}/products`} className="text-primary font-medium hover:underline">Products</Link>. No extra content to configure here.
-                    </p>
-                );
-
             case 'categoryShelves':
                 return (
                     <div className="space-y-4 pt-3">
                         <p className="text-xs text-admin-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
-                            Puts products first: one swipeable row of products per category. The category bar at the top highlights the row being read as the shopper scrolls (on phones, a sticky strip does this).
-                            This list also decides which categories appear in the top bar. Categories with no products are hidden automatically. Drag this section higher or lower in the list above to place it.
+                            One swipeable row of products with filter chips (All, Bestsellers, New, then each category that has products).
+                            The category list below also decides which categories appear in the top bar and as chips. Categories with no products are hidden automatically.
                         </p>
+                        <AdminField label="Small heading">
+                            <Input value={content.featured.stylesTitle} onChange={(e) => update('featured', { ...content.featured, stylesTitle: e.target.value })} />
+                        </AdminField>
+                        <AdminField label="Heading">
+                            <Input value={content.featured.collectionTitle} onChange={(e) => update('featured', { ...content.featured, collectionTitle: e.target.value })} />
+                        </AdminField>
                         <AdminField label="Which categories">
                             <AdminSelect
                                 aria-label="Shelf mode"
@@ -613,8 +587,8 @@ export default function AdminContentPage() {
             case 'categories':
                 return (
                     <p className="text-sm text-admin-muted pt-3">
-                        Shows categories with at least one product, managed in{' '}
-                        <Link to={`${ADMIN_PATH}/categories`} className="text-primary font-medium hover:underline">Categories</Link>. No extra content to configure here.
+                        A bento grid of goal-led tiles (the first one large). It uses the "Shop by concern" list from Delivery & Store Options when you have added one; otherwise it falls back to your categories, managed in{' '}
+                        <Link to={`${ADMIN_PATH}/categories`} className="text-primary font-medium hover:underline">Categories</Link>.
                     </p>
                 );
 
