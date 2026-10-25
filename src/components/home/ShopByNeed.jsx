@@ -77,10 +77,10 @@ export default function ShopByNeed() {
                         <Link to="/shop" className="group flex size-full flex-col justify-between rounded-xl bg-primary p-5 text-white transition-colors hover:bg-primary-hover sm:p-6">
                             <span>
                                 <span className="block font-display text-h3 leading-tight text-white">See everything</span>
-                                <span className="mt-2 block text-small text-white/80">The full Chikit range, lab tested and clean label.</span>
+                                <span className="mt-2 hidden text-small text-white/80 sm:block">The full Chikit range, lab tested and clean label.</span>
                             </span>
                             <span className="flex items-center justify-between text-small font-medium">
-                                Shop all products
+                                Shop all
                                 <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
                             </span>
                         </Link>

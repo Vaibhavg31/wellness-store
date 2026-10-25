@@ -30,7 +30,7 @@ export default function Testimonials() {
                     <p className="mt-1 text-small text-muted">From {reviews.length} customer {reviews.length === 1 ? 'review' : 'reviews'}</p>
                 </div>
 
-                <ul className={cn('scrollbar-none -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:mx-auto lg:grid lg:gap-6 lg:overflow-visible lg:px-0', columns)}>
+                <ul className={cn('scrollbar-none -mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-pl-6 sm:px-6 lg:mx-auto lg:grid lg:gap-6 lg:overflow-visible lg:px-0', columns)}>
                     {shown.map((review, i) => (
                         <Reveal as="li" key={review.id} delay={(i % 3) * 70} className="w-[84%] shrink-0 snap-start sm:w-[55%] lg:w-auto">
                             <figure className="flex h-full flex-col rounded-xl bg-surface p-6 shadow-xs ring-1 ring-line sm:p-8">

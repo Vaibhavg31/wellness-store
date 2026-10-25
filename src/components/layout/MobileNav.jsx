@@ -6,6 +6,16 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
 import { cn } from '@/utils/formatPrice';
 
+/** Pages every shopper may need, always in the menu (the wishlist icon is hidden in the phone header). */
+const ESSENTIAL_LINKS = [
+    { label: 'Wishlist', href: '/wishlist' },
+    { label: 'Track your order', href: '/track-order' },
+    { label: 'Our story', href: '/about' },
+    { label: 'Reviews', href: '/reviews' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Contact us', href: '/contact' },
+];
+
 const row = 'block rounded-lg px-4 py-3 font-display text-h4 transition-colors';
 
 function CategoryRow({ category, onClose }) {
@@ -31,6 +41,9 @@ export default function MobileNav({ isOpen, onClose, links }) {
     const { plan } = useCategoryPlan();
     const { mode, showAll } = content.extras.nav;
     const categoryMode = mode === 'categories';
+    const menuLinks = categoryMode
+        ? [...ESSENTIAL_LINKS, ...links.filter((l) => !ESSENTIAL_LINKS.some((e) => e.href === l.href))]
+        : links;
 
     return (
         <Drawer isOpen={isOpen} onClose={onClose} title="Menu" side="left">
@@ -50,7 +63,7 @@ export default function MobileNav({ isOpen, onClose, links }) {
                     </>
                 )}
                 <ul className="space-y-1">
-                    {links.filter((link) => !categoryMode || (link.href !== '/shop' && link.href !== '/')).map((link) => (
+                    {menuLinks.filter((link) => !categoryMode || (link.href !== '/shop' && link.href !== '/')).map((link) => (
                         <li key={link.href}>
                             <NavLink
                                 to={link.href}

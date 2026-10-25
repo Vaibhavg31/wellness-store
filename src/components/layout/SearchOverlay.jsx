@@ -10,6 +10,21 @@ import { imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
 import { humanizeSlug } from '@/utils/products';
 
+function ProductRow({ product, onClose }) {
+    return (
+        <li>
+            <Link to={`/product/${product.id}`} onClick={onClose} className="flex items-center gap-3 rounded-lg p-2 hover:bg-primary-soft">
+                <img src={imageUrl(product.images?.[0], 96)} alt="" width="48" height="48" loading="lazy" className="size-12 shrink-0 rounded-md bg-canvas-alt object-cover" />
+                <span className="min-w-0 flex-1">
+                    <span className="block truncate text-small font-medium text-ink">{product.title}</span>
+                    <span className="block text-caption text-muted">{humanizeSlug(product.category)}</span>
+                </span>
+                <span className="text-small font-medium text-ink">{formatPrice(product.price)}</span>
+            </Link>
+        </li>
+    );
+}
+
 export default function SearchOverlay({ isOpen, onClose }) {
     const panelRef = useDialog(isOpen, onClose);
     const navigate = useNavigate();
@@ -24,6 +39,8 @@ export default function SearchOverlay({ isOpen, onClose }) {
             .filter((p) => `${p.title} ${p.category} ${p.description ?? ''}`.toLowerCase().includes(debounced))
             .slice(0, 6);
     }, [products, debounced]);
+
+    const popular = useMemo(() => [...products].sort((a, b) => (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0)).slice(0, 4), [products]);
 
     const { mounted, closing } = usePresence(isOpen);
     if (!mounted) return null;
@@ -74,24 +91,22 @@ export default function SearchOverlay({ isOpen, onClose }) {
                     </div>
                 )}
 
+                {!debounced && popular.length > 0 && (
+                    <div className="mt-4 border-t border-line pt-4">
+                        <p className="mb-2 text-caption font-semibold uppercase tracking-wider text-muted">Popular right now</p>
+                        <ul className="space-y-1">
+                            {popular.map((p) => <ProductRow key={p.id} product={p} onClose={onClose} />)}
+                        </ul>
+                    </div>
+                )}
+
                 {debounced && (
                     <div className="mt-4 border-t border-line pt-4">
                         {results.length === 0 ? (
                             <p className="py-6 text-center text-muted">No products found for “{query}”.</p>
                         ) : (
                             <ul className="space-y-1">
-                                {results.map((p) => (
-                                    <li key={p.id}>
-                                        <Link to={`/product/${p.id}`} onClick={onClose} className="flex items-center gap-3 rounded-lg p-2 hover:bg-primary-soft">
-                                            <img src={imageUrl(p.images?.[0])} alt="" width="48" height="48" loading="lazy" className="size-12 shrink-0 rounded-md bg-canvas-alt object-cover" />
-                                            <span className="min-w-0 flex-1">
-                                                <span className="block truncate text-small font-medium text-ink">{p.title}</span>
-                                                <span className="block text-caption text-muted">{humanizeSlug(p.category)}</span>
-                                            </span>
-                                            <span className="text-small font-medium text-ink">{formatPrice(p.price)}</span>
-                                        </Link>
-                                    </li>
-                                ))}
+                                {results.map((p) => <ProductRow key={p.id} product={p} onClose={onClose} />)}
                             </ul>
                         )}
                         {results.length > 0 && (

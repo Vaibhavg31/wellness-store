@@ -88,3 +88,24 @@ Limits of this research: I could read Kapiva and Puma as text, not see them, and
 - [Baymard: Mobile product page benchmark](https://www.baymard.com/mcommerce-usability/benchmark/mobile-page-types/product-page)
 - [Kapiva homepage](https://kapiva.in), [Puma India homepage](https://in.puma.com/in/en) (read as text)
 - Cart-abandonment reasons are as quoted in the search summary of Baymard's checkout research; I did not open the paywalled benchmark itself.
+
+## Status (24 Oct 2026)
+
+| Item | State |
+|---|---|
+| H1 two heroes | Done: orbit hero first; promo slider is now a mid-page campaign band |
+| H2/H3 sparse shelves and repeated products | Done: one filterable range rail replaces six shelves, trending and featured |
+| H4 trust repeated | Done: hero badges and certified banner removed; one "Our promise" band |
+| H5/P6 reviews | Done: average rating up front; layout adapts to the number of reviews |
+| H6 same shape everywhere | Done: bento tiles, rail, scroll story, asymmetric bundles, dark band, rating-led reviews |
+| H7 floating clutter | Done: back-to-top desktop only; offer pill stays off product, bag and checkout on phones |
+| H8 header overflow | Done: four categories plus a "More" menu |
+| P1 card density | Done |
+| P2/P4 gallery | Done: sticky, 4:5 frame |
+| P3 badges and trust tiles | Done |
+| P5 search | Done: popular products when empty |
+| Phone pack picker | Done: one row per pack (page is ~300px shorter before "Add to bag") |
+| Footer and phone menu links | Fixed: About, FAQ, Contact, Track order and Wishlist were not linked anywhere |
+| Homepage height | 13,900px to 10,800px (desktop) |
+
+Not done, needs your decision: guest checkout, subscriptions, more products per category, real photography.

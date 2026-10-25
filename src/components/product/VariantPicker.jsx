@@ -17,7 +17,7 @@ export default function VariantPicker({ variants, activeId, onChange }) {
     return (
         <fieldset>
             <legend className="mb-3 text-small font-semibold text-ink">Choose a pack</legend>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 max-sm:gap-2.5 sm:grid-cols-3">
                 {variants.map((v) => {
                     const active = v.id === activeId;
                     const soldOut = v.stock <= 0;
@@ -31,7 +31,7 @@ export default function VariantPicker({ variants, activeId, onChange }) {
                             onClick={() => onChange(v.id)}
                             aria-pressed={active}
                             className={cn(
-                                'relative flex flex-col rounded-lg border-2 p-4 text-left transition-colors',
+                                'relative flex items-center justify-between gap-3 rounded-lg border-2 px-4 py-3 text-left transition-colors sm:flex-col sm:items-stretch sm:justify-start sm:p-4',
                                 active ? 'border-primary bg-primary-soft' : 'border-line hover:border-primary/50',
                                 soldOut && 'cursor-not-allowed opacity-50',
                             )}
@@ -41,18 +41,22 @@ export default function VariantPicker({ variants, activeId, onChange }) {
                                     <Sparkles size={11} aria-hidden="true" /> Recommended
                                 </span>
                             )}
-                            <span className="flex items-center gap-2">
-                                {v.image && <img src={imageUrl(v.image)} alt="" width="36" height="36" className="size-9 rounded-md border border-line object-cover" />}
-                                <span className={cn('text-small font-semibold', active ? 'text-primary' : 'text-ink')}>{v.label}</span>
+                            <span className="flex min-w-0 flex-col">
+                                <span className="flex items-center gap-2">
+                                    {v.image && <img src={imageUrl(v.image)} alt="" width="36" height="36" className="size-9 rounded-md border border-line object-cover max-sm:hidden" />}
+                                    <span className={cn('text-small font-semibold', active ? 'text-primary' : 'text-ink')}>{v.label}</span>
+                                </span>
+                                {v.netQuantity && <span className="mt-0.5 text-caption text-muted sm:mt-1">{v.netQuantity}</span>}
                             </span>
-                            {v.netQuantity && <span className="mt-1 text-caption text-muted">{v.netQuantity}</span>}
-                            <span className="mt-3 flex flex-wrap items-baseline gap-x-1.5 border-t border-line pt-3">
-                                <span className="font-display text-h4">{formatPrice(v.price)}</span>
-                                {v.originalPrice > v.price && <span className="text-caption text-muted line-through">{formatPrice(v.originalPrice)}</span>}
+                            <span className="flex shrink-0 flex-col items-end sm:mt-3 sm:items-start sm:border-t sm:border-line sm:pt-3">
+                                <span className="flex flex-wrap items-baseline justify-end gap-x-1.5">
+                                    <span className="font-display text-h4">{formatPrice(v.price)}</span>
+                                    {v.originalPrice > v.price && <span className="text-caption text-muted line-through">{formatPrice(v.originalPrice)}</span>}
+                                </span>
+                                {savings > 0 && !soldOut && <span className="text-caption font-medium text-success sm:mt-1">Save {formatPrice(savings)}</span>}
+                                {perDay && !soldOut && <span className="text-caption text-muted max-sm:hidden">≈ {formatPrice(perDay)}/day</span>}
+                                {soldOut && <span className="text-caption font-medium text-danger sm:mt-2">Out of stock</span>}
                             </span>
-                            {savings > 0 && !soldOut && <span className="mt-1 text-caption font-medium text-success">Save {formatPrice(savings)}</span>}
-                            {perDay && !soldOut && <span className="text-caption text-muted">≈ {formatPrice(perDay)}/day</span>}
-                            {soldOut && <span className="mt-2 text-caption font-medium text-danger">Out of stock</span>}
                         </button>
                     );
                 })}

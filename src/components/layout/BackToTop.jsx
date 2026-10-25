@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { ArrowUp } from 'lucide-react';
 import { cn } from '@/utils/formatPrice';
 
-/** Appears after a long scroll (the home page is tall). Hidden where a sticky buy bar already sits at the bottom. */
+/** Appears after a long scroll on larger screens (phones scroll back with a tap on the status bar and already have a crowded bottom edge). Hidden where a sticky buy bar sits at the bottom. */
 export default function BackToTop() {
     const { pathname } = useLocation();
     const [visible, setVisible] = useState(false);
@@ -28,7 +28,7 @@ export default function BackToTop() {
             aria-label="Back to top"
             tabIndex={visible ? 0 : -1}
             className={cn(
-                'fixed bottom-20 right-4 z-40 grid size-11 place-items-center rounded-full border border-line bg-surface text-primary shadow-md sm:bottom-24 sm:right-6',
+                'fixed bottom-24 right-6 z-40 hidden size-11 place-items-center rounded-full border border-line bg-surface text-primary shadow-md sm:grid',
                 'transition-[opacity,transform] duration-300 hover:bg-primary-tint',
                 visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0',
             )}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
 import { cn } from '@/utils/formatPrice';
@@ -9,6 +9,56 @@ const pill = 'relative z-10 block whitespace-nowrap rounded-full px-4 py-2 text-
 const pillIdle = 'text-ink hover:text-primary';
 const pillActive = 'text-primary-deep';
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** How many categories sit in the desktop bar; the rest go under "More" so the bar never overflows. */
+const DESKTOP_VISIBLE = 4;
+
+/** The rest of the categories, in a small menu. Sits outside the sliding row so the panel is not clipped. */
+function MoreMenu({ categories, current }) {
+    const [open, setOpen] = useState(false);
+    const rootRef = useRef(null);
+    const { pathname } = useLocation();
+
+    useEffect(() => setOpen(false), [pathname]);
+    useEffect(() => {
+        if (!open) return undefined;
+        const onPointer = (event) => { if (!rootRef.current?.contains(event.target)) setOpen(false); };
+        const onKey = (event) => { if (event.key === 'Escape') setOpen(false); };
+        document.addEventListener('pointerdown', onPointer);
+        document.addEventListener('keydown', onKey);
+        return () => { document.removeEventListener('pointerdown', onPointer); document.removeEventListener('keydown', onKey); };
+    }, [open]);
+
+    const active = categories.some((c) => c.slug === current);
+    return (
+        <div ref={rootRef} className="relative shrink-0">
+            <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                aria-expanded={open}
+                aria-haspopup="true"
+                className={cn(pill, 'inline-flex items-center gap-1', active || open ? 'bg-primary-tint text-primary-deep' : pillIdle)}
+            >
+                More <ChevronDown size={16} className={cn('transition-transform duration-200', open && 'rotate-180')} aria-hidden="true" />
+            </button>
+            {open && (
+                <ul className="absolute left-0 top-full z-30 mt-2 w-60 animate-fade-in rounded-lg bg-surface p-2 shadow-lg ring-1 ring-line">
+                    {categories.map((category) => (
+                        <li key={category.slug}>
+                            <Link
+                                to={`/category/${category.slug}`}
+                                aria-current={current === category.slug ? 'true' : undefined}
+                                className={cn('block rounded-md px-3 py-2.5 text-small font-medium transition-colors', current === category.slug ? 'bg-primary-tint text-primary-deep' : 'text-ink hover:bg-primary-soft hover:text-primary')}
+                            >
+                                {category.label}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
 
 /** Shared by every category link (this strip and the mobile drawer): where it goes and whether it is the page being viewed. */
 export function useCategoryLink(slug) {
@@ -56,7 +106,9 @@ export default function CategoryNav({ variant = 'desktop' }) {
     const [glide, setGlide] = useState(false); // animate only after the first placement, so it doesn't fly in from the edge
     const [edges, setEdges] = useState({ left: false, right: false });
 
-    const activeKey = plan.some((c) => c.slug === currentSlug) ? currentSlug : '';
+    const listed = phone ? plan : plan.slice(0, DESKTOP_VISIBLE);
+    const overflow = phone ? [] : plan.slice(DESKTOP_VISIBLE);
+    const activeKey = listed.some((c) => c.slug === currentSlug) ? currentSlug : '';
     const shopActive = showAll && pathname.startsWith('/shop');
 
     const updateEdges = useCallback(() => {
@@ -109,11 +161,6 @@ export default function CategoryNav({ variant = 'desktop' }) {
 
     if (plan.length === 0 && !showAll) return null;
 
-    const slide = (direction) => {
-        const scroller = scrollerRef.current;
-        if (scroller) scroller.scrollBy({ left: direction * scroller.clientWidth * 0.7, behavior: reducedMotion() ? 'auto' : 'smooth' });
-    };
-
     return (
         <nav
             aria-label={phone ? 'Categories' : 'Main navigation'}
@@ -132,17 +179,7 @@ export default function CategoryNav({ variant = 'desktop' }) {
                 </NavLink>
             )}
 
-            <div className="relative min-w-0 flex-1">
-                {edges.left && !phone && (
-                    <button type="button" onClick={() => slide(-1)} aria-label="Scroll categories left" className="absolute left-0 top-1/2 z-20 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-surface shadow-md hover:bg-canvas-alt">
-                        <ChevronLeft size={16} />
-                    </button>
-                )}
-                {edges.right && !phone && (
-                    <button type="button" onClick={() => slide(1)} aria-label="Scroll categories right" className="absolute right-0 top-1/2 z-20 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-surface shadow-md hover:bg-canvas-alt">
-                        <ChevronRight size={16} />
-                    </button>
-                )}
+            <div className={cn('relative min-w-0', phone && 'flex-1')}>
                 {/* soft fade where the row continues */}
                 <span aria-hidden="true" className={cn('pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-canvas to-transparent transition-opacity', edges.left ? 'opacity-100' : 'opacity-0')} />
                 <span aria-hidden="true" className={cn('pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-canvas to-transparent transition-opacity', edges.right ? 'opacity-100' : 'opacity-0')} />
@@ -154,7 +191,7 @@ export default function CategoryNav({ variant = 'desktop' }) {
                             className={cn('absolute inset-y-0 rounded-full bg-primary-tint', glide && 'transition-[left,width,opacity] duration-500 ease-out', indicator ? 'opacity-100' : 'opacity-0')}
                             style={{ left: indicator?.left ?? 0, width: indicator?.width ?? 0 }}
                         />
-                        {plan.map((category) => (
+                        {listed.map((category) => (
                             <li key={category.slug}>
                                 <CategoryLink
                                     category={category}
@@ -166,6 +203,8 @@ export default function CategoryNav({ variant = 'desktop' }) {
                     </ul>
                 </div>
             </div>
+
+            {overflow.length > 0 && <MoreMenu categories={overflow} current={currentSlug} />}
         </nav>
     );
 }

@@ -51,12 +51,15 @@ export default function OfferTab() {
     };
 
     const right = offer.side === 'right';
+    // On phones the pill would sit on top of the sticky buy bar and the bag/checkout buttons, so it stays off those pages.
+    const busyOnPhone = /^\/(product|cart|checkout)/.test(pathname);
 
     return (
         <>
             {!hidden && (
                 <div className={cn(
                     // Phones: a compact pill at the bottom-left (clear of the chat button). Larger screens: the slim edge tab.
+                    busyOnPhone && 'max-sm:hidden',
                     'fixed bottom-4 left-4 z-40 flex animate-fade-up items-center gap-1.5 sm:bottom-auto sm:top-[60%] sm:-translate-y-1/2 sm:flex-col sm:gap-2 sm:animate-none',
                     right ? 'sm:left-auto sm:right-0 sm:animate-edge-in-right' : 'sm:left-0 sm:animate-edge-in-left',
                 )}>
