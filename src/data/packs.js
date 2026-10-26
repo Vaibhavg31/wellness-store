@@ -21,4 +21,6 @@ export const PACKS = {
 
 export const FALLBACK_PACK = { kind: 'jar', body: '#F7F3EE', cap: '#602460', accent: '#602460', sub: 'AYURVEDA & WELLNESS', note: 'Lab tested · Clean label' };
 
-export const packFor = (product) => ({ ...FALLBACK_PACK, name: product.title, ...PACKS[product.id] });
+/** The look of a product's pack: built-in suggestion, overridden by what the admin set for that product. */
+export const packFor = (product, custom = {}) => ({ ...FALLBACK_PACK, name: product.title, ...PACKS[product.id], ...Object.fromEntries(Object.entries(custom[product.id] ?? {}).filter(([, v]) => v)) });
+export const hasPack = (product, custom = {}) => Boolean(PACKS[product.id] || custom[product.id]);

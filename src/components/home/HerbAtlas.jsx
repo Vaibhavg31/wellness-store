@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, Plus } from 'lucide-react';
 import Reveal from '@/components/ui/Reveal';
 import { HERB_ATLAS } from '@/data/herbAtlas';
+import { useSiteContent } from '@/contexts/SiteContentContext';
 import { imageUrl } from '@/services/api';
 import { formatPrice, cn } from '@/utils/formatPrice';
 
@@ -12,8 +13,15 @@ import { formatPrice, cn } from '@/utils/formatPrice';
  * real Chikit products it goes into. The first herb is open, so the section never looks empty.
  */
 export default function HerbAtlas({ products = [] }) {
-    const { eyebrow, title, description, herbs } = HERB_ATLAS;
-    const [openId, setOpenId] = useState(herbs[0].id);
+    const custom = useSiteContent().content.extras.herbs;
+    const { eyebrow } = HERB_ATLAS;
+    const title = custom?.title || HERB_ATLAS.title;
+    const description = custom?.description || HERB_ATLAS.description;
+    const herbs = useMemo(() => (custom?.items?.length
+        ? custom.items.map((h) => ({ ...h, id: h.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'), productIds: h.productIds ?? [] }))
+        : HERB_ATLAS.herbs), [custom]);
+    const [openId, setOpenId] = useState(null);
+    const activeId = herbs.some((h) => h.id === openId) ? openId : herbs[0]?.id;
     const byId = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
 
     return (
@@ -30,7 +38,7 @@ export default function HerbAtlas({ products = [] }) {
                 <Reveal>
                     <ul className="flex flex-col gap-3 lg:h-[30rem] lg:flex-row lg:gap-4">
                         {herbs.map((herb, i) => {
-                            const open = herb.id === openId;
+                            const open = herb.id === activeId;
                             const found = herb.productIds.map((id) => byId.get(id)).filter(Boolean);
                             return (
                                 <li

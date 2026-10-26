@@ -435,7 +435,7 @@ export function FaqEditor({ faqs = [], onChange }) {
  * expanded; return null/undefined for a section with nothing to configure
  * (e.g. it just pulls from Products or another admin page).
  */
-export function SectionToggles({ sections, onChange, labels, renderContent }) {
+export function SectionToggles({ sections, onChange, labels, renderContent, meta = {} }) {
     // Only sections the storefront still renders — settings saved for retired sections are ignored.
     const known = Object.keys(sections).filter((k) => k in labels);
     const keys = known.length ? known : Object.keys(labels);
@@ -455,7 +455,11 @@ export function SectionToggles({ sections, onChange, labels, renderContent }) {
         });
     };
 
+    const on = keys.filter((k) => sections[k]).length;
+
     return (
+        <>
+        <p className="mb-3 text-xs text-admin-muted"><span className="font-semibold text-ink">{on} of {keys.length}</span> sections are showing on your homepage. Core sections make a complete landing page; Optional ones are there when you want more.</p>
         <Reorder.Group
             as="div"
             axis="y"
@@ -467,7 +471,9 @@ export function SectionToggles({ sections, onChange, labels, renderContent }) {
                 <SectionAccordionRow
                     key={key}
                     itemKey={key}
-                    label={labels[key] ?? key}
+                    label={meta[key]?.title ?? labels[key] ?? key}
+                    description={meta[key]?.desc}
+                    tag={meta[key]?.tag}
                     enabled={sections[key]}
                     onToggle={() => onChange({ ...sections, [key]: !sections[key] })}
                     expanded={expandedKeys.has(key)}
@@ -477,10 +483,11 @@ export function SectionToggles({ sections, onChange, labels, renderContent }) {
                 </SectionAccordionRow>
             ))}
         </Reorder.Group>
+        </>
     );
 }
 
-function SectionAccordionRow({ itemKey, label, enabled, onToggle, expanded, onToggleExpand, children }) {
+function SectionAccordionRow({ itemKey, label, description, tag, enabled, onToggle, expanded, onToggleExpand, children }) {
     const dragControls = useDragControls();
     const hasContent = children != null;
 
@@ -512,7 +519,13 @@ function SectionAccordionRow({ itemKey, label, enabled, onToggle, expanded, onTo
                         disabled={!hasContent}
                         aria-expanded={hasContent ? expanded : undefined}
                     >
-                        <span className="text-sm text-ink truncate font-medium">{label}</span>
+                        <span className="min-w-0">
+                            <span className="flex items-center gap-2">
+                                <span className="text-sm text-ink truncate font-medium">{label}</span>
+                                {tag && <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${tag === 'core' ? 'bg-primary/10 text-primary' : 'bg-admin-surface-alt text-admin-muted ring-1 ring-admin-border'}`}>{tag === 'core' ? 'Core' : 'Optional'}</span>}
+                            </span>
+                            {description && <span className="mt-0.5 block text-xs text-admin-muted font-normal leading-snug">{description}</span>}
+                        </span>
                         {hasContent && (
                             <ChevronDown
                                 size={15}
@@ -521,14 +534,18 @@ function SectionAccordionRow({ itemKey, label, enabled, onToggle, expanded, onTo
                         )}
                     </button>
                 </div>
-                <button
-                    type="button"
-                    onClick={onToggle}
-                    className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${enabled ? 'bg-primary' : 'bg-muted/30'}`}
-                    aria-label={enabled ? 'Disable section' : 'Enable section'}
-                >
-                    <span className={`absolute top-0.5 w-5 h-5 bg-canvas rounded-full shadow transition-transform ${enabled ? 'left-6' : 'left-0.5'}`} />
-                </button>
+                <div className="flex shrink-0 items-center gap-2">
+                    <span className={`hidden text-xs font-medium sm:inline ${enabled ? 'text-primary' : 'text-admin-muted'}`}>{enabled ? 'Showing' : 'Hidden'}</span>
+                    <button
+                        type="button"
+                        onClick={onToggle}
+                        className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${enabled ? 'bg-primary' : 'bg-muted/30'}`}
+                        aria-label={`${enabled ? 'Hide' : 'Show'} ${label}`}
+                        aria-pressed={enabled}
+                    >
+                        <span className={`absolute top-0.5 w-5 h-5 bg-canvas rounded-full shadow transition-transform ${enabled ? 'left-6' : 'left-0.5'}`} />
+                    </button>
+                </div>
             </div>
 
             <AnimatePresence initial={false}>

@@ -7,6 +7,7 @@ import Price from '@/components/ui/Price';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { DAY_RITUAL } from '@/data/dayRitual';
 import { useCart } from '@/contexts/CartContext';
+import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useToast } from '@/contexts/ToastContext';
 import { imageUrl } from '@/services/api';
 import { formatPrice, cn } from '@/utils/formatPrice';
@@ -91,18 +92,27 @@ function Stage({ stage, index, count, progress, product, active, onAdd, added, l
 }
 
 /** Resolves the stages against the live catalogue; the story only mounts once there are enough to tell it. */
+const STAGE_BACKGROUNDS = ['bg-accent-tint', 'bg-canvas-alt', 'bg-primary-tint'];
+
 export default function DayRitual({ products = [] }) {
+    const custom = useSiteContent().content.extras.dayRitual;
+    const source = useMemo(() => (custom?.stages?.length
+        ? custom.stages.map((s, i, all) => {
+            const last = i === all.length - 1 && all.length >= 3;
+            return { ...s, id: `${s.label}-${i}`, tone: last ? 'deep' : 'light', bg: last ? 'bg-primary-deep' : STAGE_BACKGROUNDS[i % STAGE_BACKGROUNDS.length] };
+        })
+        : DAY_RITUAL.stages), [custom]);
     const stages = useMemo(
-        () => DAY_RITUAL.stages
+        () => source
             .map((stage) => ({ stage, product: products.find((p) => p.id === stage.productId) }))
             .filter(({ product }) => product && (product.stock ?? 0) > 0),
-        [products],
+        [products, source],
     );
     if (stages.length < 3) return null;
-    return <RitualStory stages={stages} />;
+    return <RitualStory stages={stages} copy={{ title: custom?.title || DAY_RITUAL.title, description: custom?.description || DAY_RITUAL.description }} />;
 }
 
-function RitualStory({ stages }) {
+function RitualStory({ stages, copy }) {
     const { addToCart } = useCart();
     const { showToast } = useToast();
     const sectionRef = useRef(null);
@@ -144,10 +154,10 @@ function RitualStory({ stages }) {
         <LazyMotion features={domAnimation}>
             <section aria-labelledby="ritual-title" className="bg-canvas">
                 <div className="container-page pt-12 lg:pt-20">
-                    <SectionHeader eyebrow={DAY_RITUAL.eyebrow} title={DAY_RITUAL.title} description={DAY_RITUAL.description} className="!mb-6 lg:!mb-8" />
+                    <SectionHeader eyebrow={DAY_RITUAL.eyebrow} title={copy.title} description={copy.description} className="!mb-6 lg:!mb-8" />
                 </div>
                 <div ref={sectionRef} style={{ height: `${(count - 1) * HOLD_VH + 100}svh` }} className="relative">
-                    <h2 id="ritual-title" className="sr-only">{DAY_RITUAL.title}</h2>
+                    <h2 id="ritual-title" className="sr-only">{copy.title}</h2>
                     <div className="sticky top-0 h-svh overflow-hidden">
                         {stages.map(({ stage, product }, i) => (
                             <Stage

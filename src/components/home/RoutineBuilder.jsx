@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button';
 import Price from '@/components/ui/Price';
 import Reveal from '@/components/ui/Reveal';
 import { ROUTINES } from '@/data/routines';
+import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
 import { imageUrl } from '@/services/api';
@@ -16,7 +17,11 @@ import { formatPrice, cn } from '@/utils/formatPrice';
  * live total and one button that adds the whole routine to the bag. Everything shown comes from the catalogue.
  */
 export default function RoutineBuilder({ products = [] }) {
-    const { eyebrow, title, description, goals } = ROUTINES;
+    const custom = useSiteContent().content.extras.routines;
+    const { eyebrow } = ROUTINES;
+    const title = custom?.title || ROUTINES.title;
+    const description = custom?.description || ROUTINES.description;
+    const goals = custom?.goals?.length ? custom.goals : ROUTINES.goals;
     const reduced = useReducedMotion();
     const { addToCart } = useCart();
     const { showToast } = useToast();

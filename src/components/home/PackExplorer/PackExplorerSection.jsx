@@ -7,7 +7,8 @@ import Price from '@/components/ui/Price';
 import Reveal from '@/components/ui/Reveal';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
-import { PACKS, packFor } from '@/data/packs';
+import { hasPack, packFor } from '@/data/packs';
+import { useSiteContent } from '@/contexts/SiteContentContext';
 import { imageUrl } from '@/services/api';
 import { cn } from '@/utils/formatPrice';
 
@@ -43,6 +44,7 @@ function PhotoFallback({ product }) {
  */
 export default function PackExplorerSection({ products = [] }) {
     const reduced = useReducedMotion();
+    const looks = useSiteContent().content.extras.packs ?? {};
     const { addToCart } = useCart();
     const { showToast } = useToast();
     const sectionRef = useRef(null);
@@ -53,7 +55,7 @@ export default function PackExplorerSection({ products = [] }) {
     const [activeId, setActiveId] = useState(null);
     const [addedId, setAddedId] = useState(null);
 
-    const list = useMemo(() => products.filter((p) => PACKS[p.id] && p.images?.[0]), [products]);
+    const list = useMemo(() => products.filter((p) => hasPack(p, looks) && p.images?.[0]), [products, looks]);
     const active = list.find((p) => p.id === activeId) ?? list[0];
 
     useEffect(() => { setWebgl(hasWebGL()); }, []);
@@ -70,7 +72,7 @@ export default function PackExplorerSection({ products = [] }) {
     if (list.length < 2) return null;
 
     const live = near && webgl && !reduced;
-    const pack = packFor(active);
+    const pack = packFor(active, looks);
     const add = () => {
         if (addToCart(active, 1)) {
             setAddedId(active.id);

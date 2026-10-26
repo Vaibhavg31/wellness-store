@@ -75,26 +75,26 @@ export const DEFAULT_SITE_CONTENT = {
 
     navLinks: NAV_LINKS,
 
-    // Homepage order, top to bottom (the admin can reorder or hide any of these).
+    // Launch landing page, top to bottom: Core sections on, optional extras off (the admin can reorder or switch any).
     sections: {
         hero: true,
         brandMarquee: true,
         categories: true,
-        routineBuilder: true,
         categoryShelves: true,
         dayRitual: true,
-        packExplorer: true,
-        herbAtlas: true,
         bannerSlider: true,
         bundles: true,
-        doshaQuiz: true,
         whyChoose: true,
         reviews: true,
         newsletter: true,
+        promoBanner: true,
+        routineBuilder: false,
+        packExplorer: false,
+        herbAtlas: false,
+        doshaQuiz: false,
         banners: false,
         videoBanner: false,
         instagram: false,
-        promoBanner: true,
     },
 
     promo: {
@@ -245,6 +245,11 @@ export const DEFAULT_SITE_CONTENT = {
         restockReminderDays: 30,
         expertChat: true,
         concerns: [], // [{ label, search, image }] → "Shop by concern" on the homepage
+        // Text for sections that fall back to the built-in suggestions in src/data/*.js while these are empty
+        routines: { title: '', description: '', goals: [] },
+        dayRitual: { title: '', description: '', stages: [] },
+        herbs: { title: '', description: '', items: [] },
+        packs: {}, // { [productId]: { kind, body, cap, accent, name, sub, note } } look of each pack in Explore in 3D
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' }, // extra popup options; see AnnouncementPopup
         spin: { cooldownDays: 30, segments: [] }, // spin-the-wheel slices: [{ label, couponId, weight }]
         shelves: { mode: 'auto', limit: 8, items: [] }, // homepage category shelves: custom items = [{ categorySlug, subtitle }]

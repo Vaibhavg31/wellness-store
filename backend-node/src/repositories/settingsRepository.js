@@ -50,10 +50,26 @@ const DEFAULTS = {
         { label: 'FAQ', href: '/faq' },
         { label: 'Contact', href: '/contact' },
     ],
+    // Launch landing page: Core sections on in this order; optional extras off (one switch each in the admin).
     sections: {
-        hero: true, brandMarquee: true, categories: true, routineBuilder: true, categoryShelves: true, dayRitual: true, packExplorer: true, herbAtlas: true, bannerSlider: true,
-        bundles: true, doshaQuiz: true, whyChoose: true, reviews: true, newsletter: true,
-        banners: false, videoBanner: false, instagram: false, promoBanner: true,
+        hero: true,
+        brandMarquee: true,
+        categories: true,
+        categoryShelves: true,
+        dayRitual: true,
+        bannerSlider: true,
+        bundles: true,
+        whyChoose: true,
+        reviews: true,
+        newsletter: true,
+        promoBanner: true,
+        routineBuilder: false,
+        packExplorer: false,
+        herbAtlas: false,
+        doshaQuiz: false,
+        banners: false,
+        videoBanner: false,
+        instagram: false,
     },
     promo: { enabled: true, text: 'Use code', code: 'WELCOME10', suffix: 'for 10% off your first order', href: '/shop' },
     hero: {
@@ -103,6 +119,11 @@ const DEFAULTS = {
         restockReminderDays: 30,
         expertChat: true,
         concerns: [],
+        // Homepage sections whose text used to live in code. Empty = the built-in suggestion is used.
+        routines: { title: '', description: '', goals: [] },
+        dayRitual: { title: '', description: '', stages: [] },
+        herbs: { title: '', description: '', items: [] },
+        packs: {},
         // Extra popup options (the core popup fields live in their own columns): category target, schedule, pages.
         popup: { categorySlug: '', startsAt: '', endsAt: '', pages: 'all' },
         // Spin-the-wheel popup: slices (no couponId = "better luck next time"), weights are relative odds.
@@ -130,6 +151,63 @@ const DEFAULTS = {
     },
 };
 
+const HEX = /^#[0-9a-fA-F]{6}$/;
+const PACK_KINDS = ['bottle', 'jar', 'tube', 'pouch', 'pump'];
+const HERB_TONES = ['bg-success-tint', 'bg-accent-tint', 'bg-primary-tint', 'bg-info-tint', 'bg-canvas-alt', 'bg-warning-tint'];
+const text = (v, max) => String(v ?? '').trim().slice(0, max);
+const list = (v) => (Array.isArray(v) ? v : []);
+const slug = (v) => text(v, 40).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/** Content for the routine, daily-ritual, herb and 3D-pack homepage sections. Product ids are kept as plain text (a missing product is simply skipped on the storefront). */
+function sanitizeSectionContent(e) {
+    const head = (o) => ({ title: text(o?.title, 90), description: text(o?.description, 240) });
+    const packs = {};
+    Object.entries(e.packs && typeof e.packs === 'object' ? e.packs : {}).slice(0, 80).forEach(([id, p]) => {
+        const key = text(id, 64);
+        if (!key) return;
+        packs[key] = {
+            kind: PACK_KINDS.includes(p?.kind) ? p.kind : 'jar',
+            body: HEX.test(p?.body ?? '') ? p.body : '#F7F3EE',
+            cap: HEX.test(p?.cap ?? '') ? p.cap : '#602460',
+            accent: HEX.test(p?.accent ?? '') ? p.accent : (HEX.test(p?.cap ?? '') ? p.cap : '#602460'),
+            name: text(p?.name, 30),
+            sub: text(p?.sub, 30),
+            note: text(p?.note, 40),
+        };
+    });
+    return {
+        routines: {
+            ...head(e.routines),
+            goals: list(e.routines?.goals).slice(0, 6).map((g) => ({
+                id: slug(g?.id) || slug(g?.label),
+                label: text(g?.label, 30),
+                summary: text(g?.summary, 120),
+                steps: list(g?.steps).slice(0, 4)
+                    .map((st) => ({ when: text(st?.when, 24), productId: text(st?.productId, 64), why: text(st?.why, 140) }))
+                    .filter((st) => st.productId),
+            })).filter((g) => g.label && g.steps.length),
+        },
+        dayRitual: {
+            ...head(e.dayRitual),
+            stages: list(e.dayRitual?.stages).slice(0, 6)
+                .map((st) => ({ label: text(st?.label, 20), time: text(st?.time, 16), title: text(st?.title, 60), copy: text(st?.copy, 200), productId: text(st?.productId, 64) }))
+                .filter((st) => st.productId && st.title),
+        },
+        herbs: {
+            ...head(e.herbs),
+            items: list(e.herbs?.items).slice(0, 10).map((h) => ({
+                name: text(h?.name, 30),
+                local: text(h?.local, 40),
+                latin: text(h?.latin, 60),
+                use: text(h?.use, 200),
+                tone: HERB_TONES.includes(h?.tone) ? h.tone : HERB_TONES[0],
+                productIds: list(h?.productIds).slice(0, 4).map((id) => text(id, 64)).filter(Boolean),
+            })).filter((h) => h.name),
+        },
+        packs,
+    };
+}
+
 const LOCAL_DATETIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 
 /** Extras are stored as JSON; keep only known keys, with sane types and bounds. */
@@ -148,6 +226,7 @@ function sanitizeExtras(input) {
             .slice(0, 6),
         restockReminderDays: Math.min(365, Math.max(0, Number.parseInt(e.restockReminderDays ?? d.restockReminderDays, 10) || 0)),
         expertChat: e.expertChat === undefined ? d.expertChat : Boolean(e.expertChat),
+        ...sanitizeSectionContent(e),
         concerns: (Array.isArray(e.concerns) ? e.concerns : [])
             .map((c) => ({ label: String(c?.label ?? '').trim().slice(0, 40), search: String(c?.search ?? '').trim().slice(0, 60), image: String(c?.image ?? '').trim().slice(0, 300) }))
             .filter((c) => c.label)

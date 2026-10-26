@@ -18,6 +18,7 @@ import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
 import HeroProductPicker from '@/components/admin/HeroProductPicker';
+import { DayRitualEditor, HerbsEditor, PacksEditor, RoutinesEditor } from '@/components/admin/SectionEditors';
 import {
     AdminSection, AdminField, AdminTextarea, ImageUploadField, VideoUploadField,
     StringListEditor, BenefitEditor, FaqEditor, SectionToggles,
@@ -57,6 +58,31 @@ const SECTION_LABELS = {
     instagram: 'Instagram Gallery',
     newsletter: 'Newsletter',
     promoBanner: 'Top Announcement Bar (Text Only)',
+};
+
+/**
+ * What each homepage section is, in plain words, and what it needs from you. "core" sections make a complete landing
+ * page on their own; "optional" ones are extras to switch on when the store has the content for them.
+ */
+const SECTION_META = {
+    hero: { tag: 'core', title: 'Hero', desc: 'The first screen: your headline and a showcase of product cards. Needs: products with a cover photo (pick up to 5 below, or leave it on automatic).' },
+    brandMarquee: { tag: 'core', title: 'Trust strip', desc: 'A single line of promises under the hero (certified, lab tested, free delivery). Needs: only your short phrases.' },
+    categories: { tag: 'core', title: 'Shop by need', desc: 'Large goal tiles that lead into your shop. Needs: a photo on each category (Categories page).' },
+    categoryShelves: { tag: 'core', title: 'The range', desc: 'A browsable product rail with category filters. Needs: products in your categories.' },
+    dayRitual: { tag: 'core', title: 'Your day, ritualised', desc: 'A scroll story of moments in a day, one product each, with add-to-bag. Needs: at least 3 products in stock.' },
+    bannerSlider: { tag: 'core', title: 'Campaign banner', desc: 'A full-width slider of your offers, or one video. Needs: wide banner images (and a phone version).' },
+    bundles: { tag: 'core', title: 'Bundle & save offers', desc: 'Your bundle deals. Needs: at least one bundle (Bundles page). Hides itself when there are none.' },
+    whyChoose: { tag: 'core', title: 'Our promise', desc: 'Why customers can trust you, with your certificates. Needs: your promise points and certificate image.' },
+    reviews: { tag: 'core', title: 'Customer reviews', desc: 'Approved reviews with a rating summary. Needs: approved reviews (Reviews page). Best switched on once real reviews exist.' },
+    newsletter: { tag: 'core', title: 'Newsletter', desc: 'An email sign-up band. Needs: nothing.' },
+    doshaQuiz: { tag: 'optional', title: 'Prakriti quiz', desc: 'A short Ayurveda body-type quiz that suggests your products. The questions are fixed; nothing to edit.' },
+    routineBuilder: { tag: 'optional', title: 'Build your routine', desc: 'Shoppers pick a goal and add a ready-made routine to the bag. Needs: you choose the products for each goal.' },
+    packExplorer: { tag: 'optional', title: 'Explore in 3D', desc: 'A 3D pack the shopper can turn and zoom. Needs: pick a pack shape and colours per product. No images to upload.' },
+    herbAtlas: { tag: 'optional', title: 'Know your herbs', desc: 'Expanding panels about your key herbs, linked to products. Needs: a short line per herb.' },
+    banners: { tag: 'optional', title: 'Image banners', desc: 'Stacked promo banners. Needs: banner images.' },
+    videoBanner: { tag: 'optional', title: 'Video banner', desc: 'One brand video band. Needs: an MP4 video.' },
+    instagram: { tag: 'optional', title: 'Instagram gallery', desc: 'A grid of your Instagram pictures. Needs: 6 square images and your handle.' },
+    promoBanner: { tag: 'optional', title: 'Announcement bar', desc: 'A thin text strip at the very top (for example a coupon). Needs: one short line of text.' },
 };
 
 export default function AdminContentPage() {
@@ -564,11 +590,16 @@ export default function AdminContentPage() {
                 );
 
             case 'dayRitual':
-                return (
-                    <p className="text-sm text-admin-muted pt-3">
-                        A scroll-driven story through one day (morning, midday, evening, night). Each moment features one product from your catalogue with an add-to-bag button, and the last offers the whole routine in one tap. It skips any product that is missing or out of stock, and hides itself if fewer than three are available. Use the toggle to show or hide it, and drag it to reorder.
-                    </p>
-                );
+                return <DayRitualEditor value={content.extras.dayRitual} onChange={(v) => updateExtras({ dayRitual: v })} products={products} />;
+
+            case 'routineBuilder':
+                return <RoutinesEditor value={content.extras.routines} onChange={(v) => updateExtras({ routines: v })} products={products} />;
+
+            case 'herbAtlas':
+                return <HerbsEditor value={content.extras.herbs} onChange={(v) => updateExtras({ herbs: v })} products={products} />;
+
+            case 'packExplorer':
+                return <PacksEditor value={content.extras.packs} onChange={(v) => updateExtras({ packs: v })} products={products} />;
 
             case 'doshaQuiz':
                 return (
@@ -770,6 +801,7 @@ export default function AdminContentPage() {
                                 <SectionToggles
                                     sections={content.sections}
                                     labels={SECTION_LABELS}
+                                    meta={SECTION_META}
                                     onChange={handleSectionsChange}
                                     renderContent={renderHomepageSectionContent}
                                 />
