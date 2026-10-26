@@ -49,7 +49,7 @@ function Stage({ stage, index, count, progress, product, active, onAdd, added, l
             >
                 <div className="container-page grid w-full items-center gap-5 pt-20 pb-36 sm:pt-24 sm:pb-24 lg:grid-cols-2 lg:gap-16">
                     {/* the product, in an arch */}
-                    <div className="order-1 mx-auto h-[30svh] min-h-[9rem] [@media(max-height:700px)]:h-[24svh] max-h-[22rem] lg:order-2 lg:h-[min(62svh,34rem)] lg:max-h-none">
+                    <div className="order-1 mx-auto h-[30svh] min-h-[9rem] max-lg:[@media(max-height:700px)]:h-[24svh] max-h-[22rem] lg:order-2 lg:h-[min(64svh,36rem)] lg:max-h-none">
                         <div className={cn('aspect-[4/5] h-full overflow-hidden rounded-t-[999px] rounded-b-2xl shadow-lg ring-1', deep ? 'ring-white/20' : 'ring-line')}>
                             {img && <img src={imageUrl(img, 720)} alt={product.title} width="720" height="900" loading="lazy" decoding="async" className="size-full object-cover" />}
                         </div>
