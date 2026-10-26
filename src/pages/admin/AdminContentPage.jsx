@@ -47,8 +47,6 @@ const SECTION_LABELS = {
     categoryShelves: 'The Range (filterable product rail)',
     categories: 'Shop by Need (tiles)',
     dayRitual: 'Your Day, Ritualised (scroll story with shop-the-routine)',
-    packExplorer: 'Explore in 3D (turn the pack, add to bag)',
-    herbAtlas: 'Know Your Herbs (expanding herb panels)',
     doshaQuiz: 'Find Your Prakriti Quiz (Ayurveda body-type quiz)',
     bundles: 'Bundle & Save Offers',
     whyChoose: 'Our Promise (trust + certifications)',

@@ -82,8 +82,6 @@ export const DEFAULT_SITE_CONTENT = {
         categories: true,
         categoryShelves: true,
         dayRitual: true,
-        packExplorer: true,
-        herbAtlas: true,
         bannerSlider: true,
         bundles: true,
         doshaQuiz: true,

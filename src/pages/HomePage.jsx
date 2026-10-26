@@ -7,8 +7,6 @@ import ShopByNeed from '@/components/home/ShopByNeed';
 import RangeRail from '@/components/home/RangeRail';
 import BundleSection from '@/components/home/BundleSection';
 import DayRitual from '@/components/home/DayRitual';
-import HerbAtlas from '@/components/home/HerbAtlas';
-import PackExplorerSection from '@/components/home/PackExplorer/PackExplorerSection';
 import DoshaQuiz from '@/components/home/DoshaQuiz';
 import WhyChoose from '@/components/home/WhyChoose';
 import Testimonials from '@/components/home/Testimonials';
@@ -32,8 +30,6 @@ function buildSections({ products, loading }) {
         banners: () => <PromoBanners />,
         bannerSlider: () => <BannerSlider />,
         dayRitual: () => <DayRitual products={products} />,
-        packExplorer: () => <PackExplorerSection products={products} />,
-        herbAtlas: () => <HerbAtlas products={products} />,
         doshaQuiz: () => <DoshaQuiz products={products} loading={loading} />,
         bundles: () => <BundleSection />,
         whyChoose: () => <WhyChoose />,
