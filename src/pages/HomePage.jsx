@@ -7,7 +7,6 @@ import ShopByNeed from '@/components/home/ShopByNeed';
 import RangeRail from '@/components/home/RangeRail';
 import BundleSection from '@/components/home/BundleSection';
 import DayRitual from '@/components/home/DayRitual';
-import HerbStory from '@/components/home/HerbStory';
 import HerbAtlas from '@/components/home/HerbAtlas';
 import PackExplorerSection from '@/components/home/PackExplorer/PackExplorerSection';
 import DoshaQuiz from '@/components/home/DoshaQuiz';
@@ -27,7 +26,6 @@ function buildSections({ products, loading }) {
     return {
         hero: () => <Hero products={products} loading={loading} />,
         brandMarquee: () => <TrustStrip />,
-        herbStory: () => <HerbStory products={products} />,
         videoBanner: () => <VideoBanner />,
         categories: () => <ShopByNeed />,
         categoryShelves: () => <RangeRail products={products} loading={loading} />,
