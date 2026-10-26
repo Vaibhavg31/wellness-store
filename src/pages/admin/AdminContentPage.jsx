@@ -46,6 +46,7 @@ const SECTION_LABELS = {
     bannerSlider: 'Full-width Banner Slider',
     categoryShelves: 'The Range (filterable product rail)',
     categories: 'Shop by Need (tiles)',
+    routineBuilder: 'Build Your Routine (goal-based, add all to bag)',
     dayRitual: 'Your Day, Ritualised (scroll story with shop-the-routine)',
     packExplorer: 'Explore in 3D (turn the pack, add to bag)',
     herbAtlas: 'Know Your Herbs (expanding herb panels)',

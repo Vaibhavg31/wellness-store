@@ -69,6 +69,8 @@ export function CartProvider({ children }) {
     const [cartPulse, setCartPulse] = useState(0);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [autoApplied, setAutoApplied] = useState(false);
+    const itemsRef = useRef(items);
+    itemsRef.current = items;
     const manualCouponRef = useRef(false);
     const autoApplySkipRef = useRef(sessionStorage.getItem(AUTO_SKIP_KEY) === '1');
     const lastItemCountRef = useRef(0);
@@ -98,21 +100,28 @@ export function CartProvider({ children }) {
         const qty = maxQtyFor(product, quantity);
         if (qty <= 0) return false;
 
-        let added = false;
-        setItems((prev) => {
-            const existing = prev.find((item) => sameLine(item.product, product));
-            if (existing) {
-                const next = maxQtyFor(product, existing.quantity + quantity);
-                added = next > existing.quantity;
-                return prev.map((item) => {
-                    if (!sameLine(item.product, product)) return item;
-                    return { ...item, product: { ...item.product, ...product }, quantity: next };
-                }).filter((item) => item.quantity > 0);
-            }
+        // Work out the result from the latest bag first (React runs state updaters later, so a flag set inside one
+        // is not reliable to return), and keep the ref current so several adds in one tick all see each other.
+        const prev = itemsRef.current;
+        const existing = prev.find((item) => sameLine(item.product, product));
+        let next;
+        let added;
+        if (existing) {
+            const nextQty = maxQtyFor(product, existing.quantity + quantity);
+            added = nextQty > existing.quantity;
+            next = prev.map((item) => {
+                if (!sameLine(item.product, product)) return item;
+                return { ...item, product: { ...item.product, ...product }, quantity: nextQty };
+            }).filter((item) => item.quantity > 0);
+        } else {
             added = true;
-            return [...prev, { product, quantity: qty }];
-        });
-        if (added) setCartPulse((n) => n + 1);
+            next = [...prev, { product, quantity: qty }];
+        }
+        if (added) {
+            itemsRef.current = next;
+            setItems(next);
+            setCartPulse((n) => n + 1);
+        }
         return added;
     }, [setItems]);
 

@@ -80,6 +80,7 @@ export const DEFAULT_SITE_CONTENT = {
         hero: true,
         brandMarquee: true,
         categories: true,
+        routineBuilder: true,
         categoryShelves: true,
         dayRitual: true,
         packExplorer: true,

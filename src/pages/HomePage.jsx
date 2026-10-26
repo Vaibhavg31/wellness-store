@@ -7,6 +7,7 @@ import ShopByNeed from '@/components/home/ShopByNeed';
 import RangeRail from '@/components/home/RangeRail';
 import BundleSection from '@/components/home/BundleSection';
 import DayRitual from '@/components/home/DayRitual';
+import RoutineBuilder from '@/components/home/RoutineBuilder';
 import HerbAtlas from '@/components/home/HerbAtlas';
 import PackExplorerSection from '@/components/home/PackExplorer/PackExplorerSection';
 import DoshaQuiz from '@/components/home/DoshaQuiz';
@@ -28,6 +29,7 @@ function buildSections({ products, loading }) {
         brandMarquee: () => <TrustStrip />,
         videoBanner: () => <VideoBanner />,
         categories: () => <ShopByNeed />,
+        routineBuilder: () => <RoutineBuilder products={products} />,
         categoryShelves: () => <RangeRail products={products} loading={loading} />,
         banners: () => <PromoBanners />,
         bannerSlider: () => <BannerSlider />,
