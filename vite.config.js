@@ -67,9 +67,6 @@ export default defineConfig({
       },
     },
   },
-  optimizeDeps: {
-    exclude: ['@imgly/background-removal'],
-  },
   build: {
     rolldownOptions: {
       output: {

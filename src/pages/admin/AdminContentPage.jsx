@@ -17,6 +17,7 @@ import OfferPanel from '@/components/offer/OfferPanel';
 import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
+import HeroProductPicker from '@/components/admin/HeroProductPicker';
 import {
     AdminSection, AdminField, AdminTextarea, ImageUploadField, VideoUploadField,
     StringListEditor, BenefitEditor, FaqEditor, SectionToggles,
@@ -300,48 +301,15 @@ export default function AdminContentPage() {
                                 <Input value={content.hero.primaryCta?.href} onChange={(e) => update('hero', { ...content.hero, primaryCta: { ...content.hero.primaryCta, href: e.target.value } })} placeholder="/shop" />
                             </AdminField>
                         </div>
-                        <AdminField label="Hero Picture Style" hint="How the right side of the hero looks.">
-                            <div className="grid grid-cols-2 gap-3">
-                                {[
-                                    { value: 'orbit', title: 'Animated product ring', desc: 'Products turn on a podium, follow the cursor, drag to spin' },
-                                    { value: 'image', title: 'One still image', desc: 'A single picture (or the featured product photo)' },
-                                ].map((option) => (
-                                    <button
-                                        key={option.value}
-                                        type="button"
-                                        onClick={() => updateExtras({ heroVisual: option.value })}
-                                        aria-pressed={(content.extras.heroVisual ?? 'orbit') === option.value}
-                                        className={`rounded-xl border p-3 text-left transition-all ${(content.extras.heroVisual ?? 'orbit') === option.value ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-admin-border bg-admin-surface hover:border-primary/40'}`}
-                                    >
-                                        <p className="text-sm font-semibold text-ink">{option.title}</p>
-                                        <p className="text-[11px] text-admin-muted mt-0.5">{option.desc}</p>
-                                    </button>
-                                ))}
-                            </div>
-                        </AdminField>
-                        <AdminField label="Featured Product ID" hint="Pins a product to the small featured-product card and its CTA. Leave empty to hide that card.">
-                            <Input value={content.hero.featuredProductId} onChange={(e) => update('hero', { ...content.hero, featuredProductId: e.target.value })} />
-                        </AdminField>
-                        <AdminField label="Hero Photos" hint="Products shown first on the animated ring (up to 4). Any slot left on Auto is filled with your best sellers and new arrivals, up to 5 in total.">
-                            <div className="grid grid-cols-2 gap-3">
-                                {[0, 1, 2, 3].map((slot) => (
-                                    <AdminSelect
-                                        key={slot}
-                                        aria-label={`Hero photo ${slot + 1}`}
-                                        value={content.hero.productImageIds?.[slot] ?? ''}
-                                        onChange={(e) => {
-                                            const next = [...(content.hero.productImageIds ?? [])];
-                                            next[slot] = e.target.value;
-                                            update('hero', { ...content.hero, productImageIds: next });
-                                        }}
-                                        className="w-full"
-                                        options={[
-                                            { value: '', label: `Auto (slot ${slot + 1})` },
-                                            ...products.map((p) => ({ value: p.id, label: p.title })),
-                                        ]}
-                                    />
-                                ))}
-                            </div>
+                        <AdminField
+                            label="Products in the hero showcase"
+                            hint="The homepage opens with a showcase of up to 5 product cards, each using the product's cover photo. Pick the products you want shown first. If you pick none (or fewer than 5), the rest are your best sellers and new arrivals."
+                        >
+                            <HeroProductPicker
+                                products={products}
+                                value={content.hero.productImageIds ?? []}
+                                onChange={(ids) => update('hero', { ...content.hero, productImageIds: ids })}
+                            />
                         </AdminField>
                     </div>
                 );

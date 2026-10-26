@@ -281,15 +281,6 @@ CREATE TABLE IF NOT EXISTS `product_images` (
   KEY `idx_product_images_product_id` (`product_id`),
   CONSTRAINT `fk_product_images_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Primary product gallery images';
-CREATE TABLE IF NOT EXISTS `product_cutout_images` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `product_id` varchar(64) NOT NULL,
-  `url` varchar(2048) NOT NULL,
-  `sort_order` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`),
-  KEY `idx_product_cutout_images_product_id` (`product_id`),
-  CONSTRAINT `fk_product_cutout_images_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Background-removed packshots (homepage hero ring)';
 CREATE TABLE IF NOT EXISTS `product_ingredients` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` varchar(64) NOT NULL,
@@ -699,16 +690,6 @@ INSERT IGNORE INTO `product_images` (`id`, `product_id`, `url`, `sort_order`) VA
 INSERT IGNORE INTO `product_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (107,'ws-protein-001','/catalog/products/protein-2.webp',1);
 INSERT IGNORE INTO `product_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (108,'ws-multivitamin-001','/catalog/products/multivitamin-2.webp',1);
 INSERT IGNORE INTO `product_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (109,'ws-biotin-001','/catalog/products/biotin-2.webp',1);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (1,'ws-aloevera-juice-001','/catalog/cutouts/aloe.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (2,'ws-biotin-001','/catalog/cutouts/biotin.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (3,'ws-facewash-001','/catalog/cutouts/facewash.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (4,'ws-fatburner-001','/catalog/cutouts/fatburner.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (5,'ws-hairoil-001','/catalog/cutouts/hairoil.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (6,'ws-immunity-001','/catalog/cutouts/immunity.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (7,'ws-multivitamin-001','/catalog/cutouts/multivitamin.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (8,'ws-protein-001','/catalog/cutouts/protein.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (9,'ws-superfood-greens-001','/catalog/cutouts/greens.webp',0);
-INSERT IGNORE INTO `product_cutout_images` (`id`, `product_id`, `url`, `sort_order`) VALUES (10,'ws-triphala-001','/catalog/cutouts/triphala.webp',0);
 
 -- product_tags
 INSERT IGNORE INTO `product_tags` (`id`, `product_id`, `tag`, `sort_order`) VALUES (1,'ws-protein-001','Best Seller',0);

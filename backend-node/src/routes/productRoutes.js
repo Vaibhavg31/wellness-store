@@ -63,7 +63,6 @@ router.post('/products', asyncRoute(async (req, res) => {
         badges: Array.isArray(body.badges) ? body.badges : [],
         stock: Number.parseInt(body.stock, 10),
         images: body.images,
-        cutoutImages: Array.isArray(body.cutoutImages) ? body.cutoutImages : [],
         variants: Array.isArray(body.variants) ? body.variants : [],
         ingredients: body.ingredients ?? [],
         howToUse: body.howToUse ?? [],
@@ -98,7 +97,7 @@ router.put('/products/:id', asyncRoute(async (req, res) => {
     if (!product) return sendError(res, 'Product not found', 404);
 
     const allowed = ['title', 'price', 'originalPrice', 'discount', 'category', 'tags', 'rating', 'reviewCount',
-        'description', 'features', 'badges', 'stock', 'images', 'cutoutImages', 'isNew', 'isBestSeller', 'isTrendingPinned',
+        'description', 'features', 'badges', 'stock', 'images', 'isNew', 'isBestSeller', 'isTrendingPinned',
         'orbitFeatured', 'orbitSortOrder', 'showTrustBadges', 'isPublished', 'codEnabled', 'onlinePaymentEnabled', 'variants',
         'ingredients', 'howToUse', 'nutrition', 'faqs'];
 

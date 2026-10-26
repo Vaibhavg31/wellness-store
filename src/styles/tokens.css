@@ -103,8 +103,7 @@
   --animate-slide-out-left: slide-out-left 0.22s cubic-bezier(0.4, 0, 1, 1) both;
   --animate-orbit-spin: orbit-spin 70s linear infinite;
   --animate-orbit-spin-reverse: orbit-spin 110s linear infinite reverse;
-  --animate-orbit-sheen: orbit-sheen 6s ease-in-out 1.5s infinite;
-  --animate-twinkle: twinkle 3.4s ease-in-out infinite;
+  --animate-card-sheen: card-sheen 1.3s ease-out 0.35s both;
 
   @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
   @keyframes page-in { from { opacity: 0.35; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -113,7 +112,7 @@
   @keyframes confetti { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); } }
   @keyframes pop { 0% { transform: scale(0.4); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
   @keyframes logo-sheen { from { transform: translateX(-120%) skewX(-16deg); } to { transform: translateX(330%) skewX(-16deg); } }
-  @keyframes orbit-sheen { 0% { transform: translateX(0) skewX(-18deg); } 55%, 100% { transform: translateX(420%) skewX(-18deg); } }
+  @keyframes card-sheen { from { transform: translateX(0) skewX(-18deg); } to { transform: translateX(520%) skewX(-18deg); } }
   @keyframes breathe { 0%, 100% { opacity: 0.55; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
   @keyframes loader-slide { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
   @keyframes swipe-in { from { transform: translateX(56px); } to { transform: none; } }
@@ -125,7 +124,6 @@
   @keyframes slide-out-right { to { transform: translateX(100%); } }
   @keyframes slide-out-left { to { transform: translateX(-100%); } }
   @keyframes orbit-spin { to { transform: rotate(360deg); } }
-  @keyframes twinkle { 0%, 100% { opacity: 0.15; transform: scale(0.7); } 50% { opacity: 0.9; transform: scale(1.15); } }
   @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: none; } }
   @keyframes draw-check { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }

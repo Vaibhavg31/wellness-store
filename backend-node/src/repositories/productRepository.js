@@ -3,26 +3,9 @@ import { generateId } from '../lib/db.js';
 
 const CHILD_TABLES = {
     images: ['product_images', 'url'],
-    cutoutImages: ['product_cutout_images', 'url'],
     tags: ['product_tags', 'tag'],
     features: ['product_features', 'feature'],
     badges: ['product_badges', 'badge'],
-};
-
-// Cutouts (background-removed packshots, shown floating in the homepage hero ring) live in their own table.
-// It is created on first use so databases made before it existed keep working without a manual migration.
-let cutoutTable;
-const ensureCutoutTable = (pool) => {
-    cutoutTable ??= pool.query(`CREATE TABLE IF NOT EXISTS product_cutout_images (
-        id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-        product_id varchar(64) NOT NULL,
-        url varchar(2048) NOT NULL,
-        sort_order int(11) NOT NULL DEFAULT 0,
-        PRIMARY KEY (id),
-        KEY idx_product_cutout_images_product_id (product_id),
-        CONSTRAINT fk_product_cutout_images_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`).catch((err) => { cutoutTable = undefined; throw err; });
-    return cutoutTable;
 };
 
 const EMPTY_CONTENT = { ingredients: [], howToUse: [], nutrition: { servingSize: '', rows: [] }, faqs: [] };
@@ -109,7 +92,6 @@ export class ProductRepository extends BaseRepository {
 
     async fetchChildStringsBatch(table, col, productIds) {
         if (productIds.length === 0) return {};
-        if (table === 'product_cutout_images') await ensureCutoutTable(this.pool());
         const placeholders = productIds.map(() => '?').join(', ');
         const [rows] = await this.pool().query(
             `SELECT product_id, \`${col}\` AS val FROM \`${table}\` WHERE product_id IN (${placeholders}) ORDER BY product_id, sort_order ASC`,
@@ -313,13 +295,11 @@ export class ProductRepository extends BaseRepository {
     }
 
     async fetchChildStrings(table, productId, col) {
-        if (table === 'product_cutout_images') await ensureCutoutTable(this.pool());
         const [rows] = await this.pool().query(`SELECT \`${col}\` AS val FROM \`${table}\` WHERE product_id = ? ORDER BY sort_order ASC`, [productId]);
         return rows.map((r) => r.val);
     }
 
     async replaceChildStrings(table, productId, col, values) {
-        if (table === 'product_cutout_images') await ensureCutoutTable(this.pool());
         await this.pool().query(`DELETE FROM \`${table}\` WHERE product_id = ?`, [productId]);
         if (!values || values.length === 0) return;
         for (const [i, v] of values.entries()) {
@@ -335,7 +315,6 @@ export class ProductRepository extends BaseRepository {
 
         const id = data.id;
         await this.replaceChildStrings('product_images', id, 'url', data.images || []);
-        await this.replaceChildStrings('product_cutout_images', id, 'url', data.cutoutImages || []);
         await this.replaceChildStrings('product_tags', id, 'tag', data.tags || []);
         await this.replaceChildStrings('product_features', id, 'feature', data.features || []);
         await this.replaceChildStrings('product_badges', id, 'badge', data.badges || []);

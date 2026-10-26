@@ -59,7 +59,6 @@ export function draftToProduct(form, { variantsOn = false } = {}) {
         reviewCount: number(form.reviewCount),
         stock,
         images: form.images?.length ? form.images : [placeholderImage()],
-        cutoutImages: form.cutoutImages ?? [],
         tags: (form.tags ?? []).map(text).filter(Boolean),
         badges: (form.badges ?? []).map(text).filter(Boolean),
         showTrustBadges: form.showTrustBadges !== false,

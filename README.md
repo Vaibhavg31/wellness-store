@@ -230,8 +230,7 @@ Access at `/chikit-studio` (set by `ADMIN_PATH` in `config.json`; not linked on 
 Every homepage block is managed in **Admin → Content → Homepage** (drag to reorder, switch on/off). The starter
 database ships in "client demo" form: **Category shelves**, **Customer reviews** and **Instagram** are switched off
 (they look thin until real products, reviews and an Instagram account exist). Turn them on there once the client
-has reviewed the demo; nothing needs to be redeployed. The animated hero ring is chosen under Content → Hero
-("Hero Picture Style"): an Ayurvedic medallion (turning lotus mandala, ring of promises, brand mark) with products standing on a tilted orbit around it. It turns by itself, by cursor tilt, by scroll and by drag; the product in front lights the stage in its own colour and fills the info card (with add-to-bag). A product's **Cutout image** (Admin → Product → Cutout images) stands out of an arch window; any other photo (with or without a background) is clipped into the same arch, so uploads always look right.
+has reviewed the demo; nothing needs to be redeployed. The hero is a product showcase (Admin → Content → Homepage → Hero Banner): a row of product cards, each just the product's cover photo, with the front one centred. It advances by itself (a progress bar shows when), pauses on hover, focus or the pause button, and can be swiped, dragged, stepped with arrows or keys. The light behind it takes the front product's colour, and the caption under it adds that product to the bag. The admin picks up to 5 products there (or leaves it empty for best sellers and new arrivals); no special image editing is needed, any normal product photo works.
 
 **Your Day, Ritualised** is a scroll-driven story (morning, midday, evening, night), one product per moment with
 add-to-bag and a one-tap "whole ritual". Its copy and product ids live in `src/data/dayRitual.js`; prices and stock
