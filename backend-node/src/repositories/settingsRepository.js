@@ -51,7 +51,7 @@ const DEFAULTS = {
         { label: 'Contact', href: '/contact' },
     ],
     sections: {
-        hero: true, brandMarquee: true, categories: true, categoryShelves: true, dayRitual: true, packExplorer: true, herbAtlas: true, bannerSlider: true,
+        hero: true, brandMarquee: true, herbStory: true, categories: true, categoryShelves: true, dayRitual: true, packExplorer: true, herbAtlas: true, bannerSlider: true,
         bundles: true, doshaQuiz: true, whyChoose: true, reviews: true, newsletter: true,
         banners: false, videoBanner: false, instagram: false, promoBanner: true,
     },

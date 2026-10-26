@@ -42,6 +42,7 @@ const SECTION_LABELS = {
     hero: 'Hero Banner',
     videoBanner: 'Video Banner',
     brandMarquee: 'Brand Marquee',
+    herbStory: 'From Herb to Pack (particle scroll story)',
     banners: 'Image Banners (Stacked)',
     bannerSlider: 'Full-width Banner Slider',
     categoryShelves: 'The Range (filterable product rail)',

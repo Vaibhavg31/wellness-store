@@ -79,6 +79,7 @@ export const DEFAULT_SITE_CONTENT = {
     sections: {
         hero: true,
         brandMarquee: true,
+        herbStory: true,
         categories: true,
         categoryShelves: true,
         dayRitual: true,
