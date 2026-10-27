@@ -15,7 +15,7 @@ import { cn } from '@/utils/formatPrice';
 const SearchOverlay = lazy(() => import('@/components/layout/SearchOverlay'));
 
 const iconButton =
-    'relative grid size-11 place-items-center rounded-full text-ink transition-colors hover:bg-primary-soft hover:text-primary active:bg-primary-tint';
+    'relative grid size-10 min-[340px]:size-11 place-items-center rounded-full text-ink transition-colors hover:bg-primary-soft hover:text-primary active:bg-primary-tint';
 
 function CountBadge({ count }) {
     if (!count) return null;
@@ -36,6 +36,7 @@ export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const links = content.navLinks ?? [];
+    const stripHidden = direction === 'down';
 
     useEffect(() => setMenuOpen(false), [pathname]);
 
@@ -53,8 +54,12 @@ export default function Header() {
     }, []);
 
     return (
-        <header className={cn('sticky top-0 z-50 border-b bg-canvas transition-shadow duration-300', scrolled ? 'border-line shadow-sm' : 'border-transparent')}>
-            <div className="container-page flex h-16 items-center gap-4 lg:h-20">
+        // The strip below is hidden with a transform, never by changing its height: a height change moves the page under
+        // the finger, which flips the scroll direction again and made the header flicker on phones. The header box keeps
+        // its height; its transparent gap lets taps through (pointer-events), only the two rows take them.
+        <header className="pointer-events-none sticky top-0 z-50 lg:pointer-events-auto">
+            <div className={cn('pointer-events-auto relative z-10 border-b bg-canvas transition-shadow duration-300', scrolled && stripHidden ? 'border-line shadow-sm' : 'border-transparent', scrolled ? 'lg:border-line lg:shadow-sm' : 'lg:border-transparent', !stripHidden && 'shadow-none')}>
+            <div className="container-page flex h-16 items-center gap-2 min-[340px]:gap-4 lg:h-20">
                 <button type="button" className={cn(iconButton, 'lg:hidden -ml-2')} onClick={() => setMenuOpen(true)} aria-label="Open menu">
                     <Menu size={22} />
                 </button>
@@ -78,12 +83,18 @@ export default function Header() {
                     </button>
                 </div>
             </div>
+            </div>
 
-            {/* On phones the category strip slides away while reading down and returns on the way up (more room for the product). */}
-            <div className={cn('grid transition-[grid-template-rows,opacity] duration-300 ease-[var(--ease-out-soft)] lg:block', direction === 'down' ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100')} aria-hidden={direction === 'down' ? 'true' : undefined} inert={direction === 'down' ? true : undefined}>
-                <div className="min-h-0 overflow-hidden lg:overflow-visible">
-                    <CategoryNav variant="phone" />
-                </div>
+            {/* On phones the category strip slides up under the main row while reading down and returns on the way up. */}
+            <div
+                className={cn(
+                    'pointer-events-auto relative z-0 border-b bg-canvas transition-[transform,opacity] duration-300 ease-[var(--ease-out-soft)] will-change-transform lg:hidden',
+                    stripHidden ? 'pointer-events-none -translate-y-full border-transparent opacity-0' : cn('translate-y-0 opacity-100', scrolled ? 'border-line shadow-sm' : 'border-transparent'),
+                )}
+                aria-hidden={stripHidden ? 'true' : undefined}
+                inert={stripHidden ? true : undefined}
+            >
+                <CategoryNav variant="phone" />
             </div>
 
             <MobileNav isOpen={menuOpen} onClose={() => setMenuOpen(false)} links={links} />

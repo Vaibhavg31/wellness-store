@@ -5,6 +5,7 @@ import OfferPanel, { readUnlocked } from '@/components/offer/OfferPanel';
 import { ADMIN_PATH } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { popupAllowedOn } from '@/utils/popupSchedule';
+import { useScrollPosition } from '@/hooks';
 import { cn } from '@/utils/formatPrice';
 
 const HIDDEN_KEY = 'chikit-offer-tab-hidden';
@@ -30,6 +31,7 @@ export default function OfferTab() {
     const [hidden, setHidden] = useState(wasHidden);
     const [open, setOpen] = useState(false);
     const [unlocked, setUnlocked] = useState(() => Boolean(readUnlocked()));
+    const awayFromTop = useScrollPosition(320);
 
     const allowed = offer.enabled && Boolean(offer.couponId) && popupAllowedOn(pathname, offer.pages, ADMIN_PATH);
 
@@ -52,7 +54,8 @@ export default function OfferTab() {
 
     const right = offer.side === 'right';
     // On phones the pill would sit on top of the sticky buy bar and the bag/checkout buttons, so it stays off those pages.
-    const busyOnPhone = /^\/(product|cart|checkout)/.test(pathname);
+    // The home hero's product bar sits in that corner too, so there it waits until the visitor scrolls on.
+    const busyOnPhone = /^\/(product|cart|checkout)/.test(pathname) || (pathname === '/' && !awayFromTop);
 
     return (
         <>

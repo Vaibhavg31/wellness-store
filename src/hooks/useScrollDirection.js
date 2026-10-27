@@ -11,7 +11,9 @@ export function useScrollDirection({ offset = 140, tolerance = 10 } = {}) {
         let frame = 0;
         const update = () => {
             frame = 0;
-            const y = window.scrollY;
+            // Clamp to the real scroll range: the elastic bounce past the top/bottom on phones is not a direction change.
+            const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+            const y = Math.min(Math.max(window.scrollY, 0), max);
             if (y < offset) setDirection('up');
             else if (y > last + tolerance) setDirection('down');
             else if (y < last - tolerance) setDirection('up');

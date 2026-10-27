@@ -12,7 +12,7 @@ import { cn } from '@/utils/formatPrice';
 const sizes = {
     sm: 'h-10',
     md: 'h-12',
-    header: 'h-10 lg:h-12',
+    header: 'h-9 min-[340px]:h-10 lg:h-12',
     lg: 'h-16',
     xl: 'h-24 sm:h-28',
 };
@@ -28,7 +28,7 @@ export default function Logo({ size = 'md', className, linkToHome = false, prior
             alt="Chikit™ — Ayurveda and Wellness"
             decoding="async"
             fetchPriority={priority ? 'high' : undefined}
-            className={cn('aspect-[1000/305] w-auto object-contain', sizes[size], className)}
+            className={cn('aspect-[1000/305] w-auto max-w-full object-contain', sizes[size], className)}
             draggable={false}
         />
     );

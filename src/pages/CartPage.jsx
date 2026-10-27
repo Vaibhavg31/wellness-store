@@ -63,9 +63,9 @@ function LineEntry({ item, onRemove, onQuantity }) {
     const { product, quantity } = item;
     const variant = { variantId: product.variantId };
     return (
-        <li className="flex gap-4 rounded-lg border border-line bg-surface p-4 sm:p-5">
+        <li className="flex gap-3 rounded-lg border border-line bg-surface p-3 min-[340px]:gap-4 min-[340px]:p-4 sm:p-5">
             <Link to={`/product/${product.id}`} className="shrink-0">
-                <img src={imageUrl(product.images[0])} alt={product.title} width="96" height="112" className="h-28 w-24 rounded-md object-cover" />
+                <img src={imageUrl(product.images[0])} alt={product.title} width="96" height="112" className="h-24 w-20 rounded-md object-cover min-[360px]:h-28 min-[360px]:w-24" />
             </Link>
             <div className="flex min-w-0 flex-1 flex-col">
                 <div className="flex items-start justify-between gap-3">
@@ -147,8 +147,8 @@ export default function CartPage() {
                     </div>
                 )}
 
-                <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
-                    <div className="lg:col-span-2">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
+                    <div className="min-w-0 lg:col-span-2">
                     <ul className="space-y-3">
                         {entries.map((entry) => (
                             entry.type === 'bundle'

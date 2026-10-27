@@ -21,6 +21,7 @@ import { formatOrderDate, isTerminalStatus, normalizeStatus, paymentLabel, short
 import { useToast } from '@/contexts/ToastContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { deliveryWindow } from '@/utils/delivery';
+import { copyText } from '@/utils/copyText';
 
 const card = 'rounded-lg border border-line bg-surface p-5 sm:p-6';
 
@@ -47,8 +48,10 @@ export default function OrderDetailPage() {
             .finally(() => setLoading(false));
     }, [isAuthenticated, token, id]);
 
-    const copyOrderId = () => {
-        if (order?.id) navigator.clipboard.writeText(order.id).then(() => showToast('Order ID copied'));
+    const copyOrderId = async () => {
+        if (!order?.id) return;
+        const ok = await copyText(order.id);
+        showToast(ok ? 'Order ID copied' : 'Could not copy the order ID', ok ? 'success' : 'error');
     };
 
     const buyAgain = () => {

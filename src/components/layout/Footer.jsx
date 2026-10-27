@@ -81,11 +81,11 @@ export default function Footer() {
 
     return (
         <footer className="border-t-4 border-primary bg-canvas-alt">
-            <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:py-16">
-                <div className="lg:col-span-4">
+            <div className="container-page grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:py-16">
+                <div className="min-w-0 lg:col-span-4">
                     <Logo size="lg" />
                     <p className="mt-4 max-w-xs text-small text-muted">{footer.description}</p>
-                    <ul className="mt-5 flex gap-2">
+                    <ul className="mt-5 flex flex-wrap gap-2">
                         {hasInstagramUrl(instagramUrl) && (
                             <li>
                                 <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="grid size-10 place-items-center rounded-full bg-surface text-primary shadow-xs transition-colors hover:bg-primary hover:text-white" aria-label="Instagram">
@@ -108,7 +108,7 @@ export default function Footer() {
                     </ul>
                 </div>
 
-                <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-5">
+                <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:col-span-5">
                     <div>
                         <h2 className="mb-4 font-sans text-small font-semibold text-ink">Shop</h2>
                         <ul className="space-y-1">
@@ -136,7 +136,7 @@ export default function Footer() {
                     </div>
                 </nav>
 
-                <div className={homeHasSignup ? 'hidden' : 'sm:col-span-2 lg:col-span-3'}>
+                <div className={homeHasSignup ? 'hidden' : 'min-w-0 sm:col-span-2 lg:col-span-3'}>
                     <h2 className="mb-2 font-sans text-small font-semibold text-ink">{footer.newsletterTitle}</h2>
                     <p className="mb-4 text-small text-muted">{footer.newsletterDescription}</p>
                     <NewsletterForm />

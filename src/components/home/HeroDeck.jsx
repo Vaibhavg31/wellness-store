@@ -55,7 +55,7 @@ function DeckCard({ item, offset, index, onSelect, dragged, priority, reduced })
 
     return (
         <m.div
-            className="absolute left-[17%] top-[4%] aspect-[4/5] w-[66%] sm:left-[21%] sm:w-[58%]"
+            className="absolute left-[20%] top-[4%] aspect-[4/5] w-[60%] sm:left-[21%] sm:w-[58%]"
             initial={false}
             animate={slotFor(offset)}
             transition={reduced ? { duration: 0 } : SPRING}
@@ -203,7 +203,7 @@ export default function HeroDeck({ items }) {
 
     return (
         <div
-            className="relative isolate mx-auto w-full max-w-[40rem] overflow-hidden rounded-[1.75rem] bg-primary px-3 pb-3 pt-7 text-white shadow-lg sm:rounded-[2rem] sm:px-8 sm:pb-6 sm:pt-10 lg:ml-auto"
+            className="relative isolate mx-auto w-full max-w-[40rem] overflow-hidden rounded-[1.75rem] bg-primary px-3 pb-3 pt-5 text-white shadow-lg sm:rounded-[2rem] sm:px-8 sm:pb-6 sm:pt-10 lg:ml-auto"
             onPointerEnter={(e) => { if (e.pointerType === 'mouse') { hold.current.hover = true; applyHold(); } }}
             onPointerLeave={() => { hold.current.hover = false; applyHold(); }}
             onFocus={(e) => { if (e.target.matches?.(':focus-visible')) { hold.current.focus = true; applyHold(); } }}
@@ -225,7 +225,7 @@ export default function HeroDeck({ items }) {
                 onPointerMove={onPointerMove}
                 onPointerUp={endDrag}
                 onPointerCancel={endDrag}
-                className={cn('relative isolate aspect-[1/0.9] w-full touch-pan-y select-none rounded-xl outline-offset-4 sm:aspect-[1/0.8]', count > 1 && 'cursor-grab active:cursor-grabbing')}
+                className={cn('relative isolate aspect-[1/0.82] w-full touch-pan-y select-none rounded-xl outline-offset-4 sm:aspect-[1/0.8]', count > 1 && 'cursor-grab active:cursor-grabbing')}
             >
                 {/* light behind the cards, in the colour of the front product */}
                 {items.map((item, i) => {

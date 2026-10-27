@@ -55,7 +55,7 @@ export default function Hero({ products, loading = false }) {
                     <div className="container-page relative grid items-center gap-6 py-6 sm:gap-8 sm:py-12 lg:grid-cols-[1fr_1.05fr] lg:gap-10 lg:py-10">
                         <div>
                             {hero.badge && (
-                                <m.p {...rise(0.05)} className="mb-4 inline-flex sm:mb-5 items-center gap-2 rounded-full bg-primary-tint px-4 py-1.5 text-caption font-semibold text-primary-deep">
+                                <m.p {...rise(0.05)} className="mb-3 inline-flex sm:mb-5 items-center gap-2 rounded-full bg-primary-tint px-4 py-1.5 text-caption font-semibold text-primary-deep">
                                     <ShieldCheck size={14} aria-hidden="true" /> {hero.badge}
                                 </m.p>
                             )}
@@ -63,8 +63,8 @@ export default function Hero({ products, loading = false }) {
                                 <RevealWords text={hero.headline} delay={0.1} />
                                 <span className="text-primary"><RevealWords text={hero.headlineAccent} delay={0.1 + hero.headline.split(' ').length * 0.08} /></span>
                             </h1>
-                            <m.p {...rise(0.45)} className="mt-4 max-w-xl text-body text-muted sm:mt-5 sm:text-lead">{hero.subheadline}</m.p>
-                            <m.div {...rise(0.55)} className="mt-6 flex flex-wrap gap-3 sm:mt-8">
+                            <m.p {...rise(0.45)} className="mt-5 hidden max-w-xl text-lead text-muted sm:block">{hero.subheadline}</m.p>
+                            <m.div {...rise(0.55)} className="mt-4 flex flex-wrap gap-3 sm:mt-8">
                                 <Magnetic>
                                     <Link to={hero.primaryCta?.href || '/shop'}>
                                         <Button size="lg">
@@ -82,7 +82,7 @@ export default function Hero({ products, loading = false }) {
                             {slides.length > 0 ? (
                                 <HeroDeck items={slides} />
                             ) : (
-                                loading && <div className="skeleton mx-auto aspect-[1/0.9] w-full max-w-[34rem] rounded-xl sm:aspect-[1/0.8]" aria-hidden="true" />
+                                loading && <div className="skeleton mx-auto aspect-[1/0.82] w-full max-w-[34rem] rounded-xl sm:aspect-[1/0.8]" aria-hidden="true" />
                             )}
                         </m.div>
                     </div>

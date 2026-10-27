@@ -13,6 +13,7 @@ import {
     AdminIconButton,
 } from '@/components/admin/AdminUi';
 import Button from '@/components/ui/Button';
+import { copyText } from '@/utils/copyText';
 
 function formatSize(bytes) {
     if (!bytes) return '';
@@ -83,13 +84,9 @@ export default function AdminMediaPage() {
     };
 
     const copyUrl = async (item) => {
-        try {
-            await navigator.clipboard.writeText(imageUrl(item.url));
-            setCopiedId(item.id);
-            setTimeout(() => setCopiedId(null), 1500);
-        } catch {
-            showToast('Could not copy URL', 'error');
-        }
+        if (!(await copyText(imageUrl(item.url)))) return showToast('Could not copy URL', 'error');
+        setCopiedId(item.id);
+        setTimeout(() => setCopiedId(null), 1500);
     };
 
     return (

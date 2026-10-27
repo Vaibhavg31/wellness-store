@@ -1,6 +1,10 @@
 @layer base {
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  /* overflow-x: clip (not hidden) keeps position: sticky working while making sure nothing can ever widen the page, which
+     is what makes a phone zoom out and shifts fixed panels such as the bag drawer. touch-action stops double-tap zoom
+     (pinch zoom still works). */
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: clip; touch-action: manipulation; }
   body {
+    overflow-x: clip;
     background: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
@@ -16,6 +20,10 @@
   h4 { font-size: var(--text-h4); line-height: var(--text-h4--line-height); }
   p { text-wrap: pretty; }
   img, video, svg { display: block; max-width: 100%; }
+  /* A grid with no column classes gets one automatic column that grows to its widest unbreakable child, which is how a
+     single wide row (a price and stepper, a row of icons) pushes the whole page wider than a small phone. A column that
+     may shrink fixes that; any grid-cols-* class still wins because it lives in a later layer. */
+  :where(.grid) { grid-template-columns: minmax(0, 1fr); }
   button, [role="button"], summary { cursor: pointer; }
   a { color: inherit; text-decoration: none; }
   ::selection { background: var(--color-primary-tint); color: var(--color-primary-deep); }
@@ -68,6 +76,14 @@
   /* Scroll reveal — transform + opacity only. */
   .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s var(--ease-out-soft), transform 0.6s var(--ease-out-soft); transition-delay: var(--reveal-delay, 0ms); }
   .reveal.is-visible { opacity: 1; transform: none; }
+}
+
+/* Phones zoom the whole page in when a text field under 16px gets focus (and stay zoomed). Keep every field at 16px
+   on small screens. Unlayered on purpose so it wins over the size utilities on individual inputs. */
+@media (max-width: 1023px) {
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"], [type="hidden"]),
+  select,
+  textarea { font-size: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

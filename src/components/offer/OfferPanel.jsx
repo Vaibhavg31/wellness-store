@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button';
 import { useDialog } from '@/hooks/useDialog';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
+import { copyText } from '@/utils/copyText';
 
 const STORAGE_KEY = 'chikit-offer';
 
@@ -29,13 +30,9 @@ function saveUnlocked(result) {
 function CodeTicket({ result, onClose }) {
     const [copied, setCopied] = useState(false);
     const copy = async () => {
-        try {
-            await navigator.clipboard.writeText(result.code);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1800);
-        } catch {
-            /* clipboard unavailable — the code is still on screen */
-        }
+        if (!(await copyText(result.code))) return; // the code is still on screen
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
     };
     return (
         <div className="animate-fade-up text-center" role="status">

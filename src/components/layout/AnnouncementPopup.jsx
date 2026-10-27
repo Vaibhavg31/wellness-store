@@ -13,6 +13,7 @@ import { api, imageUrl } from '@/services/api';
 import { isWithinSchedule, popupAllowedOn } from '@/utils/popupSchedule';
 import { spinCooldownActive, writeSpin } from '@/utils/spinStorage';
 import { formatPrice } from '@/utils/formatPrice';
+import { copyText } from '@/utils/copyText';
 
 const TYPE_ICON = { coupon: Gift, festival: PartyPopper, product: Sparkles, category: LayoutGrid, info: Sparkles, spin: Gift };
 
@@ -47,13 +48,9 @@ function markDismissed(key, frequency) {
 function CouponRow({ code }) {
     const [copied, setCopied] = useState(false);
     const copy = async () => {
-        try {
-            await navigator.clipboard.writeText(code);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1600);
-        } catch {
-            /* clipboard unavailable — code stays visible to copy by hand */
-        }
+        if (!(await copyText(code))) return; // code stays visible to copy by hand
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1600);
     };
     return (
         <button type="button" onClick={copy} className="flex w-full items-center justify-between gap-3 rounded-lg border-2 border-dashed border-accent bg-accent-tint px-4 py-3 text-left transition-colors hover:bg-accent-tint/70">

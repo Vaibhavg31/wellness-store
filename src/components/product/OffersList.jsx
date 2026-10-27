@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Check, Copy, Tag } from 'lucide-react';
 import { usePublicCoupons } from '@/hooks/usePublicCoupons';
 import { formatPrice } from '@/utils/formatPrice';
+import { copyText } from '@/utils/copyText';
 
 /** "Available offers" on the product page: public coupons with one-tap copy. */
 export default function OffersList() {
@@ -11,13 +12,9 @@ export default function OffersList() {
     if (coupons.length === 0) return null;
 
     const copy = async (code) => {
-        try {
-            await navigator.clipboard.writeText(code);
-            setCopied(code);
-            setTimeout(() => setCopied(''), 2000);
-        } catch {
-            /* clipboard blocked — the code is still visible to type */
-        }
+        if (!(await copyText(code))) return; // blocked everywhere — the code stays visible to type
+        setCopied(code);
+        setTimeout(() => setCopied(''), 2000);
     };
 
     return (

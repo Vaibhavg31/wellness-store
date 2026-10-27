@@ -5,6 +5,7 @@ import { formatPrice } from '@/utils/formatPrice';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
 import Drawer from '@/components/ui/Drawer';
+import { copyText } from '@/utils/copyText';
 
 function couponDescription(coupon) {
     if (coupon.type === 'free_delivery') {
@@ -33,11 +34,7 @@ export default function ActiveCoupons({ className = '', variant = 'default' }) {
     if (coupons.length === 0) return null;
 
     const copyAndApply = async (code) => {
-        try {
-            await navigator.clipboard.writeText(code);
-        } catch {
-            /* ignore */
-        }
+        await copyText(code);
         const result = await applyCoupon(code);
         showToast(result.valid ? `Applied ${code}` : (result.message || 'Could not apply'), result.valid ? 'success' : 'error');
         if (result.valid) setDrawerOpen(false);

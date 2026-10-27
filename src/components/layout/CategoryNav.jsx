@@ -179,13 +179,14 @@ export default function CategoryNav({ variant = 'desktop' }) {
                 </NavLink>
             )}
 
-            <div className={cn('relative min-w-0', phone && 'flex-1')}>
+            {/* On phones the row runs on to the screen edge (not the page padding), so a half-visible category reads as "scroll for more". */}
+            <div className={cn('relative min-w-0', phone && 'flex-1 -mr-4 sm:-mr-6')}>
                 {/* soft fade where the row continues */}
                 <span aria-hidden="true" className={cn('pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-canvas to-transparent transition-opacity', edges.left ? 'opacity-100' : 'opacity-0')} />
                 <span aria-hidden="true" className={cn('pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-canvas to-transparent transition-opacity', edges.right ? 'opacity-100' : 'opacity-0')} />
 
                 <div ref={scrollerRef} onScroll={updateEdges} className="scrollbar-none overflow-x-auto overscroll-x-contain">
-                    <ul ref={listRef} className="relative flex w-max items-center gap-0.5">
+                    <ul ref={listRef} className={cn('relative flex w-max items-center gap-0.5', phone && 'pr-4 sm:pr-6')}>
                         <li
                             aria-hidden="true"
                             className={cn('absolute inset-y-0 rounded-full bg-primary-tint', glide && 'transition-[left,width,opacity] duration-500 ease-out', indicator ? 'opacity-100' : 'opacity-0')}
