@@ -88,6 +88,12 @@ jobs:
       - name: Wait for the new version to be live
         run: |
           aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE"
-          STATE=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query "services[0].deployments[?status=='PRIMARY'].rolloutState | [0]" --output text)
-          echo "Rollout state: $STATE"
-          [ "$STATE" = "COMPLETED" ]
+          # The rollout state trails "stable" by a few seconds, so poll it instead of reading it once.
+          for i in $(seq 1 30); do
+            STATE=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query "services[0].deployments[?status=='PRIMARY'].rolloutState | [0]" --output text)
+            echo "Rollout state: $STATE"
+            [ "$STATE" = "COMPLETED" ] && exit 0
+            [ "$STATE" = "FAILED" ] && exit 1
+            sleep 10
+          done
+          exit 1
