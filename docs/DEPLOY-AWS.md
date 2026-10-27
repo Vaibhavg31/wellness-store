@@ -41,3 +41,7 @@ Browser-visible `VITE_*` values (site URL, Razorpay key id, Google client id, MS
 - **Uploads** (product photos) are stored on the instance disk (`/opt/chikit/uploads`). They survive deploys and reboots, but not terminating the instance, so back that folder up or move uploads to S3 before relying on it.
 - **Sitemap / pre-rendered SEO pages** are not generated in CI (they need the live catalogue). The site itself is unaffected.
 - Logs: CloudWatch Logs group `/ecs/chikit`. Shell access without SSH: AWS Systems Manager → Session Manager on the `chikit-ecs` instance.
+
+## Running the same image locally
+
+With Docker installed: `docker compose up --build`, then open http://localhost:8080 (MySQL is created and loaded automatically; `docker compose down -v` resets it). This is the same image the pipeline deploys, so it is the quickest way to check a change before pushing to `master`. The first image build is also done by GitHub Actions on every push, so Docker is not required on your machine to deploy.
