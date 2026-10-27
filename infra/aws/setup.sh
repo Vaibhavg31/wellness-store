@@ -101,7 +101,9 @@ aws s3api put-bucket-encryption --bucket "$BUCKET" --server-side-encryption-conf
 
 # Existing settings (if this is a re-run) so passwords are never regenerated under a live database.
 ENV_FILE="$STATE_DIR/prod.env"
-if aws s3 cp "s3://$BUCKET/prod.env" "$ENV_FILE" >/dev/null 2>&1; then note "found existing prod.env — keeping its secrets"; else rm -f "$ENV_FILE"; fi
+# The Windows AWS CLI can't read Git Bash paths like /c/Users/..., so hand it the native form.
+winpath() { if command -v cygpath >/dev/null 2>&1; then cygpath -m "$1"; else printf '%s' "$1"; fi; }
+if aws s3 cp "s3://$BUCKET/prod.env" "$(winpath "$ENV_FILE")" >/dev/null 2>&1; then note "found existing prod.env — keeping its secrets"; elif [ -f "$ENV_FILE" ]; then note "using the local prod.env from an earlier run (not uploaded yet)"; fi
 getenv() { [ -f "$ENV_FILE" ] && grep -E "^$1=" "$ENV_FILE" | head -1 | cut -d= -f2- || true; }
 randpw() { node -e "console.log(require('crypto').randomBytes(24).toString('base64').replace(/[^A-Za-z0-9]/g,'').slice(0,28))"; }
 
@@ -127,7 +129,7 @@ if ! exists aws rds describe-db-instances --db-instance-identifier $APP-db; then
     --allocated-storage 20 --storage-type gp2 --no-multi-az --no-publicly-accessible \
     --master-username chikit --master-user-password "$DB_PASS" --db-name wellness_store \
     --db-subnet-group-name $APP --vpc-security-group-ids "$DB_SG" \
-    --backup-retention-period 7 --deletion-protection >/dev/null
+    --backup-retention-period 1 --deletion-protection >/dev/null
   note "creating — this takes about 10 minutes…"
 fi
 aws rds wait db-instance-available --db-instance-identifier $APP-db
@@ -185,7 +187,7 @@ SITE_URL="$(getenv FRONTEND_URL)"; [ -n "$SITE_URL" ] || SITE_URL="http://$PUBLI
   fi
 } > "$ENV_FILE.new"
 mv "$ENV_FILE.new" "$ENV_FILE"
-aws s3 cp "$ENV_FILE" "s3://$BUCKET/prod.env" --sse AES256 >/dev/null
+aws s3 cp "$(winpath "$ENV_FILE")" "s3://$BUCKET/prod.env" --sse AES256 >/dev/null
 note "uploaded (a local copy is kept in $ENV_FILE — keep it private)"
 
 # ---------------------------------------------------------------------------------------------------------------
