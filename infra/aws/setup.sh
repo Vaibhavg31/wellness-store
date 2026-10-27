@@ -197,7 +197,7 @@ if ! exists aws iam get-open-id-connect-provider --open-id-connect-provider-arn 
   aws iam create-open-id-connect-provider --url https://token.actions.githubusercontent.com --client-id-list sts.amazonaws.com \
     --thumbprint-list 6938fd4d98bab03faadb97b34396831e3780aea1 >/dev/null
 fi
-GH_TRUST="{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"$OIDC_ARN\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringEquals\":{\"token.actions.githubusercontent.com:aud\":\"sts.amazonaws.com\",\"token.actions.githubusercontent.com:sub\":\"repo:$GITHUB_REPO:ref:refs/heads/$GITHUB_BRANCH\"}}}]}"
+GH_TRUST="{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"$OIDC_ARN\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringEquals\":{\"token.actions.githubusercontent.com:aud\":\"sts.amazonaws.com\"},\"StringLike\":{\"token.actions.githubusercontent.com:sub\":[\"repo:$GITHUB_REPO:ref:refs/heads/$GITHUB_BRANCH\",\"repo:${GITHUB_REPO%%/*}@*/${GITHUB_REPO##*/}@*:ref:refs/heads/$GITHUB_BRANCH\"]}}}]}"
 if exists aws iam get-role --role-name "$GH_ROLE"; then
   aws iam update-assume-role-policy --role-name "$GH_ROLE" --policy-document "$GH_TRUST"
 else
