@@ -42,17 +42,12 @@ async function saveImageFile(file) {
     let dest = path.join(uploadsDirPath(), filename);
     await fs.writeFile(dest, file.buffer);
 
+    // processImage may convert (e.g. a large PNG/JPG becomes WebP) and has already moved the file to the new
+    // extension, so the public name must follow it — otherwise the saved URL points at a file that doesn't exist.
     const finalExt = await processImage(dest, ext);
     if (finalExt !== ext) {
-        const newFilename = filename.replace(/\.[^.]+$/, `.${finalExt}`);
-        const newDest = path.join(uploadsDirPath(), newFilename);
-        try {
-            await fs.rename(dest, newDest);
-            filename = newFilename;
-            dest = newDest;
-        } catch {
-            // keep original on rename failure
-        }
+        filename = filename.replace(/\.[^.]+$/, `.${finalExt}`);
+        dest = path.join(uploadsDirPath(), filename);
     }
 
     const url = `/uploads/${filename}`;
