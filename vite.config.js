@@ -19,7 +19,8 @@ function loadActiveConfig(filePath) {
   if (!fs.existsSync(filePath)) return {}
 
   const json = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
-  const values = json[json.environment]
+  // CONFIG_ENV (real env var, set by the Docker build) picks the block, same rule as backend-node/src/lib/config.js.
+  const values = json[process.env.CONFIG_ENV || json.environment]
   return values && typeof values === 'object' ? values : {}
 }
 

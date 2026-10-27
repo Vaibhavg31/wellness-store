@@ -16,7 +16,8 @@ export function loadConfig(configPath) {
     }
     if (!json || typeof json !== 'object') return;
 
-    const environment = json.environment || 'development';
+    // CONFIG_ENV (a real env var, e.g. set by the container) picks the block without editing the committed file.
+    const environment = process.env.CONFIG_ENV || json.environment || 'development';
     const values = json[environment];
     if (!values || typeof values !== 'object') return;
 

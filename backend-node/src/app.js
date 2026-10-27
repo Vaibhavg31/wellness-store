@@ -2,6 +2,7 @@ import express from 'express';
 import compression from 'compression';
 import path from 'node:path';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { corsMiddleware } from './lib/cors.js';
 import { sendError } from './lib/response.js';
 import { uploadsDirPath } from './lib/db.js';
@@ -50,6 +51,9 @@ export function createApp() {
         res.sendFile(filePath);
     });
 
+    // Lightweight liveness probe for the container health check (no outbound calls, unlike /api/health).
+    app.get('/healthz', (req, res) => res.type('text').send('ok'));
+
     // ── Health check ──────────────────────────────────────────────────────
     app.get('/api/health', async (req, res) => {
         const outboundIp = await serverOutboundIp();
@@ -92,6 +96,24 @@ export function createApp() {
     app.use('/api', userRoutes);
     app.use('/api', orderRoutes);
     app.use('/api', uploadRoutes);
+
+    // Production image: the same process serves the built storefront (Vite's dist/), so one container is the
+    // whole site. Pre-rendered SEO pages (dist/<route>/index.html) win; anything else falls back to the SPA shell.
+    // In local dev there's no dist/ next to the repo root's backend, so this stays off and Vite serves the UI.
+    const distDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../dist');
+    if (fs.existsSync(path.join(distDir, 'index.html'))) {
+        app.use(express.static(distDir, {
+            setHeaders: (res, filePath) => {
+                // Hashed build assets never change; HTML must always be re-checked so a deploy shows up at once.
+                res.set('Cache-Control', filePath.includes(`${path.sep}assets${path.sep}`) ? 'public, max-age=31536000, immutable' : 'no-cache');
+            },
+        }));
+        // Page routes only: a missing file (anything with an extension, or under /assets) must 404, not return HTML.
+        app.get(/^\/(?!api\/|uploads\/|assets\/)[^.]*$/, (req, res) => {
+            res.set('Cache-Control', 'no-cache');
+            res.sendFile(path.join(distDir, 'index.html'));
+        });
+    }
 
     app.use((req, res) => {
         sendError(res, 'Not found', 404);

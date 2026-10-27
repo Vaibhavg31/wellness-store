@@ -1,0 +1,41 @@
+{
+  "family": "chikit",
+  "requiresCompatibilities": ["EC2"],
+  "networkMode": "bridge",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/chikit-ecs-task-execution",
+  "volumes": [
+    { "name": "uploads", "host": { "sourcePath": "/opt/chikit/uploads" } }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "web",
+      "image": "${IMAGE}",
+      "essential": true,
+      "memory": 640,
+      "portMappings": [
+        { "containerPort": 8000, "hostPort": 80, "protocol": "tcp" }
+      ],
+      "environmentFiles": [
+        { "type": "s3", "value": "arn:aws:s3:::${CONFIG_BUCKET}/prod.env" }
+      ],
+      "mountPoints": [
+        { "sourceVolume": "uploads", "containerPath": "/app/backend-node/uploads", "readOnly": false }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:8000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 40
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/chikit",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "web"
+        }
+      }
+    }
+  ]
+}
