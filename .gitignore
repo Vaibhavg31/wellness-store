@@ -1,6 +1,27 @@
+# ── Frontend ─────────────────────────────────────────────
 node_modules/
 dist/
+
+# ── Secrets & environment ─────────────────────────────────
+# config.json is intentionally NOT ignored — this is a private repo and the
+# team has chosen to commit the single app-wide config file (see config.json
+# itself). Nothing to list here unless someone creates a personal local
+# override file in the future.
+
+# ── User-uploaded media (server-specific, not for git) ────
+backend-node/uploads/*
+!backend-node/uploads/.gitkeep
+
+# ── Logs & caches ─────────────────────────────────────────
+*.log
+
+# ── OS & editor artifacts ─────────────────────────────────
 .DS_Store
 Thumbs.db
-*.log
-.env
+desktop.ini
+*.swp
+*.swo
+.idea/
+
+# ── Claude Code local session artifacts ───────────────────
+.claude/

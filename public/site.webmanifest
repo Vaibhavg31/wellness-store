@@ -1,0 +1,13 @@
+{
+  "name": "Chikit — Ayurveda and Wellness",
+  "short_name": "Chikit",
+  "description": "Rooted in Ayurveda. Thoughtfully crafted for a healthier, happier you.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FDF9F4",
+  "theme_color": "#602460",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

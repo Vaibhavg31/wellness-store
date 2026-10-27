@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://chikit.in/sitemap.xml

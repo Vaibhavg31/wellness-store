@@ -1,0 +1,16 @@
+.git
+.github
+.claude
+.npmrc
+node_modules
+backend-node/node_modules
+dist
+backend-node/uploads
+backend
+CHIKIT
+docs
+infra
+*.pdf
+*.csv
+*.log
+.DS_Store

@@ -1,0 +1,92 @@
+name: Deploy to AWS
+
+# Every push to master builds the Docker image, pushes it to ECR and rolls it out on ECS.
+# AWS access is by OIDC (no stored keys). One-time AWS setup: infra/aws/setup.sh (see docs/DEPLOY-AWS.md).
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+  CONFIG_BUCKET: ${{ vars.CONFIG_BUCKET }}
+  ECR_REPOSITORY: chikit
+  ECS_CLUSTER: chikit
+  ECS_SERVICE: chikit-web
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: |
+          docker build \
+            --build-arg VITE_SITE_URL="${{ vars.VITE_SITE_URL }}" \
+            --build-arg VITE_GOOGLE_CLIENT_ID="${{ vars.VITE_GOOGLE_CLIENT_ID }}" \
+            --build-arg VITE_RAZORPAY_KEY_ID="${{ vars.VITE_RAZORPAY_KEY_ID }}" \
+            --build-arg VITE_MSG91_WIDGET_ID="${{ vars.VITE_MSG91_WIDGET_ID }}" \
+            --build-arg VITE_MSG91_TOKEN_AUTH="${{ vars.VITE_MSG91_TOKEN_AUTH }}" \
+            --build-arg VITE_SKIP_PHONE_VERIFY="${{ vars.VITE_SKIP_PHONE_VERIFY || 'false' }}" \
+            -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Register task definition
+        run: |
+          envsubst '${AWS_ACCOUNT_ID} ${AWS_REGION} ${IMAGE} ${CONFIG_BUCKET}' < infra/aws/task-definition.json > task-definition.rendered.json
+          TD_ARN=$(aws ecs register-task-definition --cli-input-json file://task-definition.rendered.json --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "TD_ARN=$TD_ARN" >> "$GITHUB_ENV"
+
+      - name: First deploy only - load the starter database
+        run: |
+          STATUS=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].status' --output text 2>/dev/null || true)
+          if [ "$STATUS" = "ACTIVE" ]; then echo "Service exists - database already set up."; exit 0; fi
+          echo "No service yet - importing database/chikit.sql into RDS (one-off task)."
+          TASK_ARN=$(aws ecs run-task --cluster "$ECS_CLUSTER" --launch-type EC2 --task-definition "$TD_ARN" \
+            --overrides '{"containerOverrides":[{"name":"web","command":["node","backend-node/scripts/setup-db.mjs"]}]}' \
+            --query 'tasks[0].taskArn' --output text)
+          if [ -z "$TASK_ARN" ] || [ "$TASK_ARN" = "None" ]; then echo "Could not start the database task (is the EC2 instance registered in the cluster?)"; exit 1; fi
+          aws ecs wait tasks-stopped --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN"
+          CODE=$(aws ecs describe-tasks --cluster "$ECS_CLUSTER" --tasks "$TASK_ARN" --query 'tasks[0].containers[0].exitCode' --output text)
+          echo "Database task exit code: $CODE"
+          [ "$CODE" = "0" ]
+
+      - name: Create or update the service
+        run: |
+          STATUS=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query 'services[0].status' --output text 2>/dev/null || true)
+          if [ "$STATUS" = "ACTIVE" ]; then
+            aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" --task-definition "$TD_ARN" --force-new-deployment > /dev/null
+          else
+            aws ecs create-service --cluster "$ECS_CLUSTER" --service-name "$ECS_SERVICE" --task-definition "$TD_ARN" \
+              --launch-type EC2 --desired-count 1 \
+              --deployment-configuration 'minimumHealthyPercent=0,maximumPercent=100,deploymentCircuitBreaker={enable=true,rollback=true}' > /dev/null
+          fi
+
+      - name: Wait for the new version to be live
+        run: |
+          aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE"
+          STATE=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --query "services[0].deployments[?status=='PRIMARY'].rolloutState | [0]" --output text)
+          echo "Rollout state: $STATE"
+          [ "$STATE" = "COMPLETED" ]

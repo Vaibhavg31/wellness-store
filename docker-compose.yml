@@ -1,0 +1,43 @@
+# Run the whole production-style stack locally (MySQL + the same image the pipeline deploys):
+#   docker compose up --build        ->  http://localhost:8080
+# First start loads database/chikit.sql into MySQL. Reset everything with: docker compose down -v
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: chikit-local
+      MYSQL_DATABASE: wellness_store
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./database/chikit.sql:/docker-entrypoint-initdb.d/chikit.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pchikit-local"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8000"
+    environment:
+      APP_ENV: production
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: wellness_store
+      DB_USER: root
+      DB_PASS: chikit-local
+      JWT_SECRET: local-only-change-me
+      FRONTEND_URL: http://localhost:8080
+      # Studio login: put a bcrypt hash of your chosen password in ADMIN_PASSWORD_HASH (see docs/DEPLOY-AWS.md).
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:-}
+    volumes:
+      - uploads:/app/backend-node/uploads
+
+volumes:
+  dbdata:
+  uploads:

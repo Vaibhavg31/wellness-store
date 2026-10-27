@@ -1,0 +1,6 @@
+/* Self-hosted, latin-only subsets. The heading + body weights used above the fold are preloaded in index.html. */
+@font-face { font-family: "Lora"; font-style: normal; font-weight: 500; font-display: swap; src: url("/fonts/lora-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Lora"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/lora-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/poppins-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 500; font-display: swap; src: url("/fonts/poppins-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/poppins-600-normal.woff2") format("woff2"); }

@@ -1,0 +1,84 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+/**
+ * Reads config.json's ACTIVE environment block — the single app-wide config
+ * file used by both the Node backend (see backend-node/src/lib/config.js)
+ * and this frontend. Vite only auto-loads files named .env*, so we read
+ * this one ourselves and inject its VITE_* keys via `define`, which makes
+ * every existing `import.meta.env.VITE_X` reference in the app keep
+ * working completely unchanged.
+ */
+function loadActiveConfig(filePath) {
+  if (!fs.existsSync(filePath)) return {}
+
+  const json = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+  // CONFIG_ENV (real env var, set by the Docker build) picks the block, same rule as backend-node/src/lib/config.js.
+  const values = json[process.env.CONFIG_ENV || json.environment]
+  return values && typeof values === 'object' ? values : {}
+}
+
+const activeConfig = loadActiveConfig(path.resolve(__dirname, 'config.json'))
+
+// A shell-level env var (e.g. `VITE_SKIP_PHONE_VERIFY=false vite`, used by
+// the `dev:web:prod-like` script) wins over config.json's value — mirroring
+// how the Node backend already behaves (loadConfig() never overrides a
+// variable the environment already set).
+const viteEnvDefines = Object.fromEntries(
+  Object.entries(activeConfig)
+    .filter(([key]) => key.startsWith('VITE_'))
+    .map(([key, value]) => [`import.meta.env.${key}`, JSON.stringify(process.env[key] ?? value)]),
+)
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  define: viteEnvDefines,
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  server: {
+    // Bind to all interfaces (not just localhost) so devices on the same
+    // Wi-Fi/LAN — e.g. a phone — can reach the dev server via this PC's
+    // local IP (see README "Testing on your phone").
+    host: true,
+    // Fixed port so this project never collides with, or silently swaps
+    // places with, another storefront running locally in the same
+    // workspace — each project has its own dedicated port.
+    // strictPort makes Vite fail fast instead of silently binding the next
+    // free port, which is what let a stale/orphaned dev server from another
+    // project quietly answer requests meant for this one.
+    port: 5173,
+    strictPort: true,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+    },
+  },
+  build: {
+    rolldownOptions: {
+      output: {
+        // Fewer, larger shared chunks: avoids a request waterfall of tiny per-icon files.
+        codeSplitting: {
+          groups: [
+            { name: 'react-vendor', test: /node_modules[\/](react|react-dom|react-router|react-router-dom|scheduler)[\/]/ },
+            { name: 'icons', test: /node_modules[\/]lucide-react[\/]/ },
+          ],
+        },
+      },
+    },
+  },
+})

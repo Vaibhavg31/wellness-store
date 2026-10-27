@@ -1,0 +1,42 @@
+{
+  "name": "chikit",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "concurrently -n web,api -c blue,magenta \"npm run dev:web\" \"npm run dev:server\"",
+    "dev:prod-like": "concurrently -n web,api -c blue,magenta \"npm run dev:web:prod-like\" \"npm run dev:server:prod-like\"",
+    "dev:otp": "concurrently -n web,api -c blue,magenta \"npm run dev:web:prod-like\" \"npm run dev:server:prod-like\"",
+    "dev:web": "vite",
+    "dev:web:prod-like": "VITE_SKIP_PHONE_VERIFY=false vite",
+    "db:setup": "npm --prefix backend-node install --silent && npm --prefix backend-node run db:setup",
+    "dev:server": "npm --prefix backend-node install --silent && npm --prefix backend-node run start",
+    "dev:server:prod-like": "npm --prefix backend-node install --silent && SKIP_EMAIL_VERIFY=false SKIP_PHONE_VERIFY=false MSG91_OTP_MODE=production npm --prefix backend-node run start",
+    "dev:server:otp": "npm run dev:server:prod-like",
+    "dev:all": "npm run dev",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "postbuild": "node scripts/seo-postbuild.mjs"
+  },
+  "dependencies": {
+    "@react-oauth/google": "^0.13.5",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^1.25.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.1",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "concurrently": "^10.0.4",
+    "oxlint": "^1.71.0",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.1.1"
+  }
+}

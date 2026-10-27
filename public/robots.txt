@@ -1,0 +1,4 @@
+# Overwritten at build time by scripts/seo-postbuild.mjs (absolute Sitemap URL needs the production domain).
+User-agent: *
+Allow: /
+Disallow: /chikit-studio

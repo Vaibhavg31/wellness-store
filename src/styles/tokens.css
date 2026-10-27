@@ -1,0 +1,131 @@
+/*
+ * Chikit design tokens — the single source of truth for colour, type, radius,
+ * shadow and motion. Components use the generated utilities (bg-primary,
+ * text-ink, rounded-lg, shadow-md …) and never hardcode a value.
+ *
+ * Brand anchor: #602460, sampled from the official logo.
+ * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): primary/white 10.9, ink/canvas 15,
+ * muted/canvas 6.0, accent-ink/canvas 5.6, white/danger 6.5, white/success 6.4, success/tint 5.7, warning/tint 5.4.
+ * Gold (accent) is a FILL colour only: pair it with ink text, never white.
+ */
+@theme {
+  /* Primary — brand plum */
+  --color-primary:        #602460;  /* buttons, links, headings accents, logo colour */
+  --color-primary-hover:  #4E1C4E;  /* hover */
+  --color-primary-deep:   #431A43;  /* active / pressed, footer rule */
+  --color-primary-tint:   #F1E4F2;  /* selected, soft badges, icon wells */
+  --color-primary-soft:   #F9F2F9;  /* faint hover wash */
+
+  /* Accent — turmeric gold (fills, highlights, ratings) */
+  --color-accent:         #C08A3E;
+  --color-accent-hover:   #D8A860;
+  --color-accent-ink:     #8A5A1E;  /* gold as text on light backgrounds */
+  --color-accent-tint:    #FBF1E1;
+
+  /* Neutrals — warm, plum-tinted */
+  --color-canvas:         #FDF9F4;  /* page background */
+  --color-canvas-alt:     #F6EEE5;  /* alternate section band */
+  --color-surface:        #FFFFFF;  /* cards, inputs, drawers */
+  --color-ink:            #241720;  /* body + headings */
+  --color-muted:          #6B5D68;  /* secondary text */
+  --color-subtle:         #8F8089;  /* placeholders, disabled text (not for content) */
+  --color-line:           #ECD9C4;  /* decorative hairlines */
+  --color-line-strong:    #9A8794;  /* input borders (3:1 on white) */
+
+  /* Status */
+  --color-success:        #276B43;
+  --color-success-tint:   #E6F3EB;
+  --color-warning:        #8F5400;
+  --color-warning-tint:   #FCF0DC;
+  --color-danger:         #B3261E;
+  --color-danger-tint:    #FBE9E7;
+  --color-info:           #1F5FA8;
+  --color-info-tint:      #E4EEF9;
+
+  /* Disabled */
+  --color-disabled:       #EFE6EC;
+
+  /* Admin chrome (internal, neutral) */
+  --color-admin-bg:           #F3EEE8;
+  --color-admin-surface:      #FFFFFF;
+  --color-admin-surface-alt:  #F9F6F3;
+  --color-admin-border:       #E5DDD6;
+  --color-admin-border-light: #EDE8E2;
+  --color-admin-muted:        #6B6560;
+
+  /* Typography */
+  --font-display: "Lora", Georgia, serif;
+  --font-sans:    "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-caption:  0.75rem;   --text-caption--line-height: 1.5;
+  --text-small:    0.875rem;  --text-small--line-height: 1.55;
+  --text-body:     1rem;      --text-body--line-height: 1.7;
+  --text-lead:     1.125rem;  --text-lead--line-height: 1.7;
+  --text-h4:       1.25rem;   --text-h4--line-height: 1.35;
+  --text-h3:       clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);   --text-h3--line-height: 1.3;
+  --text-h2:       clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);     --text-h2--line-height: 1.2;
+  --text-h1:       clamp(2.25rem, 1.6rem + 3vw, 3.75rem);      --text-h1--line-height: 1.1;
+
+  /* Radius */
+  --radius-xs:  0.25rem;
+  --radius-sm:  0.5rem;
+  --radius-md:  0.75rem;
+  --radius-lg:  1rem;
+  --radius-xl:  1.5rem;
+
+  /* Shadows (plum-tinted, soft) */
+  --shadow-xs: 0 1px 2px rgb(67 26 67 / 0.06);
+  --shadow-sm: 0 2px 6px rgb(67 26 67 / 0.07);
+  --shadow-md: 0 8px 24px rgb(67 26 67 / 0.09);
+  --shadow-lg: 0 20px 48px rgb(67 26 67 / 0.14);
+
+  /* Motion */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-up: fade-up 0.6s var(--ease-out-soft) both;
+  --animate-fade-in: fade-in 0.3s ease-out both;
+  --animate-slide-in-right: slide-in-right 0.3s var(--ease-out-soft) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-draw-check: draw-check 0.5s 0.15s ease-out forwards;
+  --animate-page-in: page-in 0.35s var(--ease-out-soft) both;
+  --animate-pop: pop 0.4s var(--ease-out-soft) both;
+  --animate-edge-in-right: edge-in-right 0.6s var(--ease-out-soft) both;
+  --animate-edge-in-left: edge-in-left 0.6s var(--ease-out-soft) both;
+  --animate-confetti: confetti 1.1s var(--ease-out-soft) both;
+  --animate-breathe: breathe 2.2s ease-in-out infinite;
+  --animate-loader-slide: loader-slide 1.3s ease-in-out infinite;
+  --animate-swipe-in: swipe-in 0.55s var(--ease-out-soft) both;
+  --animate-swipe-in-left: swipe-in-left 0.55s var(--ease-out-soft) both;
+  --animate-rise-in: rise-in 0.5s var(--ease-out-soft) both;
+  --animate-fade-out: fade-out 0.2s ease-in both;
+  --animate-fade-down: fade-down 0.2s ease-in both;
+  --animate-slide-in-left: slide-in-left 0.3s var(--ease-out-soft) both;
+  --animate-slide-out-right: slide-out-right 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+  --animate-slide-out-left: slide-out-left 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+  --animate-orbit-spin: orbit-spin 70s linear infinite;
+  --animate-orbit-spin-reverse: orbit-spin 110s linear infinite reverse;
+  --animate-card-sheen: card-sheen 1.3s ease-out 0.35s both;
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes page-in { from { opacity: 0.35; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes edge-in-right { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: none; } }
+  @keyframes edge-in-left { from { opacity: 0; transform: translateX(-100%); } to { opacity: 1; transform: none; } }
+  @keyframes confetti { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); } }
+  @keyframes pop { 0% { transform: scale(0.4); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  @keyframes logo-sheen { from { transform: translateX(-120%) skewX(-16deg); } to { transform: translateX(330%) skewX(-16deg); } }
+  @keyframes card-sheen { from { transform: translateX(0) skewX(-18deg); } to { transform: translateX(520%) skewX(-18deg); } }
+  @keyframes breathe { 0%, 100% { opacity: 0.55; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
+  @keyframes loader-slide { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
+  @keyframes swipe-in { from { transform: translateX(56px); } to { transform: none; } }
+  @keyframes swipe-in-left { from { transform: translateX(-56px); } to { transform: none; } }
+  @keyframes rise-in { from { transform: translateY(28px); } to { transform: none; } }
+  @keyframes fade-out { to { opacity: 0; } }
+  @keyframes fade-down { to { opacity: 0; transform: translateY(8px); } }
+  @keyframes slide-in-left { from { transform: translateX(-100%); } to { transform: none; } }
+  @keyframes slide-out-right { to { transform: translateX(100%); } }
+  @keyframes slide-out-left { to { transform: translateX(-100%); } }
+  @keyframes orbit-spin { to { transform: rotate(360deg); } }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: none; } }
+  @keyframes draw-check { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+}
