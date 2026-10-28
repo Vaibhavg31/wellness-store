@@ -192,6 +192,14 @@ router.post('/auth/login', asyncRoute(async (req, res) => {
         return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email } });
     }
 
+    // An admin email signs in here with the Studio password (checked against its hash, never stored in plain text), so the
+    // same email + password works on the normal form and on the Studio form.
+    const studioHash = process.env.ADMIN_PASSWORD_HASH || '';
+    if (studioHash && adminEmails().includes(email) && bcrypt.compareSync(password, studioHash)) {
+        const token = signToken({ role: 'admin', email });
+        return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email } });
+    }
+
     const user = await repo.findByEmail(email);
     if (!user) return sendError(res, 'Invalid email or password', 401);
     if (!user.passwordHash) return sendError(res, 'This account uses Google sign-in. Continue with Google, or use Forgot password to set a password.', 401);
@@ -400,7 +408,9 @@ router.post('/auth/admin/login', asyncRoute(async (req, res) => {
     const adminUser = process.env.ADMIN_USERNAME || 'chikit_admin';
     const adminPassHash = process.env.ADMIN_PASSWORD_HASH || null;
 
-    const validUser = username === adminUser;
+    // The Studio username, or any admin email, both work with the Studio password.
+    const given = String(username).trim();
+    const validUser = given === adminUser || adminEmails().includes(given.toLowerCase());
 
     if (!adminPassHash) {
         console.error('[Admin Login] ADMIN_PASSWORD_HASH is not set. Configure it in config.json');

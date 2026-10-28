@@ -392,7 +392,7 @@ function LoginScreen() {
                         </button>
                         {showStudioLogin && (
                             <form onSubmit={handleAdminLogin} className="mt-4 space-y-4">
-                                <Input label="Username" value={adminUser} onChange={(e) => setAdminUser(e.target.value)} required />
+                                <Input label="Username or email" value={adminUser} onChange={(e) => setAdminUser(e.target.value)} required />
                                 <Input label="Password" type="password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} required />
                                 <Button size="lg" className="w-full" type="submit" loading={loading}>Enter Studio</Button>
                             </form>
