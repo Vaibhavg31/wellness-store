@@ -102,7 +102,23 @@ export function createApp() {
     // In local dev there's no dist/ next to the repo root's backend, so this stays off and Vite serves the UI.
     const distDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../dist');
     if (fs.existsSync(path.join(distDir, 'index.html'))) {
+        const shell = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8');
+        // Link previews (WhatsApp, Facebook, Google) read this HTML without running any script, and they need full web
+        // addresses: a relative og:image shows no picture. So the page is sent with the full address filled in, plus a
+        // canonical link to the main address (FRONTEND_URL, else the address the visitor used).
+        const pageFor = (req) => {
+            const proto = String(req.headers['x-forwarded-proto'] || req.protocol || 'https').split(',')[0].trim();
+            const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+            const visited = /^[a-z0-9.-]+(:\d+)?$/i.test(host) && /^https?$/.test(proto) ? `${proto}://${host}` : '';
+            const site = (process.env.FRONTEND_URL || '').trim().replace(/\/$/, '') || visited;
+            if (!site) return shell;
+            const url = `${site}${req.path === '/' ? '/' : req.path.replace(/\/$/, '')}`;
+            return shell
+                .replaceAll('content="/og-image.png"', `content="${site}/og-image.png"`)
+                .replace('<title data-seo-default>', `<link data-seo-default rel="canonical" href="${url}" />\n    <meta data-seo-default property="og:url" content="${url}" />\n    <title data-seo-default>`);
+        };
         app.use(express.static(distDir, {
+            index: false, // the page itself is sent below, with full addresses filled in
             setHeaders: (res, filePath) => {
                 const file = filePath.split(path.sep).join('/');
                 // Hashed build assets and the font files never change; the logo and catalog pictures change rarely, so a
@@ -116,7 +132,7 @@ export function createApp() {
         // Page routes only: a missing file (anything with an extension, or under /assets) must 404, not return HTML.
         app.get(/^\/(?!api\/|uploads\/|assets\/)[^.]*$/, (req, res) => {
             res.set('Cache-Control', 'no-cache');
-            res.sendFile(path.join(distDir, 'index.html'));
+            res.type('html').send(pageFor(req));
         });
     }
 
