@@ -22,7 +22,9 @@ env:
   CONFIG_BUCKET: ${{ vars.CONFIG_BUCKET || 'chikit-config-828776175198' }}
   # The address the HTTPS proxy gets a free certificate for. sslip.io names resolve to the IP inside them (no DNS to set up);
   # switch to a real domain later by pointing its A record at the server and setting the SITE_HOST repo variable.
-  SITE_HOST: ${{ vars.SITE_HOST || '3-6-208-29.sslip.io' }}
+  SITE_HOST: ${{ vars.SITE_HOST || 'chikit.co.in' }}
+  # Other names that open the same site. Each gets its own free certificate; the sslip.io name keeps working as a fallback.
+  SITE_ALIASES: ${{ vars.SITE_ALIASES || 'www.chikit.co.in, 3-6-208-29.sslip.io' }}
   ECR_REPOSITORY: chikit
   ECS_CLUSTER: chikit
   ECS_SERVICE: chikit-web
@@ -59,7 +61,8 @@ jobs:
 
       - name: Register task definition
         run: |
-          envsubst '${AWS_ACCOUNT_ID} ${AWS_REGION} ${IMAGE} ${CONFIG_BUCKET} ${SITE_HOST}' < infra/aws/task-definition.json > task-definition.rendered.json
+          export CADDY_HOSTS="$SITE_HOST, $SITE_ALIASES"
+          envsubst '${AWS_ACCOUNT_ID} ${AWS_REGION} ${IMAGE} ${CONFIG_BUCKET} ${CADDY_HOSTS}' < infra/aws/task-definition.json > task-definition.rendered.json
           TD_ARN=$(aws ecs register-task-definition --cli-input-json file://task-definition.rendered.json --query 'taskDefinition.taskDefinitionArn' --output text)
           echo "TD_ARN=$TD_ARN" >> "$GITHUB_ENV"
 
