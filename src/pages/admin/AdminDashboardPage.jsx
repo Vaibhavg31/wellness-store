@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, Package, Star, MessageSquare, FolderOpen, ShoppingBag, PenLine, Tag, Gift, IndianRupee, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
+import { CheckCircle2, Package, Star, MessageSquare, ShoppingBag, IndianRupee, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
 import { api } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { formatPrice } from '@/utils/formatPrice';
 import { sumOrderRevenue, orderCountsTowardRevenue } from '@/utils/orderRevenue';
 import DashboardCharts from '@/components/admin/charts/DashboardCharts';
-import { AdminPageHeader, AdminPromoCard, AdminQuickLink, AdminStatusPill, AdminEmptyState } from '@/components/admin/AdminUi';
+import { AdminPageHeader, AdminQuickLink, AdminStatusPill, AdminEmptyState } from '@/components/admin/AdminUi';
 import { getStatusLabel, formatOrderDate, shortOrderId, normalizeStatus } from '@/constants/orders';
 
 const LOW_STOCK_THRESHOLD = 5;
@@ -136,23 +136,19 @@ export default function AdminDashboardPage() {
             .slice(0, 5);
     }, [orders]);
 
+    // Four numbers that matter day to day. Everything else is one click away in the menu on the left.
     const cards = [
         { label: 'Revenue', value: formatPrice(stats.revenue), icon: IndianRupee, href: `${ADMIN_PATH}/orders`, highlight: true },
-        { label: 'Products', value: stats.products, icon: Package, href: `${ADMIN_PATH}/products` },
-        { label: 'Categories', value: stats.categories, icon: FolderOpen, href: `${ADMIN_PATH}/categories` },
         { label: 'Orders', value: stats.orders, icon: ShoppingBag, href: `${ADMIN_PATH}/orders` },
-        { label: 'Low Stock', value: lowStockProducts.length, sub: outOfStockCount > 0 ? `${outOfStockCount} out of stock` : undefined, icon: AlertTriangle, href: `${ADMIN_PATH}/products` },
-        { label: 'Coupons', value: stats.coupons, sub: 'active', icon: Tag, href: `${ADMIN_PATH}/coupons` },
-        { label: 'Bundles', value: stats.bundles, sub: 'published', icon: Gift, href: `${ADMIN_PATH}/bundles` },
-        { label: 'Reviews', value: stats.reviews, icon: Star, href: `${ADMIN_PATH}/reviews` },
-        { label: 'Feedback', value: stats.feedback, sub: stats.unread > 0 ? `${stats.unread} unread` : undefined, icon: MessageSquare, href: `${ADMIN_PATH}/feedback` },
+        { label: 'Products', value: stats.products, icon: Package, href: `${ADMIN_PATH}/products` },
+        { label: 'Low stock', value: lowStockProducts.length, sub: outOfStockCount > 0 ? `${outOfStockCount} out of stock` : undefined, icon: AlertTriangle, href: `${ADMIN_PATH}/products` },
     ];
 
     return (
         <div>
             <AdminPageHeader
                 title="Dashboard"
-                subtitle="Overview of your Chikit store"
+                subtitle="What needs you today, and how the store is doing"
             />
 
             <section aria-labelledby="needs-attention" className="rounded-xl border border-admin-border bg-admin-surface p-4 shadow-xs sm:p-5">
@@ -173,14 +169,7 @@ export default function AdminDashboardPage() {
                 )}
             </section>
 
-            <AdminPromoCard
-                to={`${ADMIN_PATH}/content`}
-                icon={PenLine}
-                title="Content Manager"
-                description="Edit headlines, images, FAQs, promos and more — no code needed."
-            />
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
                 {cards.map((card) => (
                     <AdminQuickLink
                         key={card.label}

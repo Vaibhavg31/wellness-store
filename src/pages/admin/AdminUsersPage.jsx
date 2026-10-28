@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     ArrowUpDown,
     Ban,
@@ -23,7 +23,6 @@ import Drawer from '@/components/ui/Drawer';
 import ExportFormatModal from '@/components/admin/ExportFormatModal';
 import {
     AdminPageHeader,
-    AdminStatStrip,
     AdminTableShell,
     AdminFilterBar,
     AdminSearchInput,
@@ -447,20 +446,11 @@ export default function AdminUsersPage() {
 
     const hasActiveFilters = filters.phoneVerified || filters.blocked || filters.from || filters.to || filters.search;
 
-    const stats = useMemo(() => {
-        const verified = users.filter((u) => u.phoneVerified).length;
-        const withOrders = users.filter((u) => (u.orderCount ?? 0) > 0).length;
-        const totalOrders = users.reduce((sum, u) => sum + (u.orderCount ?? 0), 0);
-        const blocked = users.filter((u) => u.isBlocked).length;
-        const totalRevenue = users.reduce((sum, u) => sum + (u.revenue ?? u.totalSpent ?? 0), 0);
-        return { total: users.length, verified, withOrders, totalOrders, blocked, totalRevenue };
-    }, [users]);
-
     return (
         <div>
             <AdminPageHeader
                 title="Users"
-                subtitle="Customer accounts, verification, and order history"
+                subtitle="Everyone who has created an account on your store"
                 actions={(
                     <>
                         <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)} disabled={exporting || loading} className="gap-2">
@@ -475,19 +465,7 @@ export default function AdminUsersPage() {
                 )}
             />
 
-            <AdminStatStrip
-                columns={6}
-                stats={[
-                    { label: 'Revenue', value: formatPrice(stats.totalRevenue), tone: 'turmeric' },
-                    { label: 'Users', value: stats.total },
-                    { label: 'Orders', value: stats.totalOrders, tone: 'forest' },
-                    { label: 'With orders', value: stats.withOrders },
-                    { label: 'Verified', value: stats.verified, tone: 'emerald' },
-                    { label: 'Blocked', value: stats.blocked, tone: 'red' },
-                ]}
-            />
-
-            <AdminFilterBar footer="Orders matched by email and user ID — includes direct orders.">
+            <AdminFilterBar>
                 <AdminSearchInput value={searchInput} onChange={setSearchInput} placeholder="Search name, email, phone, user ID…" />
                 <AdminSelect value={filters.phoneVerified} onChange={(e) => setFilters((f) => ({ ...f, phoneVerified: e.target.value }))} options={VERIFIED_FILTER_OPTIONS} aria-label="Phone verification" />
                 <AdminSelect value={filters.blocked} onChange={(e) => setFilters((f) => ({ ...f, blocked: e.target.value }))} options={BLOCKED_FILTER_OPTIONS} aria-label="Blocked status" />

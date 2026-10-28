@@ -1,72 +1,36 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Copy, Plus, Pencil, Trash2, Eye, EyeOff, Package } from 'lucide-react';
+import { Copy, Plus, Trash2, Package } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
 import { humanizeSlug } from '@/utils/products';
 import {
     AdminPageHeader,
-    AdminSummaryGrid,
+    AdminTabs,
+    AdminMenu,
+    AdminSwitch,
     AdminFilterBar,
     AdminSearchInput,
     AdminTableShell,
     AdminLoadingState,
     AdminEmptyState,
-    AdminIconButton,
-    AdminStatusPill,
     AdminErrorBanner,
 } from '@/components/admin/AdminUi';
 
-/** Stock that can be edited right in the list: type a number, press Enter or leave the field to save. */
-function StockCell({ product, onSave }) {
-    const [value, setValue] = useState(String(product.stock));
-    const [state, setState] = useState('idle'); // idle | saving | saved | error
+/** Same threshold the dashboard uses for "low stock". */
+const LOW_STOCK = 5;
+const titleCase = (text) => String(text ?? '').replace(/\b\w/g, (c) => c.toUpperCase());
 
-    useEffect(() => setValue(String(product.stock)), [product.stock]);
-
-    if (product.hasVariants) {
-        return <span className="tabular-nums" title="Stock is managed per option — open the product to edit">{product.stock}</span>;
-    }
-
-    const commit = async () => {
-        const next = Number.parseInt(value, 10);
-        if (!Number.isFinite(next) || next < 0) {
-            setValue(String(product.stock));
-            return;
-        }
-        if (next === Number(product.stock)) return;
-        setState('saving');
-        try {
-            await onSave(product, next);
-            setState('saved');
-            setTimeout(() => setState('idle'), 1500);
-        } catch {
-            setValue(String(product.stock));
-            setState('error');
-        }
-    };
-
-    return (
-        <span className="inline-flex items-center gap-2">
-            <input
-                type="number"
-                min="0"
-                inputMode="numeric"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onBlur={commit}
-                onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); if (e.key === 'Escape') { setValue(String(product.stock)); e.currentTarget.blur(); } }}
-                aria-label={`Stock for ${product.title}`}
-                className="admin-control w-20 px-2 py-1 text-sm tabular-nums"
-            />
-            <span className="w-4 text-caption" aria-live="polite">
-                {state === 'saving' && <span className="text-muted">…</span>}
-                {state === 'saved' && <span className="text-success">✓</span>}
-                {state === 'error' && <span className="text-danger" title="Could not save">!</span>}
-            </span>
-        </span>
-    );
+/**
+ * Stock is shown, never edited, in the list (a stray keystroke here used to change inventory). It is changed in the product's
+ * own form, where it sits next to price and the other details.
+ */
+function StockLabel({ product }) {
+    const stock = Number(product.stock ?? 0);
+    if (stock <= 0) return <span className="inline-flex rounded-full bg-danger-tint px-2.5 py-0.5 text-xs font-medium text-danger">Out of stock</span>;
+    if (stock <= LOW_STOCK) return <span className="inline-flex rounded-full bg-warning-tint px-2.5 py-0.5 text-xs font-medium text-warning">Low · {stock} left</span>;
+    return <span className="text-sm tabular-nums text-ink">{stock}</span>;
 }
 
 export default function AdminProductsPage() {
@@ -74,21 +38,29 @@ export default function AdminProductsPage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [tab, setTab] = useState('all');
+    const [loadError, setLoadError] = useState('');
+
+    const counts = useMemo(() => ({
+        all: products.length,
+        live: products.filter((p) => p.isPublished).length,
+        hidden: products.filter((p) => !p.isPublished).length,
+        low: products.filter((p) => Number(p.stock ?? 0) <= LOW_STOCK).length,
+    }), [products]);
 
     const filteredProducts = useMemo(() => {
         const q = search.trim().toLowerCase();
-        if (!q) return products;
-        return products.filter((p) =>
-            p.title?.toLowerCase().includes(q)
-            || p.category?.toLowerCase().includes(q)
-            || p.tags?.some((t) => t.toLowerCase().includes(q))
-            || String(p.price).includes(q),
-        );
-    }, [products, search]);
-
-    const liveCount = products.filter((p) => p.isPublished).length;
-
-    const [loadError, setLoadError] = useState('');
+        return products.filter((p) => {
+            if (tab === 'live' && !p.isPublished) return false;
+            if (tab === 'hidden' && p.isPublished) return false;
+            if (tab === 'low' && Number(p.stock ?? 0) > LOW_STOCK) return false;
+            if (!q) return true;
+            return p.title?.toLowerCase().includes(q)
+                || p.category?.toLowerCase().includes(q)
+                || p.tags?.some((t) => t.toLowerCase().includes(q))
+                || String(p.price).includes(q);
+        });
+    }, [products, search, tab]);
 
     const fetchProducts = async () => {
         if (!adminToken) return;
@@ -109,26 +81,19 @@ export default function AdminProductsPage() {
         fetchProducts();
     }, [adminToken]);
 
-    const handleDelete = async (id) => {
-        if (!adminToken || !confirm('Delete this product?')) return;
+    const handleDelete = async (product) => {
+        if (!adminToken || !confirm(`Delete "${product.title}"? This cannot be undone.`)) return;
         try {
-            await api.delete(`/api/products/${id}`, adminToken);
+            await api.delete(`/api/products/${product.id}`, adminToken);
             fetchProducts();
         } catch (err) {
             setLoadError(err instanceof Error ? err.message : 'Failed to delete product');
         }
     };
 
-    const saveStock = async (product, stock) => {
-        await api.put(`/api/products/${product.id}`, { stock }, adminToken);
-        setProducts((list) => list.map((p) => (p.id === product.id ? { ...p, stock } : p)));
-    };
-
     // Clone a product (hidden, as "<title> (Copy)") so similar items don't have to be rebuilt from scratch.
-    const [duplicatingId, setDuplicatingId] = useState('');
     const duplicateProduct = async (product) => {
         if (!adminToken) return;
-        setDuplicatingId(product.id);
         try {
             await api.post('/api/products', {
                 title: `${product.title} (Copy)`,
@@ -160,8 +125,6 @@ export default function AdminProductsPage() {
             await fetchProducts();
         } catch (err) {
             setLoadError(err instanceof Error ? err.message : 'Failed to duplicate product');
-        } finally {
-            setDuplicatingId('');
         }
     };
 
@@ -175,15 +138,22 @@ export default function AdminProductsPage() {
         }
     };
 
+    const menuFor = (product) => [
+        { label: 'Duplicate', icon: Copy, onClick: () => duplicateProduct(product) },
+        { label: 'Delete', icon: Trash2, danger: true, onClick: () => handleDelete(product) },
+    ];
+    const editHref = (product) => `${ADMIN_PATH}/products/${product.id}`;
+    const optionsNote = (product) => (product.hasVariants ? `${product.variants.length} option${product.variants.length === 1 ? '' : 's'}` : '');
+
     return (
         <div>
             <AdminPageHeader
                 title="Products"
-                subtitle="Manage your catalog, pricing, and visibility"
+                subtitle={`${counts.all} ${counts.all === 1 ? 'product' : 'products'} in your store`}
                 actions={(
                     <Link to={`${ADMIN_PATH}/products/new`}>
                         <Button variant="turmeric" size="sm" className="gap-2">
-                            <Plus size={16} /> Add Product
+                            <Plus size={16} /> Add product
                         </Button>
                     </Link>
                 )}
@@ -191,21 +161,20 @@ export default function AdminProductsPage() {
 
             {loadError && <AdminErrorBanner message={loadError} onDismiss={() => setLoadError('')} />}
 
-            <AdminSummaryGrid
-                columns={3}
-                stats={[
-                    { label: 'Total products', value: products.length },
-                    { label: 'Live', value: liveCount, tone: 'emerald' },
-                    { label: 'Hidden', value: products.length - liveCount, tone: 'default' },
+            <AdminTabs
+                label="Show products"
+                value={tab}
+                onChange={setTab}
+                tabs={[
+                    { value: 'all', label: 'All', count: counts.all },
+                    { value: 'live', label: 'Live', count: counts.live },
+                    { value: 'hidden', label: 'Hidden', count: counts.hidden },
+                    { value: 'low', label: 'Low stock', count: counts.low },
                 ]}
             />
 
             <AdminFilterBar>
-                <AdminSearchInput
-                    value={search}
-                    onChange={setSearch}
-                    placeholder="Search by title, category, tags…"
-                />
+                <AdminSearchInput value={search} onChange={setSearch} placeholder="Search by name, category or tag…" />
             </AdminFilterBar>
 
             <AdminTableShell>
@@ -214,104 +183,82 @@ export default function AdminProductsPage() {
                 ) : filteredProducts.length === 0 ? (
                     <AdminEmptyState
                         icon={Package}
-                        title={search.trim() ? 'No products match your search' : 'No products yet'}
-                        description={search.trim() ? 'Try a different search term' : 'Add your first product to get started'}
+                        title={search.trim() || tab !== 'all' ? 'No products match' : 'No products yet'}
+                        description={search.trim() || tab !== 'all' ? 'Try a different search or filter' : 'Add your first product to get started'}
                     />
                 ) : (
                     <>
-                    {/* Phones: one card per product with every control in reach (the wide table needed sideways scrolling to reach Edit). */}
-                    <ul className="divide-y divide-admin-border-light md:hidden">
-                        {filteredProducts.map((product) => (
-                            <li key={product.id} className="space-y-3 p-4">
-                                <div className="flex items-start gap-3">
-                                    <img src={imageUrl(product.images?.[0] || '')} alt="" className="size-14 shrink-0 rounded-lg border border-admin-border-light object-cover" />
-                                    <div className="min-w-0 flex-1">
-                                        <p className="font-medium text-ink">{product.title}</p>
-                                        <p className="text-xs text-admin-muted">{humanizeSlug(product.category)}{product.hasVariants ? ` · ${product.variants.length} option${product.variants.length === 1 ? '' : 's'}` : ''}</p>
-                                        <p className="mt-1 font-medium tabular-nums text-ink">
-                                            {product.hasVariants && <span className="font-normal text-admin-muted">From </span>}₹{product.price}
-                                        </p>
+                        {/* Phones: one card per product with every control in reach. */}
+                        <ul className="divide-y divide-admin-border-light md:hidden">
+                            {filteredProducts.map((product) => (
+                                <li key={product.id} className="space-y-3 p-4">
+                                    <div className="flex items-start gap-3">
+                                        <img src={imageUrl(product.images?.[0] || '')} alt="" className="size-14 shrink-0 rounded-lg border border-admin-border-light object-cover" />
+                                        <div className="min-w-0 flex-1">
+                                            <Link to={editHref(product)} className="font-medium text-ink hover:text-primary">{product.title}</Link>
+                                            <p className="text-xs text-admin-muted">{titleCase(humanizeSlug(product.category))}{optionsNote(product) && ` · ${optionsNote(product)}`}</p>
+                                            <p className="mt-1 font-medium tabular-nums text-ink">
+                                                {product.hasVariants && <span className="font-normal text-admin-muted">From </span>}₹{product.price}
+                                            </p>
+                                        </div>
+                                        <StockLabel product={product} />
                                     </div>
-                                    <button type="button" onClick={() => togglePublish(product)} className="shrink-0" aria-label={product.isPublished ? 'Hide product' : 'Publish product'}>
-                                        <AdminStatusPill tone={product.isPublished ? 'success' : 'muted'}>
-                                            {product.isPublished ? <><Eye size={11} className="mr-0.5" /> Live</> : <><EyeOff size={11} className="mr-0.5" /> Hidden</>}
-                                        </AdminStatusPill>
-                                    </button>
-                                </div>
-                                <div className="flex items-center justify-between gap-3">
-                                    <StockCell product={product} onSave={saveStock} />
-                                    <div className="flex gap-1">
-                                        <Link to={`${ADMIN_PATH}/products/${product.id}`} className="inline-grid size-9 place-items-center rounded-lg text-ink hover:bg-admin-surface-alt" aria-label={`Edit ${product.title}`}><Pencil size={16} /></Link>
-                                        <AdminIconButton onClick={() => duplicateProduct(product)} icon={Copy} title="Duplicate as hidden copy" disabled={duplicatingId === product.id} />
-                                        <AdminIconButton onClick={() => handleDelete(product.id)} icon={Trash2} variant="danger" title="Delete" />
+                                    <div className="flex items-center justify-between gap-3">
+                                        <AdminSwitch checked={product.isPublished} onChange={() => togglePublish(product)} aria-label={`${product.isPublished ? 'Hide' : 'Show'} ${product.title} on the store`} />
+                                        <div className="flex items-center gap-1">
+                                            <Link to={editHref(product)}><Button variant="outline" size="sm">Edit</Button></Link>
+                                            <AdminMenu items={menuFor(product)} label={`More actions for ${product.title}`} />
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                    <div className="hidden overflow-x-auto md:block">
-                        <table className="w-full text-sm min-w-[700px]">
-                            <thead>
-                                <tr>
-                                    <th className="p-4 text-left">Product</th>
-                                    <th className="p-4 text-left">Category</th>
-                                    <th className="p-4 text-left">Price</th>
-                                    <th className="p-4 text-left">Stock</th>
-                                    <th className="p-4 text-left">Status</th>
-                                    <th className="p-4 text-left w-32">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredProducts.map((product) => (
-                                    <tr key={product.id} className="hover:bg-admin-surface-alt/60">
-                                        <td className="p-4">
-                                            <div className="flex items-center gap-3">
-                                                <img src={imageUrl(product.images?.[0] || '')} alt="" className="w-11 h-11 rounded-lg object-cover border border-admin-border-light" />
-                                                <div>
-                                                    <p className="font-medium text-ink">{product.title}</p>
-                                                    <p className="text-xs text-admin-muted line-clamp-1">
-                                                        {product.hasVariants
-                                                            ? `${product.variants.length} option${product.variants.length === 1 ? '' : 's'}${product.tags?.length ? ` · ${product.tags.join(', ')}` : ''}`
-                                                            : product.tags?.join(', ')}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-admin-muted">{humanizeSlug(product.category)}</td>
-                                        <td className="p-4 font-medium tabular-nums">
-                                            {product.hasVariants && <span className="text-admin-muted font-normal">From </span>}
-                                            ₹{product.price}
-                                        </td>
-                                        <td className="p-4"><StockCell product={product} onSave={saveStock} /></td>
-                                        <td className="p-4">
-                                            <button type="button" onClick={() => togglePublish(product)}>
-                                                <AdminStatusPill tone={product.isPublished ? 'success' : 'muted'}>
-                                                    {product.isPublished ? (
-                                                        <><Eye size={11} className="mr-0.5" /> Live</>
-                                                    ) : (
-                                                        <><EyeOff size={11} className="mr-0.5" /> Hidden</>
-                                                    )}
-                                                </AdminStatusPill>
-                                            </button>
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex gap-1">
-                                                <Link
-                                                    to={`${ADMIN_PATH}/products/${product.id}`}
-                                                    className="p-2 rounded-lg hover:bg-admin-surface-alt text-ink transition-colors inline-flex"
-                                                    title="Edit"
-                                                >
-                                                    <Pencil size={16} />
-                                                </Link>
-                                                <AdminIconButton onClick={() => duplicateProduct(product)} icon={Copy} title="Duplicate as hidden copy" disabled={duplicatingId === product.id} />
-                                                <AdminIconButton onClick={() => handleDelete(product.id)} icon={Trash2} variant="danger" title="Delete" />
-                                            </div>
-                                        </td>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <div className="hidden overflow-x-auto md:block">
+                            <table className="w-full min-w-[640px] text-sm">
+                                <thead>
+                                    <tr>
+                                        <th className="p-4 text-left">Product</th>
+                                        <th className="p-4 text-left">Category</th>
+                                        <th className="p-4 text-left">Price</th>
+                                        <th className="p-4 text-left">Stock</th>
+                                        <th className="p-4 text-left">Store</th>
+                                        <th className="w-36 p-4 text-right"><span className="sr-only">Actions</span></th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {filteredProducts.map((product) => (
+                                        <tr key={product.id} className="hover:bg-admin-surface-alt/60">
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-3">
+                                                    <img src={imageUrl(product.images?.[0] || '')} alt="" className="size-11 shrink-0 rounded-lg border border-admin-border-light object-cover" />
+                                                    <div className="min-w-0">
+                                                        <Link to={editHref(product)} className="font-medium text-ink hover:text-primary">{product.title}</Link>
+                                                        {(optionsNote(product) || product.tags?.length > 0) && (
+                                                            <p className="line-clamp-1 text-xs text-admin-muted">{[optionsNote(product), product.tags?.join(', ')].filter(Boolean).join(' · ')}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-admin-muted">{titleCase(humanizeSlug(product.category))}</td>
+                                            <td className="p-4 font-medium tabular-nums">
+                                                {product.hasVariants && <span className="font-normal text-admin-muted">From </span>}₹{product.price}
+                                            </td>
+                                            <td className="p-4"><StockLabel product={product} /></td>
+                                            <td className="p-4">
+                                                <AdminSwitch checked={product.isPublished} onChange={() => togglePublish(product)} aria-label={`${product.isPublished ? 'Hide' : 'Show'} ${product.title} on the store`} />
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <Link to={editHref(product)}><Button variant="outline" size="sm">Edit</Button></Link>
+                                                    <AdminMenu items={menuFor(product)} label={`More actions for ${product.title}`} />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </>
                 )}
             </AdminTableShell>

@@ -4,7 +4,6 @@ import { api } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import {
     AdminPageHeader,
-    AdminSummaryGrid,
     AdminFilterBar,
     AdminSearchInput,
     AdminTableShell,
@@ -73,8 +72,6 @@ export default function AdminFeedbackPage() {
         fetchFeedback();
     };
 
-    const unreadCount = feedback.filter((f) => !f.isRead).length;
-    const readCount = feedback.filter((f) => f.isRead).length;
     const hasFilters = readFilter !== 'all' || search.trim();
 
     return (
@@ -82,15 +79,6 @@ export default function AdminFeedbackPage() {
             <AdminPageHeader
                 title="Feedback Inbox"
                 subtitle="Messages from the contact form and customer inquiries"
-            />
-
-            <AdminSummaryGrid
-                columns={3}
-                stats={[
-                    { label: 'Total messages', value: feedback.length },
-                    { label: 'Unread', value: unreadCount, color: 'text-accent-ink', sub: unreadCount > 0 ? 'Needs attention' : undefined },
-                    { label: 'Read', value: readCount, color: 'text-primary' },
-                ]}
             />
 
             <AdminFilterBar

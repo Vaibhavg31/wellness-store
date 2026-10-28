@@ -63,7 +63,7 @@ export default function DashboardCharts({ orders }) {
     const isMoney = metric === 'revenue';
 
     return (
-        <section aria-labelledby="dashboard-charts" className="space-y-3">
+        <section aria-labelledby="dashboard-charts" className="mt-8 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 id="dashboard-charts" className="font-sans text-body font-semibold">Performance</h2>
                 <Segmented label="Date range" value={days} onChange={changeRange} options={RANGES.map((d) => ({ value: d, label: `${d} days` }))} />

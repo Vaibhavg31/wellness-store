@@ -5,7 +5,6 @@ import { useAdminAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import {
     AdminPageHeader,
-    AdminSummaryGrid,
     AdminFilterBar,
     AdminSearchInput,
     AdminLoadingState,
@@ -54,8 +53,6 @@ export default function AdminMediaPage() {
         if (!q) return media;
         return media.filter((m) => m.filename?.toLowerCase().includes(q));
     }, [media, search]);
-
-    const totalSize = media.reduce((sum, m) => sum + (m.sizeBytes || 0), 0);
 
     const handleUpload = async (e) => {
         if (!adminToken || !e.target.files?.length) return;
@@ -111,15 +108,6 @@ export default function AdminMediaPage() {
                         />
                     </>
                 }
-            />
-
-            <AdminSummaryGrid
-                columns={3}
-                stats={[
-                    { label: 'Total files', value: media.length },
-                    { label: 'Storage used', value: formatSize(totalSize) || '0 B' },
-                    { label: 'Showing', value: filtered.length },
-                ]}
             />
 
             <AdminFilterBar>

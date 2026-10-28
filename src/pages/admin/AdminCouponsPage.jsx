@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import {
-    Plus, Pencil, Trash2, Tag, ToggleLeft, ToggleRight,
+    Plus, Trash2, Tag,
     Percent, IndianRupee, Truck, Users, UserPlus, Repeat,
 } from 'lucide-react';
 import { api } from '@/services/api';
@@ -13,13 +13,13 @@ import Drawer from '@/components/ui/Drawer';
 import Badge from '@/components/ui/Badge';
 import {
     AdminPageHeader,
-    AdminSummaryGrid,
+    AdminMenu,
+    AdminSwitch,
     AdminFilterBar,
     AdminSearchInput,
     AdminTableShell,
     AdminLoadingState,
     AdminEmptyState,
-    AdminIconButton,
 } from '@/components/admin/AdminUi';
 
 const EMPTY_FORM = {
@@ -46,12 +46,6 @@ const AUDIENCE_OPTIONS = [
     { value: 'new_customers', label: 'New customers', icon: UserPlus },
     { value: 'returning_customers', label: 'Returning customers', icon: Repeat },
 ];
-
-function typeLabel(type) {
-    if (type === 'free_delivery') return 'Free Delivery';
-    if (type === 'flat') return 'Flat Off';
-    return 'Percentage';
-}
 
 function typeIcon(type) {
     if (type === 'free_delivery') return Truck;
@@ -180,10 +174,10 @@ export default function AdminCouponsPage() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!adminToken || !confirm('Delete this coupon? Past orders will keep their discount history.')) return;
+    const handleDelete = async (coupon) => {
+        if (!adminToken || !confirm(`Delete coupon ${coupon.code}? Past orders keep their discount history.`)) return;
         try {
-            await api.delete(`/api/coupons/${id}`, adminToken);
+            await api.delete(`/api/coupons/${coupon.id}`, adminToken);
             showToast('Coupon deleted', 'success');
             fetchCoupons();
         } catch (err) {
@@ -192,32 +186,20 @@ export default function AdminCouponsPage() {
     };
 
     const enabledCount = coupons.filter((c) => c.isEnabled).length;
-    const totalUses = coupons.reduce((sum, c) => sum + (c.stats?.totalOrders || c.usageCount || 0), 0);
-    const totalDiscountGiven = coupons.reduce((sum, c) => sum + (c.stats?.totalDiscountGiven || 0), 0);
 
     return (
         <div>
             <AdminPageHeader
                 title="Coupons"
-                subtitle="Create discount codes: percentage, flat amount, or free delivery"
-                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> New Coupon</Button>}
-            />
-
-            <AdminSummaryGrid
-                columns={4}
-                stats={[
-                    { label: 'Total coupons', value: coupons.length },
-                    { label: 'Active now', value: enabledCount, color: 'text-primary' },
-                    { label: 'Total redemptions', value: totalUses, color: 'text-primary' },
-                    { label: 'Discount given', value: formatPrice(totalDiscountGiven), color: 'text-accent-ink' },
-                ]}
+                subtitle={`${enabledCount} of ${coupons.length} ${coupons.length === 1 ? 'coupon' : 'coupons'} active`}
+                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> New coupon</Button>}
             />
 
             <AdminFilterBar>
                 <AdminSearchInput
                     value={search}
                     onChange={setSearch}
-                    placeholder="Search coupons by code, title, type…"
+                    placeholder="Search coupons…"
                 />
             </AdminFilterBar>
 
@@ -232,17 +214,14 @@ export default function AdminCouponsPage() {
                     />
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm min-w-[960px]">
+                        <table className="w-full min-w-[760px] text-sm">
                             <thead>
                                 <tr className="border-b border-admin-border text-left bg-admin-surface-alt">
                                     <th className="p-4 font-medium text-admin-muted min-w-[220px]">Coupon</th>
                                     <th className="p-4 font-medium text-admin-muted min-w-[180px]">Offer</th>
-                                    <th className="p-4 font-medium text-admin-muted text-center w-20">Customers</th>
-                                    <th className="p-4 font-medium text-admin-muted text-center w-20">Orders</th>
-                                    <th className="p-4 font-medium text-admin-muted text-center w-24">Revenue</th>
-                                    <th className="p-4 font-medium text-admin-muted text-center w-24">Given off</th>
-                                    <th className="p-4 font-medium text-admin-muted w-28">Status</th>
-                                    <th className="p-4 font-medium text-admin-muted w-28" />
+                                    <th className="min-w-[140px] p-4 font-medium text-admin-muted">Used</th>
+                                    <th className="w-32 p-4 font-medium text-admin-muted">Active</th>
+                                    <th className="w-36 p-4"><span className="sr-only">Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -296,44 +275,23 @@ export default function AdminCouponsPage() {
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="p-4 text-center align-top">
-                                                <p className="font-display text-lg text-ink">{stats.uniqueCustomers || 0}</p>
-                                            </td>
-                                            <td className="p-4 text-center align-top">
-                                                <p className="font-display text-lg text-ink">{stats.totalOrders || 0}</p>
-                                            </td>
-                                            <td className="p-4 text-center align-top">
-                                                <p className="font-display text-sm text-ink">{formatPrice(stats.totalRevenue || 0)}</p>
-                                            </td>
-                                            <td className="p-4 text-center align-top">
-                                                <p className="font-display text-sm text-accent-ink">{formatPrice(stats.totalDiscountGiven || 0)}</p>
+                                            <td className="p-4 align-top">
+                                                {(stats.totalOrders || 0) > 0 ? (
+                                                    <>
+                                                        <p className="text-ink">{stats.totalOrders} {stats.totalOrders === 1 ? 'order' : 'orders'}</p>
+                                                        <p className="text-xs text-admin-muted">{formatPrice(stats.totalDiscountGiven || 0)} given off</p>
+                                                    </>
+                                                ) : (
+                                                    <p className="text-sm text-admin-muted">Not used yet</p>
+                                                )}
                                             </td>
                                             <td className="p-4 align-top">
-                                                <Badge variant={coupon.isEnabled ? 'sale' : 'stock'}>
-                                                    {coupon.isEnabled ? 'Enabled' : 'Disabled'}
-                                                </Badge>
-                                                <p className="text-[10px] uppercase tracking-wider text-admin-muted mt-2">{typeLabel(coupon.type)}</p>
+                                                <AdminSwitch checked={coupon.isEnabled} onChange={() => handleToggle(coupon)} onLabel="On" offLabel="Off" aria-label={`${coupon.isEnabled ? 'Turn off' : 'Turn on'} coupon ${coupon.code}`} />
                                             </td>
                                             <td className="p-4 align-top">
-                                                <div className="flex items-center gap-1">
-                                                    <AdminIconButton
-                                                        onClick={() => handleToggle(coupon)}
-                                                        icon={coupon.isEnabled ? ToggleRight : ToggleLeft}
-                                                        variant="success"
-                                                        title={coupon.isEnabled ? 'Disable' : 'Enable'}
-                                                        size={18}
-                                                    />
-                                                    <AdminIconButton
-                                                        onClick={() => openEdit(coupon)}
-                                                        icon={Pencil}
-                                                        title="Edit"
-                                                    />
-                                                    <AdminIconButton
-                                                        onClick={() => handleDelete(coupon.id)}
-                                                        icon={Trash2}
-                                                        variant="danger"
-                                                        title="Delete"
-                                                    />
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <Button variant="outline" size="sm" onClick={() => openEdit(coupon)}>Edit</Button>
+                                                    <AdminMenu label={`More actions for ${coupon.code}`} items={[{ label: 'Delete', icon: Trash2, danger: true, onClick: () => handleDelete(coupon) }]} />
                                                 </div>
                                             </td>
                                         </tr>

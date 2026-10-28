@@ -11,37 +11,37 @@ const serviceToggles = [
     {
         key: 'emailEnabled',
         group: 'services',
-        label: 'Email Service',
-        description: 'Order confirmations, shipping updates, password reset emails (Brevo)',
-        hint: 'Also requires BREVO_API_KEY in config.json',
+        label: 'Emails to customers',
+        description: 'Order confirmations, shipping updates and password reset emails',
+        hint: 'Needs the email account to be connected (done once by your developer).',
     },
     {
         key: 'otpEnabled',
         group: 'services',
-        label: 'OTP Service',
-        description: 'Mobile number verification at checkout (MSG91)',
-        hint: 'When off, customers can place orders without OTP',
+        label: 'Phone verification at checkout',
+        description: 'Customers confirm their mobile number with a one-time code',
+        hint: 'When off, customers can place orders without the code.',
     },
     {
         key: 'googleSignInEnabled',
         group: 'services',
-        label: 'Google Sign-In',
-        description: 'Allow customers to sign in with Google',
-        hint: 'Also requires GOOGLE_CLIENT_ID in config.json',
+        label: 'Sign in with Google',
+        description: 'Let customers sign in with their Google account',
+        hint: 'Needs a Google sign-in key (done once by your developer).',
     },
     {
         key: 'onlinePaymentEnabled',
         group: 'payments',
-        label: 'Online Payment (Razorpay)',
+        label: 'Online payment',
         description: 'UPI, cards and net banking at checkout',
-        hint: 'Also requires Razorpay keys in config.json. Products can override.',
+        hint: 'Needs Razorpay to be connected (done once by your developer). Each product can override this.',
     },
     {
         key: 'codEnabled',
         group: 'payments',
         label: 'Cash on Delivery',
         description: 'Pay when the order arrives',
-        hint: 'Products can override this per item in the product editor',
+        hint: 'Each product can override this in its own page.',
     },
 ];
 
@@ -126,23 +126,11 @@ export default function AdminSettingsPage() {
         <div className="space-y-8">
             <AdminPageHeader
                 title="Settings"
-                subtitle="Enable or disable store services and homepage sections."
-                actions={
-                    <AdminSaveBar
-                        hasChanges={hasChanges}
-                        saving={saving}
-                        saved={saved}
-                        onSave={handleSave}
-                        saveLabel="Save Settings"
-                    />
-                }
+                subtitle="Switch store features on or off"
             />
 
             <div>
-                <h2 className="text-sm font-semibold text-ink mb-1">Store Services</h2>
-                <p className="text-xs text-admin-muted mb-3">
-                    Turn features on or off site-wide. Credentials still come from config.json — toggles control whether each service is active.
-                </p>
+                <h2 className="mb-3 text-sm font-semibold text-ink">Store features</h2>
                 <AdminTableShell className="max-w-2xl">
                     {serviceToggles.map((item, i, arr) => (
                         <div
@@ -167,16 +155,13 @@ export default function AdminSettingsPage() {
             </div>
 
             <div>
-                <h2 className="text-sm font-semibold text-ink mb-1">Homepage Sections</h2>
-                <p className="text-xs text-admin-muted mb-3">
-                    Managed in one place — show/hide and drag to reorder homepage sections there.
-                </p>
+                <h2 className="mb-3 text-sm font-semibold text-ink">Homepage</h2>
                 <div className="max-w-xl">
                     <AdminPromoCard
                         to={`${ADMIN_PATH}/content`}
                         icon={Layers}
-                        title="Open Content Manager"
-                        description="Homepage tab — toggle visibility and drag sections into order"
+                        title="Edit homepage sections"
+                        description="Show, hide and reorder the sections on your homepage"
                     />
                 </div>
             </div>
@@ -187,7 +172,7 @@ export default function AdminSettingsPage() {
                 saving={saving}
                 saved={saved}
                 onSave={handleSave}
-                saveLabel="Save Settings"
+                saveLabel="Save changes"
             />
         </div>
     );

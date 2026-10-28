@@ -1185,55 +1185,26 @@ export default function AdminProductFormPage() {
                     )}
                 </FormSection>
 
-                <div className="sm:sticky sm:bottom-4 z-10 rounded-2xl border border-admin-border bg-white shadow-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-                    <div className="flex-1 space-y-1">
-                        <div className="flex justify-between text-sm text-admin-muted">
-                            <span>Category</span>
-                            <span className="capitalize text-ink">
-                                {categories.find((c) => c.slug === form.category)?.label || '—'}
-                            </span>
-                        </div>
-                        <div className="flex justify-between text-sm text-admin-muted">
-                            <span>Images</span>
-                            <span className="text-ink">{form.images.length} uploaded</span>
-                        </div>
-                        <div className="flex justify-between items-baseline pt-2 border-t border-admin-border">
-                            <span className="text-sm font-medium text-ink">Sale price</span>
-                            <span className="font-display text-2xl text-ink">
-                                {Number.isFinite(price) && price > 0 ? formatPrice(price) : '—'}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex shrink-0 flex-wrap gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="lg"
-                            className="w-full normal-case tracking-normal sm:w-auto"
-                            onClick={() => setPreviewOpen(true)}
-                        >
-                            <Eye size={16} aria-hidden="true" /> Preview page
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="lg"
-                            className="flex-1 normal-case tracking-normal sm:flex-none"
-                            onClick={() => navigate(`${ADMIN_PATH}/products`)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="turmeric"
-                            loading={saving}
-                            disabled={uploading}
-                            size="lg"
-                            className="flex-1 normal-case tracking-normal sm:min-w-[180px] sm:flex-none"
-                        >
-                            {isNew ? 'Create product' : 'Save changes'}
-                        </Button>
-                    </div>
+                {/* One slim bar with the two things you can do here. (It used to repeat the price, category and image count that are
+                    already on the page, and a second "Preview page" button that is already at the top.) */}
+                <div className="sticky bottom-0 z-10 -mx-1 flex items-center justify-end gap-3 border-t border-admin-border bg-admin-surface/95 px-1 py-3 backdrop-blur">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="normal-case tracking-normal"
+                        onClick={() => navigate(`${ADMIN_PATH}/products`)}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="turmeric"
+                        loading={saving}
+                        disabled={uploading}
+                        className="normal-case tracking-normal sm:min-w-[180px]"
+                    >
+                        {isNew ? 'Create product' : 'Save changes'}
+                    </Button>
                 </div>
             </form>
 

@@ -1,7 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import {
-    Plus, Pencil, Trash2, Gift, ToggleLeft, ToggleRight, X,
-} from 'lucide-react';
+import { Plus, Trash2, Gift, X } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -9,17 +7,16 @@ import { formatPrice } from '@/utils/formatPrice';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Drawer from '@/components/ui/Drawer';
-import Badge from '@/components/ui/Badge';
 import ProductSearchSelect from '@/components/admin/ProductSearchSelect';
 import {
     AdminPageHeader,
-    AdminSummaryGrid,
+    AdminMenu,
+    AdminSwitch,
     AdminFilterBar,
     AdminSearchInput,
     AdminTableShell,
     AdminLoadingState,
     AdminEmptyState,
-    AdminIconButton,
 } from '@/components/admin/AdminUi';
 
 const EMPTY_FORM = {
@@ -180,10 +177,10 @@ export default function AdminBundlesPage() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!adminToken || !confirm('Delete this bundle? This does not affect past orders.')) return;
+    const handleDelete = async (bundle) => {
+        if (!adminToken || !confirm(`Delete "${bundle.title}"? Past orders are not affected.`)) return;
         try {
-            await api.delete(`/api/bundles/${id}`, adminToken);
+            await api.delete(`/api/bundles/${bundle.id}`, adminToken);
             showToast('Bundle deleted', 'success');
             fetchBundles();
         } catch (err) {
@@ -191,28 +188,16 @@ export default function AdminBundlesPage() {
         }
     };
 
-    const publishedCount = bundles.filter((b) => b.isPublished).length;
-    const totalSavingsOffered = bundles.reduce((sum, b) => sum + (b.pricing?.discountAmount || 0), 0);
-
     return (
         <div>
             <AdminPageHeader
                 title="Bundles"
-                subtitle="Group products together at a discount — shown on the product page and homepage"
-                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> New Bundle</Button>}
-            />
-
-            <AdminSummaryGrid
-                columns={3}
-                stats={[
-                    { label: 'Total bundles', value: bundles.length },
-                    { label: 'Published', value: publishedCount, color: 'text-primary' },
-                    { label: 'Combined savings offered', value: formatPrice(totalSavingsOffered), color: 'text-accent-ink' },
-                ]}
+                subtitle={`${bundles.length} ${bundles.length === 1 ? 'bundle' : 'bundles'} · products sold together at a discount`}
+                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> New bundle</Button>}
             />
 
             <AdminFilterBar>
-                <AdminSearchInput value={search} onChange={setSearch} placeholder="Search bundles by title…" />
+                <AdminSearchInput value={search} onChange={setSearch} placeholder="Search bundles…" />
             </AdminFilterBar>
 
             <AdminTableShell>
@@ -232,8 +217,8 @@ export default function AdminBundlesPage() {
                                     <th className="p-4 font-medium text-admin-muted min-w-[240px]">Bundle</th>
                                     <th className="p-4 font-medium text-admin-muted">Products</th>
                                     <th className="p-4 font-medium text-admin-muted">Price</th>
-                                    <th className="p-4 font-medium text-admin-muted w-28">Status</th>
-                                    <th className="p-4 font-medium text-admin-muted w-28" />
+                                    <th className="w-32 p-4 font-medium text-admin-muted">Store</th>
+                                    <th className="w-36 p-4"><span className="sr-only">Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -267,21 +252,12 @@ export default function AdminBundlesPage() {
                                             )}
                                         </td>
                                         <td className="p-4 align-top">
-                                            <Badge variant={bundle.isPublished ? 'sale' : 'stock'}>
-                                                {bundle.isPublished ? 'Published' : 'Hidden'}
-                                            </Badge>
+                                            <AdminSwitch checked={bundle.isPublished} onChange={() => handleToggle(bundle)} aria-label={`${bundle.isPublished ? 'Hide' : 'Show'} ${bundle.title} on the store`} />
                                         </td>
                                         <td className="p-4 align-top">
-                                            <div className="flex items-center gap-1">
-                                                <AdminIconButton
-                                                    onClick={() => handleToggle(bundle)}
-                                                    icon={bundle.isPublished ? ToggleRight : ToggleLeft}
-                                                    variant="success"
-                                                    title={bundle.isPublished ? 'Hide' : 'Publish'}
-                                                    size={18}
-                                                />
-                                                <AdminIconButton onClick={() => openEdit(bundle)} icon={Pencil} title="Edit" />
-                                                <AdminIconButton onClick={() => handleDelete(bundle.id)} icon={Trash2} variant="danger" title="Delete" />
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Button variant="outline" size="sm" onClick={() => openEdit(bundle)}>Edit</Button>
+                                                <AdminMenu label={`More actions for ${bundle.title}`} items={[{ label: 'Delete', icon: Trash2, danger: true, onClick: () => handleDelete(bundle) }]} />
                                             </div>
                                         </td>
                                     </tr>
@@ -295,7 +271,7 @@ export default function AdminBundlesPage() {
             <Drawer
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
-                title={editing ? 'Edit Bundle' : 'Create Bundle'}
+                title={editing ? 'Edit bundle' : 'Create bundle'}
                 side="right"
                 wide
                 admin

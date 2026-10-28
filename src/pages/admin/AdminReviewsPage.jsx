@@ -1,27 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Check, CheckCheck, X, Trash2, Star, MessageSquare, ShieldCheck } from 'lucide-react';
+import { CheckCheck, X, Trash2, Star, MessageSquare, ShieldCheck } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import ProductSearchSelect from '@/components/admin/ProductSearchSelect';
 import {
     AdminPageHeader,
-    AdminSummaryGrid,
+    AdminTabs,
+    AdminMenu,
     AdminFilterBar,
     AdminSearchInput,
     AdminTableShell,
     AdminLoadingState,
     AdminEmptyState,
-    AdminIconButton,
-    AdminStatusPill,
 } from '@/components/admin/AdminUi';
-
-const STATUS_FILTERS = [
-    { value: 'all', label: 'All reviews' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'approved', label: 'Approved' },
-];
 
 function StarRating({ rating }) {
     return (
@@ -138,7 +131,7 @@ export default function AdminReviewsPage() {
     const approvedCount = reviews.filter((r) => r.isApproved).length;
     const avgRating = reviews.length
         ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
-        : '—';
+        : null;
 
     const hasFilters = productFilter || statusFilter !== 'all' || search.trim();
 
@@ -146,7 +139,7 @@ export default function AdminReviewsPage() {
         <div>
             <AdminPageHeader
                 title="Reviews"
-                subtitle="Moderate customer reviews before they appear on the website"
+                subtitle={reviews.length > 0 ? `${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'}${avgRating ? ` · average ${avgRating} out of 5` : ''}` : 'Reviews appear on the store only after you approve them'}
                 actions={pendingCount > 0 && (
                     <Button variant="outline" size="sm" onClick={approveAllPending} loading={approvingAll}>
                         <CheckCheck size={15} aria-hidden="true" /> Approve all pending ({pendingCount})
@@ -154,13 +147,14 @@ export default function AdminReviewsPage() {
                 )}
             />
 
-            <AdminSummaryGrid
-                columns={4}
-                stats={[
-                    { label: 'Total reviews', value: reviews.length },
-                    { label: 'Pending', value: pendingCount, color: 'text-accent-ink', sub: pendingCount > 0 ? 'Needs action' : undefined },
-                    { label: 'Approved', value: approvedCount, color: 'text-primary' },
-                    { label: 'Average rating', value: avgRating, color: 'text-primary' },
+            <AdminTabs
+                label="Show reviews"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                tabs={[
+                    { value: 'all', label: 'All', count: reviews.length },
+                    { value: 'pending', label: 'Needs approval', count: pendingCount },
+                    { value: 'approved', label: 'Approved', count: approvedCount },
                 ]}
             />
 
@@ -172,18 +166,8 @@ export default function AdminReviewsPage() {
                 <AdminSearchInput
                     value={search}
                     onChange={setSearch}
-                    placeholder="Search by name, email, comment, product…"
+                    placeholder="Search reviews…"
                 />
-                <select
-                    aria-label="Filter by status"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="text-sm border border-admin-border rounded-lg px-3 py-2 bg-admin-surface min-w-[9rem]"
-                >
-                    {STATUS_FILTERS.map((o) => (
-                        <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                </select>
                 <div className="min-w-[12rem] lg:min-w-[14rem]">
                     <ProductSearchSelect
                         products={products}
@@ -228,8 +212,7 @@ export default function AdminReviewsPage() {
                                     <th className="p-4 font-medium text-admin-muted min-w-[280px]">Review</th>
                                     <th className="p-4 font-medium text-admin-muted min-w-[140px]">Product</th>
                                     <th className="p-4 font-medium text-admin-muted w-28">Date</th>
-                                    <th className="p-4 font-medium text-admin-muted w-24">Status</th>
-                                    <th className="p-4 font-medium text-admin-muted w-28" />
+                                    <th className="w-44 p-4"><span className="sr-only">Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -248,9 +231,9 @@ export default function AdminReviewsPage() {
                                         </td>
                                         <td className="p-4 align-top">
                                             <StarRating rating={review.rating} />
-                                            <p className="text-xs text-admin-muted mt-1">{review.rating}/5</p>
                                         </td>
                                         <td className="p-4 align-top">
+                                            {!review.isApproved && <span className="mb-1 inline-flex rounded-full bg-warning-tint px-2 py-0.5 text-xs font-medium text-warning">Waiting for your approval</span>}
                                             <p className="text-ink leading-relaxed line-clamp-3">{review.comment}</p>
                                             {review.images?.length > 0 && (
                                                 <div className="flex gap-1.5 mt-2">
@@ -273,34 +256,13 @@ export default function AdminReviewsPage() {
                                             })}
                                         </td>
                                         <td className="p-4 align-top">
-                                            <AdminStatusPill tone={review.isApproved ? 'success' : 'warning'}>
-                                                {review.isApproved ? 'Approved' : 'Pending'}
-                                            </AdminStatusPill>
-                                        </td>
-                                        <td className="p-4 align-top">
-                                            <div className="flex items-center gap-1">
-                                                {!review.isApproved && (
-                                                    <AdminIconButton
-                                                        onClick={() => approve(review.id)}
-                                                        icon={Check}
-                                                        variant="success"
-                                                        title="Approve"
-                                                    />
+                                            <div className="flex items-center justify-end gap-1">
+                                                {review.isApproved ? (
+                                                    <Button variant="outline" size="sm" onClick={() => reject(review.id)}>Hide</Button>
+                                                ) : (
+                                                    <Button variant="outline" size="sm" onClick={() => approve(review.id)}>Approve</Button>
                                                 )}
-                                                {review.isApproved && (
-                                                    <AdminIconButton
-                                                        onClick={() => reject(review.id)}
-                                                        icon={X}
-                                                        variant="warning"
-                                                        title="Unapprove"
-                                                    />
-                                                )}
-                                                <AdminIconButton
-                                                    onClick={() => remove(review.id)}
-                                                    icon={Trash2}
-                                                    variant="danger"
-                                                    title="Delete"
-                                                />
+                                                <AdminMenu label={`More actions for the review by ${review.name}`} items={[{ label: 'Delete review', icon: Trash2, danger: true, onClick: () => remove(review.id) }]} />
                                             </div>
                                         </td>
                                     </tr>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Pencil, Trash2, Upload, X, FolderOpen, Eye, EyeOff } from 'lucide-react';
+import { Plus, Trash2, Upload, X, FolderOpen } from 'lucide-react';
 import { api, imageUrl } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -8,15 +8,16 @@ import Button from '@/components/ui/Button';
 import Drawer from '@/components/ui/Drawer';
 import {
     AdminPageHeader,
-    AdminSummaryGrid,
+    AdminMenu,
+    AdminSwitch,
     AdminFilterBar,
     AdminSearchInput,
     AdminTableShell,
     AdminLoadingState,
     AdminEmptyState,
-    AdminIconButton,
-    AdminStatusPill,
 } from '@/components/admin/AdminUi';
+
+const slugify = (text) => String(text ?? '').toLowerCase().trim().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 export default function AdminCategoriesPage() {
     const { adminToken } = useAdminAuth();
@@ -70,13 +71,23 @@ export default function AdminCategoriesPage() {
 
     const handleSave = async () => {
         if (!adminToken) return;
-        if (editing) {
-            await api.put(`/api/categories/${editing.id}`, form, adminToken);
-        } else {
-            await api.post('/api/categories', form, adminToken);
+        if (!form.label.trim()) {
+            showToast('Please enter a name for the category', 'error');
+            return;
         }
-        setModalOpen(false);
-        fetchCategories();
+        // The page address is made from the name, so nobody has to think about it; an existing one is never changed.
+        const payload = { ...form, slug: editing ? form.slug : (form.slug.trim() || slugify(form.label)) };
+        try {
+            if (editing) {
+                await api.put(`/api/categories/${editing.id}`, payload, adminToken);
+            } else {
+                await api.post('/api/categories', payload, adminToken);
+            }
+            setModalOpen(false);
+            fetchCategories();
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Could not save the category', 'error');
+        }
     };
 
     const handleImageUpload = async (e) => {
@@ -90,10 +101,21 @@ export default function AdminCategoriesPage() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!adminToken || !confirm('Delete this category?')) return;
+    const togglePublish = async (cat) => {
+        if (!adminToken) return;
         try {
-            await api.delete(`/api/categories/${id}`, adminToken);
+            await api.put(`/api/categories/${cat.id}`, { slug: cat.slug, label: cat.label, description: cat.description, image: cat.image, order: cat.order, isPublished: !cat.isPublished }, adminToken);
+            fetchCategories();
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Failed to update category', 'error');
+        }
+    };
+
+    const handleDelete = async (cat) => {
+        const note = cat.productCount > 0 ? ` It has ${cat.productCount} product${cat.productCount === 1 ? '' : 's'}.` : '';
+        if (!adminToken || !confirm(`Delete "${cat.label}"?${note} This cannot be undone.`)) return;
+        try {
+            await api.delete(`/api/categories/${cat.id}`, adminToken);
             showToast('Category deleted', 'success');
             fetchCategories();
         } catch (err) {
@@ -101,31 +123,19 @@ export default function AdminCategoriesPage() {
         }
     };
 
-    const publishedCount = categories.filter((c) => c.isPublished).length;
-    const hiddenCount = categories.length - publishedCount;
-
     return (
         <div>
             <AdminPageHeader
                 title="Categories"
-                subtitle="Organize products into browsable collections on your store"
-                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> Add Category</Button>}
-            />
-
-            <AdminSummaryGrid
-                columns={3}
-                stats={[
-                    { label: 'Total categories', value: categories.length },
-                    { label: 'Published', value: publishedCount, color: 'text-primary' },
-                    { label: 'Hidden', value: hiddenCount, color: 'text-admin-muted' },
-                ]}
+                subtitle={`${categories.length} ${categories.length === 1 ? 'category' : 'categories'} on your store`}
+                actions={<Button variant="turmeric" onClick={openNew}><Plus size={16} /> Add category</Button>}
             />
 
             <AdminFilterBar>
                 <AdminSearchInput
                     value={search}
                     onChange={setSearch}
-                    placeholder="Search categories by name, slug…"
+                    placeholder="Search categories…"
                 />
             </AdminFilterBar>
 
@@ -140,80 +150,48 @@ export default function AdminCategoriesPage() {
                     />
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm min-w-[720px]">
+                        <table className="w-full min-w-[560px] text-sm">
                             <thead>
-                                <tr className="border-b border-admin-border text-left bg-admin-surface-alt">
-                                    <th className="p-4 font-medium text-admin-muted w-20">Image</th>
-                                    <th className="p-4 font-medium text-admin-muted min-w-[160px]">Name</th>
-                                    <th className="p-4 font-medium text-admin-muted w-28">Slug</th>
-                                    <th className="p-4 font-medium text-admin-muted min-w-[200px]">Description</th>
-                                    <th className="p-4 font-medium text-admin-muted w-24 text-center">Products</th>
-                                    <th className="p-4 font-medium text-admin-muted w-16 text-center">Order</th>
-                                    <th className="p-4 font-medium text-admin-muted w-24">Status</th>
-                                    <th className="p-4 font-medium text-admin-muted w-24" />
+                                <tr className="border-b border-admin-border bg-admin-surface-alt text-left">
+                                    <th className="p-4 font-medium text-admin-muted">Category</th>
+                                    <th className="w-24 p-4 text-center font-medium text-admin-muted">Products</th>
+                                    <th className="w-32 p-4 font-medium text-admin-muted">Store</th>
+                                    <th className="w-36 p-4"><span className="sr-only">Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredCategories.map((cat) => (
                                     <tr key={cat.id} className="border-b border-admin-border-light hover:bg-admin-surface-alt/60">
                                         <td className="p-4">
-                                            {cat.image ? (
-                                                <img
-                                                    src={imageUrl(cat.image)}
-                                                    alt=""
-                                                    className="w-14 h-14 rounded-xl object-cover border border-admin-border bg-canvas-alt"
-                                                />
-                                            ) : (
-                                                <div className="w-14 h-14 rounded-xl border border-admin-border bg-canvas-alt flex items-center justify-center">
-                                                    <FolderOpen size={18} className="text-admin-muted" />
+                                            <div className="flex items-center gap-3">
+                                                {cat.image ? (
+                                                    <img src={imageUrl(cat.image)} alt="" className="size-12 shrink-0 rounded-xl border border-admin-border bg-canvas-alt object-cover" />
+                                                ) : (
+                                                    <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-admin-border bg-canvas-alt">
+                                                        <FolderOpen size={18} className="text-admin-muted" />
+                                                    </div>
+                                                )}
+                                                <div className="min-w-0">
+                                                    <button type="button" onClick={() => openEdit(cat)} className="text-left font-medium text-ink hover:text-primary">{cat.label}</button>
+                                                    {cat.description && <p className="line-clamp-1 text-xs text-admin-muted">{cat.description}</p>}
                                                 </div>
-                                            )}
+                                            </div>
                                         </td>
-                                        <td className="p-4 align-top">
-                                            <p className="font-display text-base text-ink">{cat.label}</p>
-                                        </td>
-                                        <td className="p-4 align-top">
-                                            <code className="text-xs text-admin-muted bg-canvas-alt px-2 py-1 rounded-md">/{cat.slug}</code>
-                                        </td>
-                                        <td className="p-4 align-top">
-                                            <p className="text-admin-muted line-clamp-2 leading-relaxed">{cat.description || '—'}</p>
-                                        </td>
-                                        <td className="p-4 align-top text-center">
+                                        <td className="p-4 text-center">
                                             <span
-                                                className={`inline-flex items-center justify-center min-w-[1.75rem] px-2 py-0.5 rounded-full text-xs font-medium ${
-                                                    cat.productCount > 0 ? 'bg-primary/10 text-primary' : 'bg-muted/10 text-admin-muted'
-                                                }`}
-                                                title={cat.productCount === 0 ? "No products yet — won't show on the storefront until it has at least one" : undefined}
+                                                className={`inline-flex min-w-[1.75rem] items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium ${cat.productCount > 0 ? 'bg-primary/10 text-primary' : 'bg-admin-surface-alt text-admin-muted'}`}
+                                                title={cat.productCount === 0 ? 'No products yet, so it will not show on the store until it has at least one' : undefined}
                                             >
                                                 {cat.productCount}
                                             </span>
                                         </td>
-                                        <td className="p-4 align-top text-center">
-                                            <span className="font-display text-ink">{cat.order}</span>
+                                        <td className="p-4">
+                                            <AdminSwitch checked={cat.isPublished} onChange={() => togglePublish(cat)} aria-label={`${cat.isPublished ? 'Hide' : 'Show'} ${cat.label} on the store`} />
                                         </td>
-                                        <td className="p-4 align-top">
-                                            <AdminStatusPill tone={cat.isPublished ? 'success' : 'muted'}>
-                                                {cat.isPublished ? (
-                                                    <><Eye size={11} /> Live</>
-                                                ) : (
-                                                    <><EyeOff size={11} /> Hidden</>
-                                                )}
-                                            </AdminStatusPill>
-                                        </td>
-                                        <td className="p-4 align-top">
-                                            <div className="flex items-center gap-1">
-                                                <AdminIconButton
-                                                    onClick={() => openEdit(cat)}
-                                                    icon={Pencil}
-                                                    variant="success"
-                                                    title="Edit"
-                                                />
-                                                <AdminIconButton
-                                                    onClick={() => handleDelete(cat.id)}
-                                                    icon={Trash2}
-                                                    variant="danger"
-                                                    title="Delete"
-                                                />
+                                        <td className="p-4">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Button variant="outline" size="sm" onClick={() => openEdit(cat)}>Edit</Button>
+                                                <AdminMenu label={`More actions for ${cat.label}`} items={[{ label: 'Delete', icon: Trash2, danger: true, onClick: () => handleDelete(cat) }]} />
                                             </div>
                                         </td>
                                     </tr>
@@ -227,13 +205,13 @@ export default function AdminCategoriesPage() {
             <Drawer
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
-                title={editing ? 'Edit Category' : 'Add Category'}
+                title={editing ? 'Edit category' : 'Add category'}
                 side="right"
                 admin
             >
                 <div className="space-y-4">
-                    <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="protein" />
-                    <Input label="Label" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Protein & Fitness" />
+                    <Input label="Name" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Protein & Fitness" />
+                    {editing && <p className="-mt-2 text-xs text-admin-muted">Page address: <span className="font-mono">/category/{form.slug}</span></p>}
                     <div>
                         <label className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">Category Image</label>
                         {form.image ? (
@@ -267,13 +245,13 @@ export default function AdminCategoriesPage() {
                         <label className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">Description</label>
                         <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-line rounded-lg" />
                     </div>
-                    <Input label="Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
+                    <Input label="Position in the menu (1 is first)" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
                     <label className="flex items-center gap-2 text-sm">
                         <input type="checkbox" checked={form.isPublished} onChange={(e) => setForm({ ...form, isPublished: e.target.checked })} />
-                        Published (visible on website)
+                        Show this category on the store
                     </label>
                     <div className="sticky bottom-0 pt-4 pb-2 bg-canvas border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
-                        <Button variant="turmeric" className="w-full" onClick={handleSave}>Save Category</Button>
+                        <Button variant="turmeric" className="w-full" onClick={handleSave}>Save category</Button>
                     </div>
                 </div>
             </Drawer>

@@ -1,7 +1,8 @@
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Calendar, Check, Save, Search, X } from 'lucide-react';
+import { Calendar, Check, MoreHorizontal, Save, Search, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { cn } from '@/utils/formatPrice';
 
@@ -368,5 +369,111 @@ export function AdminSaveBar({
             {bar}
         </div>,
         document.body,
+    );
+}
+
+/**
+ * Filter tabs with live counts ("All 10 · Live 8 · Hidden 2"). Replaces rows of stat cards that only repeated what the table
+ * below already shows, and doubles as the status filter.
+ */
+export function AdminTabs({ tabs, value, onChange, label = 'Filter' }) {
+    return (
+        <div role="tablist" aria-label={label} className="mb-4 flex flex-wrap gap-1.5">
+            {tabs.map((tab) => {
+                const active = tab.value === value;
+                return (
+                    <button
+                        key={tab.value}
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        onClick={() => onChange(tab.value)}
+                        className={cn(
+                            'inline-flex min-h-9 items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition-colors',
+                            active ? 'border-primary bg-primary text-white' : 'border-admin-border bg-admin-surface text-ink hover:border-primary/50',
+                        )}
+                    >
+                        {tab.label}
+                        {typeof tab.count === 'number' && (
+                            <span className={cn('rounded-full px-1.5 text-xs tabular-nums', active ? 'bg-white/20 text-white' : 'bg-admin-surface-alt text-admin-muted')}>{tab.count}</span>
+                        )}
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
+
+/** A "⋯" button that opens a small menu of the less common actions (duplicate, delete…), so each row shows one clear primary action. */
+export function AdminMenu({ items, label = 'More actions' }) {
+    const [open, setOpen] = useState(false);
+    const root = useRef(null);
+
+    useEffect(() => {
+        if (!open) return undefined;
+        const onPointer = (event) => { if (!root.current?.contains(event.target)) setOpen(false); };
+        const onKey = (event) => { if (event.key === 'Escape') setOpen(false); };
+        document.addEventListener('pointerdown', onPointer);
+        document.addEventListener('keydown', onKey);
+        return () => { document.removeEventListener('pointerdown', onPointer); document.removeEventListener('keydown', onKey); };
+    }, [open]);
+
+    return (
+        <div ref={root} className="relative inline-block text-left">
+            <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={open}
+                aria-label={label}
+                className="inline-grid size-9 place-items-center rounded-lg text-admin-muted transition-colors hover:bg-admin-surface-alt hover:text-ink"
+            >
+                <MoreHorizontal size={18} />
+            </button>
+            {open && (
+                <ul role="menu" className="absolute right-0 top-full z-30 mt-1 w-48 rounded-lg border border-admin-border-light bg-admin-surface p-1 shadow-lg">
+                    {items.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <li key={item.label} role="none">
+                                <button
+                                    type="button"
+                                    role="menuitem"
+                                    disabled={item.disabled}
+                                    onClick={() => { setOpen(false); item.onClick(); }}
+                                    className={cn(
+                                        'flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-sm transition-colors disabled:pointer-events-none disabled:opacity-40',
+                                        item.danger ? 'text-danger hover:bg-danger-tint' : 'text-ink hover:bg-admin-surface-alt',
+                                    )}
+                                >
+                                    {Icon && <Icon size={15} aria-hidden="true" />}
+                                    {item.label}
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </div>
+    );
+}
+
+/** On/off switch with a visible word ("Live" / "Hidden") instead of an unlabeled eye icon. */
+export function AdminSwitch({ checked, onChange, onLabel = 'Live', offLabel = 'Hidden', disabled = false, 'aria-label': ariaLabel }) {
+    return (
+        <button
+            type="button"
+            role="switch"
+            aria-checked={checked}
+            aria-label={ariaLabel}
+            disabled={disabled}
+            onClick={onChange}
+            className="inline-flex items-center gap-2 rounded-full py-1 text-sm font-medium text-ink disabled:opacity-50"
+        >
+            <span className={cn('relative h-5 w-9 shrink-0 rounded-full transition-colors', checked ? 'bg-primary' : 'bg-admin-border')}>
+                <span className={cn('absolute top-0.5 size-4 rounded-full bg-white shadow-sm transition-all', checked ? 'left-[1.125rem]' : 'left-0.5')} />
+            </span>
+            <span className={checked ? 'text-ink' : 'text-admin-muted'}>{checked ? onLabel : offLabel}</span>
+        </button>
     );
 }

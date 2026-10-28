@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ArrowUpDown,
     CheckCircle2,
-    ChevronRight,
     Download,
     Package,
     Printer,
@@ -16,13 +15,13 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
-import { sumOrderRevenue } from '@/utils/orderRevenue';
 import Button from '@/components/ui/Button';
 import Drawer from '@/components/ui/Drawer';
 import ExportFormatModal from '@/components/admin/ExportFormatModal';
 import {
     AdminPageHeader,
-    AdminStatStrip,
+    AdminTabs,
+    AdminMenu,
     AdminTableShell,
     AdminFilterBar,
     AdminSearchInput,
@@ -50,18 +49,6 @@ import {
     shortOrderId,
 } from '@/constants/orders';
 import { printOrderStickers } from '@/utils/printOrderStickers';
-
-const STATUS_FILTER_OPTIONS = [
-    { value: '', label: 'All statuses' },
-    { value: 'placed', label: 'New (placed)' },
-    ...ADMIN_STATUS_OPTIONS.map((s) => ({ value: s.value, label: s.adminLabel })),
-];
-
-const SOURCE_FILTER_OPTIONS = [
-    { value: '', label: 'All sources' },
-    { value: 'website', label: 'Website checkout' },
-    { value: 'direct', label: 'Direct orders' },
-];
 
 const PAYMENT_FILTER_OPTIONS = [
     { value: '', label: 'All payments' },
@@ -253,9 +240,18 @@ export default function AdminOrdersPage() {
     const [exportModalOpen, setExportModalOpen] = useState(false);
 
     const [searchParams] = useSearchParams();
+    // Dashboard links arrive as ?status=placed (new) or ?status=confirmed etc. (in progress).
+    const [view, setView] = useState(() => {
+        const wanted = searchParams.get('status');
+        if (!wanted) return 'all';
+        if (wanted === 'placed') return 'new';
+        if (wanted === 'delivered') return 'delivered';
+        if (wanted === 'cancelled' || wanted === 'returned') return 'cancelled';
+        return 'active';
+    });
     const [filters, setFilters] = useState({
         search: searchParams.get('search') || '',
-        status: searchParams.get('status') || '',
+        status: '',
         payment: '',
         source: '',
         from: '',
@@ -320,6 +316,14 @@ export default function AdminOrdersPage() {
         fetchOrders(filters);
     }, [adminToken, filters.status, filters.payment, filters.source, filters.from, filters.to, filters.sort, filters.order, filters.search]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const groupOf = (order) => {
+        const st = normalizeStatus(order.status);
+        if (st === 'placed') return 'new';
+        if (st === 'delivered') return 'delivered';
+        if (st === 'cancelled' || st === 'returned') return 'cancelled';
+        return 'active';
+    };
+
     const stats = useMemo(() => {
         const counts = { placed: 0, active: 0, delivered: 0, cancelled: 0 };
         orders.forEach((o) => {
@@ -329,14 +333,16 @@ export default function AdminOrdersPage() {
             else if (s === 'cancelled' || s === 'returned') counts.cancelled++;
             else if (!isTerminalStatus(o.status)) counts.active++;
         });
-        return { ...counts, revenue: sumOrderRevenue(orders) };
+        return counts;
     }, [orders]);
 
-    const allSelected = orders.length > 0 && selected.size === orders.length;
+    const visibleOrders = useMemo(() => (view === 'all' ? orders : orders.filter((o) => groupOf(o) === view)), [orders, view]);
+
+    const allSelected = visibleOrders.length > 0 && selected.size === visibleOrders.length;
     const someSelected = selected.size > 0;
 
     const toggleAll = () => {
-        setSelected(allSelected ? new Set() : new Set(orders.map((o) => o.id)));
+        setSelected(allSelected ? new Set() : new Set(visibleOrders.map((o) => o.id)));
     };
 
     const toggleOne = (id) => {
@@ -418,6 +424,7 @@ export default function AdminOrdersPage() {
     };
 
     const clearFilters = () => {
+        setView('all');
         setSearchInput('');
         setFilters({
             search: '',
@@ -431,7 +438,7 @@ export default function AdminOrdersPage() {
         });
     };
 
-    const hasActiveFilters = filters.status || filters.payment || filters.source || filters.from || filters.to || filters.search;
+    const hasActiveFilters = view !== 'all' || filters.payment || filters.from || filters.to || filters.search;
 
     const exportOrders = async (format) => {
         if (!adminToken) return;
@@ -460,7 +467,7 @@ export default function AdminOrdersPage() {
         <div>
             <AdminPageHeader
                 title="Orders"
-                subtitle="Manage fulfillment, shipping, and refunds"
+                subtitle="Confirm, pack and ship customer orders"
                 actions={(
                     <>
                         <Link to={`${ADMIN_PATH}/direct-orders`}>
@@ -480,21 +487,21 @@ export default function AdminOrdersPage() {
                 )}
             />
 
-            <AdminStatStrip
-                columns={5}
-                stats={[
-                    { label: 'Revenue', value: formatPrice(stats.revenue), tone: 'turmeric' },
-                    { label: 'New', value: stats.placed, tone: 'blue' },
-                    { label: 'In progress', value: stats.active, tone: 'amber' },
-                    { label: 'Delivered', value: stats.delivered, tone: 'emerald' },
-                    { label: 'Cancelled', value: stats.cancelled, tone: 'red' },
+            <AdminTabs
+                label="Show orders"
+                value={view}
+                onChange={setView}
+                tabs={[
+                    { value: 'all', label: 'All', count: orders.length },
+                    { value: 'new', label: 'New', count: stats.placed },
+                    { value: 'active', label: 'In progress', count: stats.active },
+                    { value: 'delivered', label: 'Delivered', count: stats.delivered },
+                    { value: 'cancelled', label: 'Cancelled', count: stats.cancelled },
                 ]}
             />
 
             <AdminFilterBar>
-                <AdminSearchInput value={searchInput} onChange={setSearchInput} placeholder="Search ID, customer, email, phone…" />
-                <AdminSelect value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))} options={STATUS_FILTER_OPTIONS} aria-label="Filter by status" />
-                <AdminSelect value={filters.source} onChange={(e) => setFilters((f) => ({ ...f, source: e.target.value }))} options={SOURCE_FILTER_OPTIONS} aria-label="Filter by source" />
+                <AdminSearchInput value={searchInput} onChange={setSearchInput} placeholder="Search order, customer, email or phone…" />
                 <AdminSelect value={filters.payment} onChange={(e) => setFilters((f) => ({ ...f, payment: e.target.value }))} options={PAYMENT_FILTER_OPTIONS} aria-label="Filter by payment" />
                 <AdminDateRange
                     from={filters.from}
@@ -566,11 +573,11 @@ export default function AdminOrdersPage() {
                                             Date <ArrowUpDown size={12} />
                                         </button>
                                     </th>
-                                    <th className="p-4 font-medium text-admin-muted w-56" />
+                                    <th className="w-56 p-4"><span className="sr-only">Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {orders.map((order) => {
+                                {visibleOrders.map((order) => {
                                     const itemPreview = order.items?.[0];
                                     const itemCount = order.items?.length || 0;
                                     return (
@@ -618,35 +625,28 @@ export default function AdminOrdersPage() {
                                             <td className="p-4 text-xs text-admin-muted whitespace-nowrap">
                                                 {formatOrderDate(order.createdAt, { time: false })}
                                             </td>
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-2">
-                                                    {getNextStatus(order.status) && !isTerminalStatus(order.status) && (
-                                                        <button
-                                                            type="button"
+                                            <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    {getNextStatus(order.status) && !isTerminalStatus(order.status) ? (
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
                                                             disabled={advancingId === order.id}
-                                                            onClick={(e) => { e.stopPropagation(); advanceOrder(order); }}
-                                                            className="whitespace-nowrap rounded-full bg-primary px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-primary-hover disabled:bg-disabled disabled:text-subtle"
-                                                            title={`Move to ${getStatusLabel(getNextStatus(order.status))}`}
+                                                            onClick={() => advanceOrder(order)}
+                                                            title={`Move this order to "${getStatusLabel(getNextStatus(order.status))}"`}
                                                         >
-                                                            {advancingId === order.id ? '…' : getStatusLabel(getNextStatus(order.status))}
-                                                        </button>
+                                                            {advancingId === order.id ? '…' : `Mark ${getStatusLabel(getNextStatus(order.status)).toLowerCase()}`}
+                                                        </Button>
+                                                    ) : (
+                                                        <Button variant="outline" size="sm" onClick={() => setDetailOrder(order)}>View</Button>
                                                     )}
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => { e.stopPropagation(); printStickers([order.id]); }}
-                                                        className="text-ink hover:text-primary p-1 rounded-md hover:bg-canvas-alt"
-                                                        title="Print shipping label"
-                                                        aria-label={`Print label for order ${shortOrderId(order.id)}`}
-                                                    >
-                                                        <Printer size={14} />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => { e.stopPropagation(); setDetailOrder(order); }}
-                                                        className="text-primary hover:text-primary-hover text-xs font-medium inline-flex items-center gap-0.5"
-                                                    >
-                                                        View <ChevronRight size={14} />
-                                                    </button>
+                                                    <AdminMenu
+                                                        label={`More actions for order ${shortOrderId(order.id)}`}
+                                                        items={[
+                                                            { label: 'View details', onClick: () => setDetailOrder(order) },
+                                                            { label: 'Print shipping label', icon: Printer, onClick: () => printStickers([order.id]) },
+                                                        ]}
+                                                    />
                                                 </div>
                                             </td>
                                         </tr>
@@ -655,7 +655,7 @@ export default function AdminOrdersPage() {
                             </tbody>
                         </table>
 
-                        {orders.length === 0 && !error && (
+                        {visibleOrders.length === 0 && !error && (
                             <AdminEmptyState
                                 icon={Package}
                                 title="No orders found"
@@ -667,7 +667,7 @@ export default function AdminOrdersPage() {
             </AdminTableShell>
 
             {!loading && (
-                <p className="text-xs text-admin-muted mt-3">{orders.length} order{orders.length === 1 ? '' : 's'} shown</p>
+                <p className="text-xs text-admin-muted mt-3">{visibleOrders.length} order{visibleOrders.length === 1 ? '' : 's'} shown</p>
             )}
 
             <Drawer
