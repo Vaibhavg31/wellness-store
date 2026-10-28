@@ -104,8 +104,13 @@ export function createApp() {
     if (fs.existsSync(path.join(distDir, 'index.html'))) {
         app.use(express.static(distDir, {
             setHeaders: (res, filePath) => {
-                // Hashed build assets never change; HTML must always be re-checked so a deploy shows up at once.
-                res.set('Cache-Control', filePath.includes(`${path.sep}assets${path.sep}`) ? 'public, max-age=31536000, immutable' : 'no-cache');
+                const file = filePath.split(path.sep).join('/');
+                // Hashed build assets and the font files never change; the logo and catalog pictures change rarely, so a
+                // returning phone reuses them for a day (and shows them instantly while it quietly refreshes for a week).
+                // HTML must always be re-checked so a deploy shows up at once.
+                if (file.includes('/assets/') || file.includes('/fonts/')) res.set('Cache-Control', 'public, max-age=31536000, immutable');
+                else if (file.includes('/catalog/') || file.includes('/brand/')) res.set('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+                else res.set('Cache-Control', 'no-cache');
             },
         }));
         // Page routes only: a missing file (anything with an extension, or under /assets) must 404, not return HTML.
