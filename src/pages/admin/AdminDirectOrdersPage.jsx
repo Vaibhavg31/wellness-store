@@ -416,7 +416,8 @@ export default function AdminDirectOrdersPage() {
         <div className="max-w-5xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="font-display text-3xl text-ink mb-1 max-lg:hidden">Direct Orders</h1>
+                    <h1 className="text-xl sm:text-2xl font-semibold text-ink tracking-tight max-lg:hidden">Create order</h1>
+                    <span aria-hidden="true" className="mt-2 block h-[3px] w-8 rounded-full bg-accent max-lg:hidden" />
                     <p className="text-admin-muted text-sm max-w-xl">
                         Fast manual orders. Only name, phone, and items are required. Turn on optional sections when you need them.
                     </p>

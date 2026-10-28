@@ -11,35 +11,42 @@ import Drawer from '@/components/ui/Drawer';
 import AdminNavLinks, { getAdminPageTitle } from '@/components/admin/AdminNavLinks';
 import AdminCommandPalette from '@/components/admin/AdminCommandPalette';
 
-const footerLink = 'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-small font-medium text-ink transition-colors hover:bg-primary-soft hover:text-primary';
+const footerLink = 'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-small font-medium transition-colors';
+const footerLinkLight = `${footerLink} text-ink hover:bg-primary-soft hover:text-primary`;
+const footerLinkDark = `${footerLink} text-white/75 hover:bg-white/8 hover:text-white`;
 
 function SearchTrigger({ onOpen, className = '' }) {
     return (
-        <button type="button" onClick={onOpen} className={`flex w-full items-center gap-2 rounded-lg border border-admin-border bg-admin-surface-alt px-3 py-2 text-small text-admin-muted transition-colors hover:border-primary/40 hover:text-ink ${className}`}>
+        <button type="button" onClick={onOpen} className={`flex w-full items-center gap-2 rounded-lg border border-white/15 bg-white/8 px-3 py-2 text-small text-white/70 transition-colors hover:bg-white/12 hover:text-white ${className}`}>
             <Search size={16} aria-hidden="true" />
             <span className="flex-1 text-left">Quick search…</span>
-            <kbd className="hidden rounded border border-admin-border px-1.5 text-caption lg:block">Ctrl K</kbd>
+            <kbd className="hidden rounded border border-white/20 px-1.5 text-caption text-white/60 lg:block">Ctrl K</kbd>
         </button>
     );
 }
 
 function SidebarBrand() {
+    // The logo is single-colour plum, so on the plum sidebar it always sits on a cream tile.
     return (
-        <div className="border-b border-admin-border px-5 py-3">
-            <Logo size="md" />
-            <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-admin-muted">Studio Admin</p>
+        <div className="px-4 pb-0.5 pt-3">
+            <Link to={ADMIN_PATH} aria-label="Admin dashboard" className="flex justify-center rounded-xl bg-canvas px-3 py-1.5 shadow-sm">
+                <Logo size="sm" />
+            </Link>
+            <p className="mt-2 text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Studio admin</p>
         </div>
     );
 }
 
-function SidebarFooter({ onSignOut, onNavigate }) {
+function SidebarFooter({ onSignOut, onNavigate, dark = false }) {
+    const link = dark ? footerLinkDark : footerLinkLight;
+    const icon = dark ? "text-white/55" : "text-admin-muted";
     return (
-        <div className="space-y-0.5 border-t border-admin-border p-2.5">
-            <a href="/" target="_blank" rel="noopener noreferrer" onClick={onNavigate} className={footerLink}>
-                <ExternalLink size={18} strokeWidth={1.75} className="text-admin-muted" aria-hidden="true" /> View store
+        <div className={`grid grid-cols-2 gap-1 border-t px-3 py-2 ${dark ? "border-white/10" : "border-admin-border"}`}>
+            <a href="/" target="_blank" rel="noopener noreferrer" onClick={onNavigate} className={`${link} !gap-2 !px-2.5 whitespace-nowrap`}>
+                <ExternalLink size={16} strokeWidth={1.75} className={icon} aria-hidden="true" /> View site
             </a>
-            <button type="button" onClick={onSignOut} className={`${footerLink} hover:!text-danger`}>
-                <LogOut size={18} strokeWidth={1.75} className="text-admin-muted" aria-hidden="true" /> Sign out
+            <button type="button" onClick={onSignOut} className={`${link} !gap-2 !px-2.5 ${dark ? "hover:!text-white" : "hover:!text-danger"}`}>
+                <LogOut size={16} strokeWidth={1.75} className={icon} aria-hidden="true" /> Sign out
             </button>
         </div>
     );
@@ -60,13 +67,13 @@ export default function AdminLayout() {
     return (
         <div className="admin-panel flex min-h-screen">
             {/* Desktop sidebar */}
-            <aside className="fixed z-30 hidden h-full w-[15.5rem] flex-col border-r border-admin-border bg-admin-surface lg:flex">
+            <aside className="admin-sidebar fixed z-30 hidden h-full w-[15.5rem] flex-col lg:flex">
                 <SidebarBrand />
-                <div className="px-2.5 pt-3">
+                <div className="px-3 pt-2.5">
                     <AdminCommandPalette>{(open) => <SearchTrigger onOpen={open} />}</AdminCommandPalette>
                 </div>
-                <AdminNavLinks location={location} />
-                <SidebarFooter onSignOut={adminLogout} />
+                <AdminNavLinks location={location} tone="dark" />
+                <SidebarFooter onSignOut={adminLogout} dark />
             </aside>
 
             {/* Mobile navigation */}

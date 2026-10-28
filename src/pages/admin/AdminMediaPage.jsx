@@ -89,7 +89,7 @@ export default function AdminMediaPage() {
     return (
         <div>
             <AdminPageHeader
-                title="Media Library"
+                title="Media library"
                 subtitle="Every image uploaded through the admin panel — products, banners, and site content"
                 actions={
                     <>

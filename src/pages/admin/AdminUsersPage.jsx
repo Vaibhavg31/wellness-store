@@ -449,7 +449,7 @@ export default function AdminUsersPage() {
     return (
         <div>
             <AdminPageHeader
-                title="Users"
+                title="Customers"
                 subtitle="Everyone who has created an account on your store"
                 actions={(
                     <>

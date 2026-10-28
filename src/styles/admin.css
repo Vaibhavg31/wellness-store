@@ -60,3 +60,10 @@
   .admin-filter-bar-row .admin-date-field { flex: 1 1 0; min-width: 0; }
   .admin-filter-bar-row .admin-date-input { min-width: 0; width: 100%; }
 }
+
+/* Desktop sidebar: deep Chikit plum with a soft top-to-bottom shade, so the admin has its own look and the brand reads clearly. */
+.admin-sidebar {
+  background: linear-gradient(180deg, var(--color-primary-deep) 0%, #2E102E 100%);
+  box-shadow: 1px 0 0 rgb(255 255 255 / 0.04), 6px 0 24px -12px rgb(46 16 46 / 0.35);
+}
+.admin-panel main h1 + p { color: var(--color-admin-muted); }

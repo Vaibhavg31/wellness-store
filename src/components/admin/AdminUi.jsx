@@ -32,6 +32,7 @@ export function AdminPageHeader({ title, subtitle, actions }) {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
             <div>
                 <h1 className="text-xl sm:text-2xl font-semibold text-ink tracking-tight max-lg:hidden">{title}</h1>
+                <span aria-hidden="true" className="mt-2 block h-[3px] w-8 rounded-full bg-accent max-lg:hidden" />
                 {subtitle && <p className="text-admin-muted text-sm mt-1 max-lg:mt-0">{subtitle}</p>}
             </div>
             {actions && <div className="flex flex-wrap gap-2 shrink-0">{actions}</div>}

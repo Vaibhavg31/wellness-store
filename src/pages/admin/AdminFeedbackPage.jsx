@@ -77,7 +77,7 @@ export default function AdminFeedbackPage() {
     return (
         <div>
             <AdminPageHeader
-                title="Feedback Inbox"
+                title="Messages"
                 subtitle="Messages from the contact form and customer inquiries"
             />
 

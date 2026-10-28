@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Store, Home, FileText, MessageCircle, Megaphone, Bell, Truck, Gift,
+    Store, Home, FileText, MessageCircle, Bell, Truck, Gift, Search,
 } from 'lucide-react';
 import { api, ApiError } from '@/services/api';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
@@ -24,15 +24,34 @@ import {
     StringListEditor, BenefitEditor, FaqEditor, SectionToggles,
 } from '@/components/admin/ContentEditor';
 
-const TABS = [
-    { id: 'brand', label: 'Brand & Store', icon: Store },
-    { id: 'homepage', label: 'Homepage', icon: Home },
-    { id: 'about', label: 'About Page', icon: FileText },
-    { id: 'contact', label: 'Contact & FAQ', icon: MessageCircle },
-    { id: 'promo', label: 'SEO & Meta', icon: Megaphone },
-    { id: 'popup', label: 'Announcement Popup', icon: Bell },
-    { id: 'offer', label: 'Sticky Offer Tab', icon: Gift },
-    { id: 'experience', label: 'Delivery & Store Options', icon: Truck },
+// The rail groups tabs by the job you came to do. (Ids are unchanged; only the names and order are.)
+const TAB_GROUPS = [
+    {
+        label: 'Pages',
+        tabs: [
+            { id: 'homepage', label: 'Homepage', icon: Home },
+            { id: 'about', label: 'About page', icon: FileText },
+            { id: 'contact', label: 'Contact page & FAQs', icon: MessageCircle },
+        ],
+    },
+    {
+        label: 'Store',
+        tabs: [
+            { id: 'brand', label: 'Store details', icon: Store },
+            { id: 'experience', label: 'Delivery & returns', icon: Truck },
+        ],
+    },
+    {
+        label: 'Marketing',
+        tabs: [
+            { id: 'popup', label: 'Welcome popup', icon: Bell },
+            { id: 'offer', label: 'Offer button', icon: Gift },
+        ],
+    },
+    {
+        label: 'Search',
+        tabs: [{ id: 'promo', label: 'Google appearance', icon: Search }],
+    },
 ];
 
 // Deliberately distinct, unambiguous names — "Promo Banners" and "Top Promo
@@ -89,7 +108,7 @@ export default function AdminContentPage() {
     const { adminToken } = useAdminAuth();
     const { refetch } = useSiteContent();
     const { showToast } = useToast();
-    const [tab, setTab] = useState('brand');
+    const [tab, setTab] = useState('homepage');
     const [content, setContent] = useState(null);
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -633,112 +652,88 @@ export default function AdminContentPage() {
         <div className="pb-20 lg:pb-24">
             <AdminErrorBanner message={saveError} onDismiss={() => setSaveError(null)} />
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="font-display text-3xl text-ink mb-1 max-lg:hidden">Content Manager</h1>
-                    <p className="text-admin-muted text-sm">Edit website text, images, and sections. No code required.</p>
-                </div>
-                <AdminSaveBar
-                    hasChanges={hasChanges}
-                    saving={saving}
-                    saved={saved}
-                    onSave={handleSave}
-                    saveLabel="Save all changes"
-                />
+            <div className="mb-8">
+                <h1 className="text-xl sm:text-2xl font-semibold text-ink tracking-tight max-lg:hidden">Website content</h1>
+                    <span aria-hidden="true" className="mt-2 block h-[3px] w-8 rounded-full bg-accent max-lg:hidden" />
+                <p className="text-admin-muted text-sm">Change what your store says and shows. Press <strong className="font-semibold text-ink">Save all changes</strong> at the bottom when you are done.</p>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8">
-                <nav className="lg:w-52 flex lg:flex-col gap-1 overflow-x-auto pb-2 lg:pb-0">
-                    {TABS.map(({ id, label, icon: Icon }) => (
-                        <button
-                            key={id}
-                            type="button"
-                            onClick={() => setTab(id)}
-                            className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm whitespace-nowrap transition-colors ${
-                                tab === id
-                                    ? 'bg-primary text-canvas'
-                                    : 'text-admin-muted hover:bg-admin-surface hover:text-ink'
-                            }`}
-                        >
-                            <Icon size={16} strokeWidth={1.5} />
-                            {label}
-                        </button>
+                <nav aria-label="Website content sections" className="flex gap-1 overflow-x-auto pb-2 lg:w-56 lg:shrink-0 lg:flex-col lg:gap-4 lg:overflow-visible lg:pb-0">
+                    {TAB_GROUPS.map((group) => (
+                        <div key={group.label} className="flex gap-1 lg:block">
+                            <p className="mb-1 hidden px-3 text-[11px] font-semibold uppercase tracking-wider text-admin-muted lg:block">{group.label}</p>
+                            <div className="flex gap-1 lg:flex-col">
+                                {group.tabs.map(({ id, label, icon: Icon }) => (
+                                    <button
+                                        key={id}
+                                        type="button"
+                                        onClick={() => setTab(id)}
+                                        aria-current={tab === id ? 'page' : undefined}
+                                        className={`flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3.5 py-2.5 text-left text-sm transition-colors ${
+                                            tab === id
+                                                ? 'bg-primary font-medium text-canvas'
+                                                : 'text-admin-muted hover:bg-admin-surface hover:text-ink'
+                                        }`}
+                                    >
+                                        <Icon size={16} strokeWidth={1.6} aria-hidden="true" />
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     ))}
                 </nav>
 
                 <div className="flex-1 min-w-0">
                     {tab === 'brand' && (
                         <>
-                            <AdminSection title="Brand Identity" description="Your brand name and taglines appear across the site">
-                                <AdminField label="Brand Name">
+                            <AdminSection title="Store name and tagline" description="Used across the whole store, in the browser tab and in emails">
+                                <AdminField label="Store name">
                                     <Input value={content.brandName} onChange={(e) => update('brandName', e.target.value)} />
                                 </AdminField>
-                                <AdminField label="Short Name">
+                                <AdminField label="Short name" hint="Used where space is tight, such as the browser tab">
                                     <Input value={content.brandShort} onChange={(e) => update('brandShort', e.target.value)} />
                                 </AdminField>
                                 <AdminField label="Tagline">
                                     <Input value={content.brandTagline} onChange={(e) => update('brandTagline', e.target.value)} />
                                 </AdminField>
-                                <AdminField label="Description">
+                                <AdminField label="Short description">
                                     <AdminTextarea value={content.brandDescription} onChange={(e) => update('brandDescription', e.target.value)} rows={3} />
                                 </AdminField>
                             </AdminSection>
 
-                            <AdminSection title="Contact Information">
-                                <AdminField label="Email">
+                            <AdminSection title="Contact details" description="Shown on the Contact page and used by the WhatsApp chat button">
+                                <AdminField label="Email address">
                                     <Input value={content.contact.email} onChange={(e) => update('contact', { ...content.contact, email: e.target.value })} />
                                 </AdminField>
-                                <AdminField label="WhatsApp Number" hint="Include country code, e.g. +916353259781">
+                                <AdminField label="WhatsApp number" hint="With the country code and no spaces, e.g. +916353259781. The chat button opens this number.">
                                     <Input value={content.contact.whatsappNumber} onChange={(e) => update('contact', { ...content.contact, whatsappNumber: e.target.value })} />
                                 </AdminField>
-                                <AdminField label="WhatsApp Display">
+                                <AdminField label="WhatsApp number as shown on the site" hint="How customers see it written, e.g. +91 63532 59781">
                                     <Input value={content.contact.whatsappDisplay} onChange={(e) => update('contact', { ...content.contact, whatsappDisplay: e.target.value })} />
                                 </AdminField>
-                                <AdminField label="WhatsApp Default Message" hint="Pre-filled in chat when customers tap WhatsApp — they only need to press Send">
+                                <AdminField label="First message in the WhatsApp chat" hint="Already typed for the customer, so they only need to press Send">
                                     <Input value={content.contact.whatsappDefaultMessage ?? ''} onChange={(e) => update('contact', { ...content.contact, whatsappDefaultMessage: e.target.value })} />
                                 </AdminField>
-                                <AdminField label="Business Hours">
+                                <AdminField label="Opening hours">
                                     <Input value={content.contact.businessHours} onChange={(e) => update('contact', { ...content.contact, businessHours: e.target.value })} />
                                 </AdminField>
                             </AdminSection>
 
-                            <AdminSection title="Social Media">
-                                <AdminField label="Instagram Handle">
+                            <AdminSection title="Instagram">
+                                <AdminField label="Instagram name" hint="Without the @">
                                     <Input value={content.social.instagramHandle} onChange={(e) => update('social', { ...content.social, instagramHandle: e.target.value })} />
                                 </AdminField>
-                                <AdminField label="Instagram URL">
+                                <AdminField label="Instagram link">
                                     <Input value={content.social.instagramUrl} onChange={(e) => update('social', { ...content.social, instagramUrl: e.target.value })} />
                                 </AdminField>
-                                <AdminField label="Instagram Tagline">
+                                <AdminField label="Line shown next to your Instagram">
                                     <AdminTextarea value={content.social.instagramTagline} onChange={(e) => update('social', { ...content.social, instagramTagline: e.target.value })} rows={2} />
                                 </AdminField>
                             </AdminSection>
 
-                            <AdminSection title="Delivery & Pricing">
-                                <div className="grid sm:grid-cols-3 gap-4">
-                                    <AdminField label="Delivery Fee (₹)">
-                                        <Input type="number" value={content.delivery.fee} onChange={(e) => update('delivery', { ...content.delivery, fee: Number(e.target.value) })} />
-                                    </AdminField>
-                                    <AdminField label="Free Delivery Threshold (₹)">
-                                        <Input type="number" value={content.delivery.freeThreshold} onChange={(e) => update('delivery', { ...content.delivery, freeThreshold: Number(e.target.value) })} />
-                                    </AdminField>
-                                    <AdminField label="Return Policy (Days)" hint="Shown on product pages. Set to 0 to hide returns badge.">
-                                        <Input type="number" min={0} value={content.delivery.returnDays ?? 7} onChange={(e) => update('delivery', { ...content.delivery, returnDays: Number(e.target.value) })} />
-                                    </AdminField>
-                                </div>
-                            </AdminSection>
-
-                            <AdminSection title="Payment Methods" description="Managed in Settings → Store Services. Individual products can override in the product editor.">
-                                <p className="text-sm text-admin-muted">
-                                    Cash on Delivery and Online Payment toggles are in{' '}
-                                    <Link to={`${ADMIN_PATH}/settings`} className="text-primary font-medium hover:underline">
-                                        Settings
-                                    </Link>
-                                    .
-                                </p>
-                            </AdminSection>
-
-                            <AdminSection title="Footer">
+                            <AdminSection title="Bottom of every page (footer)">
                                 <AdminField label="Footer Tagline">
                                     <Input value={content.footer.tagline} onChange={(e) => update('footer', { ...content.footer, tagline: e.target.value })} />
                                 </AdminField>
@@ -797,6 +792,23 @@ export default function AdminContentPage() {
                                 )}
                             </AdminSection>
 
+                            <AdminSection title="Rotating announcements" description="Extra messages that rotate in the top bar after the main promo (e.g. “Free shipping over ₹499”). Up to 6.">
+                                {content.extras.announcements.map((item, index) => (
+                                    <div key={index} className="grid gap-3 sm:grid-cols-[1fr_12rem_auto] sm:items-end">
+                                        <AdminField label={`Message ${index + 1}`}>
+                                            <Input value={item.text} maxLength={140} onChange={(e) => updateExtras({ announcements: content.extras.announcements.map((a, i) => (i === index ? { ...a, text: e.target.value } : a)) })} />
+                                        </AdminField>
+                                        <AdminField label="Link (optional)">
+                                            <Input value={item.href} placeholder="/shop" onChange={(e) => updateExtras({ announcements: content.extras.announcements.map((a, i) => (i === index ? { ...a, href: e.target.value } : a)) })} />
+                                        </AdminField>
+                                        <Button variant="outline" size="sm" onClick={() => updateExtras({ announcements: content.extras.announcements.filter((_, i) => i !== index) })}>Remove</Button>
+                                    </div>
+                                ))}
+                                {content.extras.announcements.length < 6 && (
+                                    <Button variant="outline" size="sm" onClick={() => updateExtras({ announcements: [...content.extras.announcements, { text: '', href: '' }] })}>Add message</Button>
+                                )}
+                            </AdminSection>
+
                             <AdminSection title="Homepage Sections" description="Drag a row to reorder it, use the switch to show/hide it, and click a section's name to open its content editor right here. Reordering and show/hide save immediately — no need to press Save for those.">
                                 <SectionToggles
                                     sections={content.sections}
@@ -805,6 +817,25 @@ export default function AdminContentPage() {
                                     onChange={handleSectionsChange}
                                     renderContent={renderHomepageSectionContent}
                                 />
+                            </AdminSection>
+
+                            <AdminSection title="Shop by concern" description="Health goals shown under the categories on the homepage (e.g. Digestion, Hair care). Each opens the shop filtered by the keyword you set. Up to 8.">
+                                {content.extras.concerns.map((item, index) => {
+                                    const patch = (change) => updateExtras({ concerns: content.extras.concerns.map((c, i) => (i === index ? { ...c, ...change } : c)) });
+                                    return (
+                                        <div key={index} className="space-y-3 rounded-lg border border-admin-border p-4">
+                                            <div className="grid gap-3 sm:grid-cols-2">
+                                                <AdminField label="Name"><Input value={item.label} maxLength={40} placeholder="Digestion" onChange={(e) => patch({ label: e.target.value })} /></AdminField>
+                                                <AdminField label="Shop keyword" hint="Matches product name, description or category."><Input value={item.search} maxLength={60} placeholder="digest" onChange={(e) => patch({ search: e.target.value })} /></AdminField>
+                                            </div>
+                                            <ImageUploadField label="Image (optional)" value={item.image} onChange={(v) => patch({ image: v })} adminToken={adminToken} />
+                                            <Button variant="outline" size="sm" onClick={() => updateExtras({ concerns: content.extras.concerns.filter((_, i) => i !== index) })}>Remove</Button>
+                                        </div>
+                                    );
+                                })}
+                                {content.extras.concerns.length < 8 && (
+                                    <Button variant="outline" size="sm" className="w-fit" onClick={() => updateExtras({ concerns: [...content.extras.concerns, { label: '', search: '', image: '' }] })}>Add concern</Button>
+                                )}
                             </AdminSection>
 
                         </>
@@ -870,7 +901,7 @@ export default function AdminContentPage() {
 
                     {tab === 'promo' && (
                         <>
-                            <AdminSection title="SEO & Meta Tags">
+                            <AdminSection title="How your store appears in Google" description="The title and short summary people see in search results and when the link is shared.">
                                 <AdminField label="Page Title">
                                     <Input value={content.seo.title} onChange={(e) => update('seo', { ...content.seo, title: e.target.value })} />
                                 </AdminField>
@@ -1123,8 +1154,22 @@ export default function AdminContentPage() {
 
                     {tab === 'experience' && (
                         <>
+                            <AdminSection title="Delivery fee & returns" description="What delivery costs, when it becomes free, and how many days customers have to return an item.">
+                                <div className="grid sm:grid-cols-3 gap-4">
+                                    <AdminField label="Delivery Fee (₹)">
+                                        <Input type="number" value={content.delivery.fee} onChange={(e) => update('delivery', { ...content.delivery, fee: Number(e.target.value) })} />
+                                    </AdminField>
+                                    <AdminField label="Free Delivery Threshold (₹)">
+                                        <Input type="number" value={content.delivery.freeThreshold} onChange={(e) => update('delivery', { ...content.delivery, freeThreshold: Number(e.target.value) })} />
+                                    </AdminField>
+                                    <AdminField label="Return Policy (Days)" hint="Shown on product pages. Set to 0 to hide returns badge.">
+                                        <Input type="number" min={0} value={content.delivery.returnDays ?? 7} onChange={(e) => update('delivery', { ...content.delivery, returnDays: Number(e.target.value) })} />
+                                    </AdminField>
+                                </div>
+                            </AdminSection>
+
                             <AdminSection
-                                title="Delivery estimate"
+                                title="Delivery time promise"
                                 description="Shown on product pages, the cart and order pages as “Delivery by 12 Oct – 15 Oct”. Leave both at 0 to show no date promise."
                             >
                                 <div className="grid sm:grid-cols-2 gap-4">
@@ -1137,43 +1182,7 @@ export default function AdminContentPage() {
                                 </div>
                             </AdminSection>
 
-                            <AdminSection title="Rotating announcements" description="Extra messages that rotate in the top bar after the main promo (e.g. “Free shipping over ₹499”). Up to 6.">
-                                {content.extras.announcements.map((item, index) => (
-                                    <div key={index} className="grid gap-3 sm:grid-cols-[1fr_12rem_auto] sm:items-end">
-                                        <AdminField label={`Message ${index + 1}`}>
-                                            <Input value={item.text} maxLength={140} onChange={(e) => updateExtras({ announcements: content.extras.announcements.map((a, i) => (i === index ? { ...a, text: e.target.value } : a)) })} />
-                                        </AdminField>
-                                        <AdminField label="Link (optional)">
-                                            <Input value={item.href} placeholder="/shop" onChange={(e) => updateExtras({ announcements: content.extras.announcements.map((a, i) => (i === index ? { ...a, href: e.target.value } : a)) })} />
-                                        </AdminField>
-                                        <Button variant="outline" size="sm" onClick={() => updateExtras({ announcements: content.extras.announcements.filter((_, i) => i !== index) })}>Remove</Button>
-                                    </div>
-                                ))}
-                                {content.extras.announcements.length < 6 && (
-                                    <Button variant="outline" size="sm" onClick={() => updateExtras({ announcements: [...content.extras.announcements, { text: '', href: '' }] })}>Add message</Button>
-                                )}
-                            </AdminSection>
-
-                            <AdminSection title="Shop by concern" description="Health goals shown under the categories on the homepage (e.g. Digestion, Hair care). Each opens the shop filtered by the keyword you set. Up to 8.">
-                                {content.extras.concerns.map((item, index) => {
-                                    const patch = (change) => updateExtras({ concerns: content.extras.concerns.map((c, i) => (i === index ? { ...c, ...change } : c)) });
-                                    return (
-                                        <div key={index} className="space-y-3 rounded-lg border border-admin-border p-4">
-                                            <div className="grid gap-3 sm:grid-cols-2">
-                                                <AdminField label="Name"><Input value={item.label} maxLength={40} placeholder="Digestion" onChange={(e) => patch({ label: e.target.value })} /></AdminField>
-                                                <AdminField label="Shop keyword" hint="Matches product name, description or category."><Input value={item.search} maxLength={60} placeholder="digest" onChange={(e) => patch({ search: e.target.value })} /></AdminField>
-                                            </div>
-                                            <ImageUploadField label="Image (optional)" value={item.image} onChange={(v) => patch({ image: v })} adminToken={adminToken} />
-                                            <Button variant="outline" size="sm" onClick={() => updateExtras({ concerns: content.extras.concerns.filter((_, i) => i !== index) })}>Remove</Button>
-                                        </div>
-                                    );
-                                })}
-                                {content.extras.concerns.length < 8 && (
-                                    <Button variant="outline" size="sm" className="w-fit" onClick={() => updateExtras({ concerns: [...content.extras.concerns, { label: '', search: '', image: '' }] })}>Add concern</Button>
-                                )}
-                            </AdminSection>
-
-                            <AdminSection title="Product page & account">
+                            <AdminSection title="Product pages & reorder reminders">
                                 <AdminField label="Health disclaimer" hint="Shown at the bottom of every product page. Have it reviewed for your category.">
                                     <AdminTextarea rows={3} maxLength={600} value={content.extras.disclaimer} onChange={(e) => updateExtras({ disclaimer: e.target.value })} />
                                 </AdminField>
