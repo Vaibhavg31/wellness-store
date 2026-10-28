@@ -20,6 +20,9 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION || 'ap-south-1' }}
   AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID || '828776175198' }}
   CONFIG_BUCKET: ${{ vars.CONFIG_BUCKET || 'chikit-config-828776175198' }}
+  # The address the HTTPS proxy gets a free certificate for. sslip.io names resolve to the IP inside them (no DNS to set up);
+  # switch to a real domain later by pointing its A record at the server and setting the SITE_HOST repo variable.
+  SITE_HOST: ${{ vars.SITE_HOST || '3-6-208-29.sslip.io' }}
   ECR_REPOSITORY: chikit
   ECS_CLUSTER: chikit
   ECS_SERVICE: chikit-web
@@ -44,7 +47,7 @@ jobs:
           IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
         run: |
           docker build \
-            --build-arg VITE_SITE_URL="${{ vars.VITE_SITE_URL || 'http://3.6.208.29' }}" \
+            --build-arg VITE_SITE_URL="${{ vars.VITE_SITE_URL || format('https://{0}', env.SITE_HOST) }}" \
             --build-arg VITE_GOOGLE_CLIENT_ID="${{ vars.VITE_GOOGLE_CLIENT_ID }}" \
             --build-arg VITE_RAZORPAY_KEY_ID="${{ vars.VITE_RAZORPAY_KEY_ID }}" \
             --build-arg VITE_MSG91_WIDGET_ID="${{ vars.VITE_MSG91_WIDGET_ID }}" \
@@ -56,7 +59,7 @@ jobs:
 
       - name: Register task definition
         run: |
-          envsubst '${AWS_ACCOUNT_ID} ${AWS_REGION} ${IMAGE} ${CONFIG_BUCKET}' < infra/aws/task-definition.json > task-definition.rendered.json
+          envsubst '${AWS_ACCOUNT_ID} ${AWS_REGION} ${IMAGE} ${CONFIG_BUCKET} ${SITE_HOST}' < infra/aws/task-definition.json > task-definition.rendered.json
           TD_ARN=$(aws ecs register-task-definition --cli-input-json file://task-definition.rendered.json --query 'taskDefinition.taskDefinitionArn' --output text)
           echo "TD_ARN=$TD_ARN" >> "$GITHUB_ENV"
 

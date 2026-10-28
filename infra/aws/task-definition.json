@@ -4,7 +4,8 @@
   "networkMode": "bridge",
   "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/chikit-ecs-task-execution",
   "volumes": [
-    { "name": "uploads", "host": { "sourcePath": "/opt/chikit/uploads" } }
+    { "name": "uploads", "host": { "sourcePath": "/opt/chikit/uploads" } },
+    { "name": "caddy", "host": { "sourcePath": "/opt/chikit/caddy" } }
   ],
   "containerDefinitions": [
     {
@@ -34,6 +35,34 @@
           "awslogs-group": "/ecs/chikit",
           "awslogs-region": "${AWS_REGION}",
           "awslogs-stream-prefix": "web"
+        }
+      }
+    },
+    {
+      "name": "https",
+      "image": "caddy:2-alpine",
+      "essential": false,
+      "memory": 96,
+      "links": ["web"],
+      "portMappings": [
+        { "containerPort": 443, "hostPort": 443, "protocol": "tcp" }
+      ],
+      "mountPoints": [
+        { "sourceVolume": "caddy", "containerPath": "/data", "readOnly": false }
+      ],
+      "environment": [
+        { "name": "SITE_HOST", "value": "${SITE_HOST}" }
+      ],
+      "entryPoint": ["sh", "-c"],
+      "command": [
+        "printf '{\\n  http_port 8081\\n  auto_https disable_redirects\\n}\\n%s {\\n  encode zstd gzip\\n  reverse_proxy web:8000\\n}\\n' \"$SITE_HOST\" > /tmp/Caddyfile && exec caddy run --config /tmp/Caddyfile --adapter caddyfile"
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/chikit",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "https"
         }
       }
     }
