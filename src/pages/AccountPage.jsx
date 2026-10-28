@@ -70,8 +70,8 @@ export default function AccountPage() {
                 </div>
 
                 <div className="mb-12 grid gap-4 sm:grid-cols-3">
-                    <QuickLink to="/cart" icon={ShoppingBag} title="My bag" hint={`${cartCount} items saved`} />
-                    <QuickLink to="/wishlist" icon={Heart} title="My wishlist" hint={`${wishlistCount} saved items`} />
+                    <QuickLink to="/cart" icon={ShoppingBag} title="My bag" hint={`${cartCount} ${cartCount === 1 ? 'item' : 'items'} saved`} />
+                    <QuickLink to="/wishlist" icon={Heart} title="My wishlist" hint={`${wishlistCount} saved ${wishlistCount === 1 ? 'item' : 'items'}`} />
                     <QuickLink to="/orders" icon={Package} title="My orders" hint={activeOrders.length > 0 ? `${activeOrders.length} in progress` : `${orders.length} total`} />
                 </div>
 

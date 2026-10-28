@@ -218,7 +218,38 @@ export default function AdminProductsPage() {
                         description={search.trim() ? 'Try a different search term' : 'Add your first product to get started'}
                     />
                 ) : (
-                    <div className="overflow-x-auto">
+                    <>
+                    {/* Phones: one card per product with every control in reach (the wide table needed sideways scrolling to reach Edit). */}
+                    <ul className="divide-y divide-admin-border-light md:hidden">
+                        {filteredProducts.map((product) => (
+                            <li key={product.id} className="space-y-3 p-4">
+                                <div className="flex items-start gap-3">
+                                    <img src={imageUrl(product.images?.[0] || '')} alt="" className="size-14 shrink-0 rounded-lg border border-admin-border-light object-cover" />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="font-medium text-ink">{product.title}</p>
+                                        <p className="text-xs text-admin-muted">{humanizeSlug(product.category)}{product.hasVariants ? ` · ${product.variants.length} option${product.variants.length === 1 ? '' : 's'}` : ''}</p>
+                                        <p className="mt-1 font-medium tabular-nums text-ink">
+                                            {product.hasVariants && <span className="font-normal text-admin-muted">From </span>}₹{product.price}
+                                        </p>
+                                    </div>
+                                    <button type="button" onClick={() => togglePublish(product)} className="shrink-0" aria-label={product.isPublished ? 'Hide product' : 'Publish product'}>
+                                        <AdminStatusPill tone={product.isPublished ? 'success' : 'muted'}>
+                                            {product.isPublished ? <><Eye size={11} className="mr-0.5" /> Live</> : <><EyeOff size={11} className="mr-0.5" /> Hidden</>}
+                                        </AdminStatusPill>
+                                    </button>
+                                </div>
+                                <div className="flex items-center justify-between gap-3">
+                                    <StockCell product={product} onSave={saveStock} />
+                                    <div className="flex gap-1">
+                                        <Link to={`${ADMIN_PATH}/products/${product.id}`} className="inline-grid size-9 place-items-center rounded-lg text-ink hover:bg-admin-surface-alt" aria-label={`Edit ${product.title}`}><Pencil size={16} /></Link>
+                                        <AdminIconButton onClick={() => duplicateProduct(product)} icon={Copy} title="Duplicate as hidden copy" disabled={duplicatingId === product.id} />
+                                        <AdminIconButton onClick={() => handleDelete(product.id)} icon={Trash2} variant="danger" title="Delete" />
+                                    </div>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="hidden overflow-x-auto md:block">
                         <table className="w-full text-sm min-w-[700px]">
                             <thead>
                                 <tr>
@@ -281,6 +312,7 @@ export default function AdminProductsPage() {
                             </tbody>
                         </table>
                     </div>
+                    </>
                 )}
             </AdminTableShell>
         </div>

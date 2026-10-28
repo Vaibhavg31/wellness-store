@@ -72,7 +72,7 @@ export default function AuthPhone({ mode, onMode, copy, backTo, backLabel, child
                 </div>
 
                 <div className="mt-4 animate-rise-in rounded-xl border border-line bg-surface p-5 shadow-md sm:p-8">{children}</div>
-                {backTo && <Link to={backTo} className="mt-6 block text-center text-small text-muted hover:text-primary">{backLabel}</Link>}
+                {backTo && <Link to={backTo} className="mt-6 flex min-h-11 items-center justify-center text-center text-small text-muted hover:text-primary">{backLabel}</Link>}
             </div>
         </main>
     );

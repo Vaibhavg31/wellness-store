@@ -69,10 +69,19 @@ export default function SearchOverlay({ isOpen, onClose }) {
                         type="search"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search products, concerns, categories…"
+                        placeholder="Search products, concerns…"
                         aria-label="Search products"
-                        className="h-11 w-full bg-transparent text-body text-ink placeholder:text-subtle focus:outline-none"
+                        enterKeyHint="search"
+                        autoComplete="off"
+                        autoCapitalize="off"
+                        spellCheck={false}
+                        className="h-11 min-w-0 flex-1 bg-transparent text-body text-ink placeholder:text-subtle focus:outline-none [&::-webkit-search-cancel-button]:hidden"
                     />
+                    {query && (
+                        <button type="button" onClick={(e) => { setQuery(''); e.currentTarget.form?.querySelector('input')?.focus(); }} className="grid size-9 shrink-0 place-items-center rounded-full bg-canvas-alt text-muted hover:text-ink" aria-label="Clear search">
+                            <X size={14} />
+                        </button>
+                    )}
                     <button type="button" onClick={onClose} className="grid size-9 shrink-0 place-items-center rounded-full hover:bg-canvas-alt" aria-label="Close search">
                         <X size={18} />
                     </button>
@@ -103,7 +112,11 @@ export default function SearchOverlay({ isOpen, onClose }) {
                 {debounced && (
                     <div className="mt-4 border-t border-line pt-4">
                         {results.length === 0 ? (
-                            <p className="py-6 text-center text-muted">No products found for “{query}”.</p>
+                            <div className="py-6 text-center">
+                                <p className="text-muted">No products found for “{query}”.</p>
+                                <p className="mt-1 text-small text-muted">Check the spelling, or try a category such as “immunity”.</p>
+                                <Link to="/shop" onClick={onClose} className="mt-4 inline-flex min-h-11 items-center rounded-full border border-primary px-5 text-small font-semibold text-primary hover:bg-primary-soft">Browse all products</Link>
+                            </div>
                         ) : (
                             <ul className="space-y-1">
                                 {results.map((p) => <ProductRow key={p.id} product={p} onClose={onClose} />)}

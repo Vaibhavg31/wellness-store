@@ -36,7 +36,9 @@ export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const links = content.navLinks ?? [];
-    const stripHidden = direction === 'down';
+    // Buying pages keep the phone header to one row: the category strip would only pull attention (and the price below the fold).
+    const noStrip = /^\/(product\/|checkout)/.test(pathname);
+    const stripHidden = direction === 'down' || noStrip;
 
     useEffect(() => setMenuOpen(false), [pathname]);
 
@@ -72,12 +74,12 @@ export default function Header() {
                     <button type="button" className={iconButton} onClick={() => setSearchOpen(true)} aria-label="Search">
                         <Search size={20} />
                     </button>
-                    <NavLink to="/wishlist" className={cn(iconButton, 'hidden sm:grid')} aria-label={`Wishlist${wishlistCount ? `, ${wishlistCount} items` : ''}`}>
+                    <NavLink to="/wishlist" className={cn(iconButton, 'hidden sm:grid')} aria-label={`Wishlist${wishlistCount ? `, ${wishlistCount} ${wishlistCount === 1 ? 'item' : 'items'}` : ''}`}>
                         <Heart size={20} />
                         <CountBadge count={wishlistCount} />
                     </NavLink>
                     <AccountMenu iconButtonClass={iconButton} />
-                    <button type="button" className={iconButton} onClick={openCartDrawer} aria-label={`Bag${cartCount ? `, ${cartCount} items` : ''}`}>
+                    <button type="button" className={iconButton} onClick={openCartDrawer} aria-label={`Bag${cartCount ? `, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}` : ''}`}>
                         <ShoppingBag size={20} />
                         <CountBadge count={cartCount} />
                     </button>
@@ -89,6 +91,7 @@ export default function Header() {
             <div
                 className={cn(
                     'pointer-events-auto relative z-0 border-b bg-canvas transition-[transform,opacity] duration-300 ease-[var(--ease-out-soft)] will-change-transform lg:hidden',
+                    noStrip && 'hidden',
                     stripHidden ? 'pointer-events-none -translate-y-full border-transparent opacity-0' : cn('translate-y-0 opacity-100', scrolled ? 'border-line shadow-sm' : 'border-transparent'),
                 )}
                 aria-hidden={stripHidden ? 'true' : undefined}

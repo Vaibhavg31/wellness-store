@@ -226,7 +226,7 @@ function LoginScreen() {
                             <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="size-4 rounded border-line-strong accent-primary" />
                             Remember me
                         </label>
-                        <Link to="/forgot-password" className="font-medium text-primary hover:underline">Forgot password?</Link>
+                        <Link to="/forgot-password" className="inline-flex min-h-11 items-center font-medium text-primary hover:underline">Forgot password?</Link>
                     </div>
                 )}
                 {panel === 'signup' && <p className="text-center text-caption text-muted">We&apos;ll send a magic link to verify your email. Click it to complete sign-in.</p>}

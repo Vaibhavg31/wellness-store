@@ -34,7 +34,7 @@ export default function WhatsAppButton() {
     // On phones the home hero's product bar sits right behind the bubble, so it appears once the visitor scrolls on.
     const waitOnPhone = pathname === '/' && !awayFromTop;
 
-    const coversActions = /^\/(product\/|cart|checkout|login|forgot-password|reset-password|verify-email)/.test(pathname);
+    const coversActions = /^\/(product\/|cart|checkout|login|forgot-password|reset-password|verify-email|account|orders|wishlist)/.test(pathname);
 
     if (pathname.startsWith(ADMIN_PATH) || pathname.startsWith(PREVIEW_PATH)) return null;
 

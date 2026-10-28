@@ -13,7 +13,7 @@ export default function AuthShell({ aside, children, backTo = '/', backLabel = '
             <main className="grid min-h-dvh place-items-center overflow-x-clip bg-canvas px-4 py-10">
                 <div className="w-full max-w-5xl animate-rise-in">
                     {children}
-                    {backTo && <Link to={backTo} className="mt-6 block text-center text-small text-muted hover:text-primary">{backLabel}</Link>}
+                    {backTo && <Link to={backTo} className="mt-6 flex min-h-11 items-center justify-center text-center text-small text-muted hover:text-primary">{backLabel}</Link>}
                 </div>
             </main>
         );
@@ -31,7 +31,7 @@ export default function AuthShell({ aside, children, backTo = '/', backLabel = '
                 <div className="mx-auto w-full min-w-0 max-w-md animate-rise-in lg:animate-swipe-in">
                     <div className="mb-6 flex justify-center lg:hidden"><Logo size="lg" linkToHome /></div>
                     <div className="rounded-xl border border-line bg-surface p-6 shadow-md sm:p-10">{animateHeight ? <AutoHeight>{children}</AutoHeight> : children}</div>
-                    {backTo && <Link to={backTo} className="mt-6 block text-center text-small text-muted hover:text-primary">{backLabel}</Link>}
+                    {backTo && <Link to={backTo} className="mt-6 flex min-h-11 items-center justify-center text-center text-small text-muted hover:text-primary">{backLabel}</Link>}
                 </div>
             </div>
         </main>

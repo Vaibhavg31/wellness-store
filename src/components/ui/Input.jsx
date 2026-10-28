@@ -52,7 +52,7 @@ const Input = forwardRef(function Input({ className, label, error, hint, id, typ
                     <button
                         type="button"
                         onClick={() => setShow((v) => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-muted hover:text-ink"
+                        className="absolute right-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-muted hover:text-ink"
                         aria-label={show ? 'Hide password' : 'Show password'}
                     >
                         {show ? <EyeOff size={18} /> : <Eye size={18} />}

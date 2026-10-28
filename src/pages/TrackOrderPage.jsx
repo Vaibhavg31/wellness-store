@@ -44,7 +44,7 @@ export default function TrackOrderPage() {
                         <Input label="Email or phone number" value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} placeholder="The one used on the order" autoComplete="email" required />
                         {error && <p className="rounded-lg bg-danger-tint px-4 py-3 text-small text-danger" role="alert">{error}</p>}
                         <Button type="submit" size="lg" className="w-full" loading={loading}><PackageSearch size={18} aria-hidden="true" /> Track order</Button>
-                        <p className="text-center text-caption text-muted">Have an account? <Link to="/orders" className="font-medium text-primary hover:underline">See all your orders</Link></p>
+                        <p className="text-center text-caption text-muted">Have an account? <Link to="/orders" className="inline-flex min-h-11 items-center font-medium text-primary hover:underline">See all your orders</Link></p>
                     </form>
 
                     {order && (

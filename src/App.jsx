@@ -87,11 +87,11 @@ const STOREFRONT_ROUTES = [
 ];
 
 const AUTH_ROUTES = [
-    { path: 'login', Page: LoginPage },
-    { path: 'forgot-password', Page: ForgotPasswordPage },
-    { path: 'reset-password', Page: ResetPasswordPage },
-    { path: 'verify-email', Page: VerifyEmailPage },
-    { path: 'verify-email-pending', Page: VerifyEmailPendingPage },
+    { path: 'login', title: 'Sign in', Page: LoginPage },
+    { path: 'forgot-password', title: 'Forgot password', Page: ForgotPasswordPage },
+    { path: 'reset-password', title: 'Reset password', Page: ResetPasswordPage },
+    { path: 'verify-email', title: 'Verify your email', Page: VerifyEmailPage },
+    { path: 'verify-email-pending', title: 'Check your inbox', Page: VerifyEmailPendingPage },
 ];
 
 const ADMIN_ROUTES = [
@@ -145,8 +145,8 @@ export default function App() {
                                                 ))}
                                             </Route>
 
-                                            {AUTH_ROUTES.map(({ path, Page }) => (
-                                                <Route key={path} path={path} element={lazyElement(Page, { noindex: true, title: 'Sign in' })} />
+                                            {AUTH_ROUTES.map(({ path, Page, title }) => (
+                                                <Route key={path} path={path} element={lazyElement(Page, { noindex: true, title })} />
                                             ))}
 
                                             <Route path={`${ADMIN_PATH}/login`} element={<Navigate to={loginUrl(ADMIN_PATH)} replace />} />

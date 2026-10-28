@@ -135,6 +135,11 @@ export default function ShopPage() {
                     </div>
 
                     {loading ? <ProductGridSkeleton /> : <ProductGrid products={filtered} emptyMessage="No products match your filters. Try adjusting them." />}
+                    {!loading && filtered.length === 0 && filtersActive && (
+                        <div className="-mt-6 flex justify-center pb-10">
+                            <Button variant="outline" onClick={reset}>Clear search and filters</Button>
+                        </div>
+                    )}
                 </section>
             </div>
 

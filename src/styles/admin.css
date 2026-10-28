@@ -49,3 +49,14 @@
   .admin-promo-card { background: var(--color-admin-surface); border: 1px solid var(--color-admin-border-light); border-radius: var(--admin-radius); padding: 1rem 1.25rem; box-shadow: var(--admin-shadow); transition: border-color 0.15s, box-shadow 0.15s; }
   .admin-promo-card:hover { border-color: rgb(96 36 96 / 0.2); box-shadow: var(--shadow-sm); }
 }
+
+/* Phones: filter controls fill the row (they used to stack at different widths) and the date pair shares one line. Unlayered so it
+   beats the width utilities on the individual controls. */
+@media (max-width: 639px) {
+  .admin-filter-bar-row > select,
+  .admin-filter-bar-row > div,
+  .admin-filter-bar-row > button { width: 100%; min-width: 0; }
+  .admin-filter-bar-row .admin-date-range { width: 100%; flex-wrap: nowrap; }
+  .admin-filter-bar-row .admin-date-field { flex: 1 1 0; min-width: 0; }
+  .admin-filter-bar-row .admin-date-input { min-width: 0; width: 100%; }
+}

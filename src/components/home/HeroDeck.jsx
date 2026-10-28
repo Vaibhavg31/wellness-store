@@ -276,7 +276,7 @@ export default function HeroDeck({ items }) {
                 <div className="mt-2 flex items-center gap-3 px-1 sm:mt-3">
                     <div className="flex flex-1 gap-1.5">
                         {items.map((item, i) => (
-                            <button key={item.id} type="button" onClick={() => goTo(i)} aria-label={`Show ${item.title}`} aria-current={i === index || undefined} className="group flex-1 py-2">
+                            <button key={item.id} type="button" onClick={() => goTo(i)} aria-label={`Show ${item.title}`} aria-current={i === index || undefined} className="group -my-3 flex-1 py-[18px]">
                                 <span className="relative block h-[3px] overflow-hidden rounded-full bg-white/25">
                                     <m.span
                                         className="absolute inset-0 origin-left rounded-full bg-white"
