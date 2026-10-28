@@ -35,7 +35,7 @@ function ownerLogins() {
 }
 
 function clientIp(req) {
-    return req.headers['x-forwarded-for'] || req.socket.remoteAddress || '0.0.0.0';
+    return req.ip || req.socket.remoteAddress || '0.0.0.0'; // the visitor's real address; see 'trust proxy' in app.js
 }
 
 async function msg91ServiceError(res, result, fallback) {

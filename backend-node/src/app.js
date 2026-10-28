@@ -30,6 +30,10 @@ import uploadRoutes from './routes/uploadRoutes.js';
 
 export function createApp() {
     const app = express();
+    // The HTTPS proxy sits in front of this process on a private address. Trusting only private addresses means req.ip is
+    // the visitor's real address, so per-visitor limits (spins, logins, offers) count each person on their own instead of
+    // lumping everyone behind the proxy together, and a visitor on the open internet cannot fake it with a header.
+    app.set('trust proxy', 'loopback, linklocal, uniquelocal');
 
     app.use(compression());
     app.use(corsMiddleware);

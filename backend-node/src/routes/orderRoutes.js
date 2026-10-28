@@ -612,7 +612,7 @@ function publicTrackingView(order) {
 }
 
 router.post('/orders/track', asyncRoute(async (req, res) => {
-    const ip = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+    const ip = String(req.ip || req.socket?.remoteAddress || 'unknown');
     if (!(await checkRateLimit(`track-${ip}`, 10, 900))) return sendError(res, 'Too many attempts. Please try again in a few minutes.', 429);
 
     const orderId = String(req.body?.orderId ?? '').trim().replace(/^#/, '');
