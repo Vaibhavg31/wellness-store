@@ -21,6 +21,19 @@ function adminEmails() {
     return raw.split(',').map((e) => e.toLowerCase().trim()).filter(Boolean);
 }
 
+/** Personal admin sign-ins, each with its own password: ADMIN_LOGINS="email:hash,email:hash" (hashes only, never plain text). */
+function ownerLogins() {
+    const logins = new Map();
+    for (const entry of String(process.env.ADMIN_LOGINS || '').split(',')) {
+        const cut = entry.indexOf(':');
+        if (cut < 1) continue;
+        const email = entry.slice(0, cut).trim().toLowerCase();
+        const hash = entry.slice(cut + 1).trim();
+        if (email && hash) logins.set(email, hash);
+    }
+    return logins;
+}
+
 function clientIp(req) {
     return req.headers['x-forwarded-for'] || req.socket.remoteAddress || '0.0.0.0';
 }
@@ -188,6 +201,13 @@ router.post('/auth/login', asyncRoute(async (req, res) => {
 
     const adminDevPass = process.env.ADMIN_DEV_PASSWORD || '';
     if (adminDevPass && adminEmails().includes(email) && password === adminDevPass) {
+        const token = signToken({ role: 'admin', email });
+        return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email } });
+    }
+
+    // A personal admin login: this email has its own password, checked against its own hash.
+    const ownHash = ownerLogins().get(email);
+    if (ownHash && bcrypt.compareSync(password, ownHash)) {
         const token = signToken({ role: 'admin', email });
         return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email } });
     }
@@ -406,6 +426,10 @@ router.post('/auth/admin/login', asyncRoute(async (req, res) => {
     if (!(await checkRateLimit(`admin-${clientIp(req)}`))) return sendError(res, 'Too many login attempts. Try again later.', 429);
 
     const adminUser = process.env.ADMIN_USERNAME || 'chikit_admin';
+    const ownHash = ownerLogins().get(String(username).trim().toLowerCase());
+    if (ownHash && bcrypt.compareSync(String(password), ownHash)) {
+        return sendJson(res, { token: signToken({ role: 'admin' }), role: 'admin' });
+    }
     const adminPassHash = process.env.ADMIN_PASSWORD_HASH || null;
 
     // The Studio username, or any admin email, both work with the Studio password.
