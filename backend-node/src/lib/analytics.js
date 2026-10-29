@@ -376,7 +376,7 @@ export async function buildOverview(rangeKey) {
             [from, to],
         ),
         pool.query(
-            `SELECT LOWER(label) term, COUNT(*) searches, COUNT(DISTINCT visitor_id) visitors, SUM(qty = 0) empty
+            `SELECT LOWER(label) term, COUNT(*) searches, COUNT(DISTINCT visitor_id) visitors, SUM(qty = 0) noresults
                FROM analytics_events WHERE event_type = 'search' AND label IS NOT NULL AND created_at >= ? AND created_at < ? GROUP BY term ORDER BY searches DESC LIMIT 15`,
             [from, to],
         ),
@@ -492,7 +492,7 @@ export async function buildOverview(rangeKey) {
         sources: sourceRows.map((r) => ({ key: r.k, visitors: n(r.visitors), sessions: n(r.sessions), carts: n(r.carts), checkouts: n(r.checkouts), orders: n(r.orders) })),
         devices: deviceRows.map((r) => ({ key: r.k, visitors: n(r.visitors), sessions: n(r.sessions), carts: n(r.carts), checkouts: n(r.checkouts), orders: n(r.orders) })),
         campaigns: campaignRows.map((r) => ({ key: r.k, visitors: n(r.visitors), carts: n(r.carts), orders: n(r.orders) })),
-        searches: searchRows.map((r) => ({ term: r.term, searches: n(r.searches), visitors: n(r.visitors), empty: n(r.empty) })),
+        searches: searchRows.map((r) => ({ term: r.term, searches: n(r.searches), visitors: n(r.visitors), empty: n(r.noresults) })),
         abandoned: { sessions: n(abandoned.sessions), visitors: n(abandoned.visitors), value: n(abandoned.value) },
         live: { active: n(live.active), pages: liveRows.map((r) => ({ path: r.p, type: r.pt, count: n(r.c) })) },
         tracking: { since: tracking.firstSeen ?? null, sessions: n(tracking.sessions) },
