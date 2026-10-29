@@ -19,6 +19,7 @@ import { UserRepository } from '../repositories/userRepository.js';
 import { CouponService } from '../services/couponService.js';
 import * as razorpay from '../services/razorpayService.js';
 import * as emailService from '../services/emailService.js';
+import { recordPurchase } from '../lib/analytics.js';
 
 const router = Router();
 const repo = new OrderRepository();
@@ -297,6 +298,15 @@ function filtersFromQuery(query) {
 
 // ── Routes ───────────────────────────────────────────────────────────────
 
+/** Funnel analytics: best-effort — a sale must never fail because the visit could not be recorded. */
+async function trackPurchase(order, ids, userId) {
+    try {
+        await recordPurchase({ visitorId: ids?.visitorId, sessionId: ids?.sessionId, userId: userId || null, order });
+    } catch (err) {
+        console.error('[analytics] could not record purchase:', err.message);
+    }
+}
+
 router.get('/orders', asyncRoute(async (req, res) => {
     const payload = await requireCustomer(req);
     const orders = await repo.getByUserId(payload.userId);
@@ -538,6 +548,7 @@ router.post('/orders/verify-payment', asyncRoute(async (req, res) => {
     const statusChanges = buildStatusChange(order, 'confirmed', 'Payment received', 'system');
     const updated = await repo.update(orderId, { ...statusChanges, paymentStatus: 'paid', razorpayPaymentId, razorpaySignature, paidAt: now });
 
+    if (updated) await trackPurchase(updated, body.analytics, payload.userId);
     if (updated) await dispatchOrderEmail(updated, 'confirmed', prevStatus);
     sendJson(res, enrichOrder(updated));
 }, 'Failed to verify payment'));
@@ -753,6 +764,9 @@ router.post('/orders', asyncRoute(async (req, res) => {
     } catch {
         // ignore
     }
+
+    // Online payments count as a sale only once the payment is verified (see verify-payment); cash on delivery counts now.
+    if (payment !== 'razorpay') await trackPurchase(created, body.analytics, payload.userId);
 
     if (payment !== 'razorpay') await dispatchOrderEmail(created, 'placed');
 

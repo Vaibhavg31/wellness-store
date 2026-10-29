@@ -7,6 +7,7 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
 import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl, api, ApiError } from '@/services/api';
 import { openRazorpayCheckout } from '@/utils/razorpay';
+import { getAnalyticsIds, trackEvent } from '@/utils/analytics';
 import { isValidPincode } from '@/utils/pincodeLookup';
 import { validateDeliveryAddress } from '@/utils/validateAddress';
 import Button from '@/components/ui/Button';
@@ -91,6 +92,20 @@ export default function CheckoutPage() {
     useEffect(() => {
         if (placed) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }, [placed]);
+    // Funnel: a visitor with items who opens checkout (a guest sees the sign-in step first), then reaches the details form.
+    const hasItems = items.length > 0;
+    const funnelSent = useRef({ start: false, form: false });
+    useEffect(() => {
+        if (!hasItems || placed) return;
+        if (!funnelSent.current.start) {
+            funnelSent.current.start = true;
+            trackEvent('checkout_start', { path: '/checkout', pageType: 'checkout', value: total, qty: items.length });
+        }
+        if (isAuthenticated && !funnelSent.current.form) {
+            funnelSent.current.form = true;
+            trackEvent('checkout_form', { path: '/checkout', pageType: 'checkout', value: total, qty: items.length });
+        }
+    }, [hasItems, placed, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [otpActive, setOtpActive] = useState(false);
@@ -331,6 +346,7 @@ export default function CheckoutPage() {
                 pincode: form.pincode,
             },
             payment: form.payment,
+            analytics: getAnalyticsIds(),
         }, token);
 
         const refreshUser = async () => {
@@ -360,6 +376,7 @@ export default function CheckoutPage() {
                     razorpayOrderId: payment.razorpay_order_id,
                     razorpayPaymentId: payment.razorpay_payment_id,
                     razorpaySignature: payment.razorpay_signature,
+                    analytics: getAnalyticsIds(),
                 }, token);
 
                 setPlaced(verified);

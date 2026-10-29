@@ -32,6 +32,7 @@ export const pageLoaders = {
     VerifyEmailPendingPage: () => import('@/pages/VerifyEmailPendingPage'),
     AdminLayout: () => import('@/pages/admin/AdminLayout'),
     AdminDashboardPage: () => import('@/pages/admin/AdminDashboardPage'),
+    AdminAnalyticsPage: () => import('@/pages/admin/AdminAnalyticsPage'),
     AdminProductsPage: () => import('@/pages/admin/AdminProductsPage'),
     AdminProductFormPage: () => import('@/pages/admin/AdminProductFormPage'),
     AdminCategoriesPage: () => import('@/pages/admin/AdminCategoriesPage'),
@@ -73,7 +74,7 @@ const ROUTES = [
     ['/verify-email', ['VerifyEmailPage']],
 ];
 const ADMIN_PAGES = {
-    products: 'AdminProductsPage', categories: 'AdminCategoriesPage', reviews: 'AdminReviewsPage', feedback: 'AdminFeedbackPage',
+    analytics: 'AdminAnalyticsPage', products: 'AdminProductsPage', categories: 'AdminCategoriesPage', reviews: 'AdminReviewsPage', feedback: 'AdminFeedbackPage',
     orders: 'AdminOrdersPage', 'direct-orders': 'AdminDirectOrdersPage', users: 'AdminUsersPage', coupons: 'AdminCouponsPage',
     bundles: 'AdminBundlesPage', content: 'AdminContentPage', media: 'AdminMediaPage', settings: 'AdminSettingsPage',
 };

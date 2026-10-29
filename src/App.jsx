@@ -11,6 +11,7 @@ import ScrollToTop from '@/components/layout/ScrollToTop';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
 import RouteProgress from '@/components/layout/RouteProgress';
+import RouteTracker from '@/components/layout/RouteTracker';
 import { PREVIEW_PATH } from '@/utils/productPreview';
 import PageLoader from '@/components/layout/PageLoader';
 import RouteGroup from '@/components/layout/RouteGroup';
@@ -51,6 +52,7 @@ const VerifyEmailPendingPage = lazy(pageLoaders.VerifyEmailPendingPage);
 // Admin
 const AdminLayout = lazy(pageLoaders.AdminLayout);
 const AdminDashboardPage = lazy(pageLoaders.AdminDashboardPage);
+const AdminAnalyticsPage = lazy(pageLoaders.AdminAnalyticsPage);
 const AdminProductsPage = lazy(pageLoaders.AdminProductsPage);
 const AdminProductFormPage = lazy(pageLoaders.AdminProductFormPage);
 const AdminCategoriesPage = lazy(pageLoaders.AdminCategoriesPage);
@@ -95,6 +97,7 @@ const AUTH_ROUTES = [
 ];
 
 const ADMIN_ROUTES = [
+    { path: 'analytics', Page: AdminAnalyticsPage },
     { path: 'products', Page: AdminProductsPage },
     { path: 'products/new', Page: AdminProductFormPage },
     { path: 'products/:id', Page: AdminProductFormPage },
@@ -133,6 +136,7 @@ export default function App() {
                                 <BrowserRouter>
                                     <ToastProvider>
                                         <ScrollToTop />
+                                        <RouteTracker />
                                         <RouteProgress />
                                         <AnnouncementPopup />
                                         <Suspense fallback={<PageLoader fullscreen />}>

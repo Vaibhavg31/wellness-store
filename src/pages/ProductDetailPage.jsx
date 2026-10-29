@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { trackEvent } from '@/utils/analytics';
 import ProductDetailView from '@/components/product/ProductDetailView';
 import Button from '@/components/ui/Button';
 import Skeleton from '@/components/ui/Skeleton';
@@ -24,6 +26,12 @@ export default function ProductDetailPage() {
     const { product, loading } = useProduct(id);
     const { reviews, refetch: refetchReviews } = useReviews(id);
     const { banners: productBanners } = useBanners('product', product?.id);
+
+    // Funnel: this visitor opened this product (once per product, however many times the page re-renders).
+    const productId = product?.id;
+    useEffect(() => {
+        if (productId) trackEvent('product_view', { productId, path: `/product/${productId}`, pageType: 'product' });
+    }, [productId]);
 
     if (loading) return <ProductSkeleton />;
 

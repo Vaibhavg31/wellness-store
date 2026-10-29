@@ -27,6 +27,54 @@ USE `wellness_store`;
 -- STRUCTURE
 -- ---------------------------------------------------------------------------------------------------------------
 
+-- Visitor analytics (the backend also creates these on first use, so an older database needs no manual step).
+CREATE TABLE IF NOT EXISTS `analytics_sessions` (
+  `session_id` varchar(48) NOT NULL,
+  `visitor_id` varchar(48) NOT NULL,
+  `user_id` varchar(64) DEFAULT NULL,
+  `started_at` datetime NOT NULL,
+  `last_seen_at` datetime NOT NULL,
+  `landing_path` varchar(255) DEFAULT NULL,
+  `landing_type` varchar(24) DEFAULT NULL,
+  `exit_path` varchar(255) DEFAULT NULL,
+  `exit_type` varchar(24) DEFAULT NULL,
+  `source` varchar(40) NOT NULL DEFAULT 'direct',
+  `referrer_host` varchar(120) DEFAULT NULL,
+  `campaign` varchar(80) DEFAULT NULL,
+  `device` varchar(12) NOT NULL DEFAULT 'desktop',
+  `is_new` tinyint(1) NOT NULL DEFAULT 0,
+  `page_views` int(10) unsigned NOT NULL DEFAULT 0,
+  `product_views` int(10) unsigned NOT NULL DEFAULT 0,
+  `carted` tinyint(1) NOT NULL DEFAULT 0,
+  `checkout` tinyint(1) NOT NULL DEFAULT 0,
+  `checkout_form` tinyint(1) NOT NULL DEFAULT 0,
+  `purchased` tinyint(1) NOT NULL DEFAULT 0,
+  `cart_value` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `order_value` decimal(12,2) NOT NULL DEFAULT 0.00,
+  PRIMARY KEY (`session_id`),
+  KEY `idx_analytics_sessions_started` (`started_at`),
+  KEY `idx_analytics_sessions_visitor` (`visitor_id`),
+  KEY `idx_analytics_sessions_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='One row per website visit (anonymous until the visitor signs in)';
+CREATE TABLE IF NOT EXISTS `analytics_events` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime NOT NULL,
+  `session_id` varchar(48) NOT NULL,
+  `visitor_id` varchar(48) NOT NULL,
+  `event_type` varchar(24) NOT NULL,
+  `page_type` varchar(24) DEFAULT NULL,
+  `path` varchar(255) DEFAULT NULL,
+  `product_id` varchar(64) DEFAULT NULL,
+  `value` decimal(12,2) DEFAULT NULL,
+  `qty` int(11) DEFAULT NULL,
+  `label` varchar(160) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_analytics_events_created` (`created_at`),
+  KEY `idx_analytics_events_session` (`session_id`,`id`),
+  KEY `idx_analytics_events_type` (`event_type`,`created_at`),
+  KEY `idx_analytics_events_product` (`product_id`,`event_type`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Funnel steps: page views, product views, bag adds, checkout, purchases';
+
 CREATE TABLE IF NOT EXISTS `bundle_items` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `bundle_id` varchar(64) NOT NULL,

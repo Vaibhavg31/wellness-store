@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Seo from '@/components/seo/Seo';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, SlidersHorizontal } from 'lucide-react';
@@ -10,6 +10,7 @@ import ShopFilters, { ActiveFilters } from '@/components/shop/ShopFilters';
 import ProductGrid, { ProductGridSkeleton } from '@/components/shop/ProductGrid';
 import { filterProducts } from '@/utils/filterProducts';
 import { useProducts, useCategories } from '@/hooks/useApi';
+import { trackEvent } from '@/utils/analytics';
 
 const SORT_OPTIONS = [
     { value: 'newest', label: 'Newest' },
@@ -50,6 +51,18 @@ export default function ShopPage() {
         () => filterProducts(products, { ...filters, minPrice: 0, maxPrice }),
         [products, filters, maxPrice],
     );
+
+    // Funnel: what people search for (and whether we had it). Waits until they stop typing; each term is counted once.
+    const searchTerm = filters.search.trim().toLowerCase();
+    const lastSearchSent = useRef('');
+    useEffect(() => {
+        if (loading || searchTerm.length < 2 || searchTerm === lastSearchSent.current) return undefined;
+        const timer = setTimeout(() => {
+            lastSearchSent.current = searchTerm;
+            trackEvent('search', { label: searchTerm, qty: filtered.length, path: '/shop', pageType: 'shop' });
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, [searchTerm, loading, filtered.length]);
 
     const update = (key, value) => {
         setFilters((prev) => ({ ...prev, [key]: value }));

@@ -1,9 +1,14 @@
-import { createContext, useContext, useCallback, useMemo, } from 'react';
+import { createContext, useContext, useCallback, useMemo, useRef } from 'react';
 import { useLocalStorage } from '@/hooks';
+import { trackEvent } from '@/utils/analytics';
 const WishlistContext = createContext(null);
 export function WishlistProvider({ children }) {
     const [items, setItems] = useLocalStorage('chikit-wishlist', []);
+    const itemsRef = useRef(items);
+    itemsRef.current = items;
+    const noteWished = (product) => trackEvent('wishlist_add', { productId: product?.id, path: window.location.pathname, label: product?.title });
     const addToWishlist = useCallback((product) => {
+        if (!itemsRef.current.some((p) => p.id === product.id)) noteWished(product);
         setItems((prev) => {
             if (prev.some((p) => p.id === product.id))
                 return prev;
@@ -14,6 +19,7 @@ export function WishlistProvider({ children }) {
         setItems((prev) => prev.filter((p) => p.id !== productId));
     }, [setItems]);
     const toggleWishlist = useCallback((product) => {
+        if (!itemsRef.current.some((p) => p.id === product.id)) noteWished(product);
         setItems((prev) => {
             const exists = prev.some((p) => p.id === product.id);
             return exists

@@ -4,6 +4,7 @@ import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from '@/constants';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
+import { trackEvent } from '@/utils/analytics';
 
 const CartContext = createContext(null);
 const AUTO_SKIP_KEY = 'chikit-auto-coupon-skipped';
@@ -82,7 +83,10 @@ export function CartProvider({ children }) {
     const deliveryFeeAmount = content.delivery?.fee ?? DELIVERY_FEE;
     const freeThreshold = content.delivery?.freeThreshold ?? FREE_DELIVERY_THRESHOLD;
 
-    const openCartDrawer = useCallback(() => setIsDrawerOpen(true), []);
+    const openCartDrawer = useCallback(() => {
+        trackEvent('cart_open', { path: window.location.pathname });
+        setIsDrawerOpen(true);
+    }, []);
     const closeCartDrawer = useCallback(() => setIsDrawerOpen(false), []);
 
     const clearAutoSkip = useCallback(() => {
@@ -106,9 +110,11 @@ export function CartProvider({ children }) {
         const existing = prev.find((item) => sameLine(item.product, product));
         let next;
         let added;
+        let addedQty = qty;
         if (existing) {
             const nextQty = maxQtyFor(product, existing.quantity + quantity);
             added = nextQty > existing.quantity;
+            addedQty = nextQty - existing.quantity;
             next = prev.map((item) => {
                 if (!sameLine(item.product, product)) return item;
                 return { ...item, product: { ...item.product, ...product }, quantity: nextQty };
@@ -121,6 +127,7 @@ export function CartProvider({ children }) {
             itemsRef.current = next;
             setItems(next);
             setCartPulse((n) => n + 1);
+            trackEvent('add_to_cart', { productId: product.id, value: product.price * addedQty, qty: addedQty, label: product.variantLabel || undefined, path: window.location.pathname });
         }
         return added;
     }, [setItems]);
@@ -156,6 +163,7 @@ export function CartProvider({ children }) {
 
         setItems((prev) => [...prev, ...newLines]);
         setCartPulse((n) => n + 1);
+        newLines.forEach(({ product, quantity }) => trackEvent('add_to_cart', { productId: product.id, value: product.price * quantity, qty: quantity, label: 'bundle', path: window.location.pathname }));
         return true;
     }, [items, setItems]);
 
@@ -220,6 +228,8 @@ export function CartProvider({ children }) {
     }, [items, setItems]);
 
     const removeFromCart = useCallback((productId, { variantId = null, bundleId = null } = {}) => {
+        const line = itemsRef.current.find((item) => sameLine(item.product, { id: productId, variantId, bundleId }));
+        if (line) trackEvent('remove_from_cart', { productId, value: line.product.price * line.quantity, qty: line.quantity, path: window.location.pathname });
         setItems((prev) => prev.filter((item) => !sameLine(item.product, { id: productId, variantId, bundleId })));
     }, [setItems]);
 

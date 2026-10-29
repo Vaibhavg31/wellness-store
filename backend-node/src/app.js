@@ -27,6 +27,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 
 export function createApp() {
     const app = express();
@@ -100,6 +101,7 @@ export function createApp() {
     app.use('/api', userRoutes);
     app.use('/api', orderRoutes);
     app.use('/api', uploadRoutes);
+    app.use('/api', analyticsRoutes);
 
     // Production image: the same process serves the built storefront (Vite's dist/), so one container is the
     // whole site. Pre-rendered SEO pages (dist/<route>/index.html) win; anything else falls back to the SPA shell.
