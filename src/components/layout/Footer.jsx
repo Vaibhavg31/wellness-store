@@ -16,7 +16,7 @@ import { DEVELOPER_CREDIT, DEVELOPER_NAME, DEVELOPER_URL } from '@/constants';
 const COLLECTION_LIMIT = 6;
 
 /** Pages every shopper may need, linked from the footer whatever the admin's menu holds. */
-const COMPANY_LINKS = [{ label: 'Our story', href: '/about' }, { label: 'Reviews', href: '/reviews' }];
+const COMPANY_LINKS = [{ label: 'Our story', href: '/about' }, { label: 'Offers', href: '/offers' }, { label: 'Chikit Club Card', href: '/club' }, { label: 'Reviews', href: '/reviews' }];
 const HELP_LINKS = [{ label: 'Track your order', href: '/track-order' }, { label: 'FAQ', href: '/faq' }, { label: 'Contact us', href: '/contact' }];
 const linkClass = 'inline-flex min-h-9 items-center text-small text-muted transition-colors hover:text-primary';
 

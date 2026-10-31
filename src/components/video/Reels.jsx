@@ -81,7 +81,6 @@ export function ReelVideo({ reel, onOpen, label }) {
             <span className={cn('absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-primary shadow-md transition-opacity group-hover:opacity-100', playing ? 'opacity-0' : 'opacity-100')} aria-hidden="true">
                 <Play size={20} className="ml-0.5" fill="currentColor" />
             </span>
-            {reel.title && <span className="absolute inset-x-0 bottom-0 p-3 text-left text-small font-medium text-white">{reel.title}</span>}
         </button>
     );
 }

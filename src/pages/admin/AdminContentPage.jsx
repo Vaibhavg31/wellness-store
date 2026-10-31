@@ -768,7 +768,7 @@ export default function AdminContentPage() {
                         <>
                             <AdminSection
                                 title="Top navigation bar"
-                                description="What shoppers see in the bar at the top of every page. Products first: your categories. About, FAQ and Contact stay in the footer and the phone menu."
+                                description="What shoppers see in the bar at the top of every page. About, FAQ and Contact stay in the footer and the phone menu."
                             >
                                 <AdminField label="Bar shows">
                                     <AdminSelect
