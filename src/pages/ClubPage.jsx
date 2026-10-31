@@ -319,7 +319,8 @@ export default function ClubPage() {
                         </ul>
                         {club.discountPercent > 0 && <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-small font-semibold text-ink"><Crown size={16} aria-hidden="true" /> Save {club.discountPercent}% on most products</p>}
                     </div>
-                    <div className="flex justify-center lg:justify-end">
+                    {/* On a phone the sign-up form is what the visitor came for, so the big card only shows there once they are a member. */}
+                    <div className={cn('flex justify-center lg:justify-end', !member && 'max-lg:hidden')}>
                         <ClubCard name={member ? user?.name : ''} cardNo={member ? user?.club?.cardNo : ''} since={member ? since : ''} />
                     </div>
                 </div>

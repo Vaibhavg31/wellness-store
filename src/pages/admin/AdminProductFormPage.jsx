@@ -26,6 +26,7 @@ import { formatPrice } from '@/utils/formatPrice';
 import { resolveBadgeLabel } from '@/utils/productTrustBadges';
 import Button from '@/components/ui/Button';
 import ProductContentEditor from '@/components/admin/ProductContentEditor';
+import ProductExtrasEditor from '@/components/admin/ProductExtrasEditor';
 import ProductPreviewDrawer from '@/components/admin/ProductPreviewDrawer';
 import { draftToProduct } from '@/utils/productDraft';
 import {
@@ -88,6 +89,11 @@ const emptyProduct = {
     howToUse: [],
     nutrition: { servingSize: '', rows: [] },
     faqs: [],
+    concerns: [],
+    videos: [],
+    infoBanners: [],
+    clubEligible: true,
+    clubPrice: '',
     stock: '',
     images: [],
     variants: [],
@@ -113,6 +119,9 @@ function makeVariant(patch = {}) {
         stock: '',
         sku: '',
         isDefault: false,
+        units: 1,
+        tag: '',
+        clubPrice: '',
         ...patch,
     };
 }
@@ -163,6 +172,11 @@ export default function AdminProductFormPage() {
                     howToUse: p.howToUse ?? [],
                     nutrition: p.nutrition ?? { servingSize: '', rows: [] },
                     faqs: p.faqs ?? [],
+                    concerns: p.concerns ?? [],
+                    videos: p.videos ?? [],
+                    infoBanners: p.infoBanners ?? [],
+                    clubEligible: p.clubEligible !== false,
+                    clubPrice: p.clubPrice ?? '',
                     stock: p.stock,
                     images: p.images,
                     variants: (p.variants ?? []).map((v) => makeVariant({
@@ -175,6 +189,9 @@ export default function AdminProductFormPage() {
                         stock: v.stock,
                         sku: v.sku ?? '',
                         isDefault: v.isDefault,
+                        units: v.units ?? 1,
+                        tag: v.tag ?? '',
+                        clubPrice: v.clubPrice ?? '',
                     })),
                     isNew: p.isNew,
                     isBestSeller: p.isBestSeller,
@@ -452,6 +469,9 @@ export default function AdminProductFormPage() {
                     stock: Number(v.stock) || 0,
                     sku: v.sku.trim() || null,
                     isDefault: v.isDefault,
+                    units: Math.max(1, Number(v.units) || 1),
+                    tag: String(v.tag ?? '').trim(),
+                    clubPrice: Number(v.clubPrice) > 0 ? Number(v.clubPrice) : null,
                 }))
                 : [];
 
@@ -469,6 +489,11 @@ export default function AdminProductFormPage() {
                 howToUse: form.howToUse.filter((s) => s.trim()),
                 nutrition: { servingSize: form.nutrition.servingSize.trim(), rows: form.nutrition.rows.filter((r) => r.name.trim() && r.value.trim()) },
                 faqs: form.faqs.filter((f) => f.question.trim() && f.answer.trim()),
+                concerns: form.concerns,
+                videos: form.videos.filter((v) => v.url || v.poster),
+                infoBanners: form.infoBanners.filter((b) => b.image),
+                clubEligible: form.clubEligible,
+                clubPrice: Number(form.clubPrice) > 0 ? Number(form.clubPrice) : null,
                 discount: computedDiscount,
                 variants: cleanVariants,
                 // Deliberately NOT sending enable3dPreview: this form has no UI for it, and sending
@@ -692,6 +717,22 @@ export default function AdminProductFormPage() {
                                                 className={fieldClass}
                                                 placeholder="e.g. 250ml, 60 capsules, 180g"
                                             />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid gap-3 sm:grid-cols-3">
+                                        <div>
+                                            <FormLabel>Bottles / packs in this option</FormLabel>
+                                            <input type="number" min="1" max="12" value={v.units} onChange={(e) => updateVariant(i, { units: e.target.value })} className={fieldClass} />
+                                            <p className="mt-1 text-xs text-admin-muted">Shown as that many bottles on the card.</p>
+                                        </div>
+                                        <div>
+                                            <FormLabel>Ribbon (optional)</FormLabel>
+                                            <input value={v.tag} maxLength={40} onChange={(e) => updateVariant(i, { tag: e.target.value })} className={fieldClass} placeholder="e.g. Super saver" />
+                                        </div>
+                                        <div>
+                                            <FormLabel>Club price (₹, optional)</FormLabel>
+                                            <input type="number" min="0" value={v.clubPrice} onChange={(e) => updateVariant(i, { clubPrice: e.target.value })} className={fieldClass} placeholder="Automatic" />
                                         </div>
                                     </div>
 
@@ -1132,7 +1173,9 @@ export default function AdminProductFormPage() {
                         </button>
                     </OptionalSection>
 
-                    <ProductContentEditor form={form} update={update} optional={optional} setOptional={setOptionalSection} />
+                    <ProductContentEditor form={form} update={update} optional={optional} setOptional={setOptionalSection} adminToken={adminToken} />
+
+                    <ProductExtrasEditor form={form} update={update} siteContent={siteContent} adminToken={adminToken} basePrice={price} />
 
                     <OptionalSection
                         icon={CreditCard}

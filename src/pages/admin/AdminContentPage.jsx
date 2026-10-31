@@ -17,6 +17,7 @@ import OfferPanel from '@/components/offer/OfferPanel';
 import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
+import { ConcernsEditor, FeatureRibbonEditor, RibbonMenuEditor, TrendingEditor, WatchShopEditor } from '@/components/admin/StorefrontEditors';
 import HeroProductPicker from '@/components/admin/HeroProductPicker';
 import { DayRitualEditor, HerbsEditor, PacksEditor, RoutinesEditor } from '@/components/admin/SectionEditors';
 import {
@@ -61,10 +62,12 @@ const TAB_GROUPS = [
 const SECTION_LABELS = {
     hero: 'Hero Banner',
     videoBanner: 'Video Banner',
-    brandMarquee: 'Brand Marquee',
+    brandMarquee: 'Running Ribbon (delivery · payments · purity)',
+    trending: 'Trending Now (search chips)',
+    watchShop: 'Watch & Shop (videos)',
     banners: 'Image Banners (Stacked)',
     bannerSlider: 'Full-width Banner Slider',
-    categoryShelves: 'The Range (filterable product rail)',
+    categoryShelves: 'The Range (category buttons that follow the scroll)',
     categories: 'Shop by Need (tiles)',
     routineBuilder: 'Build Your Routine (goal-based, add all to bag)',
     dayRitual: 'Your Day, Ritualised (scroll story with shop-the-routine)',
@@ -85,9 +88,11 @@ const SECTION_LABELS = {
  */
 const SECTION_META = {
     hero: { tag: 'core', title: 'Hero', desc: 'The first screen: your headline and a showcase of product cards. Needs: products with a cover photo (pick up to 5 below, or leave it on automatic).' },
-    brandMarquee: { tag: 'core', title: 'Trust strip', desc: 'A single line of promises under the hero (certified, lab tested, free delivery). Needs: only your short phrases.' },
+    brandMarquee: { tag: 'core', title: 'Running ribbon', desc: 'A slow-moving ribbon under the top banner: free delivery, secure payments, pure herbs. Needs: nothing (it is built from your delivery settings); edit the lines below if you wish.' },
+    trending: { tag: 'core', title: 'Trending now', desc: 'Quick search words under the banner. Needs: nothing (built from your products), or write your own words.' },
+    watchShop: { tag: 'core', title: 'Watch & Shop', desc: 'Short videos, each with a Buy now for its product. Needs: videos and the product each one sells. Hides itself while empty.' },
     categories: { tag: 'core', title: 'Shop by need', desc: 'Large goal tiles that lead into your shop. Needs: a photo on each category (Categories page).' },
-    categoryShelves: { tag: 'core', title: 'The range', desc: 'A browsable product rail with category filters. Needs: products in your categories.' },
+    categoryShelves: { tag: 'core', title: 'The range', desc: 'The whole shop on one page: buttons for New Launches, Bestsellers and every category that follow the scroll, with each category\'s products beneath. Needs: products in your categories.' },
     dayRitual: { tag: 'core', title: 'Your day, ritualised', desc: 'A scroll story of moments in a day, one product each, with add-to-bag. Needs: at least 3 products in stock.' },
     bannerSlider: { tag: 'core', title: 'Campaign banner', desc: 'A full-width slider of your offers, or one video. Needs: wide banner images (and a phone version).' },
     bundles: { tag: 'core', title: 'Bundle & save offers', desc: 'Your bundle deals. Needs: at least one bundle (Bundles page). Hides itself when there are none.' },
@@ -450,9 +455,15 @@ export default function AdminContentPage() {
             case 'brandMarquee':
                 return (
                     <div className="pt-3">
-                        <StringListEditor items={content.marquee.items} onChange={(items) => update('marquee', { items })} placeholder="Marquee item" />
+                        <FeatureRibbonEditor content={content} onChange={updateExtras} />
                     </div>
                 );
+
+            case 'trending':
+                return <div className="pt-3"><TrendingEditor extras={content.extras} onChange={updateExtras} /></div>;
+
+            case 'watchShop':
+                return <div className="pt-3"><WatchShopEditor extras={content.extras} onChange={updateExtras} adminToken={adminToken} products={products} /></div>;
 
             case 'whyChoose':
                 return (
@@ -766,11 +777,18 @@ export default function AdminContentPage() {
                                         onChange={(e) => updateExtras({ nav: { ...content.extras.nav, mode: e.target.value } })}
                                         className="w-full sm:w-96"
                                         options={[
-                                            { value: 'categories', label: 'My categories (recommended — product first)' },
+                                            { value: 'ribbon', label: 'New Launches · Concern · Offers · Club Card · WhatsApp Help (recommended)' },
+                                            { value: 'categories', label: 'My categories (the older product-first bar)' },
                                             { value: 'links', label: 'My own list of links (About, FAQ, …)' },
                                         ]}
                                     />
                                 </AdminField>
+                                {content.extras.nav.mode === 'ribbon' && (
+                                    <>
+                                        <p className="text-caption text-admin-muted">Rename an item or switch it off below. Offers lists every live page from <Link to={`${ADMIN_PATH}/offers`} className="font-medium text-primary hover:underline">Offers</Link>; the Club Card goes to the sign-up page (<Link to={`${ADMIN_PATH}/club`} className="font-medium text-primary hover:underline">Chikit Club</Link>).</p>
+                                        <RibbonMenuEditor extras={content.extras} onChange={updateExtras} />
+                                    </>
+                                )}
                                 {content.extras.nav.mode === 'categories' && (
                                     <>
                                         <label className="flex items-center gap-3 cursor-pointer">
@@ -819,23 +837,8 @@ export default function AdminContentPage() {
                                 />
                             </AdminSection>
 
-                            <AdminSection title="Shop by concern" description="Health goals shown under the categories on the homepage (e.g. Digestion, Hair care). Each opens the shop filtered by the keyword you set. Up to 8.">
-                                {content.extras.concerns.map((item, index) => {
-                                    const patch = (change) => updateExtras({ concerns: content.extras.concerns.map((c, i) => (i === index ? { ...c, ...change } : c)) });
-                                    return (
-                                        <div key={index} className="space-y-3 rounded-lg border border-admin-border p-4">
-                                            <div className="grid gap-3 sm:grid-cols-2">
-                                                <AdminField label="Name"><Input value={item.label} maxLength={40} placeholder="Digestion" onChange={(e) => patch({ label: e.target.value })} /></AdminField>
-                                                <AdminField label="Shop keyword" hint="Matches product name, description or category."><Input value={item.search} maxLength={60} placeholder="digest" onChange={(e) => patch({ search: e.target.value })} /></AdminField>
-                                            </div>
-                                            <ImageUploadField label="Image (optional)" value={item.image} onChange={(v) => patch({ image: v })} adminToken={adminToken} />
-                                            <Button variant="outline" size="sm" onClick={() => updateExtras({ concerns: content.extras.concerns.filter((_, i) => i !== index) })}>Remove</Button>
-                                        </div>
-                                    );
-                                })}
-                                {content.extras.concerns.length < 8 && (
-                                    <Button variant="outline" size="sm" className="w-fit" onClick={() => updateExtras({ concerns: [...content.extras.concerns, { label: '', search: '', image: '' }] })}>Add concern</Button>
-                                )}
+                            <AdminSection title="Concern menu" description="The health goals in the Concern drop-down (and their own pages). Switch any off, rename it, or add your own; the keywords decide which products appear.">
+                                <ConcernsEditor extras={content.extras} onChange={updateExtras} adminToken={adminToken} />
                             </AdminSection>
 
                         </>

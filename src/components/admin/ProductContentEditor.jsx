@@ -1,5 +1,6 @@
 import { FlaskConical, HelpCircle, ListOrdered, Plus, Salad, Trash2 } from 'lucide-react';
 import { OptionalSection, fieldClass } from '@/components/admin/AdminFormUi';
+import { ImageUploadField } from '@/components/admin/ContentEditor';
 
 const addButton = 'inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary-soft px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary-tint';
 const removeButton = 'shrink-0 rounded-lg p-2.5 text-danger transition-colors hover:bg-danger-tint';
@@ -17,7 +18,7 @@ function RowRemove({ onClick, label }) {
  * Shown on the storefront as extra tabs (only the ones that have content). Lives in the product form state
  * as `ingredients`, `howToUse`, `nutrition` and `faqs`.
  */
-export default function ProductContentEditor({ form, update, optional, setOptional }) {
+export default function ProductContentEditor({ form, update, optional, setOptional, adminToken }) {
     const setRow = (key, index, patch) => update(key, form[key].map((item, i) => (i === index ? { ...item, ...patch } : item)));
     const removeRow = (key, index) => update(key, form[key].filter((_, i) => i !== index));
 
@@ -29,16 +30,19 @@ export default function ProductContentEditor({ form, update, optional, setOption
             <OptionalSection
                 icon={FlaskConical}
                 title="Key ingredients"
-                description="What's inside and why it matters — shown as an Ingredients tab"
+                description="What's inside and why it matters: shown as the “Hero ingredients” section with its picture"
                 enabled={optional.ingredients}
                 onToggle={(v) => setOptional('ingredients', v)}
             >
                 <div className="space-y-3">
                     {form.ingredients.map((item, i) => (
-                        <div key={i} className="flex flex-col gap-2 sm:flex-row">
-                            <input value={item.name} onChange={(e) => setRow('ingredients', i, { name: e.target.value })} className={`${fieldClass} sm:w-1/3`} placeholder="Ingredient (e.g. Ashwagandha)" aria-label={`Ingredient ${i + 1} name`} />
-                            <input value={item.benefit} onChange={(e) => setRow('ingredients', i, { benefit: e.target.value })} className={fieldClass} placeholder="Benefit / what it does" aria-label={`Ingredient ${i + 1} benefit`} />
-                            <RowRemove onClick={() => removeRow('ingredients', i)} label={`Remove ingredient ${i + 1}`} />
+                        <div key={i} className="space-y-2 rounded-xl border border-admin-border-light p-3">
+                            <div className="flex flex-col gap-2 sm:flex-row">
+                                <input value={item.name} onChange={(e) => setRow('ingredients', i, { name: e.target.value })} className={`${fieldClass} sm:w-1/3`} placeholder="Ingredient (e.g. Ashwagandha)" aria-label={`Ingredient ${i + 1} name`} />
+                                <input value={item.benefit} onChange={(e) => setRow('ingredients', i, { benefit: e.target.value })} className={fieldClass} placeholder="Benefit / what it does" aria-label={`Ingredient ${i + 1} benefit`} />
+                                <RowRemove onClick={() => removeRow('ingredients', i)} label={`Remove ingredient ${i + 1}`} />
+                            </div>
+                            <ImageUploadField label="Picture" hint="A square picture of the ingredient. It is shown round." value={item.image} onChange={(v) => setRow('ingredients', i, { image: v })} adminToken={adminToken} />
                         </div>
                     ))}
                 </div>

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import crypto from 'node:crypto';
-import { requireCustomer } from '../lib/auth.js';
+import { requireCustomer, requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError } from '../lib/response.js';
 import { getPool } from '../lib/db.js';
 import { checkRateLimit } from '../lib/rateLimiter.js';
@@ -178,5 +178,32 @@ router.post('/club/join', asyncRoute(async (req, res) => {
     });
     sendJson(res, publicUser(await users.getById(user.id)), 201);
 }, 'Failed to join the club'));
+
+// ── Admin ───────────────────────────────────────────────────────────────
+
+/** Everyone who has joined, newest first, with what the club asked for at sign-up. */
+router.get('/club/admin/members', asyncRoute(async (req, res) => {
+    requireAdmin(req);
+    const [rows] = await getPool().query(
+        `SELECT u.id, u.name, u.email, u.phone, u.dob, u.gender, u.club_card_no, u.club_joined_at,
+                (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id AND o.status NOT IN ('cancelled', 'returned')) AS orders,
+                (SELECT COALESCE(SUM(o.total), 0) FROM orders o WHERE o.user_id = u.id AND o.status NOT IN ('cancelled', 'returned')) AS spent
+           FROM users u WHERE u.club_member = 1 ORDER BY u.club_joined_at DESC`,
+    );
+    sendJson(res, rows.map((r) => ({
+        id: r.id, name: r.name, email: r.email, phone: r.phone, dob: r.dob ? String(r.dob).slice(0, 10) : null, gender: r.gender,
+        cardNo: r.club_card_no, joinedAt: r.club_joined_at ? new Date(`${String(r.club_joined_at).replace(' ', 'T')}Z`).toISOString() : null,
+        orders: Number(r.orders), spent: Number(r.spent),
+    })));
+}, 'Failed to list members'));
+
+/** Take a person out of the club (their account and orders stay). */
+router.delete('/club/admin/members/:id', asyncRoute(async (req, res) => {
+    requireAdmin(req);
+    const user = await users.getById(req.params.id);
+    if (!user) return sendError(res, 'Customer not found', 404);
+    await getPool().query('UPDATE users SET club_member = 0 WHERE id = ?', [user.id]);
+    sendJson(res, { success: true });
+}, 'Failed to remove member'));
 
 export default router;

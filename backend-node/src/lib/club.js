@@ -32,13 +32,14 @@ export function resetClubConfigCache() {
     cached = null;
 }
 
-const round2 = (n) => Math.round(n * 100) / 100;
+// Prices in the shop are whole rupees, so a member price is too (what is shown is exactly what is charged).
+const wholeRupees = (n) => Math.round(n);
 
 /** The member price for one price point, or null when there is no member saving on it. */
 export function memberPriceFor({ price, clubPrice = null, eligible = true }, cfg) {
     if (!cfg?.enabled || eligible === false) return null;
     const own = Number(clubPrice);
-    const member = own > 0 ? own : round2(Number(price) * (1 - (cfg.discountPercent || 0) / 100));
+    const member = own > 0 ? own : wholeRupees(Number(price) * (1 - (cfg.discountPercent || 0) / 100));
     return member > 0 && member < Number(price) ? member : null;
 }
 

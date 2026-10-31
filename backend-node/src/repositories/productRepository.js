@@ -178,6 +178,7 @@ export class ProductRepository extends BaseRepository {
             sku: r.sku,
             isDefault: this.bool(r.is_default),
             units: Math.max(1, Number(r.units ?? 1) || 1),
+            tag: r.tag ?? '',
             clubPrice: r.club_price === null || r.club_price === undefined ? null : Number(r.club_price),
         };
     }
@@ -210,8 +211,8 @@ export class ProductRepository extends BaseRepository {
             const price = Number(v.price || 0);
             const original = Number(v.originalPrice ?? price);
             await this.pool().query(
-                `INSERT INTO product_variants (id, product_id, label, net_quantity, image, price, original_price, discount, stock, sku, is_default, sort_order, created_at, updated_at, units, club_price)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                `INSERT INTO product_variants (id, product_id, label, net_quantity, image, price, original_price, discount, stock, sku, is_default, sort_order, created_at, updated_at, units, club_price, tag)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     v.id || generateId('variant'),
                     productId,
@@ -229,6 +230,7 @@ export class ProductRepository extends BaseRepository {
                     now,
                     Math.min(12, Math.max(1, Number.parseInt(v.units ?? 1, 10) || 1)),
                     Number(v.clubPrice) > 0 ? Number(v.clubPrice) : null,
+                    String(v.tag ?? '').trim().slice(0, 40) || null,
                 ],
             );
         }

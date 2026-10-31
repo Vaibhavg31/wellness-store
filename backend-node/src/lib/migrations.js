@@ -76,6 +76,7 @@ const COLUMNS = [
     // Pack options: how many bottles/packs a variant holds (drawn as that many bottles) and its own member price.
     ['product_variants', 'units', 'INT NOT NULL DEFAULT 1'],
     ['product_variants', 'club_price', 'DECIMAL(10,2) NULL'],
+    ['product_variants', 'tag', 'VARCHAR(40) NULL'], // the little ribbon on a pack option, e.g. "Super Saver"
     // Chikit Club members.
     ['users', 'dob', 'DATE NULL'],
     ['users', 'gender', 'VARCHAR(20) NULL'],

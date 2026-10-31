@@ -51,6 +51,8 @@ export const pageLoaders = {
     AdminMediaPage: () => import('@/pages/admin/AdminMediaPage'),
     AdminCouponsPage: () => import('@/pages/admin/AdminCouponsPage'),
     AdminBundlesPage: () => import('@/pages/admin/AdminBundlesPage'),
+    AdminOffersPage: () => import('@/pages/admin/AdminOffersPage'),
+    AdminClubPage: () => import('@/pages/admin/AdminClubPage'),
 };
 
 /** [path prefix, loader names]. More specific prefixes come first; matched on whole path segments. */
@@ -85,7 +87,7 @@ const ROUTES = [
 const ADMIN_PAGES = {
     analytics: 'AdminAnalyticsPage', products: 'AdminProductsPage', categories: 'AdminCategoriesPage', reviews: 'AdminReviewsPage', feedback: 'AdminFeedbackPage',
     orders: 'AdminOrdersPage', 'direct-orders': 'AdminDirectOrdersPage', users: 'AdminUsersPage', coupons: 'AdminCouponsPage',
-    bundles: 'AdminBundlesPage', content: 'AdminContentPage', media: 'AdminMediaPage', settings: 'AdminSettingsPage',
+    bundles: 'AdminBundlesPage', offers: 'AdminOffersPage', club: 'AdminClubPage', content: 'AdminContentPage', media: 'AdminMediaPage', settings: 'AdminSettingsPage',
 };
 
 const started = new Set();

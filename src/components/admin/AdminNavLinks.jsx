@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, BarChart3, Package, FolderOpen, Star, MessageSquare, Settings, ShoppingBag, PenLine, Tag, Gift, UserPlus, Users, Images } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Package, FolderOpen, Star, MessageSquare, Settings, ShoppingBag, PenLine, Tag, Gift, UserPlus, Users, Images, Crown, Percent } from 'lucide-react';
 import { ADMIN_PATH } from '@/contexts/AuthContext';
 import { cn } from '@/utils/formatPrice';
 
@@ -19,6 +19,7 @@ export const adminNavGroups = [
             { label: 'Orders', href: `${ADMIN_PATH}/orders`, icon: ShoppingBag },
             { label: 'Create order', href: `${ADMIN_PATH}/direct-orders`, icon: UserPlus },
             { label: 'Coupons', href: `${ADMIN_PATH}/coupons`, icon: Tag },
+            { label: 'Offers', href: `${ADMIN_PATH}/offers`, icon: Percent },
         ],
     },
     {
@@ -33,6 +34,7 @@ export const adminNavGroups = [
         label: 'Customers',
         items: [
             { label: 'Customers', href: `${ADMIN_PATH}/users`, icon: Users },
+            { label: 'Chikit Club', href: `${ADMIN_PATH}/club`, icon: Crown },
             { label: 'Reviews', href: `${ADMIN_PATH}/reviews`, icon: Star },
             { label: 'Messages', href: `${ADMIN_PATH}/feedback`, icon: MessageSquare },
         ],

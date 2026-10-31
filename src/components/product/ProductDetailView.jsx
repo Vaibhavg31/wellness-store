@@ -12,6 +12,8 @@ import DeliveryCheck from '@/components/product/DeliveryCheck';
 import OffersList from '@/components/product/OffersList';
 import PaymentAssurance from '@/components/product/PaymentAssurance';
 import ExpertChat from '@/components/product/ExpertChat';
+import ClubPrice from '@/components/product/ClubPrice';
+import { HeroIngredients, InfoBanners, ProductFaq, ProductVideos } from '@/components/product/ProductSections';
 import { Banner } from '@/components/home/BannerSection';
 import Button from '@/components/ui/Button';
 import Price from '@/components/ui/Price';
@@ -43,7 +45,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
     const { products } = useProducts();
     const { bundles } = useBundles();
     const { categories } = useCategories();
-    const { addToCart } = useCart();
+    const { addToCart, isMember } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { showToast } = useToast();
     const { content } = useSiteContent();
@@ -91,9 +93,13 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
         ? [activeVariant.image, ...product.images.filter((img) => img !== activeVariant.image)]
         : product.images;
 
-    const price = activeVariant ? activeVariant.price : product.price;
-    const originalPrice = activeVariant ? activeVariant.originalPrice : product.originalPrice;
-    const discount = activeVariant ? activeVariant.discount : product.discount;
+    const listPrice = activeVariant ? activeVariant.price : product.price;
+    const memberPrice = (activeVariant ? activeVariant.memberPrice : product.memberPrice) ?? null;
+    // A signed-in club member sees (and pays) the member price; everyone else sees what joining would save.
+    const memberView = Boolean(isMember && memberPrice);
+    const price = memberView ? memberPrice : listPrice;
+    const originalPrice = memberView ? listPrice : (activeVariant ? activeVariant.originalPrice : product.originalPrice);
+    const discount = memberView ? 0 : (activeVariant ? activeVariant.discount : product.discount);
     const stock = activeVariant ? activeVariant.stock : product.stock;
     const outOfStock = stock <= 0;
 
@@ -175,10 +181,11 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                             <Price price={price} originalPrice={originalPrice} size="lg" />
                             {discount > 0 && <span className="rounded-full bg-primary-tint px-2.5 py-0.5 text-caption font-semibold text-primary-deep">{discount}% off</span>}
                             {originalPrice > price && <span className="text-small font-medium text-success">You save {formatPrice(originalPrice - price)}</span>}
+                            <ClubPrice memberPrice={memberPrice} className="py-1" />
                         </div>
 
                         {hasVariants && (
-                            <div className="mt-8"><VariantPicker variants={variants} activeId={activeVariant?.id} onChange={setSelectedVariantId} /></div>
+                            <div className="mt-8"><VariantPicker variants={variants} activeId={activeVariant?.id} onChange={setSelectedVariantId} productImage={product.images?.[0]} isMember={isMember} /></div>
                         )}
 
                         {outOfStock ? (
@@ -223,6 +230,11 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                     <ExpertChat product={product} />
                 </div>
             </div>
+
+            <HeroIngredients product={product} />
+            <InfoBanners product={product} />
+            <ProductFaq product={product} />
+            <ProductVideos product={product} />
 
             {productBanners.length > 0 && (
                 <div className="container-page grid gap-4 pb-12 lg:pb-20">{productBanners.map((b) => <Banner key={b.id} banner={b} />)}</div>

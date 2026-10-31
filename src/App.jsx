@@ -71,6 +71,8 @@ const AdminContentPage = lazy(pageLoaders.AdminContentPage);
 const AdminMediaPage = lazy(pageLoaders.AdminMediaPage);
 const AdminCouponsPage = lazy(pageLoaders.AdminCouponsPage);
 const AdminBundlesPage = lazy(pageLoaders.AdminBundlesPage);
+const AdminOffersPage = lazy(pageLoaders.AdminOffersPage);
+const AdminClubPage = lazy(pageLoaders.AdminClubPage);
 
 const STOREFRONT_ROUTES = [
     { path: 'shop', Page: ShopPage },
@@ -119,6 +121,8 @@ const ADMIN_ROUTES = [
     { path: 'users', Page: AdminUsersPage },
     { path: 'coupons', Page: AdminCouponsPage },
     { path: 'bundles', Page: AdminBundlesPage },
+    { path: 'offers', Page: AdminOffersPage },
+    { path: 'club', Page: AdminClubPage },
     { path: 'content', Page: AdminContentPage },
     { path: 'media', Page: AdminMediaPage },
     { path: 'settings', Page: AdminSettingsPage },

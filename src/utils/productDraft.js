@@ -31,6 +31,8 @@ export function draftToProduct(form, { variantsOn = false } = {}) {
                 stock: number(v.stock),
                 sku: text(v.sku) || null,
                 isDefault: Boolean(v.isDefault),
+                units: Math.max(1, number(v.units) || 1),
+                tag: text(v.tag),
             };
         })
         : [];
@@ -70,6 +72,9 @@ export function draftToProduct(form, { variantsOn = false } = {}) {
             rows: (form.nutrition?.rows ?? []).filter((r) => text(r.name) && text(r.value)),
         },
         faqs: (form.faqs ?? []).filter((f) => text(f.question) && text(f.answer)),
+        concerns: form.concerns ?? [],
+        videos: (form.videos ?? []).filter((v) => v.url || v.poster),
+        infoBanners: (form.infoBanners ?? []).filter((b) => b.image),
         variants,
         hasVariants: variants.length > 0,
         isNew: Boolean(form.isNew),

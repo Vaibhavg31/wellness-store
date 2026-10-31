@@ -32,22 +32,6 @@ function ReviewList({ reviews }) {
     );
 }
 
-function Ingredients({ items }) {
-    return (
-        <ul className="grid gap-3 sm:grid-cols-2">
-            {items.map((item) => (
-                <li key={item.name} className="flex gap-3 rounded-lg border border-line bg-surface p-3">
-                    {item.image && <img src={imageUrl(item.image)} alt="" width="48" height="48" loading="lazy" className="size-12 shrink-0 rounded-md object-cover" />}
-                    <div className="min-w-0">
-                        <p className="text-small font-semibold text-ink">{item.name}</p>
-                        {item.benefit && <p className="text-caption text-muted">{item.benefit}</p>}
-                    </div>
-                </li>
-            ))}
-        </ul>
-    );
-}
-
 function HowToUse({ steps }) {
     return (
         <ol className="space-y-3">
@@ -86,24 +70,6 @@ function Nutrition({ nutrition }) {
     );
 }
 
-function Faqs({ items }) {
-    return (
-        <ul className="space-y-2">
-            {items.map((faq) => (
-                <li key={faq.question}>
-                    <details className="group rounded-lg border border-line bg-surface">
-                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 text-small font-medium text-ink [&::-webkit-details-marker]:hidden">
-                            {faq.question}
-                            <span className="text-primary transition-transform group-open:rotate-45" aria-hidden="true">+</span>
-                        </summary>
-                        <p className="px-4 pb-4 text-small text-muted">{faq.answer}</p>
-                    </details>
-                </li>
-            ))}
-        </ul>
-    );
-}
-
 export default function ProductTabs({ product, reviews }) {
     const [active, setActive] = useState('description');
     const baseId = useId();
@@ -111,11 +77,9 @@ export default function ProductTabs({ product, reviews }) {
     // Tabs appear only when the product actually has that content.
     const tabs = useMemo(() => [
         { id: 'description', label: 'Description' },
-        product.ingredients?.length > 0 && { id: 'ingredients', label: 'Ingredients' },
         product.features?.length > 0 && { id: 'features', label: 'Features' },
         product.howToUse?.length > 0 && { id: 'how-to-use', label: 'How to use' },
         product.nutrition?.rows?.length > 0 && { id: 'nutrition', label: 'Nutrition' },
-        product.faqs?.length > 0 && { id: 'faqs', label: 'FAQs' },
         { id: 'reviews', label: 'Reviews', count: reviews.length },
     ].filter(Boolean), [product, reviews.length]);
 
@@ -152,7 +116,6 @@ export default function ProductTabs({ product, reviews }) {
 
             <div id={`${baseId}-panel-${active}`} role="tabpanel" aria-labelledby={`${baseId}-tab-${active}`} className="animate-fade-in">
                 {active === 'description' && <p className="text-muted">{product.description}</p>}
-                {active === 'ingredients' && <Ingredients items={product.ingredients} />}
                 {active === 'features' && (
                     <ul className="space-y-3">
                         {product.features.map((feature) => (
@@ -164,7 +127,6 @@ export default function ProductTabs({ product, reviews }) {
                 )}
                 {active === 'how-to-use' && <HowToUse steps={product.howToUse} />}
                 {active === 'nutrition' && <Nutrition nutrition={product.nutrition} />}
-                {active === 'faqs' && <Faqs items={product.faqs} />}
                 {active === 'reviews' && <ReviewList reviews={reviews} />}
             </div>
         </div>

@@ -111,7 +111,8 @@ export default function CategoryScroller({ products, loading }) {
         const update = () => {
             frame = 0;
             if (Date.now() < clickLock.current) return;
-            const line = (barRef.current?.getBoundingClientRect().bottom ?? 0) + 24;
+            // A little below the bar, so a section that has just been scrolled to counts even while the phone header is still tucking away.
+            const line = (barRef.current?.getBoundingClientRect().bottom ?? 0) + 100;
             let current = '';
             for (const s of sections) {
                 const node = document.getElementById(`range-${s.id}`);

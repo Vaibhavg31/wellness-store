@@ -86,7 +86,7 @@
   --animate-slide-in-right: slide-in-right 0.3s var(--ease-out-soft) both;
   --animate-shimmer: shimmer 1.6s linear infinite;
   --animate-draw-check: draw-check 0.5s 0.15s ease-out forwards;
-  --animate-page-in: page-in 0.35s var(--ease-out-soft) both;
+  --animate-page-in: page-in 0.35s var(--ease-out-soft) backwards; /* backwards, not both: a held final transform would make every page a containing block and break position: fixed bars */
   --animate-pop: pop 0.4s var(--ease-out-soft) both;
   --animate-edge-in-right: edge-in-right 0.6s var(--ease-out-soft) both;
   --animate-edge-in-left: edge-in-left 0.6s var(--ease-out-soft) both;
