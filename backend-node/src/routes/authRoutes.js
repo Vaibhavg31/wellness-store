@@ -52,7 +52,7 @@ function isMsg91ServiceFailure(result) {
     return error.includes('auth key') || error.includes('balance') || error.includes('network') || error.includes('not configured');
 }
 
-function publicUser(user) {
+export function publicUser(user) {
     return {
         id: user.id || '',
         email: user.email || '',
@@ -63,6 +63,9 @@ function publicUser(user) {
         emailVerified: isEmailVerified(user),
         addresses: user.addresses || [],
         lastUsedAddressId: user.lastUsedAddressId ?? null,
+        dob: user.dob ?? null,
+        gender: user.gender ?? null,
+        club: { member: Boolean(user.clubMember), cardNo: user.clubMember ? (user.clubCardNo ?? null) : null, joinedAt: user.clubMember ? (user.clubJoinedAt ?? null) : null },
     };
 }
 
@@ -73,7 +76,7 @@ export function isEmailVerified(user) {
     return false;
 }
 
-function shouldSkipEmailVerify() {
+export function shouldSkipEmailVerify() {
     return String(process.env.SKIP_EMAIL_VERIFY || 'false').toLowerCase() === 'true';
 }
 

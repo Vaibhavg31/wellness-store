@@ -1,12 +1,13 @@
 
-export function filterProducts(products, filters) {
+import { searchProducts } from '@/utils/searchProducts';
+
+/**
+ * Applies the shop's filters and sort. A search keeps its best-match-first order unless a different sort is picked
+ * (the 'relevance' sort), so what the shopper typed is what comes first.
+ */
+export function filterProducts(products, filters, categories = []) {
     let result = [...products];
-    if (filters.search.trim()) {
-        const query = filters.search.toLowerCase();
-        result = result.filter((p) => p.title.toLowerCase().includes(query) ||
-            p.description.toLowerCase().includes(query) ||
-            p.category.toLowerCase().includes(query));
-    }
+    if (filters.search.trim()) result = searchProducts(result, filters.search, { categories });
     if (filters.category !== 'all') {
         result = result.filter((p) => p.category === filters.category);
     }
@@ -25,6 +26,8 @@ export function filterProducts(products, filters) {
         case 'popularity':
             result.sort((a, b) => b.reviewCount - a.reviewCount);
             break;
+        case 'relevance':
+            break; // already in best-match order from the search above
         case 'newest':
         default:
             result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));

@@ -62,6 +62,10 @@
   .card-lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
   .scrollbar-none::-webkit-scrollbar { display: none; }
 
+  /* Running ribbon: two identical copies side by side, slid left by half their width, so the loop has no seam. */
+  .marquee-track { display: flex; width: max-content; animation: var(--animate-marquee); }
+  .marquee:hover .marquee-track, .marquee:focus-within .marquee-track { animation-play-state: paused; }
+
   /* Price slider: plum fill up to the thumb, quiet track after it. */
   .price-range { -webkit-appearance: none; appearance: none; height: 2.25rem; background: transparent; cursor: pointer; }
   .price-range::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: linear-gradient(to right, var(--color-primary) var(--fill, 100%), var(--color-line) var(--fill, 100%)); }
@@ -90,4 +94,8 @@
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .reveal { opacity: 1; transform: none; }
+  /* Reduced motion: the ribbon stops and can be scrolled by hand instead of running. */
+  .marquee { overflow-x: auto; scrollbar-width: none; }
+  .marquee-track { animation: none !important; }
+  .marquee-track > [data-marquee-copy="2"] { display: none; }
 }

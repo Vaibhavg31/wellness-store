@@ -174,3 +174,26 @@ export function useReviews(productId) {
     }, [fetchReviews]);
     return { reviews, loading, refetch: fetchReviews };
 }
+
+// The header, the phone menu and the offer pages all ask for the offers; share one request for a minute.
+let offersRequest = null;
+let offersFetchedAt = 0;
+const fetchOffers = () => {
+    if (!offersRequest || Date.now() - offersFetchedAt > 60_000) {
+        offersFetchedAt = Date.now();
+        offersRequest = api.get('/api/offers').then((data) => (Array.isArray(data) ? data : [])).catch(() => { offersRequest = null; return []; });
+    }
+    return offersRequest;
+};
+
+/** The offer pages that are live right now ("Pick any 3", "Buy 1 Get 1 Free" …). */
+export function useOffers() {
+    const [offers, setOffers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        let cancelled = false;
+        fetchOffers().then((data) => { if (!cancelled) { setOffers(data); setLoading(false); } });
+        return () => { cancelled = true; };
+    }, []);
+    return { offers, loading };
+}

@@ -1,6 +1,6 @@
 /** 'digestive-health' → 'Digestive Health' (fallback when a category label isn't loaded). */
 export function humanizeSlug(slug = '') {
-    return String(slug).replace(/[-_]+/g, ' ').replace(/w/g, (c) => c.toUpperCase());
+    return String(slug).replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export function getFeaturedProducts(products) {

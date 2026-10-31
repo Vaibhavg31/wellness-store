@@ -26,13 +26,13 @@ function pickBestOffer(coupons, subtotal) {
     return { offer: closest, qualifies: false };
 }
 
-const lineKey = ({ product }) => `${product.id}-${product.variantId || ''}-${product.bundleId || ''}`;
+const lineKey = ({ product }) => `${product.id}-${product.variantId || ''}-${product.bundleId || ''}-${product.offerId || ''}-${product.offerGroup || ''}`;
 
 export default function CartDrawer() {
     const {
-        items, isDrawerOpen, closeCartDrawer, updateQuantity, removeFromCart, itemCount, subtotal,
+        items, isDrawerOpen, closeCartDrawer, updateQuantity, removeFromCart, removeOfferGroup, itemCount, subtotal,
         showFreeDeliveryUpsell, amountUntilFreeDelivery, freeDeliveryProgress,
-        couponCode, couponDetails, autoAppliedCoupon, applyCoupon, removeCoupon,
+        couponCode, couponDetails, autoAppliedCoupon, applyCoupon, removeCoupon, isMember,
     } = useCart();
     const { isAuthenticated } = useAuth();
     const { showToast, dismissAll } = useToast();
@@ -74,24 +74,31 @@ export default function CartDrawer() {
                                 <div className="min-w-0 flex-1">
                                     <p className="line-clamp-2 text-small font-medium text-ink">{item.product.title}</p>
                                     {item.product.bundleTitle && <p className="mt-0.5 text-caption text-accent-ink">Part of {item.product.bundleTitle}</p>}
+                                    {item.product.offerTitle && <p className="mt-0.5 text-caption text-accent-ink">{item.product.offerTitle}</p>}
+                                    {!item.product.offerId && !item.product.bundleId && isMember && item.product.memberPrice && item.product.price === item.product.memberPrice && <p className="mt-0.5 text-caption text-accent-ink">Chikit Club price</p>}
                                     <div className="mt-2 flex items-center justify-between gap-2">
-                                        {item.product.bundleId ? (
+                                        {item.product.bundleId || item.product.offerGroup ? (
                                             <span className="text-caption text-muted">Qty {item.quantity}</span>
                                         ) : (
                                             <QuantityStepper
                                                 value={item.quantity}
+                                                min={item.product.offerKind === 'bogo' ? 2 : 1}
+                                                step={item.product.offerKind === 'bogo' ? 2 : 1}
                                                 max={item.product.stock ?? 99}
-                                                onChange={(q) => updateQuantity(item.product.id, q, { variantId: item.product.variantId })}
+                                                onChange={(q) => updateQuantity(item.product.id, q, { variantId: item.product.variantId, offerId: item.product.offerId })}
                                                 className="scale-90 origin-left"
                                             />
                                         )}
-                                        <span className="text-small font-semibold text-ink">{formatPrice(item.product.price * item.quantity)}</span>
+                                        <span className="flex items-baseline gap-1.5">
+                                            {item.product.originalPrice > item.product.price && <span className="text-caption text-muted line-through">{formatPrice(item.product.originalPrice * item.quantity)}</span>}
+                                            <span className="text-small font-semibold text-ink">{formatPrice(item.product.price * item.quantity)}</span>
+                                        </span>
                                     </div>
                                 </div>
                                 {!item.product.bundleId && (
                                     <button
                                         type="button"
-                                        onClick={() => removeFromCart(item.product.id, { variantId: item.product.variantId })}
+                                        onClick={() => (item.product.offerGroup ? removeOfferGroup(item.product.offerGroup) : removeFromCart(item.product.id, { variantId: item.product.variantId, offerId: item.product.offerId }))}
                                         className="grid size-9 shrink-0 place-items-center self-start rounded-full text-muted hover:bg-danger-tint hover:text-danger"
                                         aria-label={`Remove ${item.product.title}`}
                                     >

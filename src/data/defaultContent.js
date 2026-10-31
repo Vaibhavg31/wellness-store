@@ -36,7 +36,7 @@ export const DEFAULT_SITE_CONTENT = {
         accentColor: '#C08A3E',
         accentLight: '#D8A860',
         tintColor: '#F1E4F2',
-        backgroundColor: '#FDF9F4',
+        backgroundColor: '#F4EBDD',
         textColor: '#241720',
         fontHeading: '"Lora", Georgia, serif',
         fontBody: '"Poppins", system-ui, sans-serif',
@@ -75,19 +75,21 @@ export const DEFAULT_SITE_CONTENT = {
 
     navLinks: NAV_LINKS,
 
-    // Launch landing page, top to bottom: Core sections on, optional extras off (the admin can reorder or switch any).
+    // Landing page (client brief v1): banner, running feature ribbon, trending, the whole range by category, Watch & Shop, trust, reviews. The earlier hero, shop-by-need, day ritual and bundles are off but still available.
     sections: {
-        hero: true,
-        brandMarquee: true,
-        categories: true,
-        categoryShelves: true,
-        dayRitual: true,
         bannerSlider: true,
-        bundles: true,
+        brandMarquee: true,
+        trending: true,
+        categoryShelves: true,
+        watchShop: true,
         whyChoose: true,
         reviews: true,
         newsletter: true,
         promoBanner: true,
+        hero: false,
+        categories: false,
+        dayRitual: false,
+        bundles: false,
         routineBuilder: false,
         packExplorer: false,
         herbAtlas: false,
@@ -244,7 +246,18 @@ export const DEFAULT_SITE_CONTENT = {
         announcements: [],
         restockReminderDays: 30,
         expertChat: true,
-        concerns: [], // [{ label, search, image }] → "Shop by concern" on the homepage
+        concerns: [], // [{ label, slug, search, image, icon, enabled }] → the Concern menu and /concern pages (empty = the built-in list)
+        ribbonMenu: [], // [{ key, label, enabled }] for the top ribbon (empty = New Launches, Concern, Offers, Chikit Club Card, WhatsApp Help)
+        ribbon: { items: [] }, // [{ icon, title, sub }] running promise ribbon (empty = built from the delivery settings)
+        trending: { title: 'Trending now', auto: true, keywords: [] }, // search chips under the banner: [{ label, query }]
+        watchShop: { title: 'Watch & Shop', subtitle: 'See it in action, then add it to your bag.', reels: [] }, // [{ id, title, videoUrl, poster, productId }]
+        club: {
+            enabled: true,
+            cardName: 'Chikit Club Card',
+            discountPercent: 10,
+            tagline: 'Members pay less on most of the range, every day.',
+            benefits: ['Member prices on most products', 'Early access to new launches', 'Birthday surprise from Chikit'],
+        },
         // Text for sections that fall back to the built-in suggestions in src/data/*.js while these are empty
         routines: { title: '', description: '', goals: [] },
         dayRitual: { title: '', description: '', stages: [] },
@@ -254,7 +267,7 @@ export const DEFAULT_SITE_CONTENT = {
         spin: { cooldownDays: 30, segments: [] }, // spin-the-wheel slices: [{ label, couponId, weight }]
         shelves: { mode: 'auto', limit: 8, items: [] }, // homepage category shelves: custom items = [{ categorySlug, subtitle }]
         topSlider: { mode: 'images', autoplaySeconds: 6, video: { url: '', poster: '', width: 0, height: 0, title: '', subtitle: '', ctaLabel: '', ctaHref: '' } }, // top section: image slider or one video
-        nav: { mode: 'categories', showAll: true, shopLabel: 'Shop' }, // top bar: 'categories' (product-first) or 'links' (custom list)
+        nav: { mode: 'ribbon', showAll: true, shopLabel: 'Shop' }, // top bar: 'ribbon' (New Launches · Concern · Offers · Club Card · Help), 'categories' or 'links' (custom list)
         offerTab: {
             enabled: false,
             tabLabel: 'Get 10% OFF',

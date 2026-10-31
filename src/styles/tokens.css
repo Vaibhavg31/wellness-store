@@ -5,7 +5,7 @@
  *
  * Brand anchor: #602460, sampled from the official logo.
  * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): primary/white 10.9, ink/canvas 15,
- * muted/canvas 6.0, accent-ink/canvas 5.6, white/danger 6.5, white/success 6.4, success/tint 5.7, warning/tint 5.4.
+ * muted/canvas 5.3, accent-ink/canvas 5.7, white/danger 6.5, white/success 6.4, success/tint 5.7, warning/tint 5.4.
  * Gold (accent) is a FILL colour only: pair it with ink text, never white.
  */
 @theme {
@@ -19,17 +19,17 @@
   /* Accent — turmeric gold (fills, highlights, ratings) */
   --color-accent:         #C08A3E;
   --color-accent-hover:   #D8A860;
-  --color-accent-ink:     #8A5A1E;  /* gold as text on light backgrounds */
+  --color-accent-ink:     #7E5118;  /* gold as text on light backgrounds */
   --color-accent-tint:    #FBF1E1;
 
   /* Neutrals — warm, plum-tinted */
-  --color-canvas:         #FDF9F4;  /* page background */
-  --color-canvas-alt:     #F6EEE5;  /* alternate section band */
+  --color-canvas:         #F4EBDD;  /* page background: warm beige (client brief v1) */
+  --color-canvas-alt:     #EADDC9;  /* alternate section band */
   --color-surface:        #FFFFFF;  /* cards, inputs, drawers */
   --color-ink:            #241720;  /* body + headings */
   --color-muted:          #6B5D68;  /* secondary text */
   --color-subtle:         #8F8089;  /* placeholders, disabled text (not for content) */
-  --color-line:           #ECD9C4;  /* decorative hairlines */
+  --color-line:           #D9C8AE;  /* decorative hairlines */
   --color-line-strong:    #9A8794;  /* input borders (3:1 on white) */
 
   /* Status */
@@ -106,6 +106,7 @@
   --animate-orbit-spin: orbit-spin 70s linear infinite;
   --animate-orbit-spin-reverse: orbit-spin 110s linear infinite reverse;
   --animate-card-sheen: card-sheen 1.3s ease-out 0.35s both;
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
 
   @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
   @keyframes page-in { from { opacity: 0.35; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -128,6 +129,7 @@
   @keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
   @keyframes sheet-down { to { transform: translateY(100%); } }
   @keyframes orbit-spin { to { transform: rotate(360deg); } }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
   @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slide-in-right { from { transform: translateX(100%); } to { transform: none; } }
   @keyframes draw-check { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }

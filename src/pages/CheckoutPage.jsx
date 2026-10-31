@@ -324,6 +324,8 @@ export default function CheckoutPage() {
                 productId: item.product.id,
                 variantId: item.product.variantId || undefined,
                 bundleId: item.product.bundleId || undefined,
+                offerId: item.product.offerId || undefined,
+                offerGroup: item.product.offerGroup || undefined,
                 title: item.product.title,
                 price: item.product.price,
                 quantity: item.quantity,

@@ -5,6 +5,7 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { trackEvent } from '@/utils/analytics';
+import { bogoUnitPrice, mixUnitPrices } from '@/utils/pricing';
 
 const CartContext = createContext(null);
 const AUTO_SKIP_KEY = 'chikit-auto-coupon-skipped';
@@ -39,14 +40,31 @@ function resolveCartProduct(product) {
         originalPrice: variant.originalPrice,
         discount: variant.discount,
         stock: variant.stock,
+        memberPrice: variant.memberPrice ?? null,
         images: variant.image ? [variant.image, ...(product.images || [])] : product.images,
     };
 }
 
+/**
+ * A plain line (not a bundle, not on an offer page) is charged the Chikit Club member price for members and the shown
+ * price for everyone else. Both are kept on the line so it flips the moment someone signs in or out.
+ */
+function withMembership(product, isMember) {
+    if (product.bundleId || product.offerId) return product;
+    const listPrice = product.listPrice ?? product.price;
+    const price = isMember && product.memberPrice && product.memberPrice < listPrice ? product.memberPrice : listPrice;
+    return { ...product, listPrice, price };
+}
+
+/** Buy 1 Get 1 pairs and Pick & Mix boxes move in whole units: pairs of two, boxes all together. */
+const stepFor = (product) => (product.offerKind === 'bogo' ? 2 : 1);
+
 const sameLine = (a, b) =>
     a.id === b.id
     && (a.variantId || null) === (b.variantId || null)
-    && (a.bundleId || null) === (b.bundleId || null);
+    && (a.bundleId || null) === (b.bundleId || null)
+    && (a.offerId || null) === (b.offerId || null)
+    && (a.offerGroup || null) === (b.offerGroup || null);
 
 /**
  * A bundle's discount is spread across its items proportionally to each
@@ -79,7 +97,8 @@ export function CartProvider({ children }) {
     // (e.g. from rapid quantity changes) can never clobber a newer one's state.
     const couponRequestIdRef = useRef(0);
     const { content } = useSiteContent();
-    const { token } = useAuth();
+    const { token, user } = useAuth();
+    const isMember = Boolean(token && user?.club?.member);
     const deliveryFeeAmount = content.delivery?.fee ?? DELIVERY_FEE;
     const freeThreshold = content.delivery?.freeThreshold ?? FREE_DELIVERY_THRESHOLD;
 
@@ -100,7 +119,7 @@ export function CartProvider({ children }) {
     }, []);
 
     const addToCart = useCallback((rawProduct, quantity = 1) => {
-        const product = resolveCartProduct(rawProduct);
+        const product = withMembership(resolveCartProduct(rawProduct), isMember);
         const qty = maxQtyFor(product, quantity);
         if (qty <= 0) return false;
 
@@ -130,7 +149,15 @@ export function CartProvider({ children }) {
             trackEvent('add_to_cart', { productId: product.id, value: product.price * addedQty, qty: addedQty, label: product.variantLabel || undefined, path: window.location.pathname });
         }
         return added;
-    }, [setItems]);
+    }, [setItems, isMember]);
+
+    // Sign in (or out) and the bag's plain lines switch to member (or normal) prices straight away.
+    useEffect(() => {
+        setItems((prev) => {
+            const next = prev.map((item) => ({ ...item, product: withMembership(item.product, isMember) }));
+            return next.some((item, i) => item.product.price !== prev[i].product.price) ? next : prev;
+        });
+    }, [isMember, setItems]);
 
     /**
      * Adds every product in a bundle as one atomic action, each line priced
@@ -171,6 +198,73 @@ export function CartProvider({ children }) {
         setItems((prev) => prev.filter((item) => item.product.bundleId !== bundleId));
     }, [setItems]);
 
+    /**
+     * "Buy 1 Get 1 Free": adds a pair (two units, each at half price, so the pair costs one). Adding again adds another pair.
+     * Returns false when there is not enough stock for the pair.
+     */
+    const addBogoPair = useCallback((offer, rawProduct) => {
+        const base = resolveCartProduct(rawProduct);
+        const listPrice = base.price;
+        const product = {
+            ...base,
+            listPrice,
+            price: bogoUnitPrice(listPrice),
+            originalPrice: Math.max(base.originalPrice || 0, listPrice),
+            memberPrice: null,
+            offerId: offer.id,
+            offerKind: 'bogo',
+            offerTitle: offer.title,
+        };
+        const prev = itemsRef.current;
+        const existing = prev.find((item) => sameLine(item.product, product));
+        const nextQty = (existing?.quantity ?? 0) + 2;
+        if (typeof product.stock === 'number' && nextQty > product.stock) return false;
+        const next = existing
+            ? prev.map((item) => (sameLine(item.product, product) ? { ...item, quantity: nextQty } : item))
+            : [...prev, { product, quantity: 2 }];
+        itemsRef.current = next;
+        setItems(next);
+        setCartPulse((n) => n + 1);
+        trackEvent('add_to_cart', { productId: product.id, value: product.price * 2, qty: 2, label: 'bogo', path: window.location.pathname });
+        return true;
+    }, [setItems]);
+
+    /**
+     * "Pick any N": adds the chosen products as one box priced as a whole. The lines are tied together by `offerGroup`
+     * (removed together, never merged with a plain line). Returns false if the box is not exactly N different, in-stock products.
+     */
+    const addMixBox = useCallback((offer, rawProducts) => {
+        const bases = rawProducts.map(resolveCartProduct);
+        if (bases.length !== offer.pickCount || new Set(bases.map((b) => b.id)).size !== bases.length) return false;
+        if (bases.some((b) => typeof b.stock === 'number' && b.stock < 1)) return false;
+        const units = mixUnitPrices(bases.map((b) => b.price), offer.price);
+        const group = `box-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+        const lines = bases.map((base, i) => ({
+            product: {
+                ...base,
+                listPrice: base.price,
+                price: units[i],
+                originalPrice: Math.max(base.originalPrice || 0, base.price),
+                memberPrice: null,
+                offerId: offer.id,
+                offerGroup: group,
+                offerKind: 'mix_match',
+                offerTitle: offer.title,
+            },
+            quantity: 1,
+        }));
+        const next = [...itemsRef.current, ...lines];
+        itemsRef.current = next;
+        setItems(next);
+        setCartPulse((n) => n + 1);
+        lines.forEach(({ product }) => trackEvent('add_to_cart', { productId: product.id, value: product.price, qty: 1, label: 'mix_box', path: window.location.pathname }));
+        return true;
+    }, [setItems]);
+
+    const removeOfferGroup = useCallback((offerGroup) => {
+        setItems((prev) => prev.filter((item) => item.product.offerGroup !== offerGroup));
+    }, [setItems]);
+
     const isBundleInCart = useCallback(
         (bundleId) => items.some((item) => item.product.bundleId === bundleId),
         [items],
@@ -185,7 +279,7 @@ export function CartProvider({ children }) {
         // silently overwrite that discount with the full price. Checkout
         // re-validates bundle pricing/stock authoritatively anyway, so it's
         // safe to leave these as-is for a soft cart-display refresh.
-        const syncable = current.filter((item) => !item.product.bundleId);
+        const syncable = current.filter((item) => !item.product.bundleId && !item.product.offerId);
         if (syncable.length === 0) return;
 
         const results = await Promise.allSettled(
@@ -195,7 +289,7 @@ export function CartProvider({ children }) {
 
         setItems((prev) => prev
             .map((item) => {
-                if (item.product.bundleId) return item;
+                if (item.product.bundleId || item.product.offerId) return item;
                 const result = resultByLine.get(item);
                 if (!result || result.status !== 'fulfilled' || !result.value) return item;
                 const fresh = result.value;
@@ -214,33 +308,41 @@ export function CartProvider({ children }) {
                 const source = freshVariant || fresh;
                 return {
                     ...item,
-                    product: {
+                    product: withMembership({
                         ...item.product,
+                        listPrice: source.price,
                         price: source.price,
+                        memberPrice: source.memberPrice ?? null,
                         originalPrice: source.originalPrice,
                         discount: source.discount,
                         stock: source.stock,
-                    },
+                    }, isMember),
                     quantity: maxQtyFor(source, item.quantity),
                 };
             })
             .filter((item) => item.quantity > 0));
-    }, [items, setItems]);
+    }, [items, setItems, isMember]);
 
-    const removeFromCart = useCallback((productId, { variantId = null, bundleId = null } = {}) => {
-        const line = itemsRef.current.find((item) => sameLine(item.product, { id: productId, variantId, bundleId }));
+    const removeFromCart = useCallback((productId, { variantId = null, bundleId = null, offerId = null, offerGroup = null } = {}) => {
+        const ref = { id: productId, variantId, bundleId, offerId, offerGroup };
+        const line = itemsRef.current.find((item) => sameLine(item.product, ref));
         if (line) trackEvent('remove_from_cart', { productId, value: line.product.price * line.quantity, qty: line.quantity, path: window.location.pathname });
-        setItems((prev) => prev.filter((item) => !sameLine(item.product, { id: productId, variantId, bundleId })));
+        setItems((prev) => prev.filter((item) => !sameLine(item.product, ref)));
     }, [setItems]);
 
-    const updateQuantity = useCallback((productId, quantity, { variantId = null, bundleId = null } = {}) => {
+    const updateQuantity = useCallback((productId, quantity, { variantId = null, bundleId = null, offerId = null, offerGroup = null } = {}) => {
+        const ref = { id: productId, variantId, bundleId, offerId, offerGroup };
         if (quantity <= 0) {
-            removeFromCart(productId, { variantId, bundleId });
+            removeFromCart(productId, { variantId, bundleId, offerId, offerGroup });
             return;
         }
         setItems((prev) => prev.map((item) => {
-            if (!sameLine(item.product, { id: productId, variantId, bundleId })) return item;
-            return { ...item, quantity: maxQtyFor(item.product, quantity) };
+            if (!sameLine(item.product, ref)) return item;
+            const step = stepFor(item.product);
+            // Buy 1 Get 1 lines stay in whole pairs.
+            const wanted = step > 1 ? Math.floor(quantity / step) * step : quantity;
+            const capped = maxQtyFor(item.product, wanted);
+            return { ...item, quantity: step > 1 ? Math.floor(capped / step) * step : capped };
         }).filter((item) => item.quantity > 0));
     }, [setItems, removeFromCart]);
 
@@ -371,8 +473,8 @@ export function CartProvider({ children }) {
         }
     }, [subtotal, items.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const isInCart = useCallback((productId, { variantId = null, bundleId = null } = {}) =>
-        items.some((item) => sameLine(item.product, { id: productId, variantId, bundleId })), [items]);
+    const isInCart = useCallback((productId, { variantId = null, bundleId = null, offerId = null, offerGroup = null } = {}) =>
+        items.some((item) => sameLine(item.product, { id: productId, variantId, bundleId, offerId, offerGroup })), [items]);
 
     const amountUntilFreeDelivery = Math.max(0, freeThreshold - subtotal);
     // Use the coupon-adjusted fee, not the pre-coupon base fee — otherwise a
@@ -389,6 +491,10 @@ export function CartProvider({ children }) {
         addBundleToCart,
         removeBundleFromCart,
         isBundleInCart,
+        addBogoPair,
+        addMixBox,
+        removeOfferGroup,
+        isMember,
         removeFromCart,
         updateQuantity,
         clearCart,
@@ -421,6 +527,10 @@ export function CartProvider({ children }) {
         addBundleToCart,
         removeBundleFromCart,
         isBundleInCart,
+        addBogoPair,
+        addMixBox,
+        removeOfferGroup,
+        isMember,
         removeFromCart,
         updateQuantity,
         clearCart,

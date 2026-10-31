@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson } from '../lib/response.js';
+import { resetClubConfigCache } from '../lib/club.js';
 import { SettingsRepository } from '../repositories/settingsRepository.js';
 
 const router = Router();
@@ -14,6 +15,7 @@ router.get('/settings', asyncRoute(async (req, res) => {
 router.put('/settings', asyncRoute(async (req, res) => {
     requireAdmin(req);
     const updated = await repo.set(req.body || {});
+    resetClubConfigCache(); // a new club discount applies to the very next page view
     sendJson(res, updated);
 }, 'Failed to update settings'));
 

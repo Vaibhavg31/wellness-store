@@ -22,7 +22,7 @@ const DEFAULTS = {
         accentColor: '#C08A3E',
         accentLight: '#D8A860',
         tintColor: '#F1E4F2',
-        backgroundColor: '#FDF9F4',
+        backgroundColor: '#F4EBDD',
         textColor: '#241720',
         fontHeading: '"Lora", Georgia, serif',
         fontBody: '"Poppins", system-ui, sans-serif',
@@ -50,19 +50,21 @@ const DEFAULTS = {
         { label: 'FAQ', href: '/faq' },
         { label: 'Contact', href: '/contact' },
     ],
-    // Launch landing page: Core sections on in this order; optional extras off (one switch each in the admin).
+    // Landing page (client brief v1): banner, running feature ribbon, trending, the whole range by category, Watch & Shop, trust, reviews. The earlier hero, shop-by-need, day ritual and bundles are off but still available.
     sections: {
-        hero: true,
-        brandMarquee: true,
-        categories: true,
-        categoryShelves: true,
-        dayRitual: true,
         bannerSlider: true,
-        bundles: true,
+        brandMarquee: true,
+        trending: true,
+        categoryShelves: true,
+        watchShop: true,
         whyChoose: true,
         reviews: true,
         newsletter: true,
         promoBanner: true,
+        hero: false,
+        categories: false,
+        dayRitual: false,
+        bundles: false,
         routineBuilder: false,
         packExplorer: false,
         herbAtlas: false,
@@ -118,7 +120,24 @@ const DEFAULTS = {
         announcements: [],
         restockReminderDays: 30,
         expertChat: true,
+        // Health goals for the Concern menu and /concern pages. Empty = the built-in list from the client's brief.
         concerns: [],
+        // The top ribbon: each of the five items can be renamed or switched off. Empty = all five, default names.
+        ribbonMenu: [],
+        // The running promise ribbon under the top banner. Empty = delivery / payments / purity built from the store settings.
+        ribbon: { items: [] },
+        // "Trending now" search chips under the banner. auto = build them from the products when none are listed.
+        trending: { title: 'Trending now', auto: true, keywords: [] },
+        // "Watch & Shop" reels on the homepage.
+        watchShop: { title: 'Watch & Shop', subtitle: 'See it in action, then add it to your bag.', reels: [] },
+        // Chikit Club Card membership.
+        club: {
+            enabled: true,
+            cardName: 'Chikit Club Card',
+            discountPercent: 10,
+            tagline: 'Members pay less on most of the range, every day.',
+            benefits: ['Member prices on most products', 'Early access to new launches', 'Birthday surprise from Chikit'],
+        },
         // Homepage sections whose text used to live in code. Empty = the built-in suggestion is used.
         routines: { title: '', description: '', goals: [] },
         dayRitual: { title: '', description: '', stages: [] },
@@ -131,7 +150,7 @@ const DEFAULTS = {
         // Homepage category shelves: 'auto' = every category that has products; 'custom' = the listed ones, in order.
         shelves: { mode: 'auto', limit: 8, items: [] },
         // Top navigation: 'categories' shows the shop's categories (product-first); 'links' shows the custom link list.
-        nav: { mode: 'categories', showAll: true, shopLabel: 'Shop' },
+        nav: { mode: 'ribbon', showAll: true, shopLabel: 'Shop' },
         // Top-of-homepage media: 'images' = the banner slider, 'video' = one full-width video. 0 seconds = no auto-advance.
         topSlider: { mode: 'images', autoplaySeconds: 6, video: { url: '', poster: '', width: 0, height: 0, title: '', subtitle: '', ctaLabel: '', ctaHref: '' } },
         // Sticky edge tab that opens an "unlock your code" panel.
@@ -153,6 +172,8 @@ const DEFAULTS = {
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 const PACK_KINDS = ['bottle', 'jar', 'tube', 'pouch', 'pump'];
+const RIBBON_KEYS = ['new', 'concern', 'offers', 'club', 'help'];
+const RIBBON_ICONS = ['truck', 'lock', 'leaf', 'flask', 'return', 'check', 'award', 'sparkles', 'heart'];
 const HERB_TONES = ['bg-success-tint', 'bg-accent-tint', 'bg-primary-tint', 'bg-info-tint', 'bg-canvas-alt', 'bg-warning-tint'];
 const text = (v, max) => String(v ?? '').trim().slice(0, max);
 const list = (v) => (Array.isArray(v) ? v : []);
@@ -227,10 +248,57 @@ function sanitizeExtras(input) {
         restockReminderDays: Math.min(365, Math.max(0, Number.parseInt(e.restockReminderDays ?? d.restockReminderDays, 10) || 0)),
         expertChat: e.expertChat === undefined ? d.expertChat : Boolean(e.expertChat),
         ...sanitizeSectionContent(e),
-        concerns: (Array.isArray(e.concerns) ? e.concerns : [])
-            .map((c) => ({ label: String(c?.label ?? '').trim().slice(0, 40), search: String(c?.search ?? '').trim().slice(0, 60), image: String(c?.image ?? '').trim().slice(0, 300) }))
+        concerns: list(e.concerns)
+            .map((c) => ({
+                label: text(c?.label, 40),
+                slug: slug(c?.slug) || slug(c?.label),
+                search: text(c?.search, 160),
+                image: text(c?.image, 300),
+                icon: text(c?.icon, 20),
+                enabled: c?.enabled !== false,
+            }))
             .filter((c) => c.label)
-            .slice(0, 8),
+            .slice(0, 24),
+        ribbonMenu: list(e.ribbonMenu)
+            .map((m) => ({ key: text(m?.key, 12), label: text(m?.label, 24), enabled: m?.enabled !== false }))
+            .filter((m) => RIBBON_KEYS.includes(m.key))
+            .slice(0, 5),
+        ribbon: {
+            items: list(e.ribbon?.items)
+                .map((i) => ({ icon: RIBBON_ICONS.includes(i?.icon) ? i.icon : 'check', title: text(i?.title, 30), sub: text(i?.sub, 60) }))
+                .filter((i) => i.title)
+                .slice(0, 8),
+        },
+        trending: {
+            title: text(e.trending?.title ?? d.trending.title, 40) || d.trending.title,
+            auto: e.trending?.auto === undefined ? d.trending.auto : Boolean(e.trending.auto),
+            keywords: list(e.trending?.keywords)
+                .map((k) => ({ label: text(k?.label, 30), query: text(k?.query, 60) }))
+                .map((k) => ({ label: k.label || k.query, query: k.query || k.label }))
+                .filter((k) => k.label)
+                .slice(0, 16),
+        },
+        watchShop: {
+            title: text(e.watchShop?.title ?? d.watchShop.title, 40) || d.watchShop.title,
+            subtitle: text(e.watchShop?.subtitle ?? d.watchShop.subtitle, 140),
+            reels: list(e.watchShop?.reels)
+                .map((r, i) => ({
+                    id: text(r?.id, 40) || `reel-${i + 1}`,
+                    title: text(r?.title, 80),
+                    videoUrl: text(r?.videoUrl, 500),
+                    poster: text(r?.poster, 500),
+                    productId: text(r?.productId, 64),
+                }))
+                .filter((r) => r.videoUrl || r.poster)
+                .slice(0, 12),
+        },
+        club: {
+            enabled: e.club?.enabled === undefined ? d.club.enabled : Boolean(e.club.enabled),
+            cardName: text(e.club?.cardName ?? d.club.cardName, 40) || d.club.cardName,
+            discountPercent: Math.min(60, Math.max(0, Number.parseInt(e.club?.discountPercent ?? d.club.discountPercent, 10) || 0)),
+            tagline: text(e.club?.tagline ?? d.club.tagline, 140),
+            benefits: list(e.club?.benefits ?? d.club.benefits).map((b) => text(b, 100)).filter(Boolean).slice(0, 8),
+        },
         popup: {
             categorySlug: String(e.popup?.categorySlug ?? '').trim().slice(0, 64),
             startsAt: LOCAL_DATETIME.test(e.popup?.startsAt ?? '') ? e.popup.startsAt : '',
@@ -271,7 +339,7 @@ function sanitizeExtras(input) {
             },
         },
         nav: {
-            mode: e.nav?.mode === 'links' ? 'links' : 'categories',
+            mode: ['links', 'categories'].includes(e.nav?.mode) ? e.nav.mode : 'ribbon',
             showAll: e.nav?.showAll === undefined ? d.nav.showAll : Boolean(e.nav.showAll),
             shopLabel: String(e.nav?.shopLabel ?? d.nav.shopLabel).trim().slice(0, 20) || d.nav.shopLabel,
         },
@@ -603,7 +671,7 @@ export class SettingsRepository {
             s.siteName ?? '', s.brandName ?? '', s.brandShort ?? '', s.brandTagline ?? '', s.brandDescription ?? '', s.logo ?? '', s.favicon ?? '',
             th.primaryColor ?? '#602460', th.primaryLight ?? '#7A3380', th.primaryDark ?? '#431A43',
             th.accentColor ?? '#C08A3E', th.accentLight ?? '#D8A860', th.tintColor ?? '#F1E4F2',
-            th.backgroundColor ?? '#FDF9F4', th.textColor ?? '#241720',
+            th.backgroundColor ?? '#F4EBDD', th.textColor ?? '#241720',
             th.fontHeading ?? '"Lora", Georgia, serif', th.fontBody ?? '"Poppins", system-ui, sans-serif',
             c.email ?? '', c.whatsappNumber ?? '', c.whatsappDisplay ?? '', c.whatsappDefaultMessage ?? '', c.businessHours ?? '',
             so.instagramHandle ?? '', so.instagramUrl ?? '', so.instagramTagline ?? '',

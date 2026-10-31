@@ -26,6 +26,11 @@ export class UserRepository extends BaseRepository {
             createdAt: this.toIso(row.created_at),
             lastLogin: this.toIso(row.last_login),
             lastUsedAddressId: row.last_used_address_id,
+            dob: row.dob ? String(row.dob instanceof Date ? row.dob.toISOString() : row.dob).slice(0, 10) : null,
+            gender: row.gender ?? null,
+            clubMember: this.bool(row.club_member),
+            clubJoinedAt: this.toIso(row.club_joined_at),
+            clubCardNo: row.club_card_no ?? null,
         };
     }
 
@@ -36,9 +41,10 @@ export class UserRepository extends BaseRepository {
             emailVerified: 'email_verified', emailVerifiedAt: 'email_verified_at',
             isBlocked: 'is_blocked', blockedAt: 'blocked_at', createdAt: 'created_at',
             lastLogin: 'last_login', lastUsedAddressId: 'last_used_address_id',
+            dob: 'dob', gender: 'gender', clubMember: 'club_member', clubJoinedAt: 'club_joined_at', clubCardNo: 'club_card_no',
         };
-        const boolCols = new Set(['phone_verified', 'email_verified', 'is_blocked']);
-        const dateCols = new Set(['phone_verified_at', 'email_verified_at', 'blocked_at', 'created_at', 'last_login']);
+        const boolCols = new Set(['phone_verified', 'email_verified', 'is_blocked', 'club_member']);
+        const dateCols = new Set(['phone_verified_at', 'email_verified_at', 'blocked_at', 'created_at', 'last_login', 'club_joined_at']);
 
         const row = {};
         for (const [key, col] of Object.entries(map)) {

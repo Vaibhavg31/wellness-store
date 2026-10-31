@@ -4,6 +4,7 @@ import { Check, Heart, ShoppingBag, Star } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import FadeImage from '@/components/ui/FadeImage';
 import Price from '@/components/ui/Price';
+import ClubPrice from '@/components/product/ClubPrice';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast, showCartToast } from '@/contexts/ToastContext';
@@ -23,7 +24,7 @@ function badgesFor(product) {
 }
 
 function ProductCard({ product, priority = false }) {
-    const { addToCart } = useCart();
+    const { addToCart, isMember } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { showToast } = useToast();
     const [added, setAdded] = useState(false);
@@ -109,7 +110,7 @@ function ProductCard({ product, priority = false }) {
                     </Link>
                 </h3>
                 <div className="mt-auto flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 pt-1">
-                    <Price price={product.price} originalPrice={product.originalPrice} />
+                    <Price price={isMember && product.memberPrice ? product.memberPrice : product.price} originalPrice={isMember && product.memberPrice ? product.price : product.originalPrice} />
                     {product.reviewCount > 0 && (
                         <p className="flex items-center gap-1 text-caption text-muted" aria-label={`Rated ${product.rating} out of 5 from ${product.reviewCount} reviews`}>
                             <Star size={13} strokeWidth={0} className="self-center fill-accent" aria-hidden="true" />
@@ -118,6 +119,7 @@ function ProductCard({ product, priority = false }) {
                         </p>
                     )}
                 </div>
+                <ClubPrice memberPrice={product.memberPrice} compact className="relative z-10 mt-1 self-start" />
             </div>
 
         </article>

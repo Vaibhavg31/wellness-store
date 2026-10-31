@@ -1,5 +1,6 @@
 import { BaseRepository } from './base.js';
 import { generateId } from '../lib/db.js';
+import { clubConfig, withMemberPrices } from '../lib/club.js';
 
 const CHILD_TABLES = {
     images: ['product_images', 'url'],
@@ -7,6 +8,26 @@ const CHILD_TABLES = {
     features: ['product_features', 'feature'],
     badges: ['product_badges', 'badge'],
 };
+
+/** Product extras kept together in products.extras_json (see lib/migrations.js). */
+const EXTRAS_KEYS = ['concerns', 'videos', 'infoBanners', 'clubEligible', 'clubPrice'];
+const cleanText = (v, max) => String(v ?? '').trim().slice(0, max);
+
+function parseExtras(raw) {
+    let parsed = {};
+    try { parsed = raw ? JSON.parse(raw) : {}; } catch { parsed = {}; }
+    return {
+        concerns: (Array.isArray(parsed.concerns) ? parsed.concerns : []).map((c) => cleanText(c, 60)).filter(Boolean),
+        videos: (Array.isArray(parsed.videos) ? parsed.videos : [])
+            .map((v) => ({ url: cleanText(v?.url, 500), poster: cleanText(v?.poster, 500), title: cleanText(v?.title, 90) }))
+            .filter((v) => v.url || v.poster),
+        infoBanners: (Array.isArray(parsed.infoBanners) ? parsed.infoBanners : [])
+            .map((b) => ({ image: cleanText(b?.image, 500), alt: cleanText(b?.alt, 140) }))
+            .filter((b) => b.image),
+        clubEligible: parsed.clubEligible !== false,
+        clubPrice: Number(parsed.clubPrice) > 0 ? Number(parsed.clubPrice) : null,
+    };
+}
 
 const EMPTY_CONTENT = { ingredients: [], howToUse: [], nutrition: { servingSize: '', rows: [] }, faqs: [] };
 
@@ -22,7 +43,7 @@ export class ProductRepository extends BaseRepository {
         }
         children.variants = await this.fetchVariants(id);
         Object.assign(children, (await this.fetchContentBatch([id]))[id] ?? EMPTY_CONTENT);
-        return this.applyVariantOverrides({ ...this.scalarFields(row), ...children });
+        return withMemberPrices(this.applyVariantOverrides({ ...this.scalarFields(row), ...children }), await clubConfig());
     }
 
     scalarFields(row) {
@@ -48,6 +69,7 @@ export class ProductRepository extends BaseRepository {
             onlinePaymentEnabled: this.bool(row.online_payment_enabled),
             createdAt: this.toIso(row.created_at),
             updatedAt: this.toIso(row.updated_at),
+            ...parseExtras(row.extras_json),
         };
     }
 
@@ -63,13 +85,14 @@ export class ProductRepository extends BaseRepository {
         const variantsById = await this.fetchVariantsBatch(ids);
         const contentById = await this.fetchContentBatch(ids);
 
+        const club = await clubConfig();
         return rows.map((row) => {
             const id = row.id;
             const children = {};
             for (const key of Object.keys(CHILD_TABLES)) children[key] = childrenByKey[key][id] || [];
             children.variants = variantsById[id] || [];
             Object.assign(children, contentById[id] ?? EMPTY_CONTENT);
-            return this.applyVariantOverrides({ ...this.scalarFields(row), ...children });
+            return withMemberPrices(this.applyVariantOverrides({ ...this.scalarFields(row), ...children }), club);
         });
     }
 
@@ -154,6 +177,8 @@ export class ProductRepository extends BaseRepository {
             stock: Number(r.stock),
             sku: r.sku,
             isDefault: this.bool(r.is_default),
+            units: Math.max(1, Number(r.units ?? 1) || 1),
+            clubPrice: r.club_price === null || r.club_price === undefined ? null : Number(r.club_price),
         };
     }
 
@@ -185,8 +210,8 @@ export class ProductRepository extends BaseRepository {
             const price = Number(v.price || 0);
             const original = Number(v.originalPrice ?? price);
             await this.pool().query(
-                `INSERT INTO product_variants (id, product_id, label, net_quantity, image, price, original_price, discount, stock, sku, is_default, sort_order, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                `INSERT INTO product_variants (id, product_id, label, net_quantity, image, price, original_price, discount, stock, sku, is_default, sort_order, created_at, updated_at, units, club_price)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     v.id || generateId('variant'),
                     productId,
@@ -202,6 +227,8 @@ export class ProductRepository extends BaseRepository {
                     i,
                     now,
                     now,
+                    Math.min(12, Math.max(1, Number.parseInt(v.units ?? 1, 10) || 1)),
+                    Number(v.clubPrice) > 0 ? Number(v.clubPrice) : null,
                 ],
             );
         }
@@ -320,8 +347,16 @@ export class ProductRepository extends BaseRepository {
         await this.replaceChildStrings('product_badges', id, 'badge', data.badges || []);
         if ('variants' in data) await this.replaceVariants(id, data.variants || []);
         await this.replaceContent(id, data);
+        await this.writeExtras(id, data, {});
 
         return data;
+    }
+
+    /** Saves the product extras that appear in `data`, leaving the others as they were. */
+    async writeExtras(id, data, current) {
+        if (!EXTRAS_KEYS.some((k) => k in data)) return;
+        const merged = parseExtras(JSON.stringify({ ...current, ...Object.fromEntries(EXTRAS_KEYS.filter((k) => k in data).map((k) => [k, data[k]])) }));
+        await this.pool().query('UPDATE products SET extras_json = ? WHERE id = ?', [JSON.stringify(merged), id]);
     }
 
     async update(id, changes) {
@@ -336,6 +371,10 @@ export class ProductRepository extends BaseRepository {
         }
         if ('variants' in changes) await this.replaceVariants(id, changes.variants || []);
         await this.replaceContent(id, changes);
+        if (EXTRAS_KEYS.some((k) => k in changes)) {
+            const [rows] = await this.pool().query('SELECT extras_json FROM products WHERE id = ?', [id]);
+            await this.writeExtras(id, changes, parseExtras(rows[0]?.extras_json));
+        }
 
         return this.getById(id);
     }

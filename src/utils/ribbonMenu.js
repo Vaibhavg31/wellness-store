@@ -1,0 +1,17 @@
+/** The five items of the top ribbon, in order. The admin can rename each and switch each on or off. */
+export const DEFAULT_RIBBON_MENU = [
+    { key: 'new', label: 'New Launches', enabled: true },
+    { key: 'concern', label: 'Concern', enabled: true },
+    { key: 'offers', label: 'Offers', enabled: true },
+    { key: 'club', label: 'Chikit Club Card', enabled: true },
+    { key: 'help', label: 'WhatsApp Help', enabled: true },
+];
+
+/** The ribbon items to show: the admin's labels and switches laid over the fixed list of five. */
+export function ribbonItems(extras) {
+    const saved = Array.isArray(extras?.ribbonMenu) ? extras.ribbonMenu : [];
+    return DEFAULT_RIBBON_MENU.map((base) => {
+        const own = saved.find((s) => s.key === base.key);
+        return { key: base.key, label: (own?.label || '').trim() || base.label, enabled: own ? own.enabled !== false : base.enabled };
+    }).filter((item) => item.enabled);
+}

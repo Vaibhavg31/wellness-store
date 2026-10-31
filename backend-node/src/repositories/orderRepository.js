@@ -68,7 +68,7 @@ export class OrderRepository extends BaseRepository {
         for (const r of itemRows) {
             (itemsById[r.order_id] ??= []).push({
                 productId: r.product_id, variantId: r.variant_id ?? null, variantLabel: r.variant_label ?? null,
-                bundleId: r.bundle_id ?? null, bundleTitle: r.bundle_title ?? null,
+                bundleId: r.bundle_id ?? null, bundleTitle: r.bundle_title ?? null, offerId: r.offer_id ?? null, offerTitle: r.offer_title ?? null,
                 title: r.title, price: Number(r.price), quantity: Number(r.quantity), image: r.image, isCustom: this.bool(r.is_custom),
             });
         }
@@ -146,7 +146,7 @@ export class OrderRepository extends BaseRepository {
         const [rows] = await this.pool().query('SELECT * FROM order_items WHERE order_id = ? ORDER BY id ASC', [orderId]);
         return rows.map((r) => ({
             productId: r.product_id, variantId: r.variant_id ?? null, variantLabel: r.variant_label ?? null,
-            bundleId: r.bundle_id ?? null, bundleTitle: r.bundle_title ?? null,
+            bundleId: r.bundle_id ?? null, bundleTitle: r.bundle_title ?? null, offerId: r.offer_id ?? null, offerTitle: r.offer_title ?? null,
             title: r.title, price: Number(r.price), quantity: Number(r.quantity), image: r.image, isCustom: this.bool(r.is_custom),
         }));
     }
@@ -172,9 +172,9 @@ export class OrderRepository extends BaseRepository {
         if (!items || items.length === 0) return;
         for (const item of items) {
             await conn.query(
-                `INSERT INTO order_items (order_id, product_id, variant_id, variant_label, bundle_id, bundle_title, title, price, quantity, image, is_custom)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [orderId, item.productId ?? null, item.variantId ?? null, item.variantLabel ?? null, item.bundleId ?? null, item.bundleTitle ?? null,
+                `INSERT INTO order_items (order_id, product_id, variant_id, variant_label, bundle_id, bundle_title, offer_id, offer_title, title, price, quantity, image, is_custom)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [orderId, item.productId ?? null, item.variantId ?? null, item.variantLabel ?? null, item.bundleId ?? null, item.bundleTitle ?? null, item.offerId ?? null, item.offerTitle ?? null,
                     item.title ?? '', Number(item.price ?? 0), Number.parseInt(item.quantity ?? 1, 10), item.image ?? null, item.isCustom ? 1 : 0],
             );
         }

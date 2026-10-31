@@ -67,6 +67,27 @@ Verify email &amp; sign in
     return sendTransactionalEmail(to, `Verify your email & sign in — ${brand}`, html, name, { tags: ['email-verification', 'auth'] });
 }
 
+/** The 6-digit code that confirms an email address when joining the Chikit Club. */
+export async function sendOtpEmail(to, name, code, minutes = 10) {
+    const brand = await brandName();
+    const year = new Date().getFullYear();
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="margin:0;padding:32px 16px;background:#f5f0e8;font-family:Georgia,'Times New Roman',serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+<table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:16px;padding:32px;"><tr><td>
+<p style="margin:0 0 8px;font-size:22px;font-weight:600;color:#2c241c;">${brand}</p>
+<p style="margin:0 0 24px;font-size:14px;color:#8b7355;">Your Chikit Club verification code</p>
+<p style="margin:0 0 12px;font-size:16px;color:#2c241c;">Hi ${esc(name)},</p>
+<p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#4a3f35;">Enter this code to confirm your email address and finish joining the club.</p>
+<p style="margin:24px 0;text-align:center;font-size:34px;letter-spacing:10px;font-weight:700;color:${BRAND_PLUM};">${esc(code)}</p>
+<p style="margin:0 0 8px;font-size:13px;color:#8b7355;">The code works for ${minutes} minutes.</p>
+<p style="margin:0;font-size:12px;color:#b0a08d;">If you did not ask for this, you can ignore this email.<br>© ${year} ${brand}</p>
+</td></tr></table></td></tr></table></body></html>`;
+    return sendTransactionalEmail(to, `${code} is your ${brand} Club code`, html, name, { tags: ['club-otp', 'auth'] });
+}
+
 export async function sendPasswordReset(to, name, resetUrl) {
     const brand = await brandName();
     const year = new Date().getFullYear();

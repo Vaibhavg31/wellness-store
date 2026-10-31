@@ -1,10 +1,10 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Heart, Menu, Search, ShoppingBag } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import AccountMenu from '@/components/layout/AccountMenu';
 import MobileNav from '@/components/layout/MobileNav';
-import CategoryNav from '@/components/layout/CategoryNav';
+import ShopRibbon, { RibbonPanels } from '@/components/layout/ShopRibbon';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
@@ -35,12 +35,58 @@ export default function Header() {
     const { pathname } = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [openMenu, setOpenMenu] = useState(null); // 'concern' | 'offers' | null: the ribbon panel that is showing
+    const headerRef = useRef(null);
+    const mainRowRef = useRef(null);
+    const stripRef = useRef(null);
+    const leaveTimer = useRef(0);
     const links = content.navLinks ?? [];
     // Buying pages keep the phone header to one row: the category strip would only pull attention (and the price below the fold).
     const noStrip = /^\/(product\/|checkout)/.test(pathname);
     const stripHidden = direction === 'down' || noStrip;
 
-    useEffect(() => setMenuOpen(false), [pathname]);
+    useEffect(() => { setMenuOpen(false); setOpenMenu(null); }, [pathname]);
+
+    // Publish how much of the header is on screen (the phone strip slides away while reading down), so a sticky bar
+    // further down the page (the homepage category buttons) can sit exactly under it.
+    useLayoutEffect(() => {
+        const root = document.documentElement;
+        const publish = () => {
+            const main = mainRowRef.current?.getBoundingClientRect().height ?? 0;
+            const strip = stripHidden || noStrip ? 0 : (stripRef.current?.getBoundingClientRect().height ?? 0);
+            root.style.setProperty('--header-offset', `${Math.round(main + strip)}px`);
+        };
+        publish();
+        const observer = new ResizeObserver(publish);
+        if (mainRowRef.current) observer.observe(mainRowRef.current);
+        if (stripRef.current) observer.observe(stripRef.current);
+        return () => { observer.disconnect(); root.style.removeProperty('--header-offset'); };
+    }, [stripHidden, noStrip]);
+
+    // A panel opens on click, and on hover for a mouse (hovering on the same pill again keeps it, leaving closes it).
+    const toggleMenu = useCallback((key, hover = false) => {
+        clearTimeout(leaveTimer.current);
+        if (hover && !window.matchMedia('(hover: hover)').matches) return;
+        setOpenMenu((current) => (hover ? key : (current === key ? null : key)));
+    }, []);
+    const closeMenu = useCallback(() => setOpenMenu(null), []);
+    const scheduleClose = () => {
+        if (!window.matchMedia('(hover: hover)').matches) return;
+        clearTimeout(leaveTimer.current);
+        leaveTimer.current = setTimeout(closeMenu, 180);
+    };
+    useEffect(() => () => clearTimeout(leaveTimer.current), []);
+
+    // Click or tap outside, or Escape, closes the panel; so does reading on down the page.
+    useEffect(() => {
+        if (!openMenu) return undefined;
+        const onPointer = (e) => { if (!headerRef.current?.contains(e.target)) closeMenu(); };
+        const onKey = (e) => { if (e.key === 'Escape') closeMenu(); };
+        document.addEventListener('pointerdown', onPointer);
+        document.addEventListener('keydown', onKey);
+        return () => { document.removeEventListener('pointerdown', onPointer); document.removeEventListener('keydown', onKey); };
+    }, [openMenu, closeMenu]);
+    useEffect(() => { if (direction === 'down') closeMenu(); }, [direction, closeMenu]);
 
     // Press "/" anywhere (outside a text field) to open search, like most large stores.
     useEffect(() => {
@@ -59,8 +105,8 @@ export default function Header() {
         // The strip below is hidden with a transform, never by changing its height: a height change moves the page under
         // the finger, which flips the scroll direction again and made the header flicker on phones. The header box keeps
         // its height; its transparent gap lets taps through (pointer-events), only the two rows take them.
-        <header className="pointer-events-none sticky top-0 z-50 lg:pointer-events-auto">
-            <div className={cn('pointer-events-auto relative z-10 border-b bg-canvas transition-shadow duration-300', scrolled && stripHidden ? 'border-line shadow-sm' : 'border-transparent', scrolled ? 'lg:border-line lg:shadow-sm' : 'lg:border-transparent', !stripHidden && 'shadow-none')}>
+        <header ref={headerRef} onMouseLeave={scheduleClose} onMouseEnter={() => clearTimeout(leaveTimer.current)} className="pointer-events-none sticky top-0 z-50 lg:pointer-events-auto">
+            <div ref={mainRowRef} className={cn('pointer-events-auto relative z-10 border-b bg-canvas transition-shadow duration-300', scrolled && stripHidden ? 'border-line shadow-sm' : 'border-transparent', scrolled ? 'lg:border-line lg:shadow-sm' : 'lg:border-transparent', !stripHidden && 'shadow-none')}>
             <div className="container-page flex h-16 items-center gap-2 min-[340px]:gap-4 lg:h-20">
                 <button type="button" className={cn(iconButton, 'lg:hidden -ml-2')} onClick={() => setMenuOpen(true)} aria-label="Open menu">
                     <Menu size={22} />
@@ -68,7 +114,7 @@ export default function Header() {
 
                 <Logo size="header" linkToHome priority shine="hover" />
 
-                <CategoryNav variant="desktop" />
+                <ShopRibbon variant="desktop" openMenu={openMenu} onToggle={toggleMenu} />
 
                 <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
                     <button type="button" className={iconButton} onClick={() => setSearchOpen(true)} aria-label="Search">
@@ -89,6 +135,7 @@ export default function Header() {
 
             {/* On phones the category strip slides up under the main row while reading down and returns on the way up. */}
             <div
+                ref={stripRef}
                 className={cn(
                     'pointer-events-auto relative z-0 border-b bg-canvas transition-[transform,opacity] duration-300 ease-[var(--ease-out-soft)] will-change-transform lg:hidden',
                     noStrip && 'hidden',
@@ -97,8 +144,10 @@ export default function Header() {
                 aria-hidden={stripHidden ? 'true' : undefined}
                 inert={stripHidden ? true : undefined}
             >
-                <CategoryNav variant="phone" />
+                <ShopRibbon variant="phone" openMenu={openMenu} onToggle={toggleMenu} />
             </div>
+
+            <RibbonPanels openMenu={openMenu} onClose={closeMenu} />
 
             <MobileNav isOpen={menuOpen} onClose={() => setMenuOpen(false)} links={links} />
             {searchOpen && (

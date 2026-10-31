@@ -14,18 +14,22 @@ import { OrderRepository } from '../repositories/orderRepository.js';
 import { ProductRepository } from '../repositories/productRepository.js';
 import { CouponRepository } from '../repositories/couponRepository.js';
 import { BundleRepository } from '../repositories/bundleRepository.js';
+import { OfferRepository } from '../repositories/offerRepository.js';
 import { SettingsRepository } from '../repositories/settingsRepository.js';
 import { UserRepository } from '../repositories/userRepository.js';
 import { CouponService } from '../services/couponService.js';
 import * as razorpay from '../services/razorpayService.js';
 import * as emailService from '../services/emailService.js';
 import { recordPurchase } from '../lib/analytics.js';
+import { clubConfig, memberPriceFor } from '../lib/club.js';
+import { bogoUnitPrice, mixUnitPrices, round2 } from '../lib/pricing.js';
 
 const router = Router();
 const repo = new OrderRepository();
 const products = new ProductRepository();
 const coupons = new CouponRepository();
 const bundles = new BundleRepository();
+const offers = new OfferRepository();
 const couponService = new CouponService();
 const users = new UserRepository();
 
@@ -181,11 +185,25 @@ async function validatePaymentMethod(payment, items) {
     }
 }
 
-async function validateAndBuildItems(rawItems) {
+/**
+ * Prices every bag line from the database (never from what the browser sent) and checks stock.
+ * Lines can be priced four ways: a bundle's share, an offer page (Buy 1 Get 1 pairs, Pick & Mix boxes), the Chikit Club
+ * member price (members only), or the plain price. Offers and the club price never stack on the same line.
+ */
+async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
     if (rawItems.length === 0) throw new HttpError('Cart is empty', 400);
 
+    const club = await clubConfig();
+    const offerCache = new Map();
+    const liveOffer = async (offerId) => {
+        if (!offerCache.has(offerId)) offerCache.set(offerId, await offers.getByIdLive(offerId));
+        const offer = offerCache.get(offerId);
+        if (!offer) throw new HttpError('One of the offers in your bag has ended. Please update your bag.', 400);
+        return offer;
+    };
+
     const built = [];
-    let subtotal = 0;
+    const mixLines = new Map(); // "offerId|group" → [{ index, listPrice, offer, productId }]
 
     for (const line of rawItems) {
         if (!line || typeof line !== 'object') throw new HttpError('Invalid cart item', 400);
@@ -193,6 +211,7 @@ async function validateAndBuildItems(rawItems) {
         const productId = String(line.productId || '');
         const variantId = String(line.variantId || '').trim();
         const bundleId = String(line.bundleId || '').trim();
+        const offerId = String(line.offerId || '').trim();
         const qty = Number.parseInt(line.quantity ?? 0, 10);
 
         if (!productId || qty < 1) throw new HttpError('Each item needs a productId and quantity ≥ 1', 400);
@@ -217,7 +236,6 @@ async function validateAndBuildItems(rawItems) {
                 title: displayTitle, price: bundleLine.unitPrice, quantity: qty,
                 image: product.images?.[0] ?? (line.image ?? ''),
             });
-            subtotal += bundleLine.unitPrice * qty;
             continue;
         }
 
@@ -232,15 +250,51 @@ async function validateAndBuildItems(rawItems) {
             throw new HttpError(stock <= 0 ? `"${displayTitle}" is out of stock` : `Only ${stock} left for "${displayTitle}". Please update your bag`, 400);
         }
 
-        const price = variant ? variant.price : Number(product.price || 0);
+        const listPrice = variant ? variant.price : Number(product.price || 0);
+        let price = listPrice;
+        let offerRef = null;
+
+        if (offerId) {
+            const offer = await liveOffer(offerId);
+            if (!(offer.allProducts || offer.productIds.includes(productId))) throw new HttpError(`"${title}" is not part of the "${offer.title}" offer`, 400);
+            if (offer.kind === 'bogo') {
+                if (qty % 2 !== 0) throw new HttpError(`"${title}" is Buy 1 Get 1 Free: please add it in pairs`, 400);
+                price = bogoUnitPrice(listPrice);
+            } else if (offer.kind === 'mix_match') {
+                if (qty !== 1) throw new HttpError(`Each product can be picked once in "${offer.title}"`, 400);
+                const key = `${offerId}|${String(line.offerGroup || 'box')}`;
+                if (!mixLines.has(key)) mixLines.set(key, []);
+                mixLines.get(key).push({ index: built.length, listPrice, offer, productId });
+            } else {
+                throw new HttpError(`"${offer.title}" is not a pricing offer`, 400);
+            }
+            offerRef = offer;
+        } else if (isMember) {
+            const member = variant
+                ? memberPriceFor({ price: variant.price, clubPrice: variant.clubPrice, eligible: product.clubEligible !== false }, club)
+                : product.memberPrice;
+            if (member) price = member;
+        }
+
         built.push({
             productId, variantId: variant?.id ?? null, variantLabel: variant?.label ?? null,
             title: displayTitle, price, quantity: qty, image: product.images?.[0] ?? (line.image ?? ''),
+            ...(offerRef ? { offerId: offerRef.id, offerTitle: offerRef.title } : {}),
+            ...(!offerRef && price < listPrice ? { offerTitle: club.cardName } : {}),
         });
-        subtotal += price * qty;
     }
 
-    return { items: built, subtotal: Math.round(subtotal * 100) / 100 };
+    // Each Pick & Mix box must hold exactly the offer's number of different products; its lines are then priced as one box.
+    for (const group of mixLines.values()) {
+        const { offer } = group[0];
+        if (group.length !== offer.pickCount) throw new HttpError(`Your "${offer.title}" box needs exactly ${offer.pickCount} different products`, 400);
+        if (new Set(group.map((g) => g.productId)).size !== group.length) throw new HttpError('Each product can only be picked once in a box', 400);
+        const units = mixUnitPrices(group.map((g) => g.listPrice), offer.price);
+        group.forEach((g, i) => { built[g.index].price = units[i]; });
+    }
+
+    const subtotal = built.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    return { items: built, subtotal: round2(subtotal) };
 }
 
 async function buildDirectOrderItems(rawItems) {
@@ -669,7 +723,8 @@ router.post('/orders', asyncRoute(async (req, res) => {
     const payment = String(body.payment || 'cod').toLowerCase();
     if (!['cod', 'razorpay'].includes(payment)) return sendError(res, 'Invalid payment method', 400);
 
-    const validated = await validateAndBuildItems(body.items);
+    const buyer = await users.getById(payload.userId || '');
+    const validated = await validateAndBuildItems(body.items, { isMember: Boolean(buyer?.clubMember) });
     await validatePaymentMethod(payment, validated.items);
     const { subtotal, items } = validated;
 

@@ -11,6 +11,14 @@ loadConfig(path.join(repoRoot, 'config.json'));
 const { initDatabase } = await import('./lib/db.js');
 initDatabase(path.resolve(__dirname, '..')); // backend-node/uploads
 
+// Bring the database up to date (new tables / columns); a failure is logged but must not stop the shop from starting.
+try {
+    const { ensureSchema } = await import('./lib/migrations.js');
+    await ensureSchema();
+} catch (err) {
+    console.error('[chikit-backend-node] schema update failed:', err.message);
+}
+
 const { createApp } = await import('./app.js');
 const app = createApp();
 

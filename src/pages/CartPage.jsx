@@ -23,6 +23,8 @@ import { humanizeSlug } from '@/utils/products';
 const removeButton = 'grid size-9 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-danger-tint hover:text-danger';
 
 function BundleEntry({ entry, onRemove }) {
+    const isBox = entry.kind === 'box';
+    const groupId = isBox ? entry.group : entry.bundleId;
     const total = entry.items.reduce((s, i) => s + i.product.price * i.quantity, 0);
     const original = entry.items.reduce((s, i) => s + i.product.originalPrice * i.quantity, 0);
     return (
@@ -30,9 +32,9 @@ function BundleEntry({ entry, onRemove }) {
             <div className="mb-3 flex items-center justify-between gap-3">
                 <p className="flex min-w-0 items-center gap-2 font-medium text-ink">
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-tint text-accent-ink"><Gift size={16} aria-hidden="true" /></span>
-                    <span className="truncate">Bundle: {entry.bundleTitle}</span>
+                    <span className="truncate">{isBox ? entry.bundleTitle : `Bundle: ${entry.bundleTitle}`}</span>
                 </p>
-                <button type="button" onClick={() => onRemove(entry.bundleId, entry.bundleTitle)} className={removeButton} aria-label={`Remove bundle ${entry.bundleTitle}`}><Trash2 size={16} /></button>
+                <button type="button" onClick={() => onRemove(groupId, entry.bundleTitle, isBox)} className={removeButton} aria-label={`Remove ${isBox ? 'box' : 'bundle'} ${entry.bundleTitle}`}><Trash2 size={16} /></button>
             </div>
             <ul className="space-y-2.5">
                 {entry.items.map((item) => (
@@ -49,7 +51,7 @@ function BundleEntry({ entry, onRemove }) {
                 ))}
             </ul>
             <p className="mt-3 flex items-center justify-between border-t border-line pt-3">
-                <span className="text-small text-muted">Bundle price</span>
+                <span className="text-small text-muted">{isBox ? 'Box price' : 'Bundle price'}</span>
                 <span className="flex items-baseline gap-2">
                     {original > total && <span className="text-caption text-muted line-through">{formatPrice(original)}</span>}
                     <span className="font-semibold text-primary">{formatPrice(total)}</span>
@@ -61,7 +63,7 @@ function BundleEntry({ entry, onRemove }) {
 
 function LineEntry({ item, onRemove, onQuantity }) {
     const { product, quantity } = item;
-    const variant = { variantId: product.variantId };
+    const variant = { variantId: product.variantId, offerId: product.offerId };
     return (
         <li className="flex gap-3 rounded-lg border border-line bg-surface p-3 min-[340px]:gap-4 min-[340px]:p-4 sm:p-5">
             <Link to={`/product/${product.id}`} className="shrink-0">
@@ -72,12 +74,16 @@ function LineEntry({ item, onRemove, onQuantity }) {
                     <div className="min-w-0">
                         <Link to={`/product/${product.id}`}><h3 className="line-clamp-2 font-sans text-body font-medium hover:text-primary">{product.title}</h3></Link>
                         <p className="mt-0.5 text-caption text-muted">{product.variantLabel || humanizeSlug(product.category)}</p>
+                        {product.offerTitle && <p className="mt-0.5 text-caption font-medium text-accent-ink">{product.offerTitle}</p>}
                     </div>
-                    <button type="button" onClick={() => onRemove(product.id, product.title, product.variantId)} className={removeButton} aria-label={`Remove ${product.title}`}><Trash2 size={16} /></button>
+                    <button type="button" onClick={() => onRemove(product.id, product.title, product.variantId, product.offerId)} className={removeButton} aria-label={`Remove ${product.title}`}><Trash2 size={16} /></button>
                 </div>
                 <div className="mt-auto flex items-center justify-between gap-3 pt-3">
-                    <QuantityStepper value={quantity} max={typeof product.stock === 'number' ? product.stock : 99} onChange={(q) => onQuantity(product.id, q, variant)} />
-                    <span className="font-semibold text-ink">{formatPrice(product.price * quantity)}</span>
+                    <QuantityStepper value={quantity} min={product.offerKind === 'bogo' ? 2 : 1} step={product.offerKind === 'bogo' ? 2 : 1} max={typeof product.stock === 'number' ? product.stock : 99} onChange={(q) => onQuantity(product.id, q, variant)} />
+                    <span className="flex items-baseline gap-2">
+                        {product.originalPrice > product.price && <span className="text-small text-muted line-through">{formatPrice(product.originalPrice * quantity)}</span>}
+                        <span className="font-semibold text-ink">{formatPrice(product.price * quantity)}</span>
+                    </span>
                 </div>
             </div>
         </li>
@@ -85,7 +91,7 @@ function LineEntry({ item, onRemove, onQuantity }) {
 }
 
 export default function CartPage() {
-    const { items, updateQuantity, removeFromCart, removeBundleFromCart, syncPrices } = useCart();
+    const { items, updateQuantity, removeFromCart, removeBundleFromCart, removeOfferGroup, syncPrices } = useCart();
     const { isAuthenticated, user } = useAuth();
     const { showToast } = useToast();
 
@@ -94,14 +100,15 @@ export default function CartPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleRemove = (productId, title, variantId) => {
-        removeFromCart(productId, { variantId });
+    const handleRemove = (productId, title, variantId, offerId) => {
+        removeFromCart(productId, { variantId, offerId });
         showToast(`Removed "${title}" from bag`, 'info');
     };
 
-    const handleRemoveBundle = (bundleId, bundleTitle) => {
-        removeBundleFromCart(bundleId);
-        showToast(`Removed bundle "${bundleTitle}" from bag`, 'info');
+    const handleRemoveBundle = (groupId, bundleTitle, isBox) => {
+        if (isBox) removeOfferGroup(groupId);
+        else removeBundleFromCart(groupId);
+        showToast(`Removed ${isBox ? 'box' : 'bundle'} "${bundleTitle}" from bag`, 'info');
     };
 
     // Bundle lines are grouped under one card (added/removed as a unit) rather than mixed in with plain lines.
@@ -109,12 +116,17 @@ export default function CartPage() {
         const seen = new Set();
         const list = [];
         for (const item of items) {
-            const bundleId = item.product.bundleId;
-            if (!bundleId) {
+            const { bundleId, offerGroup } = item.product;
+            if (offerGroup) {
+                if (!seen.has(offerGroup)) {
+                    seen.add(offerGroup);
+                    list.push({ type: 'bundle', kind: 'box', group: offerGroup, bundleTitle: item.product.offerTitle, items: items.filter((i) => i.product.offerGroup === offerGroup) });
+                }
+            } else if (!bundleId) {
                 list.push({ type: 'single', item });
             } else if (!seen.has(bundleId)) {
                 seen.add(bundleId);
-                list.push({ type: 'bundle', bundleId, bundleTitle: item.product.bundleTitle, items: items.filter((i) => i.product.bundleId === bundleId) });
+                list.push({ type: 'bundle', kind: 'bundle', bundleId, bundleTitle: item.product.bundleTitle, items: items.filter((i) => i.product.bundleId === bundleId) });
             }
         }
         return list;
@@ -152,8 +164,8 @@ export default function CartPage() {
                     <ul className="space-y-3">
                         {entries.map((entry) => (
                             entry.type === 'bundle'
-                                ? <BundleEntry key={`bundle-${entry.bundleId}`} entry={entry} onRemove={handleRemoveBundle} />
-                                : <LineEntry key={entry.item.product.variantId ? `${entry.item.product.id}::${entry.item.product.variantId}` : entry.item.product.id} item={entry.item} onRemove={handleRemove} onQuantity={updateQuantity} />
+                                ? <BundleEntry key={`bundle-${entry.group ?? entry.bundleId}`} entry={entry} onRemove={handleRemoveBundle} />
+                                : <LineEntry key={`${entry.item.product.id}::${entry.item.product.variantId ?? ''}::${entry.item.product.offerId ?? ''}`} item={entry.item} onRemove={handleRemove} onQuantity={updateQuantity} />
                         ))}
                     </ul>
                     <CartUpsell />

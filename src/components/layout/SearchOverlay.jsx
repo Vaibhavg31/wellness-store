@@ -9,6 +9,7 @@ import { useCategories, useProducts } from '@/hooks/useApi';
 import { imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
 import { humanizeSlug } from '@/utils/products';
+import { searchProducts } from '@/utils/searchProducts';
 
 function ProductRow({ product, onClose }) {
     return (
@@ -35,10 +36,8 @@ export default function SearchOverlay({ isOpen, onClose }) {
 
     const results = useMemo(() => {
         if (!debounced) return [];
-        return products
-            .filter((p) => `${p.title} ${p.category} ${p.description ?? ''}`.toLowerCase().includes(debounced))
-            .slice(0, 6);
-    }, [products, debounced]);
+        return searchProducts(products, debounced, { categories }).slice(0, 6);
+    }, [products, debounced, categories]);
 
     const popular = useMemo(() => [...products].sort((a, b) => (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0)).slice(0, 4), [products]);
 

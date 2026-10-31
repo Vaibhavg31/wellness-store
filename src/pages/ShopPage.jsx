@@ -13,6 +13,7 @@ import { useProducts, useCategories } from '@/hooks/useApi';
 import { trackEvent } from '@/utils/analytics';
 
 const SORT_OPTIONS = [
+    { value: 'relevance', label: 'Best match' },
     { value: 'newest', label: 'Newest' },
     { value: 'price-low', label: 'Price: low to high' },
     { value: 'price-high', label: 'Price: high to low' },
@@ -37,7 +38,9 @@ export default function ShopPage() {
             const value = searchParams.get(key);
             if (value) next[key] = value;
         });
-        setFilters((prev) => ({ ...prev, search: '', ...next }));
+        // A search starts on "Best match"; clearing it goes back to "Newest" (unless a sort was chosen in the link).
+        if (next.search && !next.sort) next.sort = 'relevance';
+        setFilters((prev) => ({ ...prev, search: '', sort: prev.sort === 'relevance' ? 'newest' : prev.sort, ...next }));
     }, [searchParams]);
 
     const tags = useMemo(() => {
@@ -47,9 +50,11 @@ export default function ShopPage() {
     }, [products]);
 
     const maxPrice = filters.maxPrice === Infinity ? ceiling : filters.maxPrice;
+    // "Best match" only makes sense while there is something being searched for.
+    const sortOptions = filters.search.trim() ? SORT_OPTIONS : SORT_OPTIONS.filter((o) => o.value !== 'relevance');
     const filtered = useMemo(
-        () => filterProducts(products, { ...filters, minPrice: 0, maxPrice }),
-        [products, filters, maxPrice],
+        () => filterProducts(products, { ...filters, minPrice: 0, maxPrice }, categories),
+        [products, filters, maxPrice, categories],
     );
 
     // Funnel: what people search for (and whether we had it). Waits until they stop typing; each term is counted once.
@@ -65,7 +70,14 @@ export default function ShopPage() {
     }, [searchTerm, loading, filtered.length]);
 
     const update = (key, value) => {
-        setFilters((prev) => ({ ...prev, [key]: value }));
+        setFilters((prev) => {
+            const next = { ...prev, [key]: value };
+            if (key === 'search') {
+                if (String(value).trim() && prev.sort === 'newest') next.sort = 'relevance';
+                if (!String(value).trim() && prev.sort === 'relevance') next.sort = 'newest';
+            }
+            return next;
+        });
         if (key === 'search') {
             const next = new URLSearchParams(searchParams);
             if (String(value).trim()) next.set('search', value);
@@ -84,10 +96,10 @@ export default function ShopPage() {
     const counts = useMemo(() => {
         const base = { ...filters, minPrice: 0, maxPrice };
         const category = {};
-        categories.forEach((c) => { category[c.slug] = filterProducts(products, { ...base, category: c.slug }).length; });
+        categories.forEach((c) => { category[c.slug] = filterProducts(products, { ...base, category: c.slug }, categories).length; });
         const tag = {};
-        tags.forEach((t) => { tag[t] = filterProducts(products, { ...base, tag: t }).length; });
-        return { category, tag, categoryTotal: filterProducts(products, { ...base, category: 'all' }).length };
+        tags.forEach((t) => { tag[t] = filterProducts(products, { ...base, tag: t }, categories).length; });
+        return { category, tag, categoryTotal: filterProducts(products, { ...base, category: 'all' }, categories).length };
     }, [products, categories, tags, filters, maxPrice]);
 
     const activeCount = [filters.category !== 'all', filters.tag !== 'all', filters.maxPrice !== Infinity && filters.maxPrice < ceiling].filter(Boolean).length;
@@ -133,7 +145,7 @@ export default function ShopPage() {
                                     onChange={(e) => update('sort', e.target.value)}
                                     className="h-11 w-full min-w-0 appearance-none rounded-full border border-line-strong bg-surface pl-4 pr-10 text-small text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 >
-                                    {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                    {sortOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                                 </select>
                                 <ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted" aria-hidden="true" />
                             </div>
@@ -166,7 +178,7 @@ export default function ShopPage() {
                 ceiling={ceiling}
                 maxPrice={maxPrice}
                 onChange={update}
-                sortOptions={SORT_OPTIONS}
+                sortOptions={sortOptions}
                 resultCount={filtered.length}
                 activeCount={activeCount}
                 onReset={reset}

@@ -1,10 +1,12 @@
 import Hero from '@/components/home/Hero';
 import Seo from '@/components/seo/Seo';
-import TrustStrip from '@/components/home/TrustStrip';
+import FeatureRibbon from '@/components/home/FeatureRibbon';
 import VideoBanner from '@/components/home/VideoBanner';
 import { BannerSlider, PromoBanners } from '@/components/home/BannerSection';
 import ShopByNeed from '@/components/home/ShopByNeed';
-import RangeRail from '@/components/home/RangeRail';
+import CategoryScroller from '@/components/home/CategoryScroller';
+import TrendingNow from '@/components/home/TrendingNow';
+import WatchShop from '@/components/home/WatchShop';
 import BundleSection from '@/components/home/BundleSection';
 import DayRitual from '@/components/home/DayRitual';
 import RoutineBuilder from '@/components/home/RoutineBuilder';
@@ -26,11 +28,13 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
 function buildSections({ products, loading }) {
     return {
         hero: () => <Hero products={products} loading={loading} />,
-        brandMarquee: () => <TrustStrip />,
+        brandMarquee: () => <FeatureRibbon />,
         videoBanner: () => <VideoBanner />,
         categories: () => <ShopByNeed />,
         routineBuilder: () => <RoutineBuilder products={products} />,
-        categoryShelves: () => <RangeRail products={products} loading={loading} />,
+        categoryShelves: () => <CategoryScroller products={products} loading={loading} />,
+        trending: () => <TrendingNow />,
+        watchShop: () => <WatchShop products={products} />,
         banners: () => <PromoBanners />,
         bannerSlider: () => <BannerSlider />,
         dayRitual: () => <DayRitual products={products} />,
@@ -54,6 +58,7 @@ export default function HomePage() {
     return (
         <>
             <Seo path="/" />
+            <h1 className="sr-only">Chikit: Ayurveda and Wellness</h1>
             {Object.keys(sections)
                 .filter((key) => sections[key] !== false && renderers[key])
                 .map((key) => <div key={key} className="contents">{renderers[key]()}</div>)}

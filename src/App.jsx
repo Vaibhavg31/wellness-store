@@ -24,6 +24,11 @@ import HomePage from '@/pages/HomePage';
 const ShopPage = lazy(pageLoaders.ShopPage);
 const ProductDetailPage = lazy(pageLoaders.ProductDetailPage);
 const CategoryPage = lazy(pageLoaders.CategoryPage);
+const ConcernPage = lazy(pageLoaders.ConcernPage);
+const NewLaunchesPage = lazy(pageLoaders.NewLaunchesPage);
+const OffersHubPage = lazy(pageLoaders.OffersHubPage);
+const OfferPage = lazy(pageLoaders.OfferPage);
+const ClubPage = lazy(pageLoaders.ClubPage);
 const ReviewsPage = lazy(pageLoaders.ReviewsPage);
 const CartPage = lazy(pageLoaders.CartPage);
 const CheckoutPage = lazy(pageLoaders.CheckoutPage);
@@ -70,6 +75,11 @@ const AdminBundlesPage = lazy(pageLoaders.AdminBundlesPage);
 const STOREFRONT_ROUTES = [
     { path: 'shop', Page: ShopPage },
     { path: 'category/:slug', Page: CategoryPage },
+    { path: 'concern/:slug', Page: ConcernPage },
+    { path: 'new-launches', Page: NewLaunchesPage },
+    { path: 'offers', Page: OffersHubPage },
+    { path: 'offers/:slug', Page: OfferPage },
+    { path: 'club', Page: ClubPage },
     { path: 'product/:id', Page: ProductDetailPage },
     { path: 'reviews', Page: ReviewsPage },
     { path: 'cart', title: 'Your Bag', Page: CartPage, noindex: true },
