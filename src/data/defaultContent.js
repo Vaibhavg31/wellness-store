@@ -80,6 +80,7 @@ export const DEFAULT_SITE_CONTENT = {
         bannerSlider: true,
         brandMarquee: true,
         trending: true,
+        offersSlider: true,
         categoryShelves: true,
         wellRange: true,
         bottomRibbon: true,

@@ -9,6 +9,7 @@ import TrendingNow from '@/components/home/TrendingNow';
 import WatchShop from '@/components/home/WatchShop';
 import WellRange from '@/components/home/WellRange';
 import BottomRibbon from '@/components/home/BottomRibbon';
+import OffersSlider from '@/components/home/OffersSlider';
 import BundleSection from '@/components/home/BundleSection';
 import DayRitual from '@/components/home/DayRitual';
 import RoutineBuilder from '@/components/home/RoutineBuilder';
@@ -39,6 +40,7 @@ function buildSections({ products, loading }) {
         watchShop: () => <WatchShop products={products} />,
         wellRange: () => <WellRange products={products} />,
         bottomRibbon: () => <BottomRibbon />,
+        offersSlider: () => <OffersSlider products={products} />,
         banners: () => <PromoBanners />,
         bannerSlider: () => <BannerSlider />,
         dayRitual: () => <DayRitual products={products} />,

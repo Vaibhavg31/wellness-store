@@ -55,6 +55,7 @@ const DEFAULTS = {
         bannerSlider: true,
         brandMarquee: true,
         trending: true,
+        offersSlider: true,
         categoryShelves: true,
         wellRange: true,
         watchShop: true,
