@@ -190,8 +190,8 @@ export const DEFAULT_SITE_CONTENT = {
     },
 
     newsletter: {
-        badge: 'Exclusive Access',
-        title: 'Join the Chikit Circle',
+        badge: 'Chikit Updates',
+        title: 'Stay in the loop',
         description: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.',
         buttonLabel: 'Subscribe',
         disclaimer: 'No spam. Unsubscribe anytime.',

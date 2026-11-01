@@ -59,7 +59,7 @@ export default function TrendingNow() {
                         <li key={chip.query} className="shrink-0">
                             <Link
                                 to={`/shop?search=${encodeURIComponent(chip.query)}`}
-                                className="inline-flex min-h-10 items-center rounded-full bg-primary-tint px-4 text-small font-medium text-primary-deep transition-colors hover:bg-primary hover:text-white"
+                                className="inline-flex min-h-11 items-center rounded-full bg-primary-tint px-4 text-small font-medium text-primary-deep transition-colors hover:bg-primary hover:text-white"
                             >
                                 {chip.label}
                             </Link>

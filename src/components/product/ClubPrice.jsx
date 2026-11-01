@@ -24,7 +24,8 @@ export default function ClubPrice({ memberPrice, className, compact = false }) {
     return (
         <Link
             to="/club"
-            className={cn('inline-flex items-center gap-1.5 rounded-md bg-accent px-2 py-1 text-caption font-semibold text-ink transition-colors hover:bg-accent-hover', compact && 'px-1.5 py-0.5 text-[11px]', className)}
+            className={cn('inline-flex items-center gap-1.5 rounded-md bg-accent px-2 py-1 text-caption font-semibold text-ink transition-colors hover:bg-accent-hover', // compact: a small pill on a card; its tap area still grows to a thumb's size.
+                compact && "relative px-1.5 py-0.5 text-[11px] before:absolute before:-inset-x-1 before:-inset-y-3 before:content-['']", className)}
         >
             <Crown size={compact ? 11 : 13} aria-hidden="true" />
             {formatPrice(memberPrice)} <span className="font-medium">for Club members</span>

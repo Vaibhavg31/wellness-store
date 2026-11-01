@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight, Flame, Sparkles } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
+import ProductSpotlight from '@/components/product/ProductSpotlight';
 import Skeleton from '@/components/ui/Skeleton';
 import { imageUrl } from '@/services/api';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
@@ -49,6 +50,35 @@ function ProductRail({ products, label }) {
  */
 function FewProducts({ section }) {
     const tile = section.image && section.href.startsWith('/category/');
+    const count = section.items.length;
+    // One or two products in a wide row: use the room for a wide card with the picture, a line and the buy button together.
+    if (count <= 2) {
+        return (
+            <div className="lg:grid lg:grid-cols-4 lg:gap-6">
+                {tile && (
+                    <Link to={section.href} className="group relative mb-4 hidden overflow-hidden rounded-lg bg-canvas-alt lg:mb-0 lg:block">
+                        <img src={imageUrl(section.image, 600)} alt="" loading="lazy" className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-ink/70 to-transparent p-4 text-white">
+                            <span className="font-display text-h4">Explore {section.title}</span>
+                            <ArrowRight size={18} aria-hidden="true" />
+                        </span>
+                    </Link>
+                )}
+                <ul aria-label={section.title} className={cn('grid gap-4 lg:gap-6', count === 1 ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-1', tile ? 'lg:col-span-3' : 'lg:col-span-4', count === 1 && !tile && 'lg:max-w-3xl')}>
+                    {section.items.map((product) => (
+                        <li key={product.id} className="min-w-0">
+                            {count === 1 ? <ProductSpotlight product={product} /> : (
+                                <>
+                                    <div className="lg:hidden"><ProductCard product={product} /></div>
+                                    <div className="hidden h-full lg:block"><ProductSpotlight product={product} /></div>
+                                </>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+    }
     return (
         <div className="lg:grid lg:grid-cols-4 lg:gap-6">
             {tile && (
@@ -154,7 +184,7 @@ export default function CategoryScroller({ products, loading }) {
                 className="sticky z-30 border-y border-line bg-canvas/95 backdrop-blur transition-[top] duration-300 ease-[var(--ease-out-soft)]"
             >
                 <div className="container-page">
-                    <div data-chip-row role="tablist" aria-label="Jump to a category" className="-mx-4 flex gap-2 overflow-x-auto px-4 py-3 scrollbar-none sm:mx-0 sm:px-0">
+                    <div data-chip-row role="tablist" aria-label="Jump to a category" className="-mx-4 flex gap-2 overflow-x-auto px-4 py-3 pr-10 scrollbar-none [mask-image:linear-gradient(to_right,#000_92%,transparent)] sm:mx-0 sm:px-0 sm:pr-10">
                         {sections.map((s) => {
                             const Icon = s.icon;
                             const active = activeId === s.id;
@@ -167,7 +197,7 @@ export default function CategoryScroller({ products, loading }) {
                                     aria-selected={active}
                                     onClick={() => goTo(s.id)}
                                     className={cn(
-                                        'inline-flex min-h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-small font-medium transition-colors',
+                                        'inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-small font-medium transition-colors',
                                         active ? 'border-primary bg-primary-tint text-primary-deep shadow-xs' : 'border-line-strong bg-surface text-ink hover:border-primary hover:text-primary',
                                     )}
                                 >
@@ -188,13 +218,13 @@ export default function CategoryScroller({ products, loading }) {
                     </div>
                 )}
                 {sections.map((s) => (
-                    <section key={s.id} id={`range-${s.id}`} aria-labelledby={`range-title-${s.id}`} style={{ scrollMarginTop: barTop + 64 }} className="py-8 lg:py-12">
+                    <section key={s.id} id={`range-${s.id}`} aria-labelledby={`range-title-${s.id}`} style={{ scrollMarginTop: barTop + 64 }} className="py-6 lg:py-9">
                         <div className="mb-5 flex items-end justify-between gap-4 lg:mb-7">
                             <div>
                                 <h2 id={`range-title-${s.id}`} className="text-h3">{s.title}</h2>
                                 {s.subtitle && <p className="mt-1 text-small text-muted">{s.subtitle}</p>}
                             </div>
-                            <Link to={s.href} className="inline-flex min-h-10 shrink-0 items-center gap-1.5 text-small font-medium text-primary hover:underline">
+                            <Link to={s.href} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-small font-medium text-primary hover:underline">
                                 View all <ArrowRight size={16} aria-hidden="true" />
                             </Link>
                         </div>

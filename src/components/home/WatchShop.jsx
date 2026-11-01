@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ReelProduct, ReelVideo, ReelViewer } from '@/components/video/Reels';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { trackEvent } from '@/utils/analytics';
+import { cn } from '@/utils/formatPrice';
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -29,7 +30,7 @@ export default function WatchShop({ products }) {
                     </div>
                 </div>
                 <div className="group/rail relative">
-                    <ul ref={scroller} className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-pl-4 px-4 pb-3 sm:-mx-6 sm:scroll-pl-6 sm:px-6 lg:mx-0 lg:justify-center lg:scroll-pl-0 lg:px-0">
+                    <ul ref={scroller} className={cn('scrollbar-none -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-pl-4 px-4 pb-3 sm:-mx-6 sm:scroll-pl-6 sm:px-6 lg:mx-0 lg:scroll-pl-0 lg:px-0', reels.length <= 5 && 'lg:justify-center')}>
                         {reels.map((reel, i) => {
                             const product = productFor(reel);
                             return (

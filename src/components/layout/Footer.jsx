@@ -18,7 +18,7 @@ const COLLECTION_LIMIT = 6;
 /** Pages every shopper may need, linked from the footer whatever the admin's menu holds. */
 const COMPANY_LINKS = [{ label: 'Our story', href: '/about' }, { label: 'Offers', href: '/offers' }, { label: 'Chikit Club Card', href: '/club' }, { label: 'Reviews', href: '/reviews' }];
 const HELP_LINKS = [{ label: 'Track your order', href: '/track-order' }, { label: 'FAQ', href: '/faq' }, { label: 'Contact us', href: '/contact' }];
-const linkClass = 'inline-flex min-h-9 items-center text-small text-muted transition-colors hover:text-primary';
+const linkClass = 'inline-flex min-h-11 items-center text-small text-muted transition-colors hover:text-primary';
 
 function NewsletterForm() {
     const { showToast } = useToast();
@@ -88,19 +88,19 @@ export default function Footer() {
                     <ul className="mt-5 flex flex-wrap gap-2">
                         {hasInstagramUrl(instagramUrl) && (
                             <li>
-                                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="grid size-10 place-items-center rounded-full bg-surface text-primary shadow-xs transition-colors hover:bg-primary hover:text-white" aria-label="Instagram">
+                                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-full bg-surface text-primary shadow-xs transition-colors hover:bg-primary hover:text-white" aria-label="Instagram">
                                     <InstagramIcon size={18} />
                                 </a>
                             </li>
                         )}
                         <li>
-                            <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="grid size-10 place-items-center rounded-full bg-surface text-primary shadow-xs transition-colors hover:bg-primary hover:text-white" aria-label="WhatsApp">
+                            <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-full bg-surface text-primary shadow-xs transition-colors hover:bg-primary hover:text-white" aria-label="WhatsApp">
                                 <WhatsAppIcon size={18} />
                             </a>
                         </li>
                         {contact?.email && (
                             <li>
-                                <a href={`mailto:${contact.email}`} className="grid size-10 place-items-center rounded-full bg-surface text-primary shadow-xs transition-colors hover:bg-primary hover:text-white" aria-label="Email us">
+                                <a href={`mailto:${contact.email}`} className="grid size-11 place-items-center rounded-full bg-surface text-primary shadow-xs transition-colors hover:bg-primary hover:text-white" aria-label="Email us">
                                     <Mail size={18} />
                                 </a>
                             </li>
@@ -148,13 +148,13 @@ export default function Footer() {
                 <div className="container-page flex flex-col items-center justify-between gap-3 py-5 text-caption text-muted sm:flex-row">
                     <p>© {new Date().getFullYear()} {content.brandName}. All rights reserved.</p>
                     <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
-                        <li><Link to="/privacy" className="inline-flex min-h-9 items-center hover:text-primary">Privacy Policy</Link></li>
-                        <li><Link to="/terms" className="inline-flex min-h-9 items-center hover:text-primary">Terms of Service</Link></li>
-                        <li><Link to="/shipping-policy" className="inline-flex min-h-9 items-center hover:text-primary">Shipping</Link></li>
-                        <li><Link to="/refund-policy" className="inline-flex min-h-9 items-center hover:text-primary">Returns &amp; Refunds</Link></li>
+                        <li><Link to="/privacy" className="inline-flex min-h-11 items-center hover:text-primary">Privacy Policy</Link></li>
+                        <li><Link to="/terms" className="inline-flex min-h-11 items-center hover:text-primary">Terms of Service</Link></li>
+                        <li><Link to="/shipping-policy" className="inline-flex min-h-11 items-center hover:text-primary">Shipping</Link></li>
+                        <li><Link to="/refund-policy" className="inline-flex min-h-11 items-center hover:text-primary">Returns &amp; Refunds</Link></li>
                         <li>
                             {DEVELOPER_CREDIT}{' '}
-                            <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center px-1 font-medium text-ink hover:text-primary">{DEVELOPER_NAME}</a>
+                            <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center px-1 font-medium text-ink hover:text-primary">{DEVELOPER_NAME}</a>
                         </li>
                     </ul>
                 </div>

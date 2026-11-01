@@ -1050,7 +1050,7 @@ export default function AdminContentPage() {
                                 </AdminField>
                             </div>
 
-                            <AdminField label="Delay (seconds)" hint="How long after the page loads before it appears.">
+                            <AdminField label="Wait before showing (seconds)" hint="The popup never covers the first screen: it opens as soon as the shopper scrolls a little, or after this many seconds if they do not (never sooner than 25).">
                                 <Input
                                     type="number"
                                     min={0}

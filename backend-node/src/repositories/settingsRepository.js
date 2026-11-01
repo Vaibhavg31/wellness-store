@@ -94,7 +94,7 @@ const DEFAULTS = {
     featured: { collectionTitle: 'Shop the range', stylesTitle: 'The Chikit range', viewAllLabel: 'View all', productCount: 8 },
     whyChoose: { subtitle: 'Why Choose Us', title: 'Ayurveda You Can Trust', description: 'From sourcing to lab testing, every step is built around Ayurvedic tradition and transparency.', benefits: [], ctaText: "Stay connected with us on Instagram and WhatsApp. We're always happy to help." },
     certifiedBanner: { badge: 'FSSAI & GMP Certified', title: 'Purity You Can Verify', description: 'Every product is manufactured in certified facilities and third-party lab tested before it reaches you.', ctaLabel: 'See Our Certifications', ctaHref: '/about', image: '' },
-    newsletter: { badge: 'Exclusive Access', title: 'Join the Chikit Circle', description: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.', buttonLabel: 'Subscribe', disclaimer: 'No spam. Unsubscribe anytime.', successMessage: 'Thank you for subscribing!' },
+    newsletter: { badge: 'Chikit Updates', title: 'Stay in the loop', description: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.', buttonLabel: 'Subscribe', disclaimer: 'No spam. Unsubscribe anytime.', successMessage: 'Thank you for subscribing!' },
     instagram: { subtitle: '@chikit.ayurveda', title: 'Follow Our Journey', description: 'Follow us for Ayurvedic rituals, wellness tips and behind-the-scenes.', stripLabel: 'Follow us on Instagram', images: [] },
     about: {
         heroTitle: 'Our Story',
@@ -111,7 +111,7 @@ const DEFAULTS = {
         valuesTitle: 'Mission & Vision',
     },
     contactPage: { subtitle: 'Get in Touch', title: 'Contact Us', description: "We'd love to hear from you. Our team is here to help.", faqs: [] },
-    footer: { tagline: 'Ayurveda and Wellness', description: 'Rooted in Ayurveda. Thoughtfully crafted for a healthier, happier you.', newsletterTitle: 'Our Wellness Circle', newsletterDescription: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.', instagramCardText: 'Wellness tips, product stories & behind-the-scenes.' },
+    footer: { tagline: 'Ayurveda and Wellness', description: 'Rooted in Ayurveda. Thoughtfully crafted for a healthier, happier you.', newsletterTitle: 'Stay in the loop', newsletterDescription: 'Be the first to hear about new products, offers, and Ayurvedic wellness tips.', instagramCardText: 'Wellness tips, product stories & behind-the-scenes.' },
     seo: { title: 'Chikit | Ayurveda and Wellness', description: 'Rooted in Ayurveda. Thoughtfully crafted for a healthier, happier you.' },
     popup: { enabled: false, type: 'info', title: 'Welcome to Chikit', message: 'Sign up for our newsletter and get 10% off your first order.', image: '', ctaLabel: 'Shop Now', ctaHref: '/shop', couponCode: 'WELCOME10', productId: null, delaySeconds: 2, frequency: 'session' },
     extras: {

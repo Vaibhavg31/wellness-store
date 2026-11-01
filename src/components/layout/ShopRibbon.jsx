@@ -20,7 +20,7 @@ export const CONCERN_ICONS = {
 };
 
 const pillBase = 'relative inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full font-medium transition-colors duration-200';
-const pillSize = { desktop: 'px-3.5 py-2 text-small', phone: 'px-3.5 py-1.5 text-small' };
+const pillSize = { desktop: 'px-3.5 py-2 text-small', phone: 'px-3.5 py-2.5 text-small' };
 const pillIdle = 'text-ink hover:bg-primary-soft hover:text-primary';
 const pillOpen = 'bg-primary-tint text-primary-deep';
 
@@ -120,7 +120,7 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
 
     if (variant === 'phone') {
         return (
-            <nav aria-label="Shop menu" className="container-page flex items-center gap-1 overflow-x-auto py-2 scrollbar-none lg:hidden">
+            <nav aria-label="Shop menu" className="container-page flex items-center gap-1 overflow-x-auto py-2 pr-8 scrollbar-none [mask-image:linear-gradient(to_right,#000_90%,transparent)] lg:hidden">
                 {nav}
             </nav>
         );
@@ -162,7 +162,7 @@ export function RibbonPanels({ openMenu, onClose }) {
                         <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-2 border-t border-line pt-5">
                             <span className="mr-1 text-caption font-semibold uppercase tracking-wider text-muted">Categories</span>
                             {plan.map((category) => (
-                                <Link key={category.slug} to={`/category/${category.slug}`} onClick={onClose} className="inline-flex min-h-9 items-center rounded-full border border-line-strong px-3.5 text-small font-medium text-ink transition-colors hover:border-primary hover:text-primary">
+                                <Link key={category.slug} to={`/category/${category.slug}`} onClick={onClose} className="inline-flex min-h-11 items-center rounded-full border border-line-strong px-3.5 text-small font-medium text-ink transition-colors hover:border-primary hover:text-primary">
                                     {category.label}
                                 </Link>
                             ))}

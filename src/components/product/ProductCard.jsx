@@ -79,7 +79,7 @@ function ProductCard({ product, priority = false }) {
                     onClick={handleWishlist}
                     aria-pressed={wished}
                     aria-label={wished ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
-                    className={cn('absolute right-3 top-3 z-10 grid size-10 place-items-center rounded-full bg-surface/95 shadow-xs transition-colors hover:bg-surface', wished ? 'text-primary' : 'text-muted hover:text-primary')}
+                    className={cn('absolute right-3 top-3 z-10 grid size-11 place-items-center rounded-full bg-surface/95 shadow-xs transition-colors hover:bg-surface', wished ? 'text-primary' : 'text-muted hover:text-primary')}
                 >
                     <Heart size={18} fill={wished ? 'currentColor' : 'none'} />
                 </button>

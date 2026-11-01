@@ -27,6 +27,10 @@ function contentKey(popup) {
     }
 }
 
+/** The popup waits at least this long, or until the shopper has scrolled this many screens, whichever comes first. */
+const MIN_WAIT_SECONDS = 25;
+const SCROLL_TRIGGER = 0.6;
+
 const storeFor = (frequency) => (frequency === 'once' ? localStorage : sessionStorage);
 
 function wasDismissed(key, frequency) {
@@ -253,7 +257,7 @@ export function PopupDialog({ popup, product = null, category = null, segments =
 
 /**
  * Site-wide on-load announcement popup, managed from Content Manager.
- * Shows once per session / visit / ever depending on `frequency`, after `delaySeconds`, only inside its
+ * Shows once per session / visit / ever depending on `frequency`, once the shopper has scrolled a little or waited `delaySeconds` (at least 25), only inside its
  * start/end window and only on the pages the admin chose (never checkout, sign-in or admin).
  */
 export default function AnnouncementPopup() {
@@ -290,8 +294,14 @@ export default function AnnouncementPopup() {
             return undefined;
         }
         if (visible || !canStart || wasDismissed(key, popup.frequency)) return undefined;
-        const timer = setTimeout(() => setVisible(true), Math.max(0, (popup.delaySeconds ?? 2) * 1000));
-        return () => clearTimeout(timer);
+        // Never on the first screen: a full-screen card the moment a shopper arrives hides the page they came for (and Google
+        // can demote mobile pages that do it). It opens once they have scrolled a little, or have stayed a while.
+        const wait = Math.max(popup.delaySeconds ?? 0, MIN_WAIT_SECONDS) * 1000;
+        const show = () => setVisible(true);
+        const timer = setTimeout(show, wait);
+        const onScroll = () => { if (window.scrollY > window.innerHeight * SCROLL_TRIGGER) show(); };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => { clearTimeout(timer); window.removeEventListener('scroll', onScroll); };
     }, [routeOk, canStart, visible, key, popup.frequency, popup.delaySeconds]);
 
     if (!routeOk || !visible) return null;

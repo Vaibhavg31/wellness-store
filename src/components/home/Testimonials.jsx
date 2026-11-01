@@ -6,7 +6,10 @@ import UserAvatar from '@/components/ui/UserAvatar';
 import { useReviews } from '@/hooks/useApi';
 import { cn } from '@/utils/formatPrice';
 
-const COLUMNS = { 1: 'lg:grid-cols-1 lg:max-w-xl', 2: 'lg:grid-cols-2 lg:max-w-4xl', 3: 'lg:grid-cols-3 lg:max-w-none' };
+/** From this many reviews the big average-rating headline is shown; below it the section leads with what people wrote. */
+const ENOUGH_FOR_HEADLINE = 8;
+
+const COLUMNS ={ 1: 'lg:grid-cols-1 lg:max-w-xl', 2: 'lg:grid-cols-2 lg:max-w-4xl', 3: 'lg:grid-cols-3 lg:max-w-none' };
 
 /**
  * Social proof led by the number: the average rating and how many reviews stand behind it, then the words.
@@ -23,12 +26,20 @@ export default function Testimonials() {
     return (
         <section className="section bg-canvas" aria-labelledby="voices-title">
             <div className="container-page">
-                <div className="mb-10 flex flex-col items-center text-center lg:mb-14">
-                    <p className="font-display text-[3.5rem] font-semibold leading-none text-primary lg:text-[4.5rem]" aria-label={`Average rating ${average.toFixed(1)} out of 5`}>{average.toFixed(1)}</p>
-                    <Rating value={average} size={20} className="mt-3" />
-                    <h2 id="voices-title" className="mt-4 text-h3">Loved by people who use it daily</h2>
-                    <p className="mt-1 text-small text-muted">From {reviews.length} customer {reviews.length === 1 ? 'review' : 'reviews'}</p>
-                </div>
+                {reviews.length >= ENOUGH_FOR_HEADLINE ? (
+                    <div className="mb-10 flex flex-col items-center text-center lg:mb-14">
+                        <p className="font-display text-[3.5rem] font-semibold leading-none text-primary lg:text-[4.5rem]" aria-label={`Average rating ${average.toFixed(1)} out of 5`}>{average.toFixed(1)}</p>
+                        <Rating value={average} size={20} className="mt-3" />
+                        <h2 id="voices-title" className="mt-4 text-h3">Loved by people who use it daily</h2>
+                        <p className="mt-1 text-small text-muted">From {reviews.length} customer {reviews.length === 1 ? 'review' : 'reviews'}</p>
+                    </div>
+                ) : (
+                    // A big score built on two or three reviews reads as thin proof, so until there are more the words lead.
+                    <div className="mb-8 flex flex-col items-center text-center lg:mb-10">
+                        <h2 id="voices-title" className="text-h3">What our customers say</h2>
+                        <p className="mt-2 flex items-center gap-2 text-small text-muted"><Rating value={average} size={15} /> {average.toFixed(1)} from {reviews.length} customer {reviews.length === 1 ? 'review' : 'reviews'}</p>
+                    </div>
+                )}
 
                 <ul className={cn('scrollbar-none -mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-pl-6 sm:px-6 lg:mx-auto lg:grid lg:gap-6 lg:overflow-visible lg:px-0', columns)}>
                     {shown.map((review, i) => (

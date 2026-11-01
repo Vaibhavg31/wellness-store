@@ -6,6 +6,7 @@ import { ADMIN_PATH } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { popupAllowedOn } from '@/utils/popupSchedule';
 import { useScrollPosition } from '@/hooks';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { cn } from '@/utils/formatPrice';
 
 const HIDDEN_KEY = 'chikit-offer-tab-hidden';
@@ -32,6 +33,8 @@ export default function OfferTab() {
     const [open, setOpen] = useState(false);
     const [unlocked, setUnlocked] = useState(() => Boolean(readUnlocked()));
     const awayFromTop = useScrollPosition(320);
+    // On phones the pill sits over the products, so it tucks away while the shopper scrolls down and returns on the way up.
+    const scrollingDown = useScrollDirection({ offset: 200 }) === 'down';
 
     const allowed = offer.enabled && Boolean(offer.couponId) && popupAllowedOn(pathname, offer.pages, ADMIN_PATH);
 
@@ -63,6 +66,7 @@ export default function OfferTab() {
                 <div className={cn(
                     // Phones: a compact pill at the bottom-left (clear of the chat button). Larger screens: the slim edge tab.
                     busyOnPhone && 'max-sm:hidden',
+                    scrollingDown && 'max-sm:pointer-events-none max-sm:!opacity-0',
                     'fixed bottom-4 left-4 z-40 flex animate-fade-up items-center gap-1.5 sm:bottom-auto sm:top-[60%] sm:-translate-y-1/2 sm:flex-col sm:gap-2 sm:animate-none',
                     right ? 'sm:left-auto sm:right-0 sm:animate-edge-in-right' : 'sm:left-0 sm:animate-edge-in-left',
                 )}>
@@ -83,7 +87,7 @@ export default function OfferTab() {
                         type="button"
                         onClick={hide}
                         aria-label="Hide offer tab"
-                        className={cn('grid size-9 place-items-center rounded-full bg-surface text-ink shadow-md hover:bg-canvas-alt sm:order-1 sm:size-7', right ? 'sm:mr-1' : 'sm:ml-1')}
+                        className={cn('grid size-11 place-items-center rounded-full bg-surface text-ink shadow-md hover:bg-canvas-alt sm:order-1 sm:size-7', right ? 'sm:mr-1' : 'sm:ml-1')}
                     >
                         <X size={14} />
                     </button>

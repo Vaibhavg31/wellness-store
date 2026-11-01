@@ -47,7 +47,7 @@ export function ReelProduct({ product, compact = false, onBuy }) {
                     <Price price={product.price} originalPrice={product.originalPrice} className="text-small" />
                 </span>
             </Link>
-            <Button size="sm" disabled={outOfStock} onClick={buy} className="w-full"><ShoppingBag size={15} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Buy now'}</Button>
+            <Button disabled={outOfStock} onClick={buy} className="w-full"><ShoppingBag size={15} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Buy now'}</Button>
         </div>
     );
 }

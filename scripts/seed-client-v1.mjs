@@ -69,7 +69,13 @@ const extras = {
     },
 };
 
-await call('PUT', '/api/settings', { theme: { ...current.theme, backgroundColor: '#F4EBDD' }, sections, extras }, token);
+// The email signup used to be called "Join the Chikit Circle", which sits beside the Chikit Club Card and looks like a second membership.
+// Rename it only while it still has the old default wording, so a title the client chose themselves is never overwritten.
+const newsletter = current.newsletter?.title === 'Join the Chikit Circle'
+    ? { ...current.newsletter, badge: 'Chikit Updates', title: 'Stay in the loop' }
+    : current.newsletter;
+
+await call('PUT', '/api/settings', { theme: { ...current.theme, backgroundColor: '#F4EBDD' }, sections, extras, newsletter }, token);
 console.log('Settings applied to', base);
 
 /* ------------------------------------------------------------------------------------------------ products */
