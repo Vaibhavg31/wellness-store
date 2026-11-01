@@ -791,6 +791,9 @@ export default function AdminContentPage() {
                                 )}
                                 {content.extras.nav.mode === 'categories' && (
                                     <>
+                                        {content.sections?.categoryShelves !== false && (
+                                            <p className="rounded-lg bg-warning-tint px-3 py-2 text-caption text-warning">The homepage already shows every category in its own bar, so with this choice shoppers see the same list twice there. The recommended bar avoids that.</p>
+                                        )}
                                         <label className="flex items-center gap-3 cursor-pointer">
                                             <input type="checkbox" className="h-4 w-4 accent-primary" checked={content.extras.nav.showAll} onChange={(e) => updateExtras({ nav: { ...content.extras.nav, showAll: e.target.checked } })} />
                                             <span className="text-sm text-ink">Show a “Shop” button first (opens all products)</span>

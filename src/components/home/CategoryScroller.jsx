@@ -9,7 +9,7 @@ import { cn } from '@/utils/formatPrice';
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** One row of products that can be swiped (phone) or paged with the arrows (desktop). */
-function ProductRail({ products, label }) {
+function ProductRail({ products, label, href }) {
     const scroller = useRef(null);
     const slide = (direction) => {
         const node = scroller.current;
@@ -27,6 +27,16 @@ function ProductRail({ products, label }) {
                         <ProductCard product={product} />
                     </li>
                 ))}
+                {products.length < 4 && (
+                    // A short row would end in blank space: the rest of it says more is coming and leads on to the whole range.
+                    <li className="flex min-w-[46%] flex-1 snap-start sm:min-w-[31%] lg:min-w-0">
+                        <div className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line-strong/50 bg-canvas-alt/60 p-4 text-center sm:p-6">
+                            <p className="font-display text-lead text-primary-deep sm:text-h4">More {label} on the way</p>
+                            <p className="hidden max-w-xs text-small text-muted sm:block">We are adding new formulations here. Meanwhile, explore everything Chikit makes.</p>
+                            <Link to={href} className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap text-small font-semibold text-primary hover:underline">Browse all <ArrowRight size={16} aria-hidden="true" /></Link>
+                        </div>
+                    </li>
+                )}
             </ul>
             {products.length > 4 && (
                 <>
@@ -172,7 +182,7 @@ export default function CategoryScroller({ products, loading }) {
                                 View all <ArrowRight size={16} aria-hidden="true" />
                             </Link>
                         </div>
-                        <ProductRail products={s.items} label={s.title} />
+                        <ProductRail products={s.items} label={s.title} href="/shop" />
                     </section>
                 ))}
             </div>
