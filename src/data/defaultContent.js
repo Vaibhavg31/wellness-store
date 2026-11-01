@@ -36,7 +36,7 @@ export const DEFAULT_SITE_CONTENT = {
         accentColor: '#C08A3E',
         accentLight: '#D8A860',
         tintColor: '#F1E4F2',
-        backgroundColor: '#F4EBDD',
+        backgroundColor: '#FEE1C5',
         textColor: '#241720',
         fontHeading: '"Lora", Georgia, serif',
         fontBody: '"Poppins", system-ui, sans-serif',
@@ -150,7 +150,7 @@ export const DEFAULT_SITE_CONTENT = {
         productImageIds: [],
         trustBadges: [
             { icon: 'shield', label: 'Ayurveda Certified' },
-            { icon: 'star', label: '4.9★ Rated' },
+            { icon: 'truck', label: 'Cash on Delivery' },
             { icon: 'sparkles', label: '100% Natural' },
         ],
     },
@@ -245,6 +245,7 @@ export const DEFAULT_SITE_CONTENT = {
         disclaimer: 'These statements have not been evaluated by the FSSAI. This product is not intended to diagnose, treat, cure or prevent any disease and is not a substitute for medical advice. Results may vary from person to person.',
         announcements: [],
         restockReminderDays: 30,
+        reviewRequestDays: 1,
         expertChat: true,
         concerns: [], // [{ label, slug, search, image, icon, enabled }] → the Concern menu and /concern pages (empty = the built-in list)
         ribbonMenu: [], // [{ key, label, enabled }] for the top ribbon (empty = New Launches, Concern, Offers, Chikit Club Card, WhatsApp Help)

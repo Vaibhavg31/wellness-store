@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { HttpError } from './response.js';
 import { UserRepository } from '../repositories/userRepository.js';
+import { isAccountTokenValid, isSuperEmail } from './adminAccounts.js';
 
 /**
  * JWT auth — same secret, HS256 algorithm and payload shape as
@@ -39,11 +40,20 @@ export function requireAdmin(req) {
     try {
         const payload = verifyToken(token);
         if (payload.role !== 'admin') throw new HttpError('Forbidden', 403);
+        // A shop admin account that was switched off, removed or given a new password signs out everywhere at once.
+        if (payload.acct && !isAccountTokenValid(payload)) throw new HttpError('Your admin access has changed. Please sign in again.', 401);
         return payload;
     } catch (err) {
         if (err instanceof HttpError) throw err;
         throw new HttpError('Invalid or expired token', 401);
     }
+}
+
+/** Super admins only (the developer logins in ADMIN_LOGINS): managing who may open the admin panel. */
+export function requireSuperAdmin(req) {
+    const payload = requireAdmin(req);
+    if (!payload.super || !isSuperEmail(payload.email)) throw new HttpError('Only a super admin can do this', 403);
+    return payload;
 }
 
 export function optionalCustomer(req) {

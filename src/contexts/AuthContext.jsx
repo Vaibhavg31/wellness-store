@@ -144,6 +144,7 @@ export function AuthProvider({ children }) {
         isAdmin: !!adminToken,
         adminLogin,
         adminLogout,
+        adminLoginToken,
         loginWithGoogle,
         loginWithEmail,
         registerWithEmail,
@@ -158,6 +159,7 @@ export function AuthProvider({ children }) {
         adminToken,
         adminLogin,
         adminLogout,
+        adminLoginToken,
         loginWithGoogle,
         loginWithEmail,
         registerWithEmail,
@@ -178,6 +180,6 @@ export function useAuth() {
 }
 
 export function useAdminAuth() {
-    const { adminToken, isAdmin, adminLogin, adminLogout } = useAuth();
-    return { adminToken, isAdmin, adminLogin, adminLogout };
+    const { adminToken, isAdmin, adminLogin, adminLogout, adminLoginToken } = useAuth();
+    return { adminToken, isAdmin, adminLogin, adminLogout, adminLoginToken };
 }

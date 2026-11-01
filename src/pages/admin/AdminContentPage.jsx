@@ -1192,6 +1192,9 @@ export default function AdminContentPage() {
                                 <AdminField label="Restock reminder after (days)" hint="Account page suggests re-ordering a delivered product after this many days. 0 turns it off.">
                                     <Input type="number" min={0} max={365} className="w-32" value={content.extras.restockReminderDays} onChange={(e) => updateExtras({ restockReminderDays: Number(e.target.value) || 0 })} />
                                 </AdminField>
+                                <AdminField label="Review request email after delivery (days)" hint="Customers get one email asking how the product was, this many days after you mark the order delivered. 0 turns it off. Needs the email account to be connected.">
+                                    <Input type="number" min={0} max={30} className="w-32" value={content.extras.reviewRequestDays} onChange={(e) => updateExtras({ reviewRequestDays: Number(e.target.value) || 0 })} />
+                                </AdminField>
                                 <label className="flex items-center gap-3 cursor-pointer">
                                     <input type="checkbox" className="h-4 w-4 accent-primary" checked={content.extras.expertChat} onChange={(e) => updateExtras({ expertChat: e.target.checked })} />
                                     <span className="text-sm text-ink">Show “Ask an expert on WhatsApp” on product pages</span>

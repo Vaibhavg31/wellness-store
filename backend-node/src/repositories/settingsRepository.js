@@ -85,7 +85,7 @@ const DEFAULTS = {
         productImageIds: [],
         trustBadges: [
             { icon: 'shield', label: 'Ayurveda Certified' },
-            { icon: 'star', label: '4.9★ Rated' },
+            { icon: 'truck', label: 'Cash on Delivery' },
             { icon: 'sparkles', label: '100% Natural' },
         ],
     },
@@ -119,6 +119,8 @@ const DEFAULTS = {
         disclaimer: 'These statements have not been evaluated by the FSSAI. This product is not intended to diagnose, treat, cure or prevent any disease and is not a substitute for medical advice. Results may vary from person to person.',
         announcements: [],
         restockReminderDays: 30,
+        // Days after an order is marked delivered before the "how was it?" review email goes out (0 = off).
+        reviewRequestDays: 1,
         expertChat: true,
         // Health goals for the Concern menu and /concern pages. Empty = the built-in list from the client's brief.
         concerns: [],
@@ -246,6 +248,7 @@ function sanitizeExtras(input) {
             .filter((a) => a.text)
             .slice(0, 6),
         restockReminderDays: Math.min(365, Math.max(0, Number.parseInt(e.restockReminderDays ?? d.restockReminderDays, 10) || 0)),
+        reviewRequestDays: Math.min(30, Math.max(0, Number.parseInt(e.reviewRequestDays ?? d.reviewRequestDays, 10) || 0)),
         expertChat: e.expertChat === undefined ? d.expertChat : Boolean(e.expertChat),
         ...sanitizeSectionContent(e),
         concerns: list(e.concerns)

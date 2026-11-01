@@ -20,7 +20,7 @@
     <!-- Critical styles for the pre-React shell below. In dev the real stylesheet only arrives with the JS bundle, so
          without these the shell logo paints at its natural (huge) size for a moment on every hard refresh. -->
     <style>
-      body { margin: 0; background: #F4EBDD; }
+      body { margin: 0; background: #FEE1C5; }
       #root > .shell > div { display: flex; align-items: center; box-sizing: border-box; width: 100%; max-width: 80rem; height: 4rem; margin-inline: auto; padding-inline: 1rem; }
       #root > .shell img { display: block; width: auto; height: 2.5rem; aspect-ratio: 1000 / 305; }
       @media (min-width: 640px) { #root > .shell > div { padding-inline: 1.5rem; } }
@@ -28,7 +28,7 @@
 
       /* First-visit splash: logo painted in, a real progress bar, then a solid shutter reveal (no fading). */
       html.sp-lock { overflow: hidden; }
-      #splash { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; background: #F4EBDD; transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1); will-change: transform; }
+      #splash { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; background: #FEE1C5; transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1); will-change: transform; }
       #splash.sp-out { transform: translateY(-100%); }
       #splash .sp-inner { display: grid; justify-items: center; gap: 28px; }
       #splash .sp-logo { display: block; width: min(260px, 64vw); height: auto; aspect-ratio: 1000 / 305; clip-path: inset(0 100% 0 0); }

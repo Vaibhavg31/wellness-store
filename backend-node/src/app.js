@@ -24,6 +24,7 @@ import spinRoutes from './routes/spinRoutes.js';
 import offerRoutes from './routes/offerRoutes.js';
 import offerPageRoutes from './routes/offerPageRoutes.js';
 import clubRoutes from './routes/clubRoutes.js';
+import adminAccessRoutes from './routes/adminAccessRoutes.js';
 import bundleRoutes from './routes/bundleRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -100,6 +101,7 @@ export function createApp() {
     app.use('/api', offerRoutes);
     app.use('/api', offerPageRoutes);
     app.use('/api', clubRoutes);
+    app.use('/api', adminAccessRoutes);
     app.use('/api', bundleRoutes);
     app.use('/api', authRoutes);
     app.use('/api', userRoutes);

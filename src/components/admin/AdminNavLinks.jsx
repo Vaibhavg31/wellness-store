@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, BarChart3, Package, FolderOpen, Star, MessageSquare, Settings, ShoppingBag, PenLine, Tag, Gift, UserPlus, Users, Images, Crown, Percent } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Package, FolderOpen, Star, MessageSquare, Settings, ShoppingBag, PenLine, Tag, Gift, UserPlus, Users, Images, Crown, Percent, KeyRound } from 'lucide-react';
 import { ADMIN_PATH } from '@/contexts/AuthContext';
 import { cn } from '@/utils/formatPrice';
 
@@ -45,6 +45,7 @@ export const adminNavGroups = [
             { label: 'Website content', href: `${ADMIN_PATH}/content`, icon: PenLine },
             { label: 'Media library', href: `${ADMIN_PATH}/media`, icon: Images },
             { label: 'Settings', href: `${ADMIN_PATH}/settings`, icon: Settings },
+            { label: 'Login & access', href: `${ADMIN_PATH}/access`, icon: KeyRound },
         ],
     },
 ];

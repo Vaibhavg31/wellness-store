@@ -20,9 +20,14 @@ export const RIBBON_ICONS = {
 export function defaultRibbonItems(content) {
     const threshold = content.delivery?.freeThreshold;
     const days = content.delivery?.returnDays;
+    const { onlinePaymentEnabled = true, codEnabled = true } = content.payments ?? {};
+    // Only promise the ways to pay that checkout really offers right now.
+    const payment = onlinePaymentEnabled
+        ? { icon: 'lock', title: 'Secure Payments', sub: codEnabled ? 'UPI, cards & COD available' : 'UPI, cards & net banking' }
+        : { icon: 'lock', title: 'Cash on Delivery', sub: 'Pay when your order arrives' };
     return [
         { icon: 'truck', title: 'Free Delivery', sub: threshold ? `On all orders above ${formatPrice(threshold)}` : 'On eligible orders' },
-        { icon: 'lock', title: 'Secure Payments', sub: 'UPI, cards & COD available' },
+        payment,
         { icon: 'leaf', title: 'Pure Herbs', sub: 'Authentic Ayurvedic formulations' },
         { icon: 'flask', title: 'Lab Tested', sub: 'FSSAI & GMP certified' },
         ...(days ? [{ icon: 'return', title: 'Easy Returns', sub: `${days}-day hassle-free returns` }] : []),

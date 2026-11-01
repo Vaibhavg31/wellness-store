@@ -17,23 +17,32 @@ export function concernSlug(label) {
         .replace(/^-+|-+$/g, '');
 }
 
-/** The starting list (from the client's brief). `search` holds the keywords that also place a product in the concern. */
+/**
+ * The starting list (from the client's brief). `search` holds the keywords that also place a product in the concern. Pictures
+ * are the line icons from the client's own icon sheet (chikit icon.pdf), in public/brand/icons. Kidney Wellness and Blood
+ * Purifier have no icon of their own in that sheet yet, so they borrow the closest one (flush, karela-jamun).
+ */
 export const DEFAULT_CONCERNS = [
-    { label: 'Cardiac Wellness', search: 'heart, cardiac, arjuna', icon: 'heart' },
-    { label: 'Daily Wellness', search: 'daily, multivitamin, greens', icon: 'sun' },
-    { label: 'Diabetic Wellness', search: 'diabetic, sugar, glucose', icon: 'droplet' },
-    { label: 'Digestive Wellness', search: 'digestive, digestion, gut, aloe, triphala', icon: 'leaf' },
-    { label: 'Hair Wellness', search: 'hair, scalp, biotin, onion', icon: 'sparkles' },
-    { label: 'Immunity Wellness', search: 'immunity, giloy, tulsi, amla', icon: 'shield' },
-    { label: 'Kidney Wellness', search: 'kidney, renal', icon: 'bean' },
-    { label: 'Liver Wellness', search: 'liver, detox', icon: 'flask' },
-    { label: 'Men’s Wellness', search: 'men, mens, stamina', icon: 'mars' },
-    { label: 'Pain Reliever', search: 'pain, joint, relief', icon: 'activity' },
-    { label: 'Skin Wellness', search: 'skin, face, neem, glow', icon: 'smile' },
-    { label: 'Stamina Booster', search: 'stamina, energy, protein, ashwagandha', icon: 'zap' },
-    { label: 'Women’s Wellness', search: 'women, womens, hormonal', icon: 'venus' },
-    { label: 'Blood Purifier', search: 'blood, purifier, neem', icon: 'droplets' },
-].map((c) => ({ ...c, slug: concernSlug(c.label), image: '', enabled: true }));
+    { label: 'Cardiac Wellness', search: 'heart, cardiac, arjuna', icon: 'heart', image: '/brand/icons/heartwell-cholesterol.webp' },
+    { label: 'Daily Wellness', search: 'daily, multivitamin, greens', icon: 'sun', image: '/brand/icons/himwell-calm.webp' },
+    { label: 'Diabetic Wellness', search: 'diabetic, sugar, glucose', icon: 'droplet', image: '/brand/icons/sugarwell-shield.webp' },
+    { label: 'Digestive Wellness', search: 'digestive, digestion, gut, aloe, triphala', icon: 'leaf', image: '/brand/icons/gutwell-pure.webp' },
+    { label: 'Hair Wellness', search: 'hair, scalp, biotin, onion', icon: 'sparkles', image: '/brand/icons/herwell-roots.webp' },
+    { label: 'Immunity Wellness', search: 'immunity, giloy, tulsi, amla', icon: 'shield', image: '/brand/icons/ingredients/wild-amla.webp' },
+    { label: 'Kidney Wellness', search: 'kidney, renal', icon: 'bean', image: '/brand/icons/gutwell-flush.webp' },
+    { label: 'Liver Wellness', search: 'liver, detox', icon: 'flask', image: '/brand/icons/liverwell-protect.webp' },
+    { label: 'Men’s Wellness', search: 'men, mens, stamina', icon: 'mars', image: '/brand/icons/himwell-performance.webp' },
+    { label: 'Pain Reliever', search: 'pain, joint, relief', icon: 'activity', image: '/brand/icons/elderwell-uric.webp' },
+    { label: 'Skin Wellness', search: 'skin, face, neem, glow', icon: 'smile', image: '/brand/icons/glowwell-berry.webp' },
+    { label: 'Stamina Booster', search: 'stamina, energy, protein, ashwagandha', icon: 'zap', image: '/brand/icons/himwell-stamina.webp' },
+    { label: 'Women’s Wellness', search: 'women, womens, hormonal', icon: 'venus', image: '/brand/icons/herwell-cycle.webp' },
+    { label: 'Blood Purifier', search: 'blood, purifier, neem', icon: 'droplets', image: '/brand/icons/ingredients/karela-jamun.webp' },
+    // Ready for the client's own range (WeighWell, ThyroWell, CalmWell, BabyWell); switched off until those products are listed.
+    { label: 'Weight Wellness', search: 'weight, metabolism, fat, slim', icon: 'zap', image: '/brand/icons/weighwell-lean.webp', enabled: false },
+    { label: 'Thyroid Wellness', search: 'thyroid, thyro', icon: 'sparkles', image: '/brand/icons/thyrowell.webp', enabled: false },
+    { label: 'Sleep & Calm', search: 'sleep, calm, stress, tagar, ashwagandha', icon: 'sun', image: '/brand/icons/ingredients/tagar-sleep.webp', enabled: false },
+    { label: 'Baby Wellness', search: 'baby, kids, ragi, makhana', icon: 'smile', image: '/brand/icons/ingredients/ragi-makhana.webp', enabled: false },
+].map((c) => ({ image: '', enabled: true, ...c, slug: concernSlug(c.label) }));
 
 /** The concerns to show: the admin's own list when there is one, else the starting list; switched-off ones removed. */
 export function activeConcerns(extras) {

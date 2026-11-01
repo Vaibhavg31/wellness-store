@@ -12,6 +12,7 @@ import { logOtp, recentOtpLogs, serverOutboundIp } from '../lib/otpLogger.js';
 import * as msg91 from '../services/msg91Service.js';
 import * as emailService from '../services/emailService.js';
 import { UserRepository } from '../repositories/userRepository.js';
+import { accountTokenPayload, activeAccountByEmail, findAccountByEmail, recordAdminLogin, superLogins, verifyAccountLogin } from '../lib/adminAccounts.js';
 
 const router = Router();
 const repo = new UserRepository();
@@ -19,19 +20,6 @@ const repo = new UserRepository();
 function adminEmails() {
     const raw = process.env.ADMIN_EMAILS || '';
     return raw.split(',').map((e) => e.toLowerCase().trim()).filter(Boolean);
-}
-
-/** Personal admin sign-ins, each with its own password: ADMIN_LOGINS="email:hash,email:hash" (hashes only, never plain text). */
-function ownerLogins() {
-    const logins = new Map();
-    for (const entry of String(process.env.ADMIN_LOGINS || '').split(',')) {
-        const cut = entry.indexOf(':');
-        if (cut < 1) continue;
-        const email = entry.slice(0, cut).trim().toLowerCase();
-        const hash = entry.slice(cut + 1).trim();
-        if (email && hash) logins.set(email, hash);
-    }
-    return logins;
 }
 
 function clientIp(req) {
@@ -202,18 +190,28 @@ router.post('/auth/login', asyncRoute(async (req, res) => {
     if (!email || !password) return sendError(res, 'Email and password are required', 400);
     if (!(await checkRateLimit(`login-${clientIp(req)}`, 20, 900))) return sendError(res, 'Too many login attempts. Try again later.', 429);
 
+    // A super admin (developer) login from the server config: always works, whatever the admin accounts in the database say.
+    const superHash = superLogins().get(email);
+    if (superHash && bcrypt.compareSync(password, superHash)) {
+        await recordAdminLogin(email, true, clientIp(req), 'password');
+        const token = signToken({ role: 'admin', email, super: true });
+        return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email } });
+    }
+
     const adminDevPass = process.env.ADMIN_DEV_PASSWORD || '';
     if (adminDevPass && adminEmails().includes(email) && password === adminDevPass) {
         const token = signToken({ role: 'admin', email });
         return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email } });
     }
 
-    // A personal admin login: this email has its own password, checked against its own hash.
-    const ownHash = ownerLogins().get(email);
-    if (ownHash && bcrypt.compareSync(password, ownHash)) {
-        const token = signToken({ role: 'admin', email });
-        return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email } });
+    // The shop's own admin login (managed from Login & access in the admin panel): straight to the admin panel.
+    const account = await verifyAccountLogin(email, password);
+    if (account) {
+        await recordAdminLogin(email, true, clientIp(req), 'password');
+        const token = signToken(accountTokenPayload(account));
+        return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email, name: account.name || null } });
     }
+    if (superHash || activeAccountByEmail(email)) await recordAdminLogin(email, false, clientIp(req), 'password');
 
     // An admin email signs in here with the Studio password (checked against its hash, never stored in plain text), so the
     // same email + password works on the normal form and on the Studio form.
@@ -395,8 +393,17 @@ router.post('/auth/google', asyncRoute(async (req, res) => {
         const avatar = payload.picture || null;
 
         if (shouldGrantAdminRole(email)) {
+            await recordAdminLogin(email, true, clientIp(req), 'google');
             const token = signToken({ role: 'admin', email });
             return sendJson(res, { role: 'admin', token, redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email, name, avatar } });
+        }
+        // The shop's admin account signing in with the Google account of that same email.
+        if (activeAccountByEmail(email)) {
+            const account = await findAccountByEmail(email);
+            if (account?.isActive) {
+                await recordAdminLogin(email, true, clientIp(req), 'google');
+                return sendJson(res, { role: 'admin', token: signToken(accountTokenPayload(account)), redirect: process.env.ADMIN_PATH || '/chikit-studio', user: { email, name, avatar } });
+            }
         }
 
         const existing = await repo.findByEmail(email);
@@ -429,9 +436,16 @@ router.post('/auth/admin/login', asyncRoute(async (req, res) => {
     if (!(await checkRateLimit(`admin-${clientIp(req)}`))) return sendError(res, 'Too many login attempts. Try again later.', 429);
 
     const adminUser = process.env.ADMIN_USERNAME || 'chikit_admin';
-    const ownHash = ownerLogins().get(String(username).trim().toLowerCase());
-    if (ownHash && bcrypt.compareSync(String(password), ownHash)) {
-        return sendJson(res, { token: signToken({ role: 'admin' }), role: 'admin' });
+    const asEmail = String(username).trim().toLowerCase();
+    const superHash = superLogins().get(asEmail);
+    if (superHash && bcrypt.compareSync(String(password), superHash)) {
+        await recordAdminLogin(asEmail, true, clientIp(req), 'studio');
+        return sendJson(res, { token: signToken({ role: 'admin', email: asEmail, super: true }), role: 'admin' });
+    }
+    const account = await verifyAccountLogin(asEmail, password);
+    if (account) {
+        await recordAdminLogin(asEmail, true, clientIp(req), 'studio');
+        return sendJson(res, { token: signToken(accountTokenPayload(account)), role: 'admin' });
     }
     const adminPassHash = process.env.ADMIN_PASSWORD_HASH || null;
 
@@ -445,8 +459,12 @@ router.post('/auth/admin/login', asyncRoute(async (req, res) => {
     }
 
     const validPass = bcrypt.compareSync(password, adminPassHash);
-    if (!validUser || !validPass) return sendError(res, 'Invalid credentials', 401);
+    if (!validUser || !validPass) {
+        if (validUser || superHash || activeAccountByEmail(asEmail)) await recordAdminLogin(given, false, clientIp(req), 'studio');
+        return sendError(res, 'Invalid credentials', 401);
+    }
 
+    await recordAdminLogin(given, true, clientIp(req), 'studio');
     const token = signToken({ role: 'admin' });
     sendJson(res, { token, role: 'admin' });
 }, 'Admin login failed'));

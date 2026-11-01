@@ -4,6 +4,7 @@ import {
     CheckCircle2,
     ChevronRight,
     Download,
+    FileText,
     Package,
     Printer,
     RefreshCw,
@@ -50,6 +51,8 @@ import {
     shortOrderId,
 } from '@/constants/orders';
 import { printOrderStickers } from '@/utils/printOrderStickers';
+import { openInvoice } from '@/utils/invoice';
+import { useSiteContent } from '@/contexts/SiteContentContext';
 
 const PAYMENT_FILTER_OPTIONS = [
     { value: '', label: 'All payments' },
@@ -230,6 +233,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
 
 export default function AdminOrdersPage() {
     const { adminToken } = useAdminAuth();
+    const { content } = useSiteContent();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -646,6 +650,7 @@ export default function AdminOrdersPage() {
                                                         items={[
                                                             { label: 'View details', onClick: () => setDetailOrder(order) },
                                                             { label: 'Print shipping label', icon: Printer, onClick: () => printStickers([order.id]) },
+                                                            { label: 'Invoice', icon: FileText, onClick: () => openInvoice(order, content) },
                                                         ]}
                                                     />
                                                 </div>

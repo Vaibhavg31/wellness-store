@@ -30,6 +30,7 @@ function parseExtras(raw) {
 }
 
 const EMPTY_CONTENT = { ingredients: [], howToUse: [], nutrition: { servingSize: '', rows: [] }, faqs: [] };
+const NO_REVIEWS = { rating: 0, reviewCount: 0 };
 
 /** Products — backed by `products` + child tables. Mirrors ProductRepository.php. */
 export class ProductRepository extends BaseRepository {
@@ -43,6 +44,7 @@ export class ProductRepository extends BaseRepository {
         }
         children.variants = await this.fetchVariants(id);
         Object.assign(children, (await this.fetchContentBatch([id]))[id] ?? EMPTY_CONTENT);
+        Object.assign(children, (await this.fetchReviewStatsBatch([id]))[id] ?? NO_REVIEWS);
         return withMemberPrices(this.applyVariantOverrides({ ...this.scalarFields(row), ...children }), await clubConfig());
     }
 
@@ -84,6 +86,7 @@ export class ProductRepository extends BaseRepository {
         }
         const variantsById = await this.fetchVariantsBatch(ids);
         const contentById = await this.fetchContentBatch(ids);
+        const reviewsById = await this.fetchReviewStatsBatch(ids);
 
         const club = await clubConfig();
         return rows.map((row) => {
@@ -92,6 +95,7 @@ export class ProductRepository extends BaseRepository {
             for (const key of Object.keys(CHILD_TABLES)) children[key] = childrenByKey[key][id] || [];
             children.variants = variantsById[id] || [];
             Object.assign(children, contentById[id] ?? EMPTY_CONTENT);
+            Object.assign(children, reviewsById[id] ?? NO_REVIEWS);
             return withMemberPrices(this.applyVariantOverrides({ ...this.scalarFields(row), ...children }), club);
         });
     }
@@ -186,6 +190,22 @@ export class ProductRepository extends BaseRepository {
     async fetchVariants(productId) {
         const [rows] = await this.pool().query('SELECT * FROM product_variants WHERE product_id = ? ORDER BY sort_order ASC, created_at ASC', [productId]);
         return rows.map((r) => this.variantRowToArray(r));
+    }
+
+    /**
+     * Star rating and review count from the approved reviews on the site. These used to be typed in on each product, which let
+     * a shop show numbers no customer gave; now they always match what a shopper can read.
+     */
+    async fetchReviewStatsBatch(productIds) {
+        if (productIds.length === 0) return {};
+        const placeholders = productIds.map(() => '?').join(', ');
+        const [rows] = await this.pool().query(
+            `SELECT product_id, COUNT(*) AS review_count, AVG(rating) AS rating FROM reviews WHERE is_approved = 1 AND product_id IN (${placeholders}) GROUP BY product_id`,
+            productIds,
+        );
+        const stats = {};
+        for (const r of rows) stats[r.product_id] = { rating: Math.round(Number(r.rating) * 10) / 10, reviewCount: Number(r.review_count) };
+        return stats;
     }
 
     async fetchVariantsBatch(productIds) {

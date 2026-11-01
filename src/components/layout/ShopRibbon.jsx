@@ -31,7 +31,8 @@ export function ConcernTile({ concern, onClick }) {
         <Link to={`/concern/${concern.slug}`} onClick={onClick} className="group flex flex-col items-center gap-2 text-center">
             <span className="relative grid aspect-square w-full place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-primary-tint to-accent-tint ring-1 ring-line transition-shadow group-hover:shadow-md">
                 {concern.image
-                    ? <img src={imageUrl(concern.image, 240)} alt="" width="120" height="120" loading="lazy" className="size-full object-cover" />
+                    // The brand's round line icons sit whole on the tile; an uploaded photo fills it.
+                    ? <img src={imageUrl(concern.image, 240)} alt="" width="120" height="120" loading="lazy" className={concern.image.startsWith('/brand/icons/') ? 'size-[86%] object-contain transition-transform duration-300 group-hover:scale-105' : 'size-full object-cover'} />
                     : <Icon size={34} strokeWidth={1.6} className="text-primary transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />}
             </span>
             <span className="text-caption font-medium leading-tight text-ink group-hover:text-primary sm:text-small">{concern.label}</span>

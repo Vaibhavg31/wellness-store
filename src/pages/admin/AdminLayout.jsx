@@ -29,7 +29,7 @@ function SidebarBrand() {
     // The logo is single-colour plum, so on the plum sidebar it always sits on a cream tile.
     return (
         <div className="px-4 pb-0.5 pt-3">
-            <Link to={ADMIN_PATH} aria-label="Admin dashboard" className="flex justify-center rounded-xl bg-canvas px-3 py-1.5 shadow-sm">
+            <Link to={ADMIN_PATH} aria-label="Admin dashboard" className="flex justify-center rounded-xl bg-brand-beige px-3 py-1.5 shadow-sm">
                 <Logo size="sm" />
             </Link>
             <p className="mt-2 text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Studio admin</p>
@@ -59,6 +59,11 @@ export default function AdminLayout() {
     const pageTitle = getAdminPageTitle(location.pathname);
 
     useEffect(() => setMobileNavOpen(false), [location.pathname]);
+    // Neutral admin surfaces everywhere while the panel is open, including drawers and bars rendered outside this layout.
+    useEffect(() => {
+        document.body.classList.add('admin-theme');
+        return () => document.body.classList.remove('admin-theme');
+    }, []);
 
     if (!isAdmin) {
         return <Navigate to={loginUrl(ADMIN_PATH)} replace />;

@@ -19,6 +19,18 @@ try {
     console.error('[chikit-backend-node] schema update failed:', err.message);
 }
 
+// Load the shop's admin accounts so the admin check can tell a switched-off account from a live one.
+try {
+    const { startAdminAccounts } = await import('./lib/adminAccounts.js');
+    await startAdminAccounts();
+} catch (err) {
+    console.error('[chikit-backend-node] admin accounts not loaded:', err.message);
+}
+
+// After-delivery review request emails (does nothing until email is connected or while switched off in the admin).
+const { startReviewRequests } = await import('./lib/reviewRequests.js');
+startReviewRequests();
+
 const { createApp } = await import('./app.js');
 const app = createApp();
 

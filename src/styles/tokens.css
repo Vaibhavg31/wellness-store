@@ -4,8 +4,8 @@
  * text-ink, rounded-lg, shadow-md …) and never hardcode a value.
  *
  * Brand anchor: #602460, sampled from the official logo.
- * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): primary/white 10.9, ink/canvas 15,
- * muted/canvas 5.3, accent-ink/canvas 5.7, white/danger 6.5, white/success 6.4, success/tint 5.7, warning/tint 5.4.
+ * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): primary/white 10.9, ink/canvas 13.8, primary/canvas 8.8,
+ * muted/canvas 5.7 (5.1 on canvas-alt), accent-ink/canvas 5.5, white/danger 6.5, white/success 6.4, success/tint 5.7, warning/tint 5.4.
  * Gold (accent) is a FILL colour only: pair it with ink text, never white.
  */
 @theme {
@@ -23,13 +23,14 @@
   --color-accent-tint:    #FBF1E1;
 
   /* Neutrals — warm, plum-tinted */
-  --color-canvas:         #F4EBDD;  /* page background: warm beige (client brief v1) */
-  --color-canvas-alt:     #EADDC9;  /* alternate section band */
+  --color-canvas:         #FEE1C5;  /* page background: the brand beige from the Chikit brand book (palette page) */
+  --color-brand-beige:    #FEE1C5;  /* the brand beige itself, for places that must stay beige (the admin logo plate) */
+  --color-canvas-alt:     #FAD4AF;  /* alternate section band: the brand beige, one step deeper */
   --color-surface:        #FFFFFF;  /* cards, inputs, drawers */
   --color-ink:            #241720;  /* body + headings */
-  --color-muted:          #6B5D68;  /* secondary text */
+  --color-muted:          #62545E;  /* secondary text */
   --color-subtle:         #8F8089;  /* placeholders, disabled text (not for content) */
-  --color-line:           #D9C8AE;  /* decorative hairlines */
+  --color-line:           #EBC29C;  /* decorative hairlines */
   --color-line-strong:    #9A8794;  /* input borders (3:1 on white) */
 
   /* Status */

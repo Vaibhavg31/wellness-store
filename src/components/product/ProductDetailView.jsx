@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { Heart, Share2, ShoppingBag } from 'lucide-react';
 import ProductGallery from '@/components/product/ProductGallery';
 import VariantPicker from '@/components/product/VariantPicker';
 import ProductTabs from '@/components/product/ProductTabs';
@@ -28,6 +28,7 @@ import { getRelatedProducts } from '@/utils/filterProducts';
 import { humanizeSlug } from '@/utils/products';
 import { formatPrice, cn } from '@/utils/formatPrice';
 import { getProductTrustBadges } from '@/utils/productTrustBadges';
+import { copyText } from '@/utils/copyText';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
@@ -118,6 +119,15 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
         : product;
 
     const previewOnly = () => showToast('This is a preview. Nothing was added.', 'info');
+    // Phones open their own share sheet (WhatsApp, Instagram…); elsewhere the link is copied.
+    const shareProduct = async () => {
+        const url = `${window.location.origin}/product/${product.id}`;
+        if (navigator.share) {
+            try { await navigator.share({ title: product.title, text: `${product.title} on Chikit`, url }); } catch { /* closed the share sheet */ }
+            return;
+        }
+        showToast((await copyText(url)) ? 'Link copied' : url, 'success');
+    };
 
     const handleAddToCart = () => {
         if (preview) return previewOnly();
@@ -202,6 +212,9 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                                 className={cn('grid size-11 place-items-center rounded-full border transition-colors', wished ? 'border-primary bg-primary-tint text-primary' : 'border-line-strong text-ink hover:border-primary hover:text-primary')}
                             >
                                 <Heart size={20} fill={wished ? 'currentColor' : 'none'} />
+                            </button>
+                            <button type="button" onClick={shareProduct} aria-label="Share this product" className="grid size-11 place-items-center rounded-full border border-line-strong text-ink transition-colors hover:border-primary hover:text-primary">
+                                <Share2 size={19} />
                             </button>
                         </div>
 

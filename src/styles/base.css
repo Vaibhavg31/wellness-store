@@ -99,3 +99,11 @@
   .marquee-track { animation: none !important; }
   .marquee-track > [data-marquee-copy="2"] { display: none; }
 }
+
+/* The admin panel is a working tool, not the shop window: inside it the storefront's brand-beige surfaces become the admin's
+   neutral white and greys, so every section card matches the dashboard. The sidebar keeps the brand (plum, logo on beige). */
+.admin-theme {
+  --color-canvas: var(--color-admin-surface);
+  --color-canvas-alt: var(--color-admin-surface-alt);
+  --color-line: var(--color-admin-border);
+}

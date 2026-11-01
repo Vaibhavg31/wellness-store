@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Check, ShieldCheck } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import Rating from '@/components/ui/Rating';
@@ -71,7 +71,14 @@ function Nutrition({ nutrition }) {
 }
 
 export default function ProductTabs({ product, reviews }) {
-    const [active, setActive] = useState('description');
+    // A link ending in #reviews (the after-delivery review email) opens straight on the reviews.
+    const [active, setActive] = useState(() => (typeof window !== 'undefined' && window.location.hash === '#reviews' ? 'reviews' : 'description'));
+    const rootRef = useRef(null);
+    useEffect(() => {
+        if (window.location.hash !== '#reviews') return undefined;
+        const timer = setTimeout(() => rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 600);
+        return () => clearTimeout(timer);
+    }, []);
     const baseId = useId();
 
     // Tabs appear only when the product actually has that content.
@@ -94,7 +101,7 @@ export default function ProductTabs({ product, reviews }) {
     };
 
     return (
-        <div>
+        <div ref={rootRef} id="reviews" className="scroll-mt-28">
             <div role="tablist" aria-label="Product information" onKeyDown={onKeyDown} className="mb-5 flex gap-1 overflow-x-auto border-b border-line scrollbar-none">
                 {tabs.map((tab) => (
                     <button

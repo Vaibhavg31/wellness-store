@@ -68,6 +68,31 @@ const TABLES = [
         PRIMARY KEY (id),
         KEY idx_club_email_otps_user (user_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    // Admin panel logins the shop manages itself (see lib/adminAccounts.js); super admins stay in the server config.
+    `CREATE TABLE IF NOT EXISTS admin_accounts (
+        id VARCHAR(64) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        name VARCHAR(120) NOT NULL DEFAULT '',
+        password_hash VARCHAR(100) NOT NULL,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        token_version INT NOT NULL DEFAULT 1,
+        created_at DATETIME(3) NOT NULL,
+        updated_at DATETIME(3) NULL,
+        last_login_at DATETIME(3) NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_admin_accounts_email (email)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    // Every admin sign-in attempt, shown to super admins (kept 180 days).
+    `CREATE TABLE IF NOT EXISTS admin_login_log (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        email VARCHAR(255) NOT NULL,
+        ok TINYINT(1) NOT NULL,
+        ip VARCHAR(64) NOT NULL DEFAULT '',
+        via VARCHAR(20) NOT NULL DEFAULT '',
+        created_at DATETIME(3) NOT NULL,
+        PRIMARY KEY (id),
+        KEY idx_admin_login_log_created (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 ];
 
 const COLUMNS = [
@@ -86,6 +111,8 @@ const COLUMNS = [
     // What an order line was bought under (an offer page), kept as a snapshot like bundle_title.
     ['order_items', 'offer_id', 'VARCHAR(64) NULL'],
     ['order_items', 'offer_title', 'VARCHAR(160) NULL'],
+    // When the after-delivery review request email went out (lib/reviewRequests.js), so it is sent once.
+    ['orders', 'review_request_sent_at', 'DATETIME NULL'],
 ];
 
 async function hasTable(pool, table) {

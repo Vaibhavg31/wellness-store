@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { ShoppingBag, Shield, Star, Leaf } from 'lucide-react';
+import { ShoppingBag, Shield, Truck, Leaf } from 'lucide-react';
 import AuthShell from '@/components/auth/AuthShell';
 import AuthSlider from '@/components/auth/AuthSlider';
 import AuthPhone from '@/components/auth/AuthPhone';
@@ -186,7 +186,7 @@ function LoginScreen() {
             <ul className="mt-10 space-y-4">
                 {[
                     { icon: Shield, label: 'FSSAI certified' },
-                    { icon: Star, label: '4.9★ rated by customers' },
+                    { icon: Truck, label: 'Cash on delivery across India' },
                     { icon: Leaf, label: 'Lab-tested purity' },
                 ].map(({ icon: Icon, label }) => (
                     <li key={label} className="flex items-center gap-3 font-medium text-ink">
@@ -284,7 +284,7 @@ function LoginScreen() {
                     onMode={switchMode}
                     signin={column('signin')}
                     signup={column('signup')}
-                    points={['FSSAI certified', '4.9★ rated by customers', 'Lab-tested purity']}
+                    points={['FSSAI certified', 'Cash on delivery across India', 'Lab-tested purity']}
                     copy={{
                         signin: { title: 'New to Chikit?', body: 'Create an account to save your addresses, track orders and check out in seconds.', action: 'Create account' },
                         signup: { title: 'Welcome back', body: 'Already have an account? Sign in to pick up right where you left off.', action: 'Sign in' },

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Copy, MapPin, MessageCircle, Package, Phone, RotateCcw, Sparkles, Star, Truck } from 'lucide-react';
+import { Copy, FileText, MapPin, MessageCircle, Package, Phone, RotateCcw, Sparkles, Star, Truck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
@@ -22,6 +22,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { deliveryWindow } from '@/utils/delivery';
 import { copyText } from '@/utils/copyText';
+import { openInvoice } from '@/utils/invoice';
 
 const card = 'rounded-lg border border-line bg-surface p-5 sm:p-6';
 
@@ -159,6 +160,7 @@ export default function OrderDetailPage() {
                     <a href={getWhatsAppUrl(`Hi, I have a question about my order ${order.id}`)} target="_blank" rel="noopener noreferrer" className="flex-1">
                         <Button variant="outline" className="w-full"><MessageCircle size={16} aria-hidden="true" /> Need help?</Button>
                     </a>
+                    <Button variant="outline" className="flex-1" onClick={() => openInvoice(order, content)}><FileText size={16} aria-hidden="true" /> Invoice</Button>
                 </div>
             </div>
         </div>
