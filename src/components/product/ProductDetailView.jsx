@@ -220,7 +220,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
 
                         <div className="mt-4 grid gap-3 sm:grid-cols-2">
                             <Button size="lg" disabled={outOfStock} onClick={handleAddToCart}><ShoppingBag size={18} aria-hidden="true" /> Add to bag</Button>
-                            <Button size="lg" variant="accent" disabled={outOfStock} onClick={handleBuyNow}>Buy now</Button>
+                            <Button size="lg" variant="outline" disabled={outOfStock} onClick={handleBuyNow}>Buy now</Button>
                         </div>
                         <PaymentAssurance className="mt-4" />
                     </div>
@@ -289,7 +289,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                             <p className="font-display text-h4 text-primary">{formatPrice(price)}</p>
                         </div>
                         <Button variant="outline" disabled={outOfStock} onClick={handleAddToCart} aria-label="Add to bag"><ShoppingBag size={18} aria-hidden="true" /></Button>
-                        <Button variant="accent" disabled={outOfStock} onClick={handleBuyNow}>{outOfStock ? 'Sold out' : 'Buy now'}</Button>
+                        <Button variant="outline" disabled={outOfStock} onClick={handleBuyNow}>{outOfStock ? 'Sold out' : 'Buy now'}</Button>
                     </div>
                 </div>
             )}

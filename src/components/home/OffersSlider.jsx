@@ -46,20 +46,20 @@ export default function OffersSlider({ products }) {
                             const pictures = picturesFor(offer);
                             return (
                                 <li key={offer.id} className={offers.length === 1 ? 'w-full' : 'w-[88%] shrink-0 snap-start sm:w-[62%] lg:w-[calc(50%-0.75rem)]'}>
-                                    <Link to={`/offers/${offer.slug}`} className="group relative flex h-full min-h-[13rem] overflow-hidden rounded-2xl bg-primary-deep text-white">
-                                        {offer.image && <img src={imageUrl(offer.image, 900)} alt="" loading="lazy" className="absolute inset-0 size-full object-cover opacity-40" />}
+                                    <Link to={`/offers/${offer.slug}`} className="group relative flex h-full min-h-[11rem] overflow-hidden rounded-2xl border border-line bg-canvas-alt text-ink transition-shadow hover:shadow-md">
+                                        {offer.image && <img src={imageUrl(offer.image, 900)} alt="" loading="lazy" className="absolute inset-0 size-full object-cover opacity-25" />}
                                         <div className="relative flex flex-1 flex-col justify-between gap-4 p-5 sm:p-7">
                                             <div>
-                                                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption font-bold uppercase tracking-wide text-primary-deep"><Tag size={13} aria-hidden="true" /> {KIND_LABEL[offer.kind]}</span>
-                                                <p className="mt-3 font-display text-h2 leading-tight text-white">{headline(offer)}</p>
-                                                {offer.summary && <p className="mt-2 max-w-sm text-small text-white/80">{offer.summary}</p>}
+                                                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption font-semibold uppercase tracking-wide text-primary-deep"><Tag size={13} aria-hidden="true" /> {KIND_LABEL[offer.kind]}</span>
+                                                <p className="mt-3 font-display text-h3 leading-tight text-primary-deep sm:text-h2">{headline(offer)}</p>
+                                                {offer.summary && <p className="mt-2 max-w-sm text-small text-muted">{offer.summary}</p>}
                                             </div>
-                                            <span className="inline-flex items-center gap-1.5 text-small font-semibold text-accent">Shop this offer <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+                                            <span className="inline-flex items-center gap-1.5 text-small font-semibold text-primary">Shop this offer <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
                                         </div>
                                         <div className="relative hidden w-[38%] shrink-0 items-center justify-center pr-5 sm:flex" aria-hidden="true">
                                             <div className="flex -space-x-6">
                                                 {pictures.map((p, i) => (
-                                                    <span key={p.id} className="grid size-20 place-items-center overflow-hidden rounded-full bg-canvas-alt ring-4 ring-primary-deep lg:size-24" style={{ zIndex: 3 - i }}>
+                                                    <span key={p.id} className="grid size-20 place-items-center overflow-hidden rounded-full bg-surface ring-4 ring-canvas-alt lg:size-24" style={{ zIndex: 3 - i }}>
                                                         <img src={imageUrl(p.src, 240)} alt="" loading="lazy" className="size-full object-contain mix-blend-multiply" />
                                                     </span>
                                                 ))}

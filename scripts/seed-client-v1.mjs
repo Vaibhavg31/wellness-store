@@ -75,7 +75,7 @@ const newsletter = current.newsletter?.title === 'Join the Chikit Circle'
     ? { ...current.newsletter, badge: 'Chikit Updates', title: 'Stay in the loop' }
     : current.newsletter;
 
-await call('PUT', '/api/settings', { theme: { ...current.theme, backgroundColor: '#FBF4E8' }, sections, extras, newsletter }, token);
+await call('PUT', '/api/settings', { theme: { ...current.theme, backgroundColor: '#FFFFFF' }, sections, extras, newsletter }, token);
 console.log('Settings applied to', base);
 
 /* ------------------------------------------------------------------------------------------------ products */

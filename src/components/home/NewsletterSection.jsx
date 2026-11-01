@@ -30,10 +30,10 @@ export default function NewsletterSection() {
     return (
         <section className="section bg-canvas">
             <div className="container-page">
-                <div className="mx-auto max-w-2xl rounded-2xl bg-accent px-6 py-12 text-center text-ink sm:px-12">
+                <div className="mx-auto max-w-2xl rounded-2xl border border-line bg-canvas-alt px-6 py-12 text-center text-ink sm:px-12">
                     <p className="eyebrow">{nl.badge}</p>
-                    <h2 className="mt-3 !text-primary-deep">{nl.title}</h2>
-                    <p className="mt-3 text-ink/80">{nl.description}</p>
+                    <h2 className="mt-3">{nl.title}</h2>
+                    <p className="mt-3 text-muted">{nl.description}</p>
 
                     {submitted ? (
                         <p className="mt-8 inline-flex items-center gap-2 font-medium text-primary-deep" role="status">
@@ -55,7 +55,7 @@ export default function NewsletterSection() {
                             <Button type="submit" size="lg" loading={loading}>{nl.buttonLabel}</Button>
                         </form>
                     )}
-                    <p className="mt-4 text-caption text-ink/70">{nl.disclaimer}</p>
+                    <p className="mt-4 text-caption text-muted">{nl.disclaimer}</p>
                 </div>
             </div>
         </section>

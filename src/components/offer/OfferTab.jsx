@@ -75,7 +75,7 @@ export default function OfferTab() {
                         onClick={() => setOpen(true)}
                         aria-haspopup="dialog"
                         className={cn(
-                            'flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-small font-semibold tracking-wide text-white shadow-lg transition-colors hover:bg-primary-hover',
+                            'flex min-h-11 items-center gap-2 rounded-full border border-primary/25 bg-surface px-4 text-small font-semibold tracking-wide text-primary shadow-md transition-colors hover:border-primary',
                             'sm:order-2 sm:rounded-none sm:px-3 sm:py-4 sm:[writing-mode:vertical-rl]',
                             right ? 'sm:rotate-180 sm:rounded-l-xl' : 'sm:rounded-r-xl',
                         )}

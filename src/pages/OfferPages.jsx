@@ -30,12 +30,12 @@ export function OffersHubPage() {
                     {offers.map((offer) => (
                         <li key={offer.id}>
                             <Link to={`/offers/${offer.slug}`} className="group flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface transition-shadow hover:shadow-md">
-                                <div className="relative aspect-[16/7] bg-gradient-to-br from-primary to-primary-deep">
+                                <div className="relative aspect-[16/7] bg-canvas-alt">
                                     {offer.image
                                         ? <img src={imageUrl(offer.image, 900)} alt="" loading="lazy" className="size-full object-cover" />
                                         : (
-                                            <div className="flex size-full flex-col justify-center px-6 text-white">
-                                                <span className="mb-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption font-bold uppercase tracking-wide text-ink"><Tag size={13} aria-hidden="true" /> {KIND_LABEL[offer.kind]}</span>
+                                            <div className="flex size-full flex-col justify-center px-6 text-primary-deep">
+                                                <span className="mb-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption font-semibold uppercase tracking-wide text-primary-deep"><Tag size={13} aria-hidden="true" /> {KIND_LABEL[offer.kind]}</span>
                                                 <span className="font-display text-h2 leading-tight">{offer.kind === 'mix_match' ? `Any ${offer.pickCount} for ${formatPrice(offer.price)}` : offer.kind === 'bogo' ? 'Buy 1 Get 1 Free' : offer.title}</span>
                                             </div>
                                         )}

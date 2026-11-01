@@ -68,8 +68,8 @@ function ProductCard({ product, priority = false, action = true }) {
     const wasPrice = isMember && product.memberPrice ? product.price : product.originalPrice;
 
     return (
-        <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-surface ring-1 ring-line transition-shadow duration-300 hover:shadow-md">
-            <div className="relative aspect-[4/5] overflow-hidden bg-canvas-alt">
+        <article className="group relative flex h-full flex-col">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-canvas-alt">
                 <Link to={href} tabIndex={-1} aria-hidden="true" className="block size-full">
                     <FadeImage
                         src={imageUrl(primary, 480)}
@@ -101,7 +101,7 @@ function ProductCard({ product, priority = false, action = true }) {
                 </button>
             </div>
 
-            <div className="flex flex-1 flex-col p-3 sm:p-4">
+            <div className="flex flex-1 flex-col pt-3">
                 <h3 className="font-sans text-small font-medium leading-snug text-ink sm:text-[0.9375rem]">
                     <Link to={href} className="line-clamp-2 transition-colors after:absolute after:inset-0 after:content-[''] hover:text-primary">
                         {product.title}
@@ -126,8 +126,8 @@ function ProductCard({ product, priority = false, action = true }) {
                         disabled={outOfStock || added}
                         aria-label={outOfStock ? `${product.title} is sold out` : `Add ${product.title} to bag`}
                         className={cn(
-                            'relative z-10 mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border text-small font-semibold transition-colors sm:h-11',
-                            added ? 'border-success bg-success text-white' : 'border-primary text-primary hover:bg-primary hover:text-white',
+                            'relative z-10 mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border text-small font-semibold transition-colors',
+                            added ? 'border-success bg-success text-white' : 'border-primary/40 text-primary hover:border-primary hover:bg-primary hover:text-white',
                             'disabled:cursor-not-allowed',
                             outOfStock && 'border-line-strong text-subtle hover:bg-transparent hover:text-subtle',
                         )}

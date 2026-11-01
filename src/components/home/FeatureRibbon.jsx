@@ -41,16 +41,16 @@ export default function FeatureRibbon() {
     const items = custom.length > 0 ? custom : defaultRibbonItems(content);
 
     return (
-        <section aria-label="Why shop with us" className="bg-primary-deep text-white">
+        <section aria-label="Why shop with us" className="border-y border-line bg-canvas-alt text-ink">
             <Marquee secondsPerItem={6}>
                 {items.map((item) => {
                     const Icon = RIBBON_ICONS[item.icon] ?? BadgeCheck;
                     return (
-                        <div key={item.title} className="flex items-center gap-3 border-r border-white/20 px-6 py-3.5 sm:px-10 sm:py-4">
-                            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/12 text-accent-hover"><Icon size={20} aria-hidden="true" /></span>
+                        <div key={item.title} className="flex items-center gap-3 px-6 py-2.5 sm:px-10">
+                            <Icon size={18} className="shrink-0 text-primary" strokeWidth={1.6} aria-hidden="true" />
                             <span className="leading-tight">
-                                <span className="block text-small font-semibold">{item.title}</span>
-                                {item.sub && <span className="block text-caption text-white/75">{item.sub}</span>}
+                                <span className="block text-caption font-semibold">{item.title}</span>
+                                {item.sub && <span className="block text-[11px] text-muted">{item.sub}</span>}
                             </span>
                         </div>
                     );

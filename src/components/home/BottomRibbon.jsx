@@ -14,7 +14,7 @@ export default function BottomRibbon() {
     const custom = (content.extras?.bottomRibbon?.words ?? []).filter(Boolean);
     const words = custom.length > 0 ? custom : DEFAULT_BOTTOM_WORDS;
     return (
-        <section aria-label="Our promise" className="border-y border-line bg-accent text-primary-deep">
+        <section aria-label="Our promise" className="border-y border-line bg-canvas-alt text-primary-deep">
             <Marquee secondsPerItem={5}>
                 {words.map((word) => (
                     <span key={word} className="inline-flex items-center gap-6 px-6 py-3.5 text-caption font-semibold uppercase tracking-[0.22em] sm:px-8">
