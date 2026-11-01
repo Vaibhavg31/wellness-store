@@ -1,4 +1,5 @@
-/* Scene library for the dummy catalogue artwork. Every pack is an original Chikit-branded design drawn with SVG + CSS. */
+/* Scene library for the placeholder product pictures. Every pack is an original Chikit-branded design drawn with SVG + CSS, shown
+   as a calm packshot (clean paper) or on the client's stone podium photograph. Real product photography replaces all of it. */
 
 /* ---------- colour helpers ---------- */
 const h2r = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -49,6 +50,11 @@ export const PRODUCTS = {
         benefits: [['gut', 'Supports regular digestion'], ['leaf', 'Classical three-fruit blend'], ['heart', 'Gentle, daily use'], ['shield', 'Ayurvedic, lab tested']] },
 };
 
+/* The first drawings were saturated; muted here so no pack looks like a candy-coloured sticker. */
+const gray = (c) => { const [r, g, b] = h2r(c); const l = 0.3 * r + 0.59 * g + 0.11 * b; return r2h([l, l, l]); };
+const muted = (c, t = 0.4) => mix(c, gray(c), t);
+for (const P of Object.values(PRODUCTS)) for (const k of ['liquid', 'cap', 'jar', 'accent', 'tint', 'pouch', 'tube', 'amber']) if (P[k] && !/^#F[0-9A-F]{5}$/i.test(P[k])) P[k] = muted(P[k]);
+
 /* ---------- pack drawing ---------- */
 function labelHtml(P, opts = {}) {
     const { icon = true, band = true, bg = '#FFFDF8' } = opts;
@@ -67,7 +73,7 @@ function cyl(id, base, dark = 0.4) {
       <stop offset=".82" stop-color="${darken(base, 0.16)}"/><stop offset="1" stop-color="${darken(base, dark + 0.04)}"/></linearGradient>`;
 }
 const ridges = (id) => `<pattern id="${id}" width="3.4" height="10" patternUnits="userSpaceOnUse"><rect width="1.3" height="10" fill="rgba(0,0,0,.2)"/></pattern>`;
-const sheen = (x, y, w, h, o = 0.42) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w / 2}" fill="#fff" opacity="${o}" style="filter:blur(.8px)"/>`;
+const sheen = (x, y, w, h, o = 0.42) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w / 2}" fill="#fff" opacity="${(o * 0.6).toFixed(2)}" style="filter:blur(.8px)"/>`;
 
 /** Returns { html, h } for a pack of width w, horizontally centred on x with its base `bottom` px above the scene floor. */
 export function pack(P, w, x, bottom, { shadow = true, rot = 0 } = {}) {
@@ -142,305 +148,156 @@ export function pack(P, w, x, bottom, { shadow = true, rot = 0 } = {}) {
     const html = `<div class="pk" style="left:${x}px;bottom:${bottom}px;width:${w}px;height:${H}px;${rot ? `transform:translateX(-50%) rotate(${rot}deg);transform-origin:50% 100%;` : ''}">
       <svg viewBox="0 0 100 ${vbH}" preserveAspectRatio="none">${svg}</svg>
       <div class="lw" style="left:${lx}%;top:${(ly / vbH) * 100}%;width:${lw}%;height:${(lh / vbH) * 100}%;${radius}">${lbl}</div></div>`;
-    const sh = shadow ? `<div class="shadow" style="left:${x}px;bottom:${bottom - w * 0.05}px;width:${w * 1.12}px;height:${w * 0.13}px"></div>` : '';
+    const sh = shadow ? `<div class="shadow" style="left:${x}px;bottom:${bottom - w * 0.07}px;width:${w * 1.3}px;height:${w * 0.2}px"></div><div class="shadow tight" style="left:${x}px;bottom:${bottom - w * 0.02}px;width:${w * 0.96}px;height:${w * 0.06}px"></div>` : '';
     return { html: sh + html, h: H };
 }
 
-/* ---------- props ---------- */
-const abs = (style, inner) => `<div class="abs" style="${style}">${inner}</div>`;
-
-function leaf(x, y, w, rot, color = '#4F8A3A', blur = 0, flip = false) {
-    const g = gid();
-    return abs(`left:${x}px;top:${y}px;width:${w}px;height:${w * 0.6}px;transform:rotate(${rot}deg)${flip ? ' scaleY(-1)' : ''};${blur ? `filter:blur(${blur}px);` : ''}`,
-        `<svg viewBox="0 0 100 60" width="100%" height="100%"><defs><linearGradient id="${g}" x1="0" x2="1"><stop offset="0" stop-color="${darken(color, 0.25)}"/><stop offset=".6" stop-color="${color}"/><stop offset="1" stop-color="${lighten(color, 0.2)}"/></linearGradient></defs>
-        <path d="M2,30 C20,0 72,0 98,30 C72,60 20,60 2,30 Z" fill="url(#${g})"/><path d="M2,30 L94,30" stroke="${lighten(color, 0.35)}" stroke-width="1.2" opacity=".7"/>
-        <path d="M22,30 L40,16 M38,30 L58,13 M56,30 L76,16 M22,30 L40,44 M38,30 L58,47 M56,30 L76,44" stroke="${lighten(color, 0.3)}" stroke-width=".8" opacity=".5" fill="none"/></svg>`);
-}
-function sprig(x, y, size, rot, color, n = 5, blur = 0) {
-    let out = '';
-    for (let i = 0; i < n; i++) out += leaf(x + Math.cos((rot + i * 28 - 56) * Math.PI / 180) * size * 0.5, y + Math.sin((rot + i * 28 - 56) * Math.PI / 180) * size * 0.5, size * (0.7 + (i % 3) * 0.12), rot + i * 28 - 56, color, blur);
-    return out;
-}
-function citrus(x, y, d, c1 = '#F6A83B', c2 = '#FFE3A6') {
-    return abs(`left:${x}px;top:${y}px;width:${d}px;height:${d}px;border-radius:50%;background:radial-gradient(circle,${c2} 0 12%,transparent 12.5%),repeating-conic-gradient(from 8deg,${c1} 0 24deg,${c2} 24deg 28deg);box-shadow:0 0 0 ${d * 0.07}px ${darken(c1, 0.12)}, 0 ${d * 0.1}px ${d * 0.18}px rgba(60,30,0,.28);`, '');
-}
-function ball(x, y, d, color, shadow = true) {
-    return abs(`left:${x}px;top:${y}px;width:${d}px;height:${d}px;border-radius:50%;background:radial-gradient(circle at 32% 28%,${lighten(color, 0.55)} 0,${lighten(color, 0.12)} 22%,${color} 55%,${darken(color, 0.28)} 100%);${shadow ? `box-shadow:0 ${d * 0.18}px ${d * 0.25}px rgba(40,20,20,.25);` : ''}`, '');
-}
-function gummies(cx, cy, n, colors, size = 46, spread = 150, seed = 3) {
-    let out = ''; let s = seed;
-    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-    for (let i = 0; i < n; i++) {
-        const a = rnd() * Math.PI * 2; const r = rnd() * spread;
-        const d = size * (0.8 + rnd() * 0.4);
-        out += `<div class="abs" style="left:${cx + Math.cos(a) * r * 1.5}px;top:${cy + Math.sin(a) * r * 0.45}px;width:${d}px;height:${d * 0.92}px;border-radius:46% 46% 42% 42% / 52% 52% 40% 40%;transform:rotate(${rnd() * 360}deg);background:radial-gradient(circle at 32% 26%,${lighten(colors[i % colors.length], 0.6)} 0,${colors[i % colors.length]} 45%,${darken(colors[i % colors.length], 0.22)} 100%);box-shadow:0 ${d * 0.14}px ${d * 0.2}px rgba(40,20,20,.28)"></div>`;
-    }
-    return out;
-}
-function capsules(cx, cy, n, c1, c2, size = 62, spread = 150, seed = 5) {
-    let out = ''; let s = seed;
-    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-    for (let i = 0; i < n; i++) {
-        const a = rnd() * Math.PI * 2; const r = rnd() * spread;
-        out += `<div class="abs" style="left:${cx + Math.cos(a) * r * 1.5}px;top:${cy + Math.sin(a) * r * 0.45}px;width:${size}px;height:${size * 0.4}px;border-radius:99px;transform:rotate(${rnd() * 180}deg);background:linear-gradient(90deg,${c1} 0 50%,${c2} 50% 100%);box-shadow:inset 0 ${size * 0.06}px ${size * 0.08}px rgba(255,255,255,.55),inset 0 -${size * 0.06}px ${size * 0.08}px rgba(0,0,0,.2),0 ${size * 0.08}px ${size * 0.12}px rgba(40,20,20,.28)"></div>`;
-    }
-    return out;
-}
-function scoop(x, y, w, rot = -18) {
-    return abs(`left:${x}px;top:${y}px;width:${w}px;height:${w * 0.62}px;transform:rotate(${rot}deg)`,
-        `<svg viewBox="0 0 100 62" width="100%" height="100%"><defs><linearGradient id="sc" x1="0" x2="1"><stop offset="0" stop-color="#E8E0D4"/><stop offset=".5" stop-color="#FFFFFF"/><stop offset="1" stop-color="#CFC4B4"/></linearGradient></defs>
-        <path d="M0,18 Q0,2 16,2 L60,2 Q74,2 74,18 L74,26 Q74,52 40,56 Q0,52 0,26 Z" fill="url(#sc)" stroke="rgba(0,0,0,.12)"/><path d="M66,12 L100,8 L100,16 L68,24 Z" fill="url(#sc)" stroke="rgba(0,0,0,.12)"/>
-        <ellipse cx="36" cy="14" rx="30" ry="7" fill="#7A4B2A"/></svg>`);
-}
-
 /* ---------- scene chrome ---------- */
-/** One calm studio colour for the whole catalogue: identity comes from the pack, with only a hint of tint in the arch. */
-const NEUTRAL = ['#F8F3EA', '#EADFCE'];
-
-function studio(w, h, [c1, c2], { arch = true, floor = 0.15, floorColor, tint } = {}) {
-    const fl = floorColor || darken(c2, 0.06);
-    let s = `<div class="abs" style="inset:0;background:radial-gradient(110% 80% at 50% 28%,${lighten(c1, 0.35)} 0,${c1} 46%,${c2} 100%)"></div>`;
-    if (arch) s += `<div class="arch" style="left:${w * 0.2}px;width:${w * 0.6}px;bottom:${h * floor}px;height:${h * 0.66}px;background:linear-gradient(180deg,${tint ? mix(tint, '#ffffff', 0.25) : lighten(c1, 0.55)},${tint ? mix(tint, '#ffffff', 0.7) : lighten(c2, 0.35)});opacity:${tint ? 0.9 : 0.75}"></div>`;
-    s += `<div class="abs" style="left:0;right:0;bottom:0;height:${h * floor}px;background:linear-gradient(180deg,${mix(fl, '#fff', 0.1)},${darken(fl, 0.07)});box-shadow:0 -2px 10px rgba(60,30,50,.08)"></div>`;
-    s += `<div class="abs" style="left:0;right:0;bottom:${h * floor - 1}px;height:2px;background:rgba(255,255,255,.55)"></div>`;
-    return s;
-}
+const abs = (style, inner = '') => `<div class="abs" style="${style}">${inner}</div>`;
 const scene = (w, h, body) => `<div class="scene" id="scene" style="width:${w}px;height:${h}px">${body}</div>`;
 
-/* ---------- product scenes (900x1125, key content inside the central square so 1:1 crops stay good) ---------- */
+/**
+ * The clean packshot: seamless warm-white paper lit softly from above, a barely visible table edge, no colour props.
+ * Calm on purpose: the pack is the only thing in the picture.
+ */
+function studio(w, h, _colors, { floor = 0.15 } = {}) {
+    const fy = h * floor;
+    return abs('inset:0;background:radial-gradient(120% 90% at 46% 28%,#FFFDF9 0,#F8F2E9 55%,#EDE3D4 100%)')
+        + abs(`left:0;right:0;bottom:0;height:${fy}px;background:linear-gradient(180deg,#F0E7DA,#E6DAC8)`)
+        + abs(`left:0;right:0;bottom:${fy}px;height:${h * 0.07}px;background:linear-gradient(0deg,rgba(90,60,30,.05),rgba(90,60,30,0))`)
+        + abs(`left:0;right:0;bottom:${fy - 1}px;height:1px;background:rgba(120,95,60,.18)`);
+}
+
+/**
+ * The client's own photograph of a stone podium in warm light (public/brand/photos/podium.webp) as a stage. The photograph's
+ * stone top sits at 40-53% of its height, so a pack's base goes at `base` (0.5 by default) of the scene height.
+ */
+const PODIUM = '/brand/photos/podium.webp';
+function podiumStage(W, H, { x = '62%' } = {}) {
+    return abs(`inset:0;background:#EBD9BF url(${PODIUM}) ${x} 50%/auto 100% no-repeat`)
+        + abs('inset:0;background:linear-gradient(180deg,rgba(255,235,205,.10),rgba(120,70,20,.05))')
+        + abs('inset:0;box-shadow:inset 0 0 160px rgba(90,50,20,.14)');
+}
+
 const PACK_W = { bottle: 275, jar: 480, tub: 530, tube: 310, pouch: 410, oil: 285, carton: 0 };
 const RATIO = { bottle: 2.5, jar: 1.18, tub: 1.18, tube: 2.2, pouch: 1.5, oil: 2.3, carton: 1.5 };
+/** Width that gives a pack the height `h`. */
+const widthForHeight = (P, h) => Math.min(PACK_W[P.kind] * 1.4, h / RATIO[P.kind]);
 
+/** A set of packs standing on a surface: [key, height, x as a fraction of the width] from left to right. */
+function standing(items, W, bottom) {
+    return items.map(([k, h, fx]) => {
+        const P = PRODUCTS[k];
+        let out = pack(P, widthForHeight(P, h), W * fx, bottom).html;
+        if (P.kind === 'oil') out += pack({ ...P, kind: 'carton' }, widthForHeight(P, h) * 0.8, W * fx + widthForHeight(P, h) * 0.95, bottom).html;
+        return out;
+    }).join('');
+}
+
+/* ---------- product pictures (900x1125: key content stays inside the central square so 1:1 crops stay good) ---------- */
 export function productFront(key) {
-    const P = PRODUCTS[key]; const W = 900; const H = 1125;
-    const floorH = H * 0.16;
-    let body = studio(W, H, NEUTRAL, { floor: 0.16, tint: P.tint });
+    const W = 900; const H = 1125; const floor = 0.16;
+    const P = PRODUCTS[key];
+    let body = studio(W, H, null, { floor });
     const w = PACK_W[P.kind];
-    const pk = pack(P, w, W / 2 + (P.kind === 'oil' ? -125 : 0), floorH - 6);
-    body += pk.html;
-    if (P.kind === 'oil') {
-        const carton = pack({ ...P, kind: 'carton' }, 225, W / 2 + 175, floorH - 6);
-        body += carton.html;
-    }
+    body += pack(P, w, W / 2 + (P.kind === 'oil' ? -125 : 0), H * floor - 6).html;
+    if (P.kind === 'oil') body += pack({ ...P, kind: 'carton' }, 225, W / 2 + 175, H * floor - 6).html;
     return scene(W, H, body);
 }
 
-export function productBenefits(key) {
-    const P = PRODUCTS[key]; const W = 900; const H = 1125;
-    let body = `<div class="abs" style="inset:0;background:linear-gradient(160deg,#FBF7F0,${NEUTRAL[1]})"></div>`;
-    body += `<div class="blob" style="left:${-W * 0.2}px;top:${H * 0.55}px;width:${W * 0.9}px;height:${W * 0.9}px;background:${P.tint};opacity:.7"></div>`;
-    body += `<div class="txt serif" style="left:60px;top:${H * 0.145}px;font-size:46px;line-height:1.1;color:#241720">${P.l1}<br><span style="color:${P.accent}">${P.l2}</span></div>`;
-    const w = Math.min(PACK_W[P.kind] * 0.95, 380, 560 / RATIO[P.kind]);
-    const fy = H * 0.205;
-    body += (P.kind === 'oil' ? pack({ ...P, kind: 'carton' }, 190, 330, fy).html : '');
-    body += pack(P, w, 210, fy).html;
-    let rows = '';
-    P.benefits.forEach(([ic, text], i) => {
-        rows += `<div class="abs" style="left:${W * 0.5}px;top:${H * 0.3 + i * 128}px;width:${W * 0.45}px;display:flex;align-items:center;gap:20px">
-          <div style="flex:none;width:72px;height:72px;border-radius:50%;background:#fff;color:${P.accent};display:grid;place-items:center;box-shadow:0 6px 18px rgba(60,30,50,.12)"><div style="width:36px;height:36px">${ICON[ic]}</div></div>
-          <div style="font-size:23px;font-weight:500;line-height:1.3;color:#241720">${text}</div></div>`;
-    });
-    body += rows;
-    body += `<div class="abs" style="left:60px;right:60px;top:${H * 0.835}px;height:54px;border-radius:99px;background:#fff;display:flex;align-items:center;justify-content:center;gap:34px;font-size:19px;font-weight:600;color:${P.accent};box-shadow:0 6px 18px rgba(60,30,50,.1)"><span>100% Ayurvedic</span><span style="opacity:.4">|</span><span>FSSAI licensed</span><span style="opacity:.4">|</span><span>Lab tested</span></div>`;
-    return scene(W, H, body);
+/** The second picture of each product: the pack on the stone podium. */
+export function productStyled(key) {
+    const W = 900; const H = 1125;
+    const P = PRODUCTS[key];
+    const h = P.kind === 'jar' || P.kind === 'tub' ? 330 : P.kind === 'pouch' ? 400 : 450;
+    let body = podiumStage(W, H, { x: '54%' });
+    body += standing([[key, h, 0.5]], W, H * 0.535);
+    return scene(W, H, `<div class="warm" style="position:absolute;inset:0">${body}</div>`);
 }
 
-/* ---------- category tiles (square) ---------- */
+/* ---------- category tiles (square): calm packshots, no props ---------- */
 const CATS = {
-    protein: { bg: ['#F3E8F4', '#DCC5DE'], items: [['greens', 290, 0.7, 0], ['protein', 400, 0.36, 0]], props: (W, fy) => scoop(W * 0.08, fy + 30, 140, -10) },
-    immunity: { bg: ['#FDEBD2', '#F7CD92'], items: [['immunity', 240, 0.36, 0], ['immunity', 210, 0.7, 0]], props: (W, fy) => citrus(W * 0.06, fy + 10, 110) + citrus(W * 0.78, fy + 26, 90, '#F0932B') + leaf(W * 0.82, fy - 80, 150, 205, '#5E9A32') },
-    'weight-management': { bg: ['#EFEBDD', '#DCD3BB'], items: [['fatburner', 450, 0.5, 0]], props: (W, fy) => capsules(W * 0.5, fy + 36, 10, '#5B8F3A', '#F4EBCF', 52, 150) + leaf(W * 0.05, fy - 80, 160, -25, '#5E8E3E') },
-    vitamins: { bg: ['#FFF1C9', '#F9DD8D'], items: [['multivitamin', 340, 0.3, 0], ['biotin', 340, 0.7, 0]], props: (W, fy) => gummies(W * 0.5, fy + 34, 14, ['#F6A21E', '#E85A82', '#F9C74F'], 38, 150) },
-    'personal-care': { bg: ['#E2F1E8', '#BFE0CD'], items: [['facewash', 200, 0.2, 0], ['hairoil', 215, 0.5, 0], ['facewash', 160, 0.82, 0]], props: (W, fy) => sprig(W * 0.06, fy - 20, 120, -30, '#3E8E5A', 4) },
-    'digestive-health': { bg: ['#E9F3DC', '#CFE5B6'], items: [['aloe', 200, 0.27, 0], ['triphala', 360, 0.68, 0]], props: (W, fy) => leaf(W * 0.04, fy - 70, 160, -25, '#5E9A32') + ball(W * 0.84, fy + 28, 40, '#9CCB4E') },
-    superfoods: { bg: ['#E3F0D3', '#BCD9A0'], items: [['greens', 450, 0.5, 0]], props: (W, fy) => leaf(W * 0.04, fy - 100, 200, -26, '#4F8A3A') + leaf(W * 0.74, fy - 90, 200, 208, '#68A445') + ball(W * 0.8, fy + 30, 44, '#7FB34A') },
+    protein: [['greens', 290, 0.7], ['protein', 400, 0.36]],
+    immunity: [['immunity', 240, 0.36], ['immunity', 210, 0.7]],
+    'weight-management': [['fatburner', 450, 0.5]],
+    vitamins: [['multivitamin', 340, 0.3], ['biotin', 340, 0.7]],
+    'personal-care': [['facewash', 200, 0.2], ['hairoil', 215, 0.5], ['facewash', 160, 0.82]],
+    'digestive-health': [['aloe', 200, 0.27], ['triphala', 360, 0.68]],
+    superfoods: [['greens', 450, 0.5]],
 };
 export function categoryTile(slug) {
-    const C = CATS[slug]; const W = 800; const H = 800;
-    const floorH = H * 0.14; let body = studio(W, H, NEUTRAL, { floor: 0.14, arch: true, tint: PRODUCTS[C.items[0][0]].tint });
-    C.items.forEach(([k, w, fx]) => { body += pack(PRODUCTS[k], w, W * fx, floorH - 4).html; });
+    const W = 800; const H = 800; const floor = 0.14;
+    let body = studio(W, H, null, { floor });
+    CATS[slug].forEach(([k, w, fx]) => { body += pack(PRODUCTS[k], w, W * fx, H * floor - 4).html; });
     return scene(W, H, body);
 }
 
-/* ---------- lineups: hero, banners, promos ---------- */
-function lineup(items, W, floorH, bottomOffset = 0) {
-    let out = '';
-    items.forEach(([k, w, x, dy = 0, rot = 0]) => { out += pack(PRODUCTS[k], w, x, floorH - 4 + dy + bottomOffset, { rot }).html; });
-    return out;
+/* ---------- banners, promos and tiles with packs on the stone podium ---------- */
+function onPodium(W, H, items, { x = '62%', base = 0.455 } = {}) {
+    // class 'warm': the packs take on the photograph's warm light, and their shadows darken the stone instead of covering it
+    return scene(W, H, `<div class="warm" style="position:absolute;inset:0">${podiumStage(W, H, { x })}${standing(items, W, H * (1 - base))}</div>`);
 }
-
-export function hero() {
-    const W = 1080; const H = 1200; const floorH = H * 0.15;
-    let body = `<div class="abs" style="inset:0;background:radial-gradient(110% 80% at 50% 25%,#FFFFFF 0,#F6EBF6 45%,#E6D2E8 100%)"></div>`;
-    body += `<div class="arch" style="left:${W * 0.14}px;width:${W * 0.72}px;bottom:${floorH}px;height:${H * 0.72}px;background:linear-gradient(180deg,#FFFFFF,#EBD9EC);opacity:.85"></div>`;
-    body += `<div class="abs" style="left:0;right:0;bottom:0;height:${floorH}px;background:linear-gradient(180deg,#EBDDEA,#D9C3DA)"></div><div class="abs" style="left:0;right:0;bottom:${floorH - 1}px;height:2px;background:rgba(255,255,255,.7)"></div>`;
-    body += leaf(W * 0.02, H * 0.5, 300, -30, '#6B9A4E') + leaf(W * 0.78, H * 0.46, 300, 210, '#79A85A') + leaf(W * 0.05, H * 0.62, 220, -10, '#4F8A3A', 1.5);
-    body += lineup([['aloe', 195, W * 0.14, 0], ['hairoil', 215, W * 0.3, 0], ['greens', 285, W * 0.8, 0], ['protein', 350, W * 0.55, 0]], W, floorH);
-    body += citrus(W * 0.05, H * 0.88, 110) + gummies(W * 0.38, H * 0.915, 10, ['#E85A82', '#F28AA6'], 40, 120) + ball(W * 0.93, H * 0.9, 50, '#7FB34A');
-    return scene(W, H, body);
-}
-
-const BANNERS = [
-    { bg: ['#E59A2E', '#B8691A'], glow: '#FFD488', wide: [['immunity', 190, 0.6], ['multivitamin', 300, 0.745], ['immunity', 165, 0.88]], mob: [['immunity', 215, 0.2], ['multivitamin', 300, 0.52], ['immunity', 175, 0.83]],
-        props: (W, H, f, m) => leaf(W * (m ? 0.02 : 0.45), H * (m ? 0.2 : 0.3), m ? 230 : 250, -22, '#6AA84F') + leaf(W * (m ? 0.74 : 0.93), H * (m ? 0.16 : 0.2), m ? 220 : 230, 205, '#6AA84F') + citrus(W * (m ? 0.04 : 0.5), H - f - 20, m ? 120 : 130) + citrus(W * (m ? 0.86 : 0.96), H - f - 10, 90, '#F0932B') },
-    { bg: ['#2F6B34', '#1C4524'], glow: '#7FBF6A', wide: [['protein', 350, 0.595], ['greens', 280, 0.775], ['aloe', 175, 0.915]], mob: [['protein', 330, 0.24], ['greens', 270, 0.58], ['aloe', 170, 0.85]],
-        props: (W, H, f, m) => leaf(W * (m ? 0.02 : 0.46), H * (m ? 0.22 : 0.28), m ? 230 : 250, -22, '#7FBF6A') + leaf(W * (m ? 0.74 : 0.94), H * (m ? 0.14 : 0.18), m ? 220 : 230, 205, '#5E9A32') + (m ? '' : scoop(W * 0.5, H - f - 6, 150, -10)) },
-    { bg: ['#B04A78', '#7A2A55'], glow: '#F3A8C6', wide: [['hairoil', 215, 0.6], ['facewash', 190, 0.72], ['biotin', 300, 0.86]], mob: [['hairoil', 200, 0.2], ['facewash', 175, 0.45], ['biotin', 300, 0.76]],
-        props: (W, H, f, m) => leaf(W * (m ? 0.02 : 0.45), H * (m ? 0.22 : 0.3), m ? 230 : 250, -22, '#9BC47A') + leaf(W * (m ? 0.76 : 0.95), H * (m ? 0.14 : 0.2), m ? 220 : 220, 205, '#9BC47A') + gummies(W * (m ? 0.5 : 0.8), H - f + (m ? -10 : 24), 12, ['#F28AA6', '#F6B1C3'], 40, 120) },
-];
-export function bannerWide(n) {
-    const B = BANNERS[n]; const W = 1920; const H = 720; const f = 90;
-    let body = `<div class="abs" style="inset:0;background:radial-gradient(70% 110% at 78% 40%,${B.glow} 0,${B.bg[0]} 38%,${B.bg[1]} 100%)"></div>`;
-    body += `<div class="blob" style="left:${W * 0.5}px;top:${-H * 0.2}px;width:${H * 1.5}px;height:${H * 1.5}px;border:2px solid rgba(255,255,255,.18)"></div><div class="blob" style="left:${W * 0.56}px;top:${H * 0.05}px;width:${H * 1.1}px;height:${H * 1.1}px;border:2px solid rgba(255,255,255,.14)"></div>`;
-    body += `<div class="abs" style="left:0;right:0;bottom:0;height:${f}px;background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.28))"></div>`;
-    body += B.props(W, H, f, false);
-    body += lineup(B.wide.map(([k, w, fx]) => [k, w, W * fx, 0]), W, f);
-    return scene(W, H, body);
-}
-export function bannerMobile(n) {
-    const B = BANNERS[n]; const W = 900; const H = 1125; const f = 400;
-    let body = `<div class="abs" style="inset:0;background:radial-gradient(90% 60% at 50% 34%,${B.glow} 0,${B.bg[0]} 42%,${B.bg[1]} 100%)"></div>`;
-    body += `<div class="blob" style="left:${W * 0.1}px;top:${H * 0.02}px;width:${W * 0.8}px;height:${W * 0.8}px;border:2px solid rgba(255,255,255,.2)"></div>`;
-    body += `<div class="abs" style="left:0;right:0;bottom:0;height:${f}px;background:linear-gradient(180deg,rgba(0,0,0,.14),rgba(0,0,0,.34))"></div><div class="abs" style="left:0;right:0;bottom:${f - 1}px;height:2px;background:rgba(255,255,255,.3)"></div>`;
-    body += B.props(W, H, f, true);
-    body += lineup(B.mob.map(([k, w, fx]) => [k, w, W * fx, 0]), W, f);
-    return scene(W, H, body);
-}
-
-const PROMOS = [
-    { tint: '#E7F2D8', items: [['aloe', 185, 0.69], ['triphala', 255, 0.885]] },
-    { tint: '#F1E4F2', items: [['protein', 310, 0.68], ['greens', 205, 0.915]] },
-];
-export function promo(n) {
-    const B = PROMOS[n]; const W = 1200; const H = 750; const f = 130;
-    let body = studio(W, H, NEUTRAL, { arch: false, floor: f / H });
-    body += `<div class="arch" style="left:${W * 0.5}px;width:${W * 0.48}px;bottom:${f}px;height:${H * 0.72}px;background:linear-gradient(180deg,${mix(B.tint, '#ffffff', 0.2)},${mix(B.tint, '#ffffff', 0.7)});opacity:.9"></div>`;
-    body += lineup(B.items.map(([k, w, fx]) => [k, w, W * fx, 0]), W, f);
-    return scene(W, H, body);
-}
-
-/* ---------- Instagram squares ---------- */
+export const bannerPodiumWide = () => onPodium(1920, 720, [['protein', 170, 0.6], ['greens', 215, 0.735], ['aloe', 255, 0.86]], { x: '70%' });
+export const bannerPodiumMobile = () => onPodium(900, 1125, [['protein', 250, 0.24], ['greens', 330, 0.52], ['aloe', 400, 0.8]], { x: '60%' });
+export const promo = (n) => (n === 0
+    ? onPodium(1200, 750, [['aloe', 280, 0.58], ['triphala', 190, 0.8]], { x: '66%' })
+    : onPodium(1200, 750, [['protein', 210, 0.58], ['hairoil', 280, 0.8]], { x: '40%' }));
+export const certified = () => onPodium(1050, 700, [['triphala', 160, 0.3], ['protein', 200, 0.52], ['aloe', 260, 0.76]], { x: '58%' });
 export function insta(n) {
     const W = 800; const H = 800;
     const defs = [
-        () => { const f = 110; return studio(W, H, ['#F3E8F4', '#DCC5DE'], { floor: f / H }) + pack(PRODUCTS.protein, 400, W * 0.5, f - 4).html + scoop(W * 0.68, H - f + 30, 190, -10) + leaf(W * 0.04, H * 0.5, 240, -28, '#6B8F4E'); },
-        () => `<div class="abs" style="inset:0;background:radial-gradient(90% 90% at 50% 40%,#FFF3F6,#F6CCD8)"></div>` + gummies(W * 0.5, H * 0.74, 38, ['#E85A82', '#F28AA6', '#F6B1C3'], 64, 270, 11) + pack(PRODUCTS.biotin, 400, W * 0.5, H * 0.38).html + leaf(W * 0.02, H * 0.08, 220, 28, '#6AA84F'),
-        () => `<div class="abs" style="inset:0;background:#FDF9F4"></div><div class="blob" style="left:-120px;top:-120px;width:420px;height:420px;background:#F1E4F2"></div><div class="blob" style="right:-140px;bottom:-140px;width:460px;height:460px;background:#FBF1E1"></div>` + leaf(W * 0.7, H * 0.08, 230, 25, '#79A85A') + leaf(W * 0.05, H * 0.74, 230, -30, '#79A85A') + `<div class="abs" style="left:0;right:0;top:${H * 0.28}px;text-align:center;padding:0 70px"><div class="serif" style="font-size:66px;line-height:1.15;color:#431A43">Rooted in<br>Ayurveda.</div><div style="margin-top:26px;font-size:24px;color:#6B5D68">Daily rituals, thoughtfully made.</div><img src="/brand/chikit-logo.webp" style="margin-top:46px;width:260px" alt=""></div>`,
-        () => { const f = 110; return studio(W, H, ['#FDEBD2', '#F7CD92'], { floor: f / H, arch: false }) + pack(PRODUCTS.immunity, 250, W * 0.5, f - 4).html + citrus(W * 0.14, H - f + 4, 170) + citrus(W * 0.7, H - f + 22, 140, '#F0932B') + leaf(W * 0.66, H * 0.2, 220, 205, '#5E9A32'); },
-        () => { const f = 110; return studio(W, H, ['#E2F1E8', '#BFE0CD'], { floor: f / H }) + pack(PRODUCTS.facewash, 280, W * 0.5, f - 4).html + sprig(W * 0.07, H * 0.66, 120, -30, '#3E8E5A', 4) + sprig(W * 0.93, H * 0.7, 110, 200, '#4E9C68', 4) + ball(W * 0.7, H - f + 26, 56, '#CFE9DA'); },
-        () => { const f = 120; return studio(W, H, ['#FFF1C9', '#F5E3A8'], { floor: f / H }) + lineup([['multivitamin', 230, W * 0.17], ['aloe', 150, W * 0.38], ['protein', 270, W * 0.66], ['greens', 180, W * 0.9]], W, f) + gummies(W * 0.5, H - f + 30, 10, ['#F6A21E', '#F9C74F'], 34, 150); },
+        null, null, null,
+        () => onPodium(W, H, [['immunity', 360, 0.5]], { x: '56%' }),
+        () => onPodium(W, H, [['facewash', 320, 0.36], ['hairoil', 350, 0.7]], { x: '48%' }),
+        () => onPodium(W, H, [['multivitamin', 190, 0.22], ['aloe', 300, 0.45], ['protein', 210, 0.69], ['greens', 240, 0.9]], { x: '66%' }),
     ];
-    return scene(W, H, defs[n]());
+    return defs[n]();
 }
 
-/* ---------- misc ---------- */
-export function certified() {
-    const W = 1050; const H = 700; const f = 90;
-    let body = `<div class="abs" style="inset:0;background:radial-gradient(90% 90% at 50% 40%,#FFFFFF,#EBD9EC)"></div>`;
-    body += `<div class="abs" style="left:0;right:0;bottom:0;height:${f}px;background:linear-gradient(180deg,#E8D6E9,#D6BCD8)"></div>`;
-    body += lineup([['triphala', 225, W * 0.25], ['protein', 270, W * 0.5], ['aloe', 150, W * 0.74]], W, f);
-    body += `<div class="abs" style="right:46px;top:46px;width:150px;height:150px;border-radius:50%;background:#602460;color:#fff;display:grid;place-items:center;text-align:center;box-shadow:0 10px 28px rgba(67,26,67,.3);border:5px solid #F1E4F2"><div><div style="width:34px;height:34px;margin:0 auto 4px">${ICON.shield}</div><div style="font-size:15px;font-weight:600;letter-spacing:.08em">LAB<br>TESTED</div></div></div>`;
-    return scene(W, H, body);
-}
-export function about() {
-    const W = 800; const H = 1000; const f = 140;
-    let body = studio(W, H, ['#F6EBF6', '#E3CCE5'], { floor: f / H });
-    body += lineup([['hairoil', 210, W * 0.22], ['protein', 330, W * 0.55], ['greens', 270, W * 0.84, 0]], W, f);
-    return scene(W, H, body);
-}
-export function videoFrame(n) {
-    const W = 1280; const H = 720; const f = 90;
-    const sets = [
-        ['#F1E4F2', [['protein', 270, 0.59], ['greens', 215, 0.78], ['aloe', 140, 0.92]]],
-        ['#FCEBD3', [['immunity', 160, 0.59], ['multivitamin', 260, 0.77], ['immunity', 140, 0.92]]],
-        ['#DDF0E6', [['hairoil', 165, 0.58], ['facewash', 150, 0.72], ['biotin', 250, 0.88]]],
-        ['#E7F2D8', [['aloe', 155, 0.58], ['triphala', 255, 0.76], ['fatburner', 200, 0.915]]],
-    ];
-    const [tint, items] = sets[n];
-    let body = studio(W, H, NEUTRAL, { floor: f / H, arch: false });
-    body += `<div class="arch" style="left:${W * 0.46}px;width:${W * 0.52}px;bottom:${f}px;height:${H * 0.74}px;background:linear-gradient(180deg,${mix(tint, '#ffffff', 0.2)},${mix(tint, '#ffffff', 0.7)});opacity:.9"></div>`;
-    body += lineup(items.map(([k, w, fx]) => [k, w, W * fx, 0]), W, f);
-    return scene(W, H, body);
-}
-
-/* ---------- ingredient medallions: soft round pictures of the plants and nutrients used in the products ---------- */
-const sv = (inner) => `<div class="abs" style="inset:0"><svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${inner}</svg></div>`;
-const rg = (id, c, hi = 0.5, lo = 0.28) => `<radialGradient id="${id}" cx=".34" cy=".3" r=".85"><stop offset="0" stop-color="${lighten(c, hi)}"/><stop offset=".55" stop-color="${c}"/><stop offset="1" stop-color="${darken(c, lo)}"/></radialGradient>`;
-const lg = (id, c) => `<linearGradient id="${id}" x1="0" x2="1"><stop offset="0" stop-color="${darken(c, 0.2)}"/><stop offset=".55" stop-color="${c}"/><stop offset="1" stop-color="${lighten(c, 0.22)}"/></linearGradient>`;
-const dot = (id, x, y, r, c) => `<defs>${rg(id, c)}</defs><circle cx="${x}" cy="${y}" r="${r}" fill="url(#${id})"/>`;
-const shadowEl = (cx, cy, rx, ry) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="rgba(45,25,30,.18)"/>`;
-
-/** A leaf pointing along its own x axis from (0,0) to (len,0), drawn at (x,y) turned by `rot`. */
-const lf = (id, x, y, len, wid, rot, c) => `<g transform="translate(${x} ${y}) rotate(${rot})"><defs>${lg(id, c)}</defs>
-  <path d="M0,0 C${len * 0.25},${-wid} ${len * 0.75},${-wid} ${len},0 C${len * 0.75},${wid} ${len * 0.25},${wid} 0,0Z" fill="url(#${id})"/>
-  <path d="M0,0 L${len * 0.95},0" stroke="${lighten(c, 0.4)}" stroke-width=".7" opacity=".7"/></g>`;
-const heartLeaf = (id, x, y, s, rot, c) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><defs>${lg(id, c)}</defs>
-  <path d="M0,0 C-14,-4 -18,-22 -6,-26 C-2,-27 0,-24 0,-22 C0,-24 2,-27 6,-26 C18,-22 14,-4 0,0Z" fill="url(#${id})"/><path d="M0,0 L0,-24" stroke="${lighten(c, 0.4)}" stroke-width=".8" opacity=".7"/></g>`;
-const roundFruit = (id, x, y, r, c) => `<defs>${rg(id, c)}</defs><circle cx="${x}" cy="${y}" r="${r}" fill="url(#${id})"/><ellipse cx="${x - r * 0.3}" cy="${y - r * 0.35}" rx="${r * 0.22}" ry="${r * 0.14}" fill="rgba(255,255,255,.5)"/>`;
-const bean = (id, x, y, rx, ry, rot, c) => `<g transform="translate(${x} ${y}) rotate(${rot})"><defs>${rg(id, c, 0.35, 0.3)}</defs><ellipse rx="${rx}" ry="${ry}" fill="url(#${id})"/><path d="M${-rx * 0.8},0 C${-rx * 0.3},${-ry * 0.5} ${rx * 0.3},${ry * 0.5} ${rx * 0.8},0" stroke="${darken(c, 0.4)}" stroke-width="1.1" fill="none"/></g>`;
-const seedDrop = (x, y, rot, c = '#2B2220') => `<path transform="translate(${x} ${y}) rotate(${rot})" d="M0,-4 C3,-2 3,3 0,4 C-3,3 -3,-2 0,-4Z" fill="${c}"/>`;
-const grain = (x, y, rot, c = '#F3E7CF') => `<ellipse transform="translate(${x} ${y}) rotate(${rot})" rx="3.6" ry="1.5" fill="${c}" stroke="rgba(120,90,50,.25)" stroke-width=".3"/>`;
-const pillLetters = (id, label, c1, c2) => `<g transform="translate(50 50) rotate(-28)"><defs><clipPath id="${id}c"><rect x="-34" y="-14" width="68" height="28" rx="14"/></clipPath><linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${lighten(c1, 0.3)}"/><stop offset="1" stop-color="${c1}"/></linearGradient><linearGradient id="${id}b" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${lighten(c2, 0.3)}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>
-  <g clip-path="url(#${id}c)"><rect x="-34" y="-14" width="34" height="28" fill="url(#${id})"/><rect x="0" y="-14" width="34" height="28" fill="url(#${id}b)"/><rect x="-28" y="-10" width="52" height="5" rx="2.5" fill="rgba(255,255,255,.4)"/></g></g>
-  <text x="50" y="86" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="13" fill="${darken(c1, 0.35)}">${label}</text>`;
-
-const ING = {
-    'aloe-vera': { bg: ['#EAF4DE', '#BEDDA2'], art: () => sv([-44, -22, 0, 22, 44].map((a, i) => `<g transform="rotate(${a} 50 90)"><defs>${lg(`al${i}`, '#6FAF4A')}</defs><path d="M50,90 C41,62 42,34 50,10 C58,34 59,62 50,90Z" fill="url(#al${i})"/><path d="M50,88 L50,16" stroke="#B5DB93" stroke-width=".8" opacity=".6"/></g>`).join('') + shadowEl(50, 92, 22, 3)) },
-    amla: { bg: ['#F1F4DA', '#D2DE9B'], art: () => sv(shadowEl(50, 86, 30, 4) + lf('amL1', 50, 30, 30, 7, -150, '#5E9A32') + lf('amL2', 50, 30, 30, 7, -30, '#6AA84F') + roundFruit('am1', 36, 62, 15, '#B5CF5A') + roundFruit('am2', 62, 66, 14, '#A6C84C') + roundFruit('am3', 50, 44, 13, '#C2D96A')) },
-    ginger: { bg: ['#F8EEDA', '#E7CDA0'], art: () => sv(shadowEl(50, 82, 32, 4) + `<defs>${lg('gi', '#C99A5E')}</defs><path d="M14,64 C12,52 24,48 30,52 L40,40 C42,30 54,30 56,40 L62,52 C70,46 84,50 84,62 C86,74 72,78 62,74 L36,76 C24,80 14,74 14,64Z" fill="url(#gi)"/><path d="M26,60 q6,-4 12,0 M52,56 q6,-4 12,0 M30,70 q8,-3 16,0" stroke="#8A6234" stroke-width="1.2" fill="none" opacity=".6"/>`) },
-    biotin: { bg: ['#FCE9EE', '#F4C4D3'], art: () => sv(shadowEl(50, 84, 28, 3.5) + pillLetters('bi', 'B7', '#D8587F', '#F28AA6')) },
-    zinc: { bg: ['#E9EEF4', '#C4CFDC'], art: () => sv(shadowEl(50, 84, 30, 4) + [[30, 60, 14, 12], [54, 56, 18, 16], [70, 70, 11, 10], [44, 74, 10, 9], [58, 40, 11, 12]].map(([x, y, w, h], i) => `<defs>${lg(`zn${i}`, '#8CA3BF')}</defs><polygon points="${x},${y - h} ${x + w},${y - h * 0.3} ${x + w * 0.7},${y + h} ${x - w * 0.7},${y + h * 0.8} ${x - w},${y - h * 0.2}" fill="url(#zn${i})" stroke="rgba(255,255,255,.5)" stroke-width=".5"/>`).join('')) },
-    'vitamin-e': { bg: ['#FFF2D4', '#F6D58A'], art: () => sv(shadowEl(50, 84, 26, 3.5) + `<defs>${rg('ve', '#F2B21F', 0.55, 0.3)}</defs><path d="M50,14 C70,38 78,50 78,62 A28,28 0 0 1 22,62 C22,50 30,38 50,14Z" fill="url(#ve)"/><ellipse cx="38" cy="58" rx="5" ry="11" fill="rgba(255,255,255,.55)" transform="rotate(14 38 58)"/>`) },
-    neem: { bg: ['#E7F2DC', '#B7D69A'], art: () => sv(shadowEl(50, 90, 26, 3) + `<path d="M50,92 C50,70 52,50 56,18" stroke="#5B8E3C" stroke-width="2.4" fill="none"/>` + [[52, 76, -150], [52, 76, -20], [53, 58, -155], [54, 58, -25], [55, 40, -158], [56, 40, -30], [56, 22, -80]].map(([x, y, r], i) => lf(`ne${i}`, x, y, 26 - (76 - y) * 0.15, 6, r, '#5E9A32')).join('')) },
-    'tea-tree': { bg: ['#E3F1EA', '#B3D9C4'], art: () => sv(shadowEl(50, 90, 26, 3) + `<path d="M48,92 C48,70 52,50 54,16" stroke="#6A9B7C" stroke-width="2" fill="none"/>` + [[50, 78, -165], [50, 78, -15], [51, 62, -160], [52, 62, -20], [53, 46, -162], [54, 46, -18], [54, 30, -150], [55, 30, -28]].map(([x, y, r], i) => lf(`tt${i}`, x, y, 24, 3.4, r, '#79B08E')).join('') + `<path d="M78,70 C84,78 86,82 86,86 A6,6 0 0 1 74,86 C74,82 76,78 78,70Z" fill="#9FD2B6"/>`) },
-    'green-coffee': { bg: ['#F0F0DD', '#CFD8A6'], art: () => sv(shadowEl(50, 86, 30, 4) + bean('gc1', 36, 52, 16, 11, -30, '#8FA75E') + bean('gc2', 62, 46, 16, 11, 25, '#7E9A4E') + bean('gc3', 52, 70, 16, 11, 5, '#9BB268')) },
-    garcinia: { bg: ['#FFF0D2', '#F3CF8B'], art: () => sv(shadowEl(50, 86, 30, 4) + `<defs>${rg('ga', '#E9A33A', 0.5, 0.3)}</defs><ellipse cx="50" cy="56" rx="32" ry="27" fill="url(#ga)"/>` + [-20, -9, 0, 9, 20].map((o) => `<path d="M${50 + o * 0.6},30 C${50 + o * 1.6},46 ${50 + o * 1.6},66 ${50 + o * 0.6},83" stroke="${darken('#E9A33A', 0.28)}" stroke-width="1.1" fill="none" opacity=".6"/>`).join('') + lf('ga1', 50, 30, 16, 5, -60, '#5E9A32')) },
-    'green-tea': { bg: ['#E5F0D6', '#B5D393'], art: () => sv(shadowEl(50, 90, 26, 3) + lf('gt1', 50, 88, 56, 12, -100, '#5E9A32') + lf('gt2', 50, 88, 46, 10, -135, '#6AA84F') + lf('gt3', 50, 88, 46, 10, -65, '#7DBA5A') + lf('gt4', 50, 70, 26, 7, -165, '#6AA84F')) },
-    onion: { bg: ['#F7E7EC', '#E0B1C4'], art: () => sv(shadowEl(50, 88, 28, 4) + `<defs>${rg('on', '#B8557D', 0.5, 0.3)}</defs><path d="M50,28 C70,36 82,52 78,68 C74,82 62,88 50,88 C38,88 26,82 22,68 C18,52 30,36 50,28Z" fill="url(#on)"/>` + [-16, -6, 6, 16].map((o) => `<path d="M${50 + o * 0.4},32 C${50 + o * 2},52 ${50 + o * 2},72 ${50 + o * 0.7},86" stroke="${lighten('#B8557D', 0.35)}" stroke-width="1" fill="none" opacity=".6"/>`).join('') + `<path d="M50,30 C48,20 52,14 54,10" stroke="#7BA85A" stroke-width="3" fill="none" stroke-linecap="round"/>`) },
-    'black-seed': { bg: ['#F8F1E4', '#E1CFAE'], art: () => sv(shadowEl(50, 88, 32, 4) + `<ellipse cx="50" cy="62" rx="34" ry="22" fill="#EADBBE"/>` + Array.from({ length: 34 }, (_, i) => seedDrop(18 + ((i * 37) % 64), 44 + ((i * 53) % 36), (i * 71) % 180)).join('')) },
-    bhringraj: { bg: ['#EAF3E0', '#C3DDAA'], art: () => sv(shadowEl(50, 90, 26, 3) + lf('bh1', 50, 78, 34, 7, -150, '#5E9A32') + lf('bh2', 50, 78, 34, 7, -30, '#6AA84F') + `<path d="M50,80 L50,46" stroke="#5B8E3C" stroke-width="2.4"/>` + Array.from({ length: 10 }, (_, i) => `<ellipse transform="translate(50 36) rotate(${i * 36})" cx="0" cy="-15" rx="4.4" ry="11" fill="#FFFFFF" stroke="rgba(120,140,100,.35)" stroke-width=".5"/>`).join('') + `<circle cx="50" cy="36" r="8" fill="#F2C230"/><circle cx="48" cy="34" r="2.4" fill="#FFE07A"/>`) },
-    giloy: { bg: ['#E6F1DA', '#B5D396'], art: () => sv(shadowEl(50, 90, 26, 3) + `<path d="M26,90 C34,72 40,60 52,52 C64,44 72,34 76,18" stroke="#6B8F4E" stroke-width="2.2" fill="none"/>` + heartLeaf('gl1', 42, 66, 1.25, -45, '#5E9A32') + heartLeaf('gl2', 60, 50, 1.2, 40, '#6AA84F') + heartLeaf('gl3', 70, 30, 0.95, -20, '#79B35A')) },
-    tulsi: { bg: ['#E3F0D3', '#AFD18B'], art: () => sv(shadowEl(50, 90, 26, 3) + `<path d="M50,92 C50,70 50,46 50,14" stroke="#4E7F36" stroke-width="2.4" fill="none"/>` + [[50, 80, -140], [50, 80, -40], [50, 62, -145], [50, 62, -35], [50, 44, -148], [50, 44, -32], [50, 28, -120], [50, 28, -60]].map(([x, y, r], i) => lf(`tu${i}`, x, y, 25, 8, r, i % 2 ? '#4E8A3A' : '#5E9A32')).join('')) },
-    'vitamin-c': { bg: ['#FFF1D2', '#F8CE87'], art: () => sv(shadowEl(50, 88, 32, 4) + `<defs>${rg('vc', '#F6A83B', 0.5, 0.25)}</defs><circle cx="50" cy="52" r="34" fill="${darken('#F6A83B', 0.1)}"/><circle cx="50" cy="52" r="30" fill="url(#vc)"/>` + Array.from({ length: 9 }, (_, i) => `<path transform="rotate(${i * 40} 50 52)" d="M50,52 L50,26" stroke="#FFE6B0" stroke-width="1.4"/>`).join('') + `<circle cx="50" cy="52" r="4" fill="#FFE6B0"/>`) },
-    'vitamin-d': { bg: ['#FFF3C9', '#F9DB7B'], art: () => sv(`<defs>${rg('vd', '#F6B81E', 0.55, 0.2)}</defs>` + Array.from({ length: 12 }, (_, i) => `<path transform="rotate(${i * 30} 50 50)" d="M50,10 L50,22" stroke="#F0A81A" stroke-width="4.5" stroke-linecap="round"/>`).join('') + `<circle cx="50" cy="50" r="22" fill="url(#vd)"/><ellipse cx="42" cy="42" rx="6" ry="4" fill="rgba(255,255,255,.55)"/>`) },
-    'vitamin-b12': { bg: ['#FBE6EC', '#F1B7C8'], art: () => sv(shadowEl(50, 84, 28, 3.5) + pillLetters('b12', 'B12', '#C2456A', '#E98BA6')) },
-    'pea-protein': { bg: ['#EDF5DE', '#C5DD9C'], art: () => sv(shadowEl(50, 88, 32, 4) + `<defs>${lg('pp', '#7DBA4A')}</defs><path d="M12,58 C20,34 70,24 90,38 C86,64 36,80 12,58Z" fill="url(#pp)"/>` + [[28, 54], [42, 52], [56, 50], [70, 47]].map(([x, y], i) => roundFruit(`pe${i}`, x, y, 8.5, '#A5D45E')).join('')) },
-    'brown-rice': { bg: ['#F7EFE0', '#E2CCA2'], art: () => sv(shadowEl(50, 88, 32, 4) + `<path d="M16,80 C20,50 36,34 50,34 C64,34 80,50 84,80Z" fill="#E7D2A8"/>` + Array.from({ length: 46 }, (_, i) => grain(22 + ((i * 29) % 56), 46 + ((i * 41) % 34), (i * 67) % 180, i % 3 ? '#D9BB86' : '#EEDDB7')).join('')) },
-    cocoa: { bg: ['#F1E4D8', '#CBAA8A'], art: () => sv(shadowEl(50, 88, 32, 4) + `<defs>${lg('co', '#8A5A3A')}</defs><path d="M14,58 C22,34 58,26 84,40 C84,66 40,80 14,58Z" fill="url(#co)"/>` + [-14, -4, 6, 16].map((o) => `<path d="M${40 + o},34 C${46 + o},46 ${46 + o},58 ${38 + o},68" stroke="${darken('#8A5A3A', 0.3)}" stroke-width="1.2" fill="none" opacity=".6"/>`).join('') + bean('cb1', 70, 74, 9, 6, -20, '#5A3825') + bean('cb2', 82, 66, 9, 6, 30, '#6A4630')) },
-    moringa: { bg: ['#E5F2D5', '#B3D68F'], art: () => sv(shadowEl(50, 92, 24, 3) + `<path d="M24,86 C40,70 56,50 80,22" stroke="#5E8E3E" stroke-width="2" fill="none"/>` + [[34, 76, -50], [42, 68, 40], [48, 62, -60], [55, 54, 35], [62, 46, -62], [68, 38, 30], [75, 30, -65]].map(([x, y, r], i) => `<g transform="translate(${x} ${y}) rotate(${r})"><ellipse cx="9" cy="0" rx="9" ry="4.6" fill="${i % 2 ? '#79B35A' : '#68A445'}"/><ellipse cx="19" cy="0" rx="6" ry="3.4" fill="#79B35A"/></g>`).join('')) },
-    spirulina: { bg: ['#DDEDE8', '#9CC9BC'], art: () => sv(shadowEl(50, 88, 32, 4) + `<defs>${rg('sp', '#1F6B5A', 0.45, 0.25)}</defs><path d="M14,82 C18,56 34,40 50,40 C66,40 82,56 86,82Z" fill="url(#sp)"/>` + Array.from({ length: 40 }, (_, i) => `<circle cx="${22 + ((i * 31) % 56)}" cy="${52 + ((i * 47) % 28)}" r="1.2" fill="#6BB8A0" opacity=".7"/>`).join('')) },
-    wheatgrass: { bg: ['#E8F3D6', '#BAD98F'], art: () => sv(shadowEl(50, 92, 28, 3) + [-30, -22, -14, -6, 2, 10, 18, 26, 34].map((o, i) => `<g transform="rotate(${o * 0.9} 50 90)"><defs>${lg(`wg${i}`, i % 2 ? '#6AA84F' : '#5E9A32')}</defs><path d="M${48 + o * 0.2},90 C${46 + o * 0.5},60 ${50 + o * 0.9},36 ${52 + o * 1.1},${14 + (i % 3) * 8} C${54 + o * 0.6},44 ${53 + o * 0.3},66 ${52 + o * 0.2},90Z" fill="url(#wg${i})"/></g>`).join('')) },
-    bibhitaki: { bg: ['#EFEBDD', '#D5CBA8'], art: () => sv(shadowEl(50, 88, 32, 4) + roundFruit('bb1', 38, 58, 17, '#A89A6A') + roundFruit('bb2', 62, 54, 16, '#B5A878') + roundFruit('bb3', 52, 36, 11, '#C0B488') + lf('bbl', 50, 24, 20, 5, -80, '#7BA05A')) },
-    haritaki: { bg: ['#F8EDD3', '#E5C98B'], art: () => sv(shadowEl(50, 88, 32, 4) + [[34, 60, 14], [58, 56, 15], [48, 38, 11]].map(([x, y, r], i) => `<defs>${rg(`ha${i}`, '#D9A441', 0.5, 0.3)}</defs><ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 1.12}" fill="url(#ha${i})"/>` + [-0.5, 0, 0.5].map((o) => `<path d="M${x + o * r},${y - r} C${x + o * r * 1.5},${y - r * 0.2} ${x + o * r * 1.5},${y + r * 0.2} ${x + o * r},${y + r}" stroke="${darken('#D9A441', 0.3)}" stroke-width=".8" fill="none" opacity=".55"/>`).join('')).join('')) },
+/* ---------- ingredient medallions: fine plum line drawings on the brand beige, like the client's own icon sheet ---------- */
+const PLUM = '#602460';
+const ln = (d, extra = '') => `<path d="${d}" fill="none" stroke="${PLUM}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`;
+const fillish = (d) => `<path d="${d}" fill="${PLUM}" fill-opacity=".09" stroke="${PLUM}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+/** A leaf from (x,y) of length l and half-width w, pointing along `rot` degrees. */
+const leafAt = (x, y, l, w, rot) => `<g transform="translate(${x} ${y}) rotate(${rot})">${fillish(`M0,0 C${l * 0.25},${-w} ${l * 0.75},${-w} ${l},0 C${l * 0.75},${w} ${l * 0.25},${w} 0,0Z`)}${ln(`M${l * 0.08},0 L${l * 0.86},0`, 'stroke-width="1.6" opacity=".7"')}</g>`;
+const sprig = (pairs = 3, l = 20, w = 7, spread = 48) => ln('M50,90 C50,66 50,40 50,12')
+    + Array.from({ length: pairs * 2 }, (_, i) => { const y = 80 - i * (60 / (pairs * 2)); const right = i % 2 === 0; return leafAt(50, y, l * 1.25 - i * 0.8, w * 1.1, right ? -spread : -180 + spread); }).join('')
+    + leafAt(50, 16, 17, 6, -90);
+const fruit = (cx, cy, r) => fillish(`M${cx - r},${cy} a${r},${r} 0 1,0 ${2 * r},0 a${r},${r} 0 1,0 ${-2 * r},0`) + ln(`M${cx - r * 0.5},${cy - r * 0.4} q${r * 0.2},${-r * 0.35} ${r * 0.55},${-r * 0.45}`, 'stroke-width="1.8" opacity=".6"');
+const GLYPH = {
+    fan: () => [-48, -24, 0, 24, 48].map((a, i) => `<g transform="rotate(${a} 50 90)">${fillish('M50,90 C42,62 43,34 50,12 C57,34 58,62 50,90Z')}${ln('M50,84 L50,24', 'stroke-width="1.5" opacity=".6"')}</g>`).join(''),
+    cluster: () => fruit(36, 62, 17) + fruit(64, 58, 16) + fruit(50, 36, 12) + leafAt(50, 26, 22, 6, -75),
+    root: () => fillish('M16,66 C13,52 25,47 32,52 L41,40 C43,29 56,29 58,40 L63,52 C72,46 86,51 86,63 C88,76 73,80 63,76 L36,78 C24,82 16,76 16,66Z') + ln('M30,60 L40,64 M56,56 L62,62', 'stroke-width="1.8" opacity=".6"'),
+    capsule: () => `<g transform="rotate(-35 50 50)">${fillish('M26,38 h48 a14,14 0 0 1 0,28 h-48 a14,14 0 0 1 0,-28Z')}${ln('M50,38 L50,66')}</g>` + ln('M30,80 h40', 'stroke-width="1.6" opacity=".4"'),
+    tablet: () => fillish('M50,18 a32,32 0 1,0 0.01,0Z') + ln('M22,50 L78,50') + ln('M34,34 q8,-8 18,-9', 'stroke-width="1.8" opacity=".5"'),
+    drop: () => fillish('M50,14 C70,38 78,50 78,62 A28,28 0 0 1 22,62 C22,50 30,38 50,14Z') + ln('M36,62 q2,10 12,13', 'stroke-width="1.8" opacity=".6"'),
+    bean: () => `<g transform="rotate(-30 36 52)">${fillish('M36,52 m-18,0 a18,12 0 1,0 36,0 a18,12 0 1,0 -36,0')}${ln('M20,52 C30,44 42,60 52,52', 'stroke-width="1.8"')}</g>` + `<g transform="rotate(28 64 50)">${fillish('M64,50 m-18,0 a18,12 0 1,0 36,0 a18,12 0 1,0 -36,0')}${ln('M48,50 C58,42 70,58 80,50', 'stroke-width="1.8"')}</g>` + `<g transform="rotate(4 52 72)">${fillish('M52,72 m-17,0 a17,11 0 1,0 34,0 a17,11 0 1,0 -34,0')}${ln('M36,72 C46,64 58,80 68,72', 'stroke-width="1.8"')}</g>`,
+    citrus: () => fillish('M50,50 m-32,0 a32,32 0 1,0 64,0 a32,32 0 1,0 -64,0') + ln('M50,20 L50,80 M20,50 L80,50 M29,29 L71,71 M71,29 L29,71', 'stroke-width="1.6" opacity=".55"') + ln('M50,50 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0', 'stroke-width="1.6" opacity=".55"'),
+    sun: () => fillish('M50,50 m-16,0 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0') + Array.from({ length: 10 }, (_, i) => ln('M50,16 L50,26', `transform="rotate(${i * 36} 50 50)"`)).join(''),
+    onion: () => fillish('M50,28 C70,36 82,52 78,68 C74,82 62,88 50,88 C38,88 26,82 22,68 C18,52 30,36 50,28Z') + ln('M50,28 C42,52 42,70 50,88 M50,28 C58,52 58,70 50,88', 'stroke-width="1.6" opacity=".55"') + leafAt(50, 28, 16, 4.5, -85),
+    seeds: () => Array.from({ length: 22 }, (_, i) => `<path transform="translate(${20 + ((i * 37) % 62)} ${34 + ((i * 53) % 48)}) rotate(${(i * 71) % 180})" d="M0,-5 C4,-2 4,4 0,5 C-4,4 -4,-2 0,-5Z" fill="${PLUM}" fill-opacity=".14" stroke="${PLUM}" stroke-width="1.8"/>`).join(''),
+    grain: () => ln('M50,90 L50,26') + Array.from({ length: 5 }, (_, i) => leafAt(50, 74 - i * 11, 17, 5, -180 + 58) + leafAt(50, 74 - i * 11, 17, 5, -58)).join('') + leafAt(50, 24, 14, 5, -90),
+    pod: () => fillish('M10,56 C18,30 68,22 92,36 C88,64 34,80 10,56Z') + [[28, 52], [42, 50], [56, 47], [70, 44]].map(([x, y]) => ln(`M${x},${y} m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0`, 'stroke-width="1.8"')).join(''),
+    cocoa: () => fillish('M50,12 C74,22 82,48 78,74 C72,88 28,88 22,74 C18,48 26,22 50,12Z') + ln('M50,14 L50,86 M36,22 C28,48 30,70 36,84 M64,22 C72,48 70,70 64,84', 'stroke-width="1.6" opacity=".55"'),
+    swirl: () => ln('M50,50 m0,0 a6,6 0 1,1 6,6 a14,14 0 1,1 -14,-14 a22,22 0 1,1 22,22 a30,30 0 1,1 -30,-30'),
+    grass: () => [-30, -20, -10, 0, 10, 20, 30].map((o, i) => ln(`M${50 + o * 0.45},90 C${50 + o * 0.8},60 ${50 + o * 1.5},38 ${50 + o * 1.9},${14 + Math.abs(o) * 0.5}`)).join(''),
+    bud: () => leafAt(50, 88, 56, 12, -100) + leafAt(50, 88, 46, 10, -135) + leafAt(50, 88, 46, 10, -65) + leafAt(50, 70, 26, 7, -165),
+    vine: () => ln('M26,90 C34,72 40,60 52,52 C64,44 72,34 76,18') + [[42, 66, -40], [60, 50, 20], [30, 78, -100], [70, 34, -20]].map(([x, y, r]) => `<g transform="translate(${x} ${y}) rotate(${r})">${fillish('M0,0 C-12,-3 -15,-19 -5,-22 C-2,-23 0,-20 0,-18 C0,-20 2,-23 5,-22 C15,-19 12,-3 0,0Z')}</g>`).join(''),
 };
+const ING = {
+    'aloe-vera': 'fan', amla: 'cluster', bibhitaki: 'cluster', haritaki: 'cluster', ginger: 'root', biotin: 'capsule', 'vitamin-b12': 'capsule', zinc: 'tablet',
+    'vitamin-e': 'drop', neem: 'sprigA', 'tea-tree': 'sprigB', 'green-coffee': 'bean', garcinia: 'citrus', 'vitamin-c': 'citrus', 'green-tea': 'bud', onion: 'onion',
+    'black-seed': 'seeds', bhringraj: 'sprigC', giloy: 'vine', tulsi: 'sprigD', 'vitamin-d': 'sun', 'pea-protein': 'pod', 'brown-rice': 'grain', cocoa: 'cocoa',
+    moringa: 'sprigE', spirulina: 'swirl', wheatgrass: 'grass',
+};
+// each plant gets its own leaf: neem long and narrow, tea tree needles, bhringraj wide-spreading, tulsi broad, moringa small and many
+const SPRIG = { sprigA: () => sprig(4, 22, 4.2, 38), sprigB: () => sprig(6, 15, 2.2, 28), sprigC: () => sprig(3, 25, 6, 68), sprigD: () => sprig(3, 17, 11, 62), sprigE: () => sprig(7, 9, 5.5, 52) };
 export function ingredient(id) {
-    const I = ING[id]; const W = 640; const H = 640;
-    const body = `<div class="abs" style="inset:0;background:radial-gradient(90% 90% at 38% 30%,${lighten(I.bg[0], 0.5)} 0,${I.bg[0]} 45%,${I.bg[1]} 100%)"></div>` + `<div class="abs" style="inset:${W * 0.07}px">${I.art()}</div>`;
-    return scene(W, H, body);
-}
-
-/* ---------- Watch & Shop reels: tall posters (9:16); scripts/catalog-art/reels.mjs turns each into a short looping video ---------- */
-const REELS = [
-    { key: 'aloe', tint: '#E7F2D8', bg: ['#EEF5E2', '#CFE4B4'], line1: 'Wake the gut', line2: 'gently', tag: 'Aloe Vera Digestive Juice', items: [['aloe', 400, 0.5, 0]], props: (W) => leaf(W * 0.02, 1130, 400, -24, '#6AA84F') + leaf(W * 0.64, 1180, 400, 205, '#5E9A32') },
-    { key: 'immunity', tint: '#FCE8CE', bg: ['#FEEED8', '#F7CD92'], line1: 'Daily shield,', line2: 'from within', tag: 'Immunity Booster Juice', items: [['immunity', 420, 0.5, 0]], props: (W) => citrus(W * 0.05, 1440, 240) + citrus(W * 0.74, 1470, 200, '#F0932B') + leaf(W * 0.68, 1130, 360, 200, '#5E9A32') },
-    { key: 'protein', tint: '#F1E4F2', bg: ['#F6ECF6', '#DCC5DE'], line1: 'Plant power,', line2: 'every scoop', tag: 'Plant Protein Isolate', items: [['protein', 640, 0.5, 0]], props: (W) => scoop(W * 0.03, 1480, 300, -12) + leaf(W * 0.72, 1150, 360, 200, '#6B8F4E') },
-    { key: 'biotin', tint: '#FBE3EA', bg: ['#FDEEF2', '#F6CCD8'], line1: 'Hair, skin', line2: '& nails', tag: 'Biotin Gummies', items: [['biotin', 620, 0.5, 0]], props: (W) => gummies(W * 0.5, 1660, 16, ['#E85A82', '#F28AA6', '#F6B1C3'], 64, 260, 7) + leaf(W * 0.04, 1180, 360, -22, '#6AA84F') },
-    { key: 'triphala', tint: '#F4E1D0', bg: ['#F8EBDD', '#E2C4A4'], line1: 'Classic Ayurveda,', line2: 'made simple', tag: 'Triphala Digestive Tablets', items: [['triphala', 600, 0.5, 0]], props: (W) => ball(W * 0.08, 1500, 90, '#9A5B31') + ball(W * 0.84, 1520, 80, '#B5772D') + leaf(W * 0.03, 1160, 360, -24, '#6AA84F') },
-    { key: 'facewash', tint: '#DDF0E6', bg: ['#E8F5EE', '#BFE0CD'], line1: 'Fresh, clear', line2: 'skin every day', tag: 'Neem & Tea Tree Face Wash', items: [['facewash', 400, 0.5, 0]], props: (W) => sprig(W * 0.06, 1300, 150, -30, '#3E8E5A', 4) + sprig(W * 0.9, 1320, 140, 200, '#4E9C68', 4) + ball(W * 0.78, 1560, 70, '#CFE9DA') },
-    { key: 'hairoil', tint: '#F7E6CD', bg: ['#FAEEDC', '#EBCB9C'], line1: 'Stronger roots,', line2: 'happier hair', tag: 'Onion Black Seed Hair Oil', items: [['hairoil', 380, 0.42, 0]], props: (W) => leaf(W * 0.62, 1220, 380, 200, '#6AA84F') + leaf(W * 0.02, 1190, 360, -24, '#5E9A32') },
-    { key: 'multivitamin', tint: '#FDEFC9', bg: ['#FFF4D3', '#F9DD8D'], line1: 'One a day,', line2: 'every vitamin', tag: 'Daily Multivitamin Gummies', items: [['multivitamin', 640, 0.5, 0]], props: (W) => gummies(W * 0.5, 1660, 18, ['#F6A21E', '#F9C74F', '#E85A82'], 62, 260, 11) + citrus(W * 0.04, 1180, 200) },
-    { key: 'fatburner', tint: '#E4EED6', bg: ['#F1EEE1', '#D8D0B6'], line1: 'Steady, mindful', line2: 'weight support', tag: 'Green Coffee Capsules', items: [['fatburner', 620, 0.5, 0]], props: (W) => capsules(W * 0.5, 1660, 14, '#5B8F3A', '#F4EBCF', 80, 240) + leaf(W * 0.03, 1180, 360, -24, '#5E8E3E') },
-    { key: 'greens', tint: '#E7F2D8', bg: ['#E8F3D9', '#BCD9A0'], line1: 'Your daily', line2: 'greens, sorted', tag: 'Daily Greens Superfood Blend', items: [['greens', 560, 0.5, 0]], props: (W) => leaf(W * 0.02, 1130, 420, -26, '#4F8A3A') + leaf(W * 0.64, 1150, 420, 208, '#68A445') + ball(W * 0.8, 1580, 60, '#7FB34A') },
-];
-export function reelPoster(n) {
-    const R = REELS[n]; const W = 1080; const H = 1920; const f = 330;
-    let body = `<div class="abs" style="inset:0;background:radial-gradient(110% 70% at 50% 38%,${lighten(R.bg[0], 0.5)} 0,${R.bg[0]} 45%,${R.bg[1]} 100%)"></div>`;
-    body += `<div class="arch" style="left:${W * 0.1}px;width:${W * 0.8}px;bottom:${f}px;height:${H * 0.52}px;background:linear-gradient(180deg,${mix(R.tint, '#ffffff', 0.25)},${mix(R.tint, '#ffffff', 0.7)});opacity:.9"></div>`;
-    body += `<div class="abs" style="left:0;right:0;bottom:0;height:${f}px;background:linear-gradient(180deg,${darken(R.bg[1], 0.04)},${darken(R.bg[1], 0.14)})"></div><div class="abs" style="left:0;right:0;bottom:${f - 1}px;height:2px;background:rgba(255,255,255,.6)"></div>`;
-    body += R.props(W, f);
-    body += lineup(R.items.map(([k, w, fx]) => [k, w, W * fx, 0]), W, f);
-    body += `<div class="txt serif" style="left:70px;right:70px;top:150px;font-size:96px;line-height:1.08;color:#241720">${R.line1}<br><span style="color:${PRODUCTS[R.items[0][0]].accent}">${R.line2}</span></div>`;
-    body += `<div class="abs" style="left:70px;right:70px;bottom:70px;height:96px;border-radius:99px;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;gap:22px;font-size:34px;font-weight:600;color:#241720;box-shadow:0 10px 30px rgba(60,30,50,.14)"><img src="/brand/chikit-logo.webp" alt="" style="height:54px"><span style="opacity:.3">|</span><span>${R.tag}</span></div>`;
+    const W = 640; const H = 640;
+    const kind = ING[id];
+    const art = (GLYPH[kind] ?? SPRIG[kind])();
+    const body = abs('inset:0;background:radial-gradient(90% 90% at 38% 30%,#FFF6EA 0,#FEE9D3 55%,#FBD9B6 100%)')
+        + abs(`inset:${W * 0.15}px`, `<svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${art}</svg>`);
     return scene(W, H, body);
 }
 
@@ -449,18 +306,15 @@ export const SCENES = {};
 const reg = (id, build, w, h, out, quality = 86, transparent = false) => { SCENES[id] = { build, w, h, out, quality, transparent }; };
 Object.keys(PRODUCTS).forEach((k) => {
     reg(`${k}-1`, () => productFront(k), 900, 1125, `products/${k}-1.webp`);
-    reg(`${k}-2`, () => productBenefits(k), 900, 1125, `products/${k}-2.webp`);
+    reg(`${k}-2`, () => productStyled(k), 900, 1125, `products/${k}-2.webp`);
 });
 Object.keys(CATS).forEach((s) => reg(`cat-${s}`, () => categoryTile(s), 800, 800, `categories/${s}.webp`));
-reg('hero', hero, 1080, 1200, 'home/hero.webp');
-[0, 1, 2].forEach((n) => { reg(`banner-${n}`, () => bannerWide(n), 1920, 720, `banners/slide-${n + 1}.webp`, 84); reg(`banner-m-${n}`, () => bannerMobile(n), 900, 1125, `banners/slide-${n + 1}-mobile.webp`, 84); });
+reg('banner-1', bannerPodiumWide, 1920, 720, 'banners/slide-2.webp', 84);
+reg('banner-m-1', bannerPodiumMobile, 900, 1125, 'banners/slide-2-mobile.webp', 84);
 [0, 1].forEach((n) => reg(`promo-${n}`, () => promo(n), 1200, 750, `banners/promo-${n + 1}.webp`, 84));
-for (let n = 0; n < 6; n++) reg(`insta-${n}`, () => insta(n), 800, 800, `instagram/post-${n + 1}.webp`);
+[3, 4, 5].forEach((n) => reg(`insta-${n}`, () => insta(n), 800, 800, `instagram/post-${n + 1}.webp`));
 reg('certified', certified, 1050, 700, 'home/certified.webp');
-reg('about', about, 800, 1000, 'home/about-story.webp');
-for (let n = 0; n < 4; n++) reg(`vf-${n}`, () => videoFrame(n), 1280, 720, `video/frame-${n + 1}.png`);
 Object.keys(ING).forEach((k) => reg(`ing-${k}`, () => ingredient(k), 640, 640, `ingredients/${k}.webp`, 88));
-REELS.forEach((_, n) => reg(`reel-${n + 1}`, () => reelPoster(n), 1080, 1920, `video/reel-${n + 1}.png`));
 
 const id = new URLSearchParams(location.search).get('scene') || 'aloe-1';
 const def = SCENES[id];

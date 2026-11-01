@@ -1,7 +1,7 @@
 <!doctype html>
 <!--
-  Chikit dummy catalogue artwork: original, Chikit-branded product packshots, banners and social tiles that give the
-  storefront a realistic "D2C wellness brand" look until real photography is shot. Rendered by build.mjs.
+  Placeholder product pictures: original Chikit-branded packs shown as calm packshots and on the client's stone podium photograph, until
+  real product photography is shot. Rendered by build.mjs.
   Open via the local server that build.mjs starts: ?scene=<id>
 -->
 <html lang="en">
@@ -36,7 +36,10 @@
   .label .bd { align-self: stretch; margin: 0 -6cqw; padding: 3.2cqw 4cqw; background: var(--a); color: #fff; font-size: 4.6cqw; font-weight: 500; letter-spacing: .05em; display: flex; justify-content: center; gap: 3cqw; text-transform: uppercase; }
   .label.plain { padding-top: 0; }
 
-  .shadow { position: absolute; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(45,20,45,.42), rgba(45,20,45,.16) 55%, rgba(45,20,45,0)); filter: blur(3px); }
+  .shadow { position: absolute; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(60,38,26,.30), rgba(60,38,26,.11) 58%, rgba(60,38,26,0)); filter: blur(7px); }
+  .warm .pk { filter: sepia(.16) saturate(.9) brightness(.97) contrast(.98); }
+  .warm .shadow { mix-blend-mode: multiply; }
+  .shadow.tight { background: radial-gradient(closest-side, rgba(40,24,16,.55), rgba(40,24,16,.18) 70%, rgba(40,24,16,0)); filter: blur(2px); }
   .arch { position: absolute; border-radius: 999px 999px 0 0; }
   .blob { position: absolute; border-radius: 50%; }
   .txt { position: absolute; }
