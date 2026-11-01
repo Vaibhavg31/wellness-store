@@ -4,7 +4,7 @@
   "description": "Rooted in Ayurveda. Thoughtfully crafted for a healthier, happier you.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFCF8",
+  "background_color": "#FBF4E8",
   "theme_color": "#602460",
   "icons": [
     { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

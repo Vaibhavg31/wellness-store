@@ -44,6 +44,9 @@ export default function Header() {
     // Buying pages keep the phone header to one row: the category strip would only pull attention (and the price below the fold).
     const noStrip = /^\/(product\/|checkout)/.test(pathname);
     const stripHidden = direction === 'down' || noStrip;
+    // On the homepage the category bar sticks to the page while you read down, so the menu above it steps out of the way
+    // (and returns on the way up): the same words are never stacked twice in the corner of the screen.
+    const tuckAway = pathname === '/' && direction === 'down';
 
     useEffect(() => { setMenuOpen(false); setOpenMenu(null); }, [pathname]);
 
@@ -52,8 +55,8 @@ export default function Header() {
     useLayoutEffect(() => {
         const root = document.documentElement;
         const publish = () => {
-            const main = mainRowRef.current?.getBoundingClientRect().height ?? 0;
-            const strip = stripHidden || noStrip ? 0 : (stripRef.current?.getBoundingClientRect().height ?? 0);
+            const main = tuckAway ? 0 : (mainRowRef.current?.getBoundingClientRect().height ?? 0);
+            const strip = tuckAway || stripHidden || noStrip ? 0 : (stripRef.current?.getBoundingClientRect().height ?? 0);
             root.style.setProperty('--header-offset', `${Math.round(main + strip)}px`);
         };
         publish();
@@ -61,7 +64,7 @@ export default function Header() {
         if (mainRowRef.current) observer.observe(mainRowRef.current);
         if (stripRef.current) observer.observe(stripRef.current);
         return () => { observer.disconnect(); root.style.removeProperty('--header-offset'); };
-    }, [stripHidden, noStrip]);
+    }, [stripHidden, noStrip, tuckAway]);
 
     // A panel opens on click, and on hover for a mouse (hovering on the same pill again keeps it, leaving closes it).
     const toggleMenu = useCallback((key, hover = false) => {
@@ -105,7 +108,7 @@ export default function Header() {
         // The strip below is hidden with a transform, never by changing its height: a height change moves the page under
         // the finger, which flips the scroll direction again and made the header flicker on phones. The header box keeps
         // its height; its transparent gap lets taps through (pointer-events), only the two rows take them.
-        <header ref={headerRef} onMouseLeave={scheduleClose} onMouseEnter={() => clearTimeout(leaveTimer.current)} className="pointer-events-none sticky top-0 z-50 lg:pointer-events-auto">
+        <header ref={headerRef} onMouseLeave={scheduleClose} onMouseEnter={() => clearTimeout(leaveTimer.current)} className={cn('pointer-events-none sticky top-0 z-50 transition-transform duration-300 ease-[var(--ease-out-soft)] lg:pointer-events-auto', tuckAway && '-translate-y-full lg:pointer-events-none')} inert={tuckAway ? true : undefined}>
             <div ref={mainRowRef} className={cn('pointer-events-auto relative z-10 border-b bg-canvas transition-shadow duration-300', scrolled && stripHidden ? 'border-line shadow-sm' : 'border-transparent', scrolled ? 'lg:border-line lg:shadow-sm' : 'lg:border-transparent', !stripHidden && 'shadow-none')}>
             <div className="container-page flex h-16 items-center gap-2 min-[340px]:gap-4 lg:h-20">
                 <button type="button" className={cn(iconButton, 'lg:hidden -ml-2')} onClick={() => setMenuOpen(true)} aria-label="Open menu">

@@ -36,7 +36,7 @@ export const DEFAULT_SITE_CONTENT = {
         accentColor: '#C08A3E',
         accentLight: '#D8A860',
         tintColor: '#F1E4F2',
-        backgroundColor: '#FFFCF8',
+        backgroundColor: '#FBF4E8',
         textColor: '#241720',
         fontHeading: '"Lora", Georgia, serif',
         fontBody: '"Poppins", system-ui, sans-serif',
@@ -82,6 +82,7 @@ export const DEFAULT_SITE_CONTENT = {
         trending: true,
         categoryShelves: true,
         wellRange: true,
+        bottomRibbon: true,
         watchShop: true,
         whyChoose: true,
         reviews: true,
@@ -250,6 +251,7 @@ export const DEFAULT_SITE_CONTENT = {
         expertChat: true,
         concerns: [], // [{ label, slug, search, image, icon, enabled }] → the Concern menu and /concern pages (empty = the built-in list)
         ribbonMenu: [], // [{ key, label, enabled }] for the top ribbon (empty = New Launches, Concern, Offers, Chikit Club Card, WhatsApp Help)
+        bottomRibbon: { words: [] },
         ribbon: { items: [] }, // [{ icon, title, sub }] running promise ribbon (empty = built from the delivery settings)
         trending: { title: 'Trending now', auto: true, keywords: [] }, // search chips under the banner: [{ label, query }]
         watchShop: { title: 'Watch & Shop', subtitle: 'See it in action, then add it to your bag.', reels: [] }, // [{ id, title, videoUrl, poster, productId }]

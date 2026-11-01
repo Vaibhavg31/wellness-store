@@ -60,6 +60,7 @@ const DEFAULTS = {
         watchShop: true,
         whyChoose: true,
         reviews: true,
+        bottomRibbon: true,
         newsletter: true,
         promoBanner: true,
         hero: false,
@@ -129,6 +130,8 @@ const DEFAULTS = {
         ribbonMenu: [],
         // The running promise ribbon under the top banner. Empty = delivery / payments / purity built from the store settings.
         ribbon: { items: [] },
+        // The running ribbon at the foot of the homepage: short brand words. Empty = the brand's own five.
+        bottomRibbon: { words: [] },
         // "Trending now" search chips under the banner. auto = build them from the products when none are listed.
         trending: { title: 'Trending now', auto: true, keywords: [] },
         // "Watch & Shop" reels on the homepage.
@@ -267,6 +270,7 @@ function sanitizeExtras(input) {
             .map((m) => ({ key: text(m?.key, 12), label: text(m?.label, 24), enabled: m?.enabled !== false }))
             .filter((m) => RIBBON_KEYS.includes(m.key))
             .slice(0, 5),
+        bottomRibbon: { words: list(e.bottomRibbon?.words).map((w) => text(w, 40)).filter(Boolean).slice(0, 10) },
         ribbon: {
             items: list(e.ribbon?.items)
                 .map((i) => ({ icon: RIBBON_ICONS.includes(i?.icon) ? i.icon : 'check', title: text(i?.title, 30), sub: text(i?.sub, 60) }))

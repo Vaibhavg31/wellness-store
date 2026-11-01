@@ -126,6 +126,11 @@ export default function CategoryScroller({ products, loading }) {
         if (!node) return;
         setActiveId(id);
         clickLock.current = Date.now() + 900; // do not let the scroll-spy fight the glide
+        // Going down, the menu steps away and only this bar remains; going up, the menu comes back above it. Leave room for what will be there.
+        const bar = barRef.current?.getBoundingClientRect().height ?? 48;
+        const menu = document.querySelector('header')?.offsetHeight ?? 0;
+        const goingUp = node.getBoundingClientRect().top < 0;
+        node.style.scrollMarginTop = `${Math.round(bar + 16 + (goingUp ? menu : 0))}px`;
         node.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
     }, []);
 
@@ -172,7 +177,7 @@ export default function CategoryScroller({ products, loading }) {
                     </div>
                 )}
                 {sections.map((s) => (
-                    <section key={s.id} id={`range-${s.id}`} aria-labelledby={`range-title-${s.id}`} style={{ scrollMarginTop: barTop + 64 }} className="py-6 lg:py-9">
+                    <section key={s.id} id={`range-${s.id}`} aria-labelledby={`range-title-${s.id}`} style={{ scrollMarginTop: 64 }} className="py-6 lg:py-9">
                         <div className="mb-5 flex items-end justify-between gap-4 lg:mb-7">
                             <div>
                                 <h2 id={`range-title-${s.id}`} className="text-h3">{s.title}</h2>

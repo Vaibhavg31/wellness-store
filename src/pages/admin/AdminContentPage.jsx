@@ -66,6 +66,7 @@ const SECTION_LABELS = {
     trending: 'Trending Now (search chips)',
     watchShop: 'Watch & Shop (videos)',
     wellRange: 'The Chikit Well range',
+    bottomRibbon: 'Bottom running ribbon',
     banners: 'Image Banners (Stacked)',
     bannerSlider: 'Full-width Banner Slider',
     categoryShelves: 'The Range (category buttons that follow the scroll)',
@@ -91,6 +92,7 @@ const SECTION_META = {
     hero: { tag: 'core', title: 'Hero', desc: 'The first screen: your headline and a showcase of product cards. Needs: products with a cover photo (pick up to 5 below, or leave it on automatic).' },
     brandMarquee: { tag: 'core', title: 'Running ribbon', desc: 'A slow-moving ribbon under the top banner: free delivery, secure payments, pure herbs. Needs: nothing (it is built from your delivery settings); edit the lines below if you wish.' },
     trending: { tag: 'core', title: 'Trending now', desc: 'Quick search words under the banner. Needs: nothing (built from your products), or write your own words.' },
+    bottomRibbon: { tag: 'core', title: 'Bottom running ribbon', desc: 'A slow-moving ribbon of brand words just above the footer, matching the announcement ribbon at the top of the page. Needs: nothing; edit the words below if you wish.' },
     wellRange: { tag: 'core', title: 'The Chikit Well range', desc: 'Your product series (HimWell, HerWell, GutWell …) with their icons. A series shows "Coming soon" until a product of it is live; set a product\'s series on its product page. Needs: nothing.' },
     watchShop: { tag: 'core', title: 'Watch & Shop', desc: 'Short videos, each with a Buy now for its product. Needs: videos and the product each one sells. Hides itself while empty.' },
     categories: { tag: 'core', title: 'Shop by need', desc: 'Large goal tiles that lead into your shop. Needs: a photo on each category (Categories page).' },
@@ -451,6 +453,15 @@ export default function AdminContentPage() {
                             Not the same as "Banner Slider" above. Tag a banner "Both" to show it in both places.
                         </p>
                         <BannerManager filterTarget="stacked" />
+                    </div>
+                );
+
+            case 'bottomRibbon':
+                return (
+                    <div className="pt-3">
+                        <AdminField label="Words" hint="Short phrases, up to 10. Leave empty to use the brand's own: Pure ingredients, Ayurvedic formulations, Holistic wellness, Rooted in Ayurveda, Made with care.">
+                            <StringListEditor items={content.extras.bottomRibbon?.words ?? []} onChange={(words) => updateExtras({ bottomRibbon: { words } })} placeholder="e.g. Pure ingredients" />
+                        </AdminField>
                     </div>
                 );
 

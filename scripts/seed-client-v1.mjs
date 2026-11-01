@@ -35,7 +35,7 @@ if (!token) throw new Error('Admin sign-in failed');
 const current = await call('GET', '/api/settings');
 
 // Homepage order: banner, running feature ribbon, trending, the whole range by category, Watch & Shop, trust, reviews.
-const ON = ['bannerSlider', 'brandMarquee', 'trending', 'categoryShelves', 'wellRange', 'watchShop', 'whyChoose', 'reviews', 'newsletter', 'promoBanner'];
+const ON = ['bannerSlider', 'brandMarquee', 'trending', 'categoryShelves', 'wellRange', 'watchShop', 'whyChoose', 'reviews', 'bottomRibbon', 'newsletter', 'promoBanner'];
 const OFF = ['hero', 'categories', 'dayRitual', 'bundles', 'routineBuilder', 'packExplorer', 'herbAtlas', 'doshaQuiz', 'banners', 'videoBanner', 'instagram'];
 const sections = Object.fromEntries([...ON.map((k) => [k, true]), ...OFF.map((k) => [k, false])]);
 
@@ -75,7 +75,7 @@ const newsletter = current.newsletter?.title === 'Join the Chikit Circle'
     ? { ...current.newsletter, badge: 'Chikit Updates', title: 'Stay in the loop' }
     : current.newsletter;
 
-await call('PUT', '/api/settings', { theme: { ...current.theme, backgroundColor: '#FFFCF8' }, sections, extras, newsletter }, token);
+await call('PUT', '/api/settings', { theme: { ...current.theme, backgroundColor: '#FBF4E8' }, sections, extras, newsletter }, token);
 console.log('Settings applied to', base);
 
 /* ------------------------------------------------------------------------------------------------ products */

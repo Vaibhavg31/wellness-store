@@ -3,12 +3,12 @@
  * shadow and motion. Components use the generated utilities (bg-primary,
  * text-ink, rounded-lg, shadow-md …) and never hardcode a value.
  *
- * Palette, from the Chikit brand book: plum #602460 and beige #FEE1C5, Lora + Poppins. The brand book's own website
- * design sets plum type on a soft cream page and keeps the beige for accents, so the shop does the same: a warm-white
- * page, plum for text and actions, and the brand beige where it should be noticed (icon circles, badges, the Club price,
- * Buy now, the footer). Gold and lavender are gone; stars keep a functional amber.
- * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): ink/canvas 16.9, primary/canvas 10.7, primary/white 10.9, muted/canvas 7.0
- * (6.5 on canvas-alt), accent-ink/canvas 7.0, ink/beige 13.8, primary/beige 8.8, beige/primary-deep 11.4.
+ * Palette, from the Chikit brand book: plum #602460 and beige #FEE1C5, Lora + Poppins. The brand book's own website design (page 4)
+ * sets plum type on a soft beige (about #F6EAD7), not on the full-strength peach, so the page is a light tint of the brand beige
+ * (#FBF4E8), the bands are that mockup beige (#F6EAD7), and the full brand beige #FEE1C5 is kept for what should be noticed (icon
+ * circles, badges, the Club price, the sign-in panel, the newsletter card). Gold and lavender are gone; stars keep a functional amber.
+ * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): ink/canvas 15.8, primary/canvas 10.0, primary/white 10.9, muted/canvas 6.5
+ * (6.0 on canvas-alt), accent-ink/canvas 6.5, ink/beige 13.8, primary/beige 8.8, beige/primary-deep 11.4.
  * The beige (accent) is a FILL colour on light backgrounds: put ink or plum text on it, never white.
  */
 @theme {
@@ -29,14 +29,14 @@
   --color-star:           #D9951F;
 
   /* Neutrals — warm */
-  --color-canvas:         #FFFCF8;  /* page background: warm white, like the brand book's website design */
+  --color-canvas:         #FBF4E8;  /* page background: a light tint of the brand beige */
   --color-brand-beige:    #FEE1C5;  /* the brand beige itself, where it must stay beige whatever the theme */
-  --color-canvas-alt:     #FBF3E8;  /* alternate section band: soft cream */
+  --color-canvas-alt:     #F6EAD7;  /* alternate band and header strips: the beige of the brand book website design (page 4) */
   --color-surface:        #FFFFFF;  /* cards, inputs, drawers */
   --color-ink:            #241720;  /* body + headings */
   --color-muted:          #62545E;  /* secondary text */
   --color-subtle:         #8F8089;  /* placeholders, disabled text (not for content) */
-  --color-line:           #EFE3D5;  /* decorative hairlines */
+  --color-line:           #E7D6BC;  /* decorative hairlines */
   --color-line-strong:    #9A8794;  /* input borders (3:1 on white) */
 
   /* Status */
