@@ -7,6 +7,7 @@ import ShopByNeed from '@/components/home/ShopByNeed';
 import CategoryScroller from '@/components/home/CategoryScroller';
 import TrendingNow from '@/components/home/TrendingNow';
 import WatchShop from '@/components/home/WatchShop';
+import WellRange from '@/components/home/WellRange';
 import BundleSection from '@/components/home/BundleSection';
 import DayRitual from '@/components/home/DayRitual';
 import RoutineBuilder from '@/components/home/RoutineBuilder';
@@ -35,6 +36,7 @@ function buildSections({ products, loading }) {
         categoryShelves: () => <CategoryScroller products={products} loading={loading} />,
         trending: () => <TrendingNow />,
         watchShop: () => <WatchShop products={products} />,
+        wellRange: () => <WellRange products={products} />,
         banners: () => <PromoBanners />,
         bannerSlider: () => <BannerSlider />,
         dayRitual: () => <DayRitual products={products} />,

@@ -1,4 +1,5 @@
 import { productMatches } from '@/utils/searchProducts';
+import { seriesOf } from '@/utils/wellRange';
 
 /**
  * "Concerns" are the health goals shoppers browse by (Digestive Wellness, Hair Wellness …). The admin can switch each
@@ -62,6 +63,7 @@ export function productsForConcern(products, concern, categories = []) {
     const keywords = String(concern.search ?? '').split(/[,;\n]/).map((k) => k.trim()).filter(Boolean);
     return products.filter((p) => (
         (p.concerns ?? []).includes(concern.slug)
+        || seriesOf(p)?.concern === concern.slug
         || keywords.some((k) => productMatches(p, k, categories))
     ));
 }

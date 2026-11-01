@@ -9,6 +9,7 @@ import { useCategoryPlan } from '@/hooks/useCategoryPlan';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
 import { useOffers } from '@/hooks/useApi';
 import { activeConcerns } from '@/utils/concerns';
+import { seriesForConcern } from '@/utils/wellRange';
 import { ribbonItems } from '@/utils/ribbonMenu';
 import { imageUrl } from '@/services/api';
 import { formatPrice, cn } from '@/utils/formatPrice';
@@ -29,6 +30,7 @@ const pillOpen = 'text-primary after:bg-primary';
 export function ConcernTile({ concern, onClick }) {
     const Icon = CONCERN_ICONS[concern.icon] ?? Leaf;
     const brandIcon = concern.image?.startsWith('/brand/icons/');
+    const series = seriesForConcern(concern.slug);
     return (
         <Link to={`/concern/${concern.slug}`} onClick={onClick} className="group flex flex-col items-center gap-2 text-center">
             <span className={cn(
@@ -40,6 +42,7 @@ export function ConcernTile({ concern, onClick }) {
                     : <Icon size={34} strokeWidth={1.6} className="text-primary" aria-hidden="true" />}
             </span>
             <span className="text-caption font-medium leading-tight text-ink group-hover:text-primary sm:text-small">{concern.label}</span>
+            {series.length > 0 && <span className="-mt-1.5 text-[11px] font-semibold uppercase tracking-wider text-accent-ink">{series.join(' · ')}</span>}
         </Link>
     );
 }

@@ -2,6 +2,7 @@ import { Crown, Film, Image as ImageIcon, Plus, Target, Trash2 } from 'lucide-re
 import { OptionalSection, FormLabel, fieldClass } from '@/components/admin/AdminFormUi';
 import { ImageUploadField, VideoUploadField } from '@/components/admin/ContentEditor';
 import { activeConcerns } from '@/utils/concerns';
+import { WELL_SERIES } from '@/utils/wellRange';
 import { formatPrice } from '@/utils/formatPrice';
 
 const addButton = 'inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary-soft px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary-tint';
@@ -41,6 +42,14 @@ export default function ProductExtrasEditor({ form, update, siteContent, adminTo
                         );
                     })}
                 </div>
+                <label className="mt-4 block text-sm">
+                    <span className="mb-1.5 block font-medium text-ink">Chikit Well series</span>
+                    <select value={form.series ?? ''} onChange={(e) => update('series', e.target.value)} className={fieldClass}>
+                        <option value="">No series</option>
+                        {WELL_SERIES.map((s) => <option key={s.key} value={s.key}>{s.name} · {s.tagline}</option>)}
+                    </select>
+                    <span className="mt-1 block text-xs text-admin-muted">The product then counts in its series on the homepage and shows on the series' concern page.</span>
+                </label>
             </OptionalSection>
 
             {club.enabled !== false && (

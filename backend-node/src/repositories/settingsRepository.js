@@ -56,6 +56,7 @@ const DEFAULTS = {
         brandMarquee: true,
         trending: true,
         categoryShelves: true,
+        wellRange: true,
         watchShop: true,
         whyChoose: true,
         reviews: true,

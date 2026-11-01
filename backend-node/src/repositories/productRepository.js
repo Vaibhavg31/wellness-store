@@ -10,7 +10,7 @@ const CHILD_TABLES = {
 };
 
 /** Product extras kept together in products.extras_json (see lib/migrations.js). */
-const EXTRAS_KEYS = ['concerns', 'videos', 'infoBanners', 'clubEligible', 'clubPrice'];
+const EXTRAS_KEYS = ['concerns', 'videos', 'infoBanners', 'clubEligible', 'clubPrice', 'series'];
 const cleanText = (v, max) => String(v ?? '').trim().slice(0, max);
 
 function parseExtras(raw) {
@@ -26,6 +26,8 @@ function parseExtras(raw) {
             .filter((b) => b.image),
         clubEligible: parsed.clubEligible !== false,
         clubPrice: Number(parsed.clubPrice) > 0 ? Number(parsed.clubPrice) : null,
+        // The Chikit "Well" series the product belongs to (himwell, herwell, gutwell …; see src/utils/wellRange.js), or ''.
+        series: cleanText(parsed.series, 40).toLowerCase(),
     };
 }
 

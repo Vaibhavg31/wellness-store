@@ -20,6 +20,13 @@ function validateProduct(body, required) {
     }
 }
 
+/** A product may be saved as a hidden draft without a price, but never shown to shoppers until it has one. */
+function assertPriceBeforePublish(published, price, variants) {
+    if (!published) return;
+    const hasPrice = Number(price) > 0 || (Array.isArray(variants) && variants.some((v) => Number(v?.price) > 0));
+    if (!hasPrice) throw new HttpError('Set a price before showing this product in the shop', 400);
+}
+
 // Short cache (30s): this list grows with the catalog and is fetched on nearly every storefront page.
 // The admin panel reads/writes through a DIFFERENT URL (/api/products/admin/all), so admins always see fresh data.
 router.get('/products', asyncRoute(async (req, res) => {
@@ -46,6 +53,7 @@ router.post('/products', asyncRoute(async (req, res) => {
     requireAdmin(req);
     const body = req.body || {};
     validateProduct(body, true);
+    assertPriceBeforePublish(body.isPublished ?? true, body.price, body.variants);
 
     const now = new Date().toISOString();
     const product = {
@@ -73,6 +81,7 @@ router.post('/products', asyncRoute(async (req, res) => {
         infoBanners: body.infoBanners ?? [],
         clubEligible: body.clubEligible !== false,
         clubPrice: body.clubPrice ?? null,
+        series: body.series ?? '',
         isNew: Boolean(body.isNew ?? false),
         isBestSeller: Boolean(body.isBestSeller ?? false),
         isTrendingPinned: Boolean(body.isTrendingPinned ?? false),
@@ -104,13 +113,14 @@ router.put('/products/:id', asyncRoute(async (req, res) => {
     const allowed = ['title', 'price', 'originalPrice', 'discount', 'category', 'tags', 'rating', 'reviewCount',
         'description', 'features', 'badges', 'stock', 'images', 'isNew', 'isBestSeller', 'isTrendingPinned',
         'orbitFeatured', 'orbitSortOrder', 'showTrustBadges', 'isPublished', 'codEnabled', 'onlinePaymentEnabled', 'variants',
-        'ingredients', 'howToUse', 'nutrition', 'faqs', 'concerns', 'videos', 'infoBanners', 'clubEligible', 'clubPrice'];
+        'ingredients', 'howToUse', 'nutrition', 'faqs', 'concerns', 'videos', 'infoBanners', 'clubEligible', 'clubPrice', 'series'];
 
     const changes = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
     if ('variants' in changes && !Array.isArray(changes.variants)) delete changes.variants;
 
     const price = Number(changes.price ?? product.price);
     const originalPrice = Number(changes.originalPrice ?? product.originalPrice);
+    assertPriceBeforePublish(changes.isPublished ?? product.isPublished, price, changes.variants ?? product.variants);
     changes.discount = ProductRepository.calcDiscount(price, originalPrice, body.discount !== undefined ? Number(body.discount) : null);
     changes.updatedAt = new Date().toISOString();
 

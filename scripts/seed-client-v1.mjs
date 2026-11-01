@@ -35,7 +35,7 @@ if (!token) throw new Error('Admin sign-in failed');
 const current = await call('GET', '/api/settings');
 
 // Homepage order: banner, running feature ribbon, trending, the whole range by category, Watch & Shop, trust, reviews.
-const ON = ['bannerSlider', 'brandMarquee', 'trending', 'categoryShelves', 'watchShop', 'whyChoose', 'reviews', 'newsletter', 'promoBanner'];
+const ON = ['bannerSlider', 'brandMarquee', 'trending', 'categoryShelves', 'wellRange', 'watchShop', 'whyChoose', 'reviews', 'newsletter', 'promoBanner'];
 const OFF = ['hero', 'categories', 'dayRitual', 'bundles', 'routineBuilder', 'packExplorer', 'herbAtlas', 'doshaQuiz', 'banners', 'videoBanner', 'instagram'];
 const sections = Object.fromEntries([...ON.map((k) => [k, true]), ...OFF.map((k) => [k, false])]);
 
