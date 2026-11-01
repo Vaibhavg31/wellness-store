@@ -31,7 +31,7 @@ export default function OffersSlider({ products }) {
     };
 
     return (
-        <section aria-labelledby="offers-slider-title" className="section bg-canvas">
+        <section aria-labelledby="offers-slider-title" className="bg-canvas py-8 lg:py-10">
             <div className="container-page">
                 <div className="mb-6 flex items-end justify-between gap-4 lg:mb-8">
                     <div>
@@ -57,9 +57,9 @@ export default function OffersSlider({ products }) {
                                             <span className="inline-flex items-center gap-1.5 text-small font-semibold text-accent">Shop this offer <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
                                         </div>
                                         <div className="relative hidden w-[38%] shrink-0 items-center justify-center pr-5 sm:flex" aria-hidden="true">
-                                            <div className="flex -space-x-8">
+                                            <div className="flex -space-x-6">
                                                 {pictures.map((p, i) => (
-                                                    <span key={p.id} className="grid size-24 place-items-center overflow-hidden rounded-full bg-canvas-alt ring-4 ring-primary-deep lg:size-28" style={{ zIndex: 3 - i }}>
+                                                    <span key={p.id} className="grid size-20 place-items-center overflow-hidden rounded-full bg-canvas-alt ring-4 ring-primary-deep lg:size-24" style={{ zIndex: 3 - i }}>
                                                         <img src={imageUrl(p.src, 240)} alt="" loading="lazy" className="size-full object-contain mix-blend-multiply" />
                                                     </span>
                                                 ))}

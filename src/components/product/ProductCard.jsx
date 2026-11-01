@@ -23,8 +23,17 @@ function badgesFor(product) {
     ].slice(0, 1); // one badge only: a calmer card
 }
 
+/** One short line on what the product is for: its first listed benefit, else the first sentence of its description. */
+function oneLiner(product) {
+    const first = (product.features ?? []).find(Boolean);
+    if (first) return String(first).slice(0, 90);
+    const plain = String(product.description ?? '').replace(/\s+/g, ' ').trim();
+    const end = plain.search(/[.!?](\s|$)/);
+    return (end > 12 ? plain.slice(0, end) : plain).slice(0, 90);
+}
+
 /**
- * The product tile used across the shop: picture, name, rating, price, Club price and a full-width Add to bag.
+ * The product tile used across the shop: picture, name, one-line benefit, rating, price, Club price and a full-width Add to bag.
  * `action={false}` hides the button where the page brings its own (Buy 1 Get 1).
  */
 function ProductCard({ product, priority = false, action = true }) {
@@ -98,6 +107,7 @@ function ProductCard({ product, priority = false, action = true }) {
                         {product.title}
                     </Link>
                 </h3>
+                {oneLiner(product) && <p className="mt-1 line-clamp-1 text-caption text-muted">{oneLiner(product)}</p>}
                 {product.reviewCount > 0 && (
                     <p className="mt-1 flex items-center gap-1 text-caption text-muted" aria-label={`Rated ${product.rating} out of 5 from ${product.reviewCount} reviews`}>
                         <Star size={13} strokeWidth={0} className="fill-star" aria-hidden="true" />
