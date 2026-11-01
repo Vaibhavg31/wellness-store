@@ -3,7 +3,7 @@ import { cn } from '@/utils/formatPrice';
 const variants = {
     default: 'bg-canvas-alt text-ink',
     new: 'bg-primary text-white',
-    bestseller: 'bg-accent text-ink',
+    bestseller: 'bg-surface text-primary-deep ring-1 ring-primary/15',
     sale: 'bg-primary-deep text-white',
     stock: 'bg-canvas-alt text-muted border border-line',
     tint: 'bg-primary-tint text-primary-deep',

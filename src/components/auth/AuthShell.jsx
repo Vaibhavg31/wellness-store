@@ -22,7 +22,7 @@ export default function AuthShell({ aside, children, backTo = '/', backLabel = '
         <main className="min-h-dvh overflow-x-clip bg-canvas">
             <div className="mx-auto grid min-h-dvh max-w-6xl grid-cols-1 items-center gap-12 px-4 py-10 lg:grid-cols-2 lg:gap-20">
                 {aside ? (
-                    <aside className="hidden animate-swipe-in-left rounded-xl bg-primary-tint p-12 lg:block">
+                    <aside className="hidden animate-swipe-in-left rounded-xl bg-accent p-12 lg:block">
                         <Logo size="lg" linkToHome />
                         <div className="mt-12">{aside}</div>
                     </aside>

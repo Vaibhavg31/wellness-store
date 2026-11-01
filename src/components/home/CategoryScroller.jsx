@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight, Flame, Sparkles } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
-import ProductSpotlight from '@/components/product/ProductSpotlight';
 import Skeleton from '@/components/ui/Skeleton';
-import { imageUrl } from '@/services/api';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
 import { cn } from '@/utils/formatPrice';
 
@@ -25,7 +23,7 @@ function ProductRail({ products, label }) {
                 className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-pl-4 px-4 pb-2 sm:-mx-6 sm:scroll-pl-6 sm:px-6 lg:mx-0 lg:gap-6 lg:scroll-pl-0 lg:px-0"
             >
                 {products.map((product) => (
-                    <li key={product.id} className="w-[58%] shrink-0 snap-start sm:w-[34%] lg:w-[calc(25%-1.125rem)]">
+                    <li key={product.id} className="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-[calc(25%-1.125rem)]">
                         <ProductCard product={product} />
                     </li>
                 ))}
@@ -40,59 +38,6 @@ function ProductRail({ products, label }) {
                     </button>
                 </>
             )}
-        </div>
-    );
-}
-
-/**
- * A category with only a few products: a picture tile of the category beside them (on a wide screen) so the row
- * reads as a deliberate section instead of one lonely card, and a plain two-up grid on a phone.
- */
-function FewProducts({ section }) {
-    const tile = section.image && section.href.startsWith('/category/');
-    const count = section.items.length;
-    // One or two products in a wide row: use the room for a wide card with the picture, a line and the buy button together.
-    if (count <= 2) {
-        return (
-            <div className="lg:grid lg:grid-cols-4 lg:gap-6">
-                {tile && (
-                    <Link to={section.href} className="group relative mb-4 hidden overflow-hidden rounded-lg bg-canvas-alt lg:mb-0 lg:block">
-                        <img src={imageUrl(section.image, 600)} alt="" loading="lazy" className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                        <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-ink/70 to-transparent p-4 text-white">
-                            <span className="font-display text-h4">Explore {section.title}</span>
-                            <ArrowRight size={18} aria-hidden="true" />
-                        </span>
-                    </Link>
-                )}
-                <ul aria-label={section.title} className={cn('grid gap-4 lg:gap-6', count === 1 ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-1', tile ? 'lg:col-span-3' : 'lg:col-span-4', count === 1 && !tile && 'lg:max-w-3xl')}>
-                    {section.items.map((product) => (
-                        <li key={product.id} className="min-w-0">
-                            {count === 1 ? <ProductSpotlight product={product} /> : (
-                                <>
-                                    <div className="lg:hidden"><ProductCard product={product} /></div>
-                                    <div className="hidden h-full lg:block"><ProductSpotlight product={product} /></div>
-                                </>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        );
-    }
-    return (
-        <div className="lg:grid lg:grid-cols-4 lg:gap-6">
-            {tile && (
-                <Link to={section.href} className="group relative mb-4 hidden aspect-[4/5] overflow-hidden rounded-lg bg-canvas-alt lg:mb-0 lg:block">
-                    <img src={imageUrl(section.image, 600)} alt="" loading="lazy" className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                    <span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-ink/70 to-transparent p-4 text-white">
-                        <span className="font-display text-h4">Explore {section.title}</span>
-                        <ArrowRight size={18} aria-hidden="true" />
-                    </span>
-                </Link>
-            )}
-            <ul aria-label={section.title} className={cn('grid grid-cols-2 gap-4 lg:gap-6', tile ? 'lg:col-span-3 lg:grid-cols-3' : 'lg:grid-cols-4')}>
-                {section.items.map((product) => <li key={product.id}><ProductCard product={product} /></li>)}
-            </ul>
         </div>
     );
 }
@@ -114,8 +59,8 @@ export default function CategoryScroller({ products, loading }) {
         const launches = [...products].sort((a, b) => (Number(b.isNew) - Number(a.isNew)) || (new Date(b.createdAt || 0) - new Date(a.createdAt || 0))).slice(0, 12);
         const best = products.filter((p) => p.isBestSeller);
         return [
-            { id: 'new-launches', label: 'New Launches', icon: Sparkles, title: 'New Launches', subtitle: 'Fresh from Chikit', items: launches, href: '/new-launches' },
-            { id: 'bestsellers', label: 'Bestsellers', icon: Flame, title: 'Bestsellers', subtitle: 'Most loved by our customers', items: best, href: '/shop?sort=popularity' },
+            { id: 'new-launches', label: 'New Launches', title: 'New Launches', subtitle: 'Fresh from Chikit', items: launches, href: '/new-launches' },
+            { id: 'bestsellers', label: 'Bestsellers', title: 'Bestsellers', subtitle: 'Most loved by our customers', items: best, href: '/shop?sort=popularity' },
             ...plan.map((c) => ({
                 id: `cat-${c.slug}`, label: c.label, title: c.label, subtitle: c.subtitle || '', image: c.image, items: products.filter((p) => p.category === c.slug), href: `/category/${c.slug}`,
             })),
@@ -181,12 +126,11 @@ export default function CategoryScroller({ products, loading }) {
             <div
                 ref={barRef}
                 style={{ top: barTop }}
-                className="sticky z-30 border-y border-line bg-canvas/95 backdrop-blur transition-[top] duration-300 ease-[var(--ease-out-soft)]"
+                className="sticky z-30 border-b border-line bg-canvas/95 backdrop-blur transition-[top] duration-300 ease-[var(--ease-out-soft)]"
             >
                 <div className="container-page">
-                    <div data-chip-row role="tablist" aria-label="Jump to a category" className="-mx-4 flex gap-2 overflow-x-auto px-4 py-3 pr-10 scrollbar-none [mask-image:linear-gradient(to_right,#000_92%,transparent)] sm:mx-0 sm:px-0 sm:pr-10">
+                    <div data-chip-row role="tablist" aria-label="Jump to a category" className="-mx-4 flex gap-6 overflow-x-auto px-4 pr-10 scrollbar-none [mask-image:linear-gradient(to_right,#000_92%,transparent)] sm:mx-0 sm:gap-8 sm:px-0">
                         {sections.map((s) => {
-                            const Icon = s.icon;
                             const active = activeId === s.id;
                             return (
                                 <button
@@ -197,16 +141,16 @@ export default function CategoryScroller({ products, loading }) {
                                     aria-selected={active}
                                     onClick={() => goTo(s.id)}
                                     className={cn(
-                                        'inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-small font-medium transition-colors',
-                                        active ? 'border-primary bg-primary-tint text-primary-deep shadow-xs' : 'border-line-strong bg-surface text-ink hover:border-primary hover:text-primary',
+                                        // Text tabs with a plum underline under the section on screen, like the brand book's own menu.
+                                        'relative min-h-12 shrink-0 whitespace-nowrap text-small font-medium transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors',
+                                        active ? 'text-primary after:bg-primary' : 'text-muted after:bg-transparent hover:text-ink',
                                     )}
                                 >
-                                    {Icon && <Icon size={15} className={active ? 'text-primary' : 'text-accent-ink'} aria-hidden="true" />}
                                     {s.label}
                                 </button>
                             );
                         })}
-                        {loading && sections.length === 0 && Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-10 w-28 shrink-0 rounded-full" />)}
+                        {loading && sections.length === 0 && Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="my-3.5 h-5 w-24 shrink-0 rounded" />)}
                     </div>
                 </div>
             </div>
@@ -222,13 +166,13 @@ export default function CategoryScroller({ products, loading }) {
                         <div className="mb-5 flex items-end justify-between gap-4 lg:mb-7">
                             <div>
                                 <h2 id={`range-title-${s.id}`} className="text-h3">{s.title}</h2>
-                                {s.subtitle && <p className="mt-1 text-small text-muted">{s.subtitle}</p>}
+                                <p className="mt-1 text-small text-muted">{s.subtitle || `${s.items.length} ${s.items.length === 1 ? 'product' : 'products'}`}</p>
                             </div>
                             <Link to={s.href} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-small font-medium text-primary hover:underline">
                                 View all <ArrowRight size={16} aria-hidden="true" />
                             </Link>
                         </div>
-                        {s.items.length > 3 ? <ProductRail products={s.items} label={s.title} /> : <FewProducts section={s} />}
+                        <ProductRail products={s.items} label={s.title} />
                     </section>
                 ))}
             </div>

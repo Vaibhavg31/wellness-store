@@ -33,7 +33,7 @@ export default function AuthPhone({ mode, onMode, copy, backTo, backLabel, child
 
     return (
         <main className="min-h-dvh overflow-x-clip bg-canvas">
-            <header className="relative overflow-hidden rounded-b-[2rem] bg-primary-tint px-5 pb-16 pt-6 sm:pb-20">
+            <header className="relative overflow-hidden rounded-b-[2rem] bg-accent px-5 pb-16 pt-6 sm:pb-20">
                 <Mandala className="pointer-events-none absolute -right-24 -top-24 size-80 animate-orbit-spin text-primary/15" />
                 <Mandala className="pointer-events-none absolute -bottom-28 -left-28 size-64 animate-orbit-spin-reverse text-primary/10" />
                 <div className="relative mx-auto max-w-md">

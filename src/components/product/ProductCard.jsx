@@ -23,7 +23,11 @@ function badgesFor(product) {
     ].slice(0, 1); // one badge only: a calmer card
 }
 
-function ProductCard({ product, priority = false }) {
+/**
+ * The product tile used across the shop: picture, name, rating, price, Club price and a full-width Add to bag.
+ * `action={false}` hides the button where the page brings its own (Buy 1 Get 1).
+ */
+function ProductCard({ product, priority = false, action = true }) {
     const { addToCart, isMember } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { showToast } = useToast();
@@ -51,9 +55,12 @@ function ProductCard({ product, priority = false }) {
         showToast(wished ? 'Removed from wishlist' : 'Saved to wishlist', wished ? 'info' : 'success');
     };
 
+    const showPrice = isMember && product.memberPrice ? product.memberPrice : product.price;
+    const wasPrice = isMember && product.memberPrice ? product.price : product.originalPrice;
+
     return (
-        <article className="group relative flex h-full flex-col">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-canvas-alt">
+        <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-surface ring-1 ring-line transition-shadow duration-300 hover:shadow-md">
+            <div className="relative aspect-[4/5] overflow-hidden bg-canvas-alt">
                 <Link to={href} tabIndex={-1} aria-hidden="true" className="block size-full">
                     <FadeImage
                         src={imageUrl(primary, 480)}
@@ -63,14 +70,14 @@ function ProductCard({ product, priority = false }) {
                         instant={priority}
                         loading={priority ? 'eager' : 'lazy'}
                         decoding="async"
-                        className={cn('size-full object-contain mix-blend-multiply transition-[transform,opacity] duration-500 group-hover:scale-105', secondary && 'group-hover:opacity-0')}
+                        className={cn('size-full object-contain mix-blend-multiply transition-[transform,opacity] duration-500 group-hover:scale-[1.04]', secondary && 'group-hover:opacity-0')}
                     />
                     {secondary && (
-                        <img src={imageUrl(secondary, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" className="absolute inset-0 size-full scale-105 object-contain mix-blend-multiply opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-100 group-hover:opacity-100" />
+                        <img src={imageUrl(secondary, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" className="absolute inset-0 size-full scale-[1.04] object-contain mix-blend-multiply opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-100 group-hover:opacity-100" />
                     )}
                 </Link>
 
-                <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+                <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
                     {badgesFor(product).map((b) => <Badge key={b.label} variant={b.variant}>{b.label}</Badge>)}
                 </div>
 
@@ -79,49 +86,47 @@ function ProductCard({ product, priority = false }) {
                     onClick={handleWishlist}
                     aria-pressed={wished}
                     aria-label={wished ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
-                    className={cn('absolute right-3 top-3 z-10 grid size-11 place-items-center rounded-full bg-surface/95 shadow-xs transition-colors hover:bg-surface', wished ? 'text-primary' : 'text-muted hover:text-primary')}
+                    className={cn('absolute right-1 top-1 z-10 grid size-11 place-items-center rounded-full transition-colors', wished ? 'text-primary' : 'text-muted hover:text-primary')}
                 >
-                    <Heart size={18} fill={wished ? 'currentColor' : 'none'} />
-                </button>
-
-                {outOfStock && (
-                    <span className="absolute inset-x-3 bottom-3 rounded-full bg-surface/95 py-1.5 text-center text-caption font-semibold text-ink">Sold out</span>
-                )}
-                <button
-                    type="button"
-                    onClick={handleAdd}
-                    disabled={outOfStock || added}
-                    aria-label={`Add ${product.title} to bag`}
-                    className={cn(
-                        'absolute bottom-3 right-3 z-10 grid size-11 place-items-center rounded-full text-white shadow-md transition-[opacity,transform,background-color] duration-300',
-                        'opacity-100 sm:translate-y-2 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100',
-                        added ? 'bg-success' : 'bg-primary hover:bg-primary-hover',
-                        'disabled:bg-disabled disabled:text-subtle',
-                    )}
-                >
-                    {added ? <Check size={18} /> : <ShoppingBag size={18} />}
+                    <span className="grid size-8 place-items-center rounded-full bg-surface/95 shadow-xs"><Heart size={16} fill={wished ? 'currentColor' : 'none'} /></span>
                 </button>
             </div>
 
-            <div className="flex flex-1 flex-col gap-1 pt-3">
-                <h3 className="font-sans text-[0.9375rem] font-medium leading-snug">
+            <div className="flex flex-1 flex-col p-3 sm:p-4">
+                <h3 className="font-sans text-small font-medium leading-snug text-ink sm:text-[0.9375rem]">
                     <Link to={href} className="line-clamp-2 transition-colors after:absolute after:inset-0 after:content-[''] hover:text-primary">
                         {product.title}
                     </Link>
                 </h3>
-                <div className="mt-auto flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 pt-1">
-                    <Price price={isMember && product.memberPrice ? product.memberPrice : product.price} originalPrice={isMember && product.memberPrice ? product.price : product.originalPrice} />
-                    {product.reviewCount > 0 && (
-                        <p className="flex items-center gap-1 text-caption text-muted" aria-label={`Rated ${product.rating} out of 5 from ${product.reviewCount} reviews`}>
-                            <Star size={13} strokeWidth={0} className="self-center fill-accent" aria-hidden="true" />
-                            <span className="font-semibold text-ink">{Number(product.rating).toFixed(1)}</span>
-                            <span>({product.reviewCount})</span>
-                        </p>
-                    )}
+                {product.reviewCount > 0 && (
+                    <p className="mt-1 flex items-center gap-1 text-caption text-muted" aria-label={`Rated ${product.rating} out of 5 from ${product.reviewCount} reviews`}>
+                        <Star size={13} strokeWidth={0} className="fill-star" aria-hidden="true" />
+                        <span className="font-semibold text-ink">{Number(product.rating).toFixed(1)}</span>
+                        <span>({product.reviewCount})</span>
+                    </p>
+                )}
+                <div className="mt-auto pt-2">
+                    <Price price={showPrice} originalPrice={wasPrice} />
+                    <ClubPrice memberPrice={product.memberPrice} compact className="relative z-10 mt-1.5" />
                 </div>
-                <ClubPrice memberPrice={product.memberPrice} compact className="relative z-10 mt-1 self-start" />
+                {action && (
+                    <button
+                        type="button"
+                        onClick={handleAdd}
+                        disabled={outOfStock || added}
+                        aria-label={outOfStock ? `${product.title} is sold out` : `Add ${product.title} to bag`}
+                        className={cn(
+                            'relative z-10 mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border text-small font-semibold transition-colors sm:h-11',
+                            added ? 'border-success bg-success text-white' : 'border-primary text-primary hover:bg-primary hover:text-white',
+                            'disabled:cursor-not-allowed',
+                            outOfStock && 'border-line-strong text-subtle hover:bg-transparent hover:text-subtle',
+                        )}
+                    >
+                        {added ? <Check size={16} aria-hidden="true" /> : <ShoppingBag size={16} aria-hidden="true" />}
+                        {outOfStock ? 'Sold out' : added ? 'Added' : 'Add to bag'}
+                    </button>
+                )}
             </div>
-
         </article>
     );
 }

@@ -45,7 +45,7 @@ export default function Testimonials() {
                     {shown.map((review, i) => (
                         <Reveal as="li" key={review.id} delay={(i % 3) * 70} className="w-[84%] shrink-0 snap-start sm:w-[55%] lg:w-auto">
                             <figure className="flex h-full flex-col rounded-xl bg-surface p-6 shadow-xs ring-1 ring-line sm:p-8">
-                                <Quote size={28} className="mb-4 text-accent" aria-hidden="true" />
+                                <Quote size={28} className="mb-4 text-primary/25" aria-hidden="true" />
                                 <blockquote className="flex-1 font-display text-h4 leading-snug text-ink">{review.comment}</blockquote>
                                 <figcaption className="mt-6 flex items-center gap-3">
                                     <UserAvatar user={{ name: review.name, avatar: review.avatar }} size="md" signedIn />

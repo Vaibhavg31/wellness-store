@@ -18,12 +18,12 @@ import {
 
 function StarRating({ rating }) {
     return (
-        <span role="img" className="inline-flex items-center gap-0.5 text-accent" aria-label={`${rating} out of 5 stars`}>
+        <span role="img" className="inline-flex items-center gap-0.5 text-star" aria-label={`${rating} out of 5 stars`}>
             {Array.from({ length: 5 }, (_, i) => (
                 <Star
                     key={i}
                     size={12}
-                    className={i < rating ? 'fill-accent text-accent' : 'text-line-strong'}
+                    className={i < rating ? 'fill-star text-star' : 'text-line-strong'}
                 />
             ))}
         </span>

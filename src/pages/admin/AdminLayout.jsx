@@ -26,11 +26,11 @@ function SearchTrigger({ onOpen, className = '' }) {
 }
 
 function SidebarBrand() {
-    // The logo is single-colour plum, so on the plum sidebar it always sits on a cream tile.
+    // The white cut of the logo (public/brand/chikit-logo-white.webp) sits straight on the plum sidebar, no plate around it.
     return (
-        <div className="px-4 pb-0.5 pt-3">
-            <Link to={ADMIN_PATH} aria-label="Admin dashboard" className="flex justify-center rounded-xl bg-brand-beige px-3 py-1.5 shadow-sm">
-                <Logo size="sm" />
+        <div className="px-5 pb-0.5 pt-4">
+            <Link to={ADMIN_PATH} aria-label="Admin dashboard" className="flex justify-center">
+                <img src="/brand/chikit-logo-white.webp" alt="Chikit" width="480" height="147" className="h-11 w-auto" />
             </Link>
             <p className="mt-2 text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Studio admin</p>
         </div>

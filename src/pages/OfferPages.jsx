@@ -71,8 +71,8 @@ function BogoTile({ offer, product }) {
     return (
         <div className="flex h-full flex-col gap-3">
             <div className="relative">
-                <ProductCard product={product} />
-                <Badge variant="bestseller" className="pointer-events-none absolute left-3 top-12 z-10 uppercase tracking-wide">Buy 1 Get 1</Badge>
+                <ProductCard product={product} action={false} />
+                <Badge variant="new" className="pointer-events-none absolute left-2.5 top-11 z-10 uppercase tracking-wide">Buy 1 Get 1</Badge>
             </div>
             <p className="text-center text-caption text-muted">Pay <strong className="text-ink">{formatPrice(product.price)}</strong> for 2</p>
             <div className="mt-auto grid grid-cols-2 gap-2">

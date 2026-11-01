@@ -93,7 +93,7 @@ export default function ReviewForm({ product, onSubmitted }) {
                     <legend className="mb-2 text-small font-medium text-ink">Rating</legend>
                     <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((r) => (
-                            <button key={r} type="button" onClick={() => setForm({ ...form, rating: r })} aria-label={`${r} star${r > 1 ? 's' : ''}`} aria-pressed={form.rating === r} className={cn('rounded p-1', form.rating >= r ? 'text-accent' : 'text-line-strong')}>
+                            <button key={r} type="button" onClick={() => setForm({ ...form, rating: r })} aria-label={`${r} star${r > 1 ? 's' : ''}`} aria-pressed={form.rating === r} className={cn('rounded p-1', form.rating >= r ? 'text-star' : 'text-line-strong')}>
                                 <Star size={26} fill={form.rating >= r ? 'currentColor' : 'none'} />
                             </button>
                         ))}

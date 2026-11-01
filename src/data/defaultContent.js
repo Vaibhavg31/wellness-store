@@ -36,7 +36,7 @@ export const DEFAULT_SITE_CONTENT = {
         accentColor: '#C08A3E',
         accentLight: '#D8A860',
         tintColor: '#F1E4F2',
-        backgroundColor: '#FEE1C5',
+        backgroundColor: '#FFFCF8',
         textColor: '#241720',
         fontHeading: '"Lora", Georgia, serif',
         fontBody: '"Poppins", system-ui, sans-serif',

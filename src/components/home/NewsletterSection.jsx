@@ -30,13 +30,13 @@ export default function NewsletterSection() {
     return (
         <section className="section bg-canvas">
             <div className="container-page">
-                <div className="mx-auto max-w-2xl rounded-xl bg-primary px-6 py-12 text-center text-white sm:px-12">
-                    <p className="eyebrow !text-accent-hover">{nl.badge}</p>
-                    <h2 className="mt-3 !text-white">{nl.title}</h2>
-                    <p className="mt-3 text-white/85">{nl.description}</p>
+                <div className="mx-auto max-w-2xl rounded-2xl bg-accent px-6 py-12 text-center text-ink sm:px-12">
+                    <p className="eyebrow">{nl.badge}</p>
+                    <h2 className="mt-3 !text-primary-deep">{nl.title}</h2>
+                    <p className="mt-3 text-ink/80">{nl.description}</p>
 
                     {submitted ? (
-                        <p className="mt-8 inline-flex items-center gap-2 font-medium" role="status">
+                        <p className="mt-8 inline-flex items-center gap-2 font-medium text-primary-deep" role="status">
                             <CheckCircle size={20} aria-hidden="true" /> {nl.successMessage}
                         </p>
                     ) : (
@@ -50,12 +50,12 @@ export default function NewsletterSection() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Your email address"
                                 autoComplete="email"
-                                className="h-12 w-full min-w-0 rounded-full sm:flex-1 bg-surface px-5 text-body text-ink placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent"
+                                className="h-12 w-full min-w-0 rounded-full sm:flex-1 bg-surface px-5 text-body text-ink placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-primary/30"
                             />
-                            <Button type="submit" variant="accent" size="lg" loading={loading}>{nl.buttonLabel}</Button>
+                            <Button type="submit" size="lg" loading={loading}>{nl.buttonLabel}</Button>
                         </form>
                     )}
-                    <p className="mt-4 text-caption text-white/75">{nl.disclaimer}</p>
+                    <p className="mt-4 text-caption text-ink/70">{nl.disclaimer}</p>
                 </div>
             </div>
         </section>

@@ -19,21 +19,25 @@ export const CONCERN_ICONS = {
     flask: FlaskConical, mars: Mars, activity: Activity, smile: Smile, zap: Zap, venus: Venus, droplets: Droplets,
 };
 
-const pillBase = 'relative inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full font-medium transition-colors duration-200';
-const pillSize = { desktop: 'px-3.5 py-2 text-small', phone: 'px-3.5 py-2.5 text-small' };
-const pillIdle = 'text-ink hover:bg-primary-soft hover:text-primary';
-const pillOpen = 'bg-primary-tint text-primary-deep';
+// Plain text links with a plum underline for the open or current item, as in the brand book's own website design.
+const pillBase = 'relative inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap font-medium transition-colors duration-200 after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:rounded-full after:transition-colors';
+const pillSize = { desktop: 'px-3 py-2.5 text-small', phone: 'px-3 py-3 text-small' };
+const pillIdle = 'text-ink after:bg-transparent hover:text-primary';
+const pillOpen = 'text-primary after:bg-primary';
 
-/** One concern: its picture (or an icon on a soft tint) above its name. */
+/** One concern: the brand's round line icon (or an uploaded photo, or a simple icon) above its name. */
 export function ConcernTile({ concern, onClick }) {
     const Icon = CONCERN_ICONS[concern.icon] ?? Leaf;
+    const brandIcon = concern.image?.startsWith('/brand/icons/');
     return (
         <Link to={`/concern/${concern.slug}`} onClick={onClick} className="group flex flex-col items-center gap-2 text-center">
-            <span className="relative grid aspect-square w-full place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-primary-tint to-accent-tint ring-1 ring-line transition-shadow group-hover:shadow-md">
+            <span className={cn(
+                'relative grid aspect-square w-full place-items-center overflow-hidden transition-[box-shadow,transform] duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md',
+                brandIcon ? 'rounded-full ring-1 ring-line group-hover:ring-primary/40' : 'rounded-2xl bg-accent-tint ring-1 ring-line',
+            )}>
                 {concern.image
-                    // The brand's round line icons sit whole on the tile; an uploaded photo fills it.
-                    ? <img src={imageUrl(concern.image, 240)} alt="" width="120" height="120" loading="lazy" className={concern.image.startsWith('/brand/icons/') ? 'size-[86%] object-contain transition-transform duration-300 group-hover:scale-105' : 'size-full object-cover'} />
-                    : <Icon size={34} strokeWidth={1.6} className="text-primary transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />}
+                    ? <img src={imageUrl(concern.image, 240)} alt="" width="120" height="120" loading="lazy" className="size-full object-cover" />
+                    : <Icon size={34} strokeWidth={1.6} className="text-primary" aria-hidden="true" />}
             </span>
             <span className="text-caption font-medium leading-tight text-ink group-hover:text-primary sm:text-small">{concern.label}</span>
         </Link>
@@ -89,7 +93,7 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
                         return (
                             <NavLink key="new" to="/new-launches" className={({ isActive }) => cn(pillBase, size, isActive ? pillOpen : pillIdle)}>
                                 {item.label}
-                                <span className="rounded-full bg-accent px-1.5 py-px text-[10px] font-bold uppercase leading-4 tracking-wide text-ink">New</span>
+                                <span className="rounded-full bg-accent px-1.5 py-px text-[10px] font-bold uppercase leading-4 tracking-wide text-primary-deep">New</span>
                             </NavLink>
                         );
                     case 'concern':
@@ -101,7 +105,7 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
                     case 'club':
                         return (
                             <NavLink key="club" to="/club" className={({ isActive }) => cn(pillBase, size, isActive ? pillOpen : pillIdle)}>
-                                <Crown size={15} className="text-accent-ink" aria-hidden="true" />
+                                <Crown size={15} className="text-primary" aria-hidden="true" />
                                 {member ? 'My Club Card' : item.label}
                             </NavLink>
                         );
