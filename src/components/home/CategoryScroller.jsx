@@ -8,14 +8,29 @@ import { cn } from '@/utils/formatPrice';
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/** Fills the empty space of a short row (one or two products) so the page does not look unfinished while the range grows. */
+function MoreOnTheWay({ count, href }) {
+    const span = count === 1 ? 'col-span-1 lg:col-span-3' : 'col-span-2 lg:col-span-2';
+    return (
+        <li className={`${span} min-w-0`}>
+            <Link to={href} className="group flex h-full min-h-48 flex-col items-start justify-center gap-2 rounded-lg lg:h-auto lg:min-h-72 lg:self-center bg-brand-beige p-6 text-primary-deep transition-colors hover:bg-accent-hover lg:p-10">
+                <span className="text-caption font-semibold uppercase tracking-widest text-accent-ink">Growing range</span>
+                <span className="font-display text-h4 lg:text-h3">More Chikit favourites are on the way</span>
+                <span className="inline-flex items-center gap-1.5 text-small font-medium">See the full range <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+            </Link>
+        </li>
+    );
+}
+
 /** One row of products that can be swiped (phone) or paged with the arrows (desktop). */
-function ProductRail({ products, label }) {
+function ProductRail({ products, label, href }) {
     const scroller = useRef(null);
     // Up to four products fit one tidy grid (two across on a phone); more than that becomes a swipe row.
     if (products.length <= 4) {
         return (
             <ul aria-label={label} className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-6">
                 {products.map((product) => <li key={product.id} className="min-w-0"><ProductCard product={product} /></li>)}
+                {products.length <= 2 && <MoreOnTheWay count={products.length} href={href} />}
             </ul>
         );
     }
@@ -185,7 +200,7 @@ export default function CategoryScroller({ products, loading }) {
                                 View all <ArrowRight size={16} aria-hidden="true" />
                             </Link>
                         </div>
-                        <ProductRail products={s.items} label={s.title} />
+                        <ProductRail products={s.items} label={s.title} href="/shop" />
                     </section>
                 ))}
             </div>

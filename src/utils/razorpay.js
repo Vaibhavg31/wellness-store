@@ -62,7 +62,7 @@ export async function openRazorpayCheckout(opts) {
                 email: opts.email || '',
                 contact: opts.phone || '',
             },
-            theme: { color: '#5A0009' },
+            theme: { color: '#602460' },
             handler(response) {
                 settled = true;
                 resolve(response);

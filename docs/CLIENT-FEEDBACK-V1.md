@@ -38,3 +38,12 @@ browser on desktop and phone, and editable from the admin where the client said 
 * `scripts/seed-client-v1.mjs <base-url> <admin-email> <admin-password>` applies the new homepage order, the Watch & Shop reels and the starter product content through the admin API, locally or live. Re-running it is safe.
 * Pictures and videos: `node scripts/catalog-art/build.mjs ing-aloe-vera reel-1 …` and `node scripts/catalog-art/reels.mjs` (needs ffmpeg).
 * Prices are always worked out on the server (`backend-node/src/routes/orderRoutes.js`, `lib/pricing.js`, `lib/club.js`); the bag's `src/utils/pricing.js` only mirrors them for display.
+
+## Round 2 check (2026-11-03)
+
+Every point above was re-checked against the client's Google Doc, the icon PDF (30 distinct icons, all already in `public/brand/icons` and used in the Health Needs menu, the Well range and the concern pages), the logo PNG (beige #FEE1C5) and the first-phase product list.
+
+* **Brand colour sweep:** the Razorpay payment window and the admin colour field still used the old maroon `#5A0009`; both are now the plum `#602460`. The stored (unused) theme accent is the brand beige `#FEE1C5` and the page background is white, matching `tokens.css`.
+* **Short category rows:** a category with one or two products now shows a brand-beige "More Chikit favourites are on the way" panel next to the product instead of a lone card with empty space.
+* **Chikit Club:** checked end to end on a test account (mobile, email, birthday/gender/address, card number). Until MSG91 / Brevo keys exist the two OTP checks accept the number and email as entered; with keys they become real codes with no code change. Members are listed (and exported as CSV) under Admin → Chikit Club for retargeting; a product's Club price is the "Chikit Club price" switch on its product page.
+* **Search:** "ry" finds nothing, "aloe" finds aloe products, typos still match.

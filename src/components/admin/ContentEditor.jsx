@@ -271,7 +271,7 @@ export function ColorField({ label, hint, value, onChange }) {
                     className="w-11 h-11 rounded-lg border border-admin-border cursor-pointer bg-transparent p-0.5 flex-shrink-0"
                     aria-label={label}
                 />
-                <Input value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder="#5A0009" className="flex-1" />
+                <Input value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder="#602460" className="flex-1" />
             </div>
         </AdminField>
     );
