@@ -15,7 +15,7 @@ export default function AboutPage() {
     return (
         <>
             <Seo title="Our Story" description={about.heroDescription} path="/about" image={storyImage} />
-            <section className="bg-canvas-alt">
+            <section className="bg-accent">
                 <div className="container-page py-14 text-center sm:py-20">
                     <Logo size="lg" className="mx-auto mb-8 sm:h-28" />
                     <h1>{about.heroTitle}</h1>

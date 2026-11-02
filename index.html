@@ -28,7 +28,7 @@
 
       /* First-visit splash: logo painted in, a real progress bar, then a solid shutter reveal (no fading). */
       html.sp-lock { overflow: hidden; }
-      #splash { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; background: #FFFFFF; transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1); will-change: transform; }
+      #splash { position: fixed; inset: 0; z-index: 2147483000; display: grid; place-items: center; background: #FEE1C5; transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1); will-change: transform; }
       #splash.sp-out { transform: translateY(-100%); }
       #splash .sp-inner { display: grid; justify-items: center; gap: 28px; }
       #splash .sp-logo { display: block; width: min(260px, 64vw); height: auto; aspect-ratio: 1000 / 305; clip-path: inset(0 100% 0 0); }
@@ -72,7 +72,7 @@
         <span class="sp-sr">Loading Chikit</span>
       </div>
     </div>
-    <div id="root"><div class="shell border-b border-transparent bg-canvas"><div class="container-page flex h-16 items-center lg:h-20"><img src="/brand/chikit-logo-480.webp" width="1000" height="305" alt="Chikit" class="aspect-[1000/305] h-10 w-auto lg:h-12" /></div></div></div>
+    <div id="root"><div class="shell border-b border-transparent bg-accent"><div class="container-page flex h-16 items-center lg:h-20"><img src="/brand/chikit-logo-480.webp" width="1000" height="305" alt="Chikit" class="aspect-[1000/305] h-10 w-auto lg:h-12" /></div></div></div>
         <script>
       /* Splash controller. Shown once per browser session. A fast load never sees it (it is removed at once if the page is
          ready within 350 ms); otherwise it stays until fonts, the app and the first screen's pictures are really ready

@@ -32,7 +32,7 @@ function ClubCard({ name, cardNo, since, className }) {
             <span className="pointer-events-none absolute -bottom-20 -left-10 size-56 rounded-full bg-accent/20" aria-hidden="true" />
             <div className="relative flex h-full flex-col justify-between">
                 <div className="flex items-start justify-between">
-                    <span className="rounded-lg bg-white px-2.5 py-1.5"><Logo size="sm" /></span>
+                    <span className="rounded-lg bg-accent px-2.5 py-1.5"><Logo size="sm" /></span>
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption font-bold uppercase tracking-widest text-ink"><Crown size={13} aria-hidden="true" /> Club</span>
                 </div>
                 <div>

@@ -114,7 +114,7 @@ export default function MobileNav({ isOpen, onClose, links }) {
                         </li>
                     ))}
                 </ul>
-                <div className="mt-auto pt-8">
+                <div className="-mx-5 mt-auto bg-accent px-5 py-5">
                     <Logo size="md" />
                 </div>
             </nav>

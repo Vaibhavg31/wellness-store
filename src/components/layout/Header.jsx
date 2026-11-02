@@ -109,7 +109,7 @@ export default function Header() {
         // the finger, which flips the scroll direction again and made the header flicker on phones. The header box keeps
         // its height; its transparent gap lets taps through (pointer-events), only the two rows take them.
         <header ref={headerRef} onMouseLeave={scheduleClose} onMouseEnter={() => clearTimeout(leaveTimer.current)} className={cn('pointer-events-none sticky top-0 z-50 transition-transform duration-300 ease-[var(--ease-out-soft)] lg:pointer-events-auto', tuckAway && '-translate-y-full lg:pointer-events-none')} inert={tuckAway ? true : undefined}>
-            <div ref={mainRowRef} className={cn('pointer-events-auto relative z-10 border-b bg-canvas transition-shadow duration-300', scrolled && stripHidden ? 'border-line shadow-sm' : 'border-transparent', scrolled ? 'lg:border-line lg:shadow-sm' : 'lg:border-transparent', !stripHidden && 'shadow-none')}>
+            <div ref={mainRowRef} className={cn('pointer-events-auto relative z-10 border-b bg-accent transition-shadow duration-300', scrolled && stripHidden ? 'border-line shadow-sm' : 'border-transparent', scrolled ? 'lg:border-line lg:shadow-sm' : 'lg:border-transparent', !stripHidden && 'shadow-none')}>
             <div className="container-page flex h-16 items-center gap-2 min-[340px]:gap-4 lg:h-20">
                 <button type="button" className={cn(iconButton, 'lg:hidden -ml-2')} onClick={() => setMenuOpen(true)} aria-label="Open menu">
                     <Menu size={22} />
@@ -140,7 +140,7 @@ export default function Header() {
             <div
                 ref={stripRef}
                 className={cn(
-                    'pointer-events-auto relative z-0 border-b bg-canvas transition-[transform,opacity] duration-300 ease-[var(--ease-out-soft)] will-change-transform lg:hidden',
+                    'pointer-events-auto relative z-0 border-b bg-accent transition-[transform,opacity] duration-300 ease-[var(--ease-out-soft)] will-change-transform lg:hidden',
                     noStrip && 'hidden',
                     stripHidden ? 'pointer-events-none -translate-y-full border-transparent opacity-0' : cn('translate-y-0 opacity-100', scrolled ? 'border-line shadow-sm' : 'border-transparent'),
                 )}

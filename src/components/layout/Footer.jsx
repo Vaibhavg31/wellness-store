@@ -85,7 +85,7 @@ export default function Footer() {
         <footer className="bg-primary-deep text-white">
             <div className="container-page grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:py-16">
                 <div className="min-w-0 lg:col-span-4">
-                    <img src="/brand/chikit-logo-white.webp" alt="Chikit, Ayurveda and Wellness" width="480" height="147" className="h-14 w-auto" />
+                    <img src="/brand/chikit-logo-beige.webp" alt="Chikit, Ayurveda and Wellness" width="480" height="147" className="h-14 w-auto" />
                     <p className="mt-4 max-w-xs text-small text-white/70">{footer.description}</p>
                     <ul className="mt-5 flex flex-wrap gap-2">
                         {hasInstagramUrl(instagramUrl) && (

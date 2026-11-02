@@ -41,7 +41,7 @@ export default function AuthSlider({ mode, onMode, signin, signup, points = [], 
 
             {/* the sliding panel: its window travels across the card while the two messages stay put, so one wipes away as the other is revealed */}
             <div className="absolute inset-y-0 left-0 z-10 w-1/2 overflow-hidden will-change-transform" style={{ ...move, transform: signingUp ? 'translateX(100%)' : 'none' }}>
-                <div className="absolute inset-y-0 left-0 flex w-[200%] bg-canvas-alt will-change-transform" style={{ ...move, transform: signingUp ? 'translateX(-50%)' : 'none' }}>
+                <div className="absolute inset-y-0 left-0 flex w-[200%] bg-accent will-change-transform" style={{ ...move, transform: signingUp ? 'translateX(-50%)' : 'none' }}>
                     <PanelMessage {...copy.signin} points={points} hidden={signingUp} onAction={() => onMode('signup')} />
                     <PanelMessage {...copy.signup} points={points} hidden={!signingUp} onAction={() => onMode('signin')} />
                 </div>

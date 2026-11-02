@@ -26,11 +26,11 @@ function SearchTrigger({ onOpen, className = '' }) {
 }
 
 function SidebarBrand() {
-    // The white cut of the logo (public/brand/chikit-logo-white.webp) sits straight on the plum sidebar, no plate around it.
+    // The white cut of the logo (public/brand/chikit-logo-beige.webp) sits straight on the plum sidebar, no plate around it.
     return (
         <div className="px-5 pb-0.5 pt-4">
             <Link to={ADMIN_PATH} aria-label="Admin dashboard" className="flex justify-center">
-                <img src="/brand/chikit-logo-white.webp" alt="Chikit" width="480" height="147" className="h-11 w-auto" />
+                <img src="/brand/chikit-logo-beige.webp" alt="Chikit" width="480" height="147" className="h-11 w-auto" />
             </Link>
             <p className="mt-2 text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Studio admin</p>
         </div>
@@ -91,7 +91,7 @@ export default function AdminLayout() {
 
             <main className="min-h-screen min-w-0 flex-1 bg-admin-bg lg:ml-[15.5rem]">
                 {/* Mobile top bar */}
-                <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-admin-border bg-admin-surface/95 px-4 py-3 lg:hidden">
+                <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-admin-border bg-accent px-4 py-3 lg:hidden">
                     <button
                         type="button"
                         onClick={() => setMobileNavOpen(true)}
