@@ -38,11 +38,11 @@ export const DEFAULT_CONCERNS = [
     { label: 'Stamina Booster', search: 'stamina, energy, protein, ashwagandha', icon: 'zap', image: '/brand/icons/himwell-stamina.webp' },
     { label: 'Women’s Wellness', search: 'women, womens, hormonal', icon: 'venus', image: '/brand/icons/herwell-cycle.webp' },
     { label: 'Blood Purifier', search: 'blood, purifier, neem', icon: 'droplets', image: '/brand/icons/ingredients/karela-jamun.webp' },
-    // Ready for the client's own range (WeighWell, ThyroWell, CalmWell, BabyWell); switched off until those products are listed.
-    { label: 'Weight Wellness', search: 'weight, metabolism, fat, slim', icon: 'zap', image: '/brand/icons/weighwell-lean.webp', enabled: false },
-    { label: 'Thyroid Wellness', search: 'thyroid, thyro', icon: 'sparkles', image: '/brand/icons/thyrowell.webp', enabled: false },
-    { label: 'Sleep & Calm', search: 'sleep, calm, stress, tagar, ashwagandha', icon: 'sun', image: '/brand/icons/ingredients/tagar-sleep.webp', enabled: false },
-    { label: 'Baby Wellness', search: 'baby, kids, ragi, makhana', icon: 'smile', image: '/brand/icons/ingredients/ragi-makhana.webp', enabled: false },
+    // From the client's icon sheet (chikit icon.pdf), which names more needs than the first list of 14: WeighWell, ThyroWell, CalmWell, BabyWell.
+    { label: 'Weight Wellness', search: 'weight, metabolism, fat, slim', icon: 'zap', image: '/brand/icons/weighwell-lean.webp' },
+    { label: 'Thyroid Wellness', search: 'thyroid, thyro', icon: 'sparkles', image: '/brand/icons/thyrowell.webp' },
+    { label: 'Sleep & Calm', search: 'sleep, calm, stress, tagar, ashwagandha', icon: 'sun', image: '/brand/icons/ingredients/tagar-sleep.webp' },
+    { label: 'Baby Wellness', search: 'baby, kids, ragi, makhana', icon: 'smile', image: '/brand/icons/ingredients/ragi-makhana.webp' },
 ].map((c) => ({ image: '', enabled: true, ...c, slug: concernSlug(c.label) }));
 
 /** The concerns to show: the admin's own list when there is one, else the starting list; switched-off ones removed. */
