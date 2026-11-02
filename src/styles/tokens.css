@@ -3,9 +3,9 @@
  * shadow and motion. Components use the generated utilities (bg-primary,
  * text-ink, rounded-lg, shadow-md …) and never hardcode a value.
  *
- * Palette: the brand's plum #602460 and beige #FEE1C5, Lora + Poppins. The site is deliberately plain: a white page, plum type and
- * buttons, picture tiles in a barely warm grey, and the brand beige only in small places (tags, the offer tag, sign-in panel) so the
- * products are what the eye lands on. Comparable stores (OZiva, Kapiva, Wellbeing Nutrition, Plix) are white for the same reason.
+ * Palette: the brand's plum #602460 and beige #FEE1C5, Lora + Poppins. One family: white page, warm cream bands (the beige at about 15%),
+ * the beige itself for the header and highlights, and deep plum for feature bands (offers, club) and the footer, so the page moves
+ * white, cream, plum, white, beige instead of grey and beige side by side. Plum type and buttons throughout; the products are what the eye lands on. Comparable stores (OZiva, Kapiva, Wellbeing Nutrition, Plix) are white for the same reason.
  * Contrast (WCAG AA = 4.5:1 text, 3:1 UI): ink/canvas 17.2, primary/canvas 10.9, primary/white 10.9, muted/canvas 7.1
  * (6.5 on canvas-alt), accent-ink/canvas 6.0, ink/beige 13.8, primary/beige 8.8, beige/primary-deep 11.4.
  * The beige (accent) is a FILL colour on light backgrounds: put ink or plum text on it, never white.
@@ -15,6 +15,7 @@
   --color-primary:        #602460;  /* buttons, links, headings accents, logo colour */
   --color-primary-hover:  #4E1C4E;  /* hover */
   --color-primary-deep:   #431A43;  /* active / pressed, dark bands, footer */
+  --color-primary-night:  #2B0F2B;  /* the deepest plum: the end of the gradient on feature bands (offers, club) */
   --color-primary-tint:   #F6EDF4;  /* selected, soft badges, icon wells */
   --color-primary-soft:   #FBF6FA;  /* faint hover wash */
 
@@ -23,6 +24,7 @@
   --color-accent-hover:   #FAD0A6;
   --color-accent-ink:     #7D4378;  /* small labels and eyebrows (a softer plum) */
   --color-accent-tint:    #FFF3E6;
+  --color-peach:          #F6C7A1;  /* a step deeper than the beige: numerals and highlights on plum bands */
 
   /* Stars only */
   --color-star:           #D9951F;
@@ -30,12 +32,12 @@
   /* Neutrals — warm */
   --color-canvas:         #FFFFFF;  /* page background: clean white, so the products carry the page (as on OZiva, Kapiva, Wellbeing) */
   --color-brand-beige:    #FEE1C5;  /* the brand beige itself, where it must stay beige whatever the theme */
-  --color-canvas-alt:     #F8F5F0;  /* alternate band, picture tiles: a barely warm grey */
+  --color-canvas-alt:     #FFF8F0;  /* alternate band, picture tiles: warm cream drawn from the brand beige, so bands, cards and the logo share one family */
   --color-surface:        #FFFFFF;  /* cards, inputs, drawers */
   --color-ink:            #241720;  /* body + headings */
   --color-muted:          #62545E;  /* secondary text */
   --color-subtle:         #8F8089;  /* placeholders, disabled text (not for content) */
-  --color-line:           #ECE7DF;  /* decorative hairlines */
+  --color-line:           #F0E2D2;  /* decorative hairlines: a warm sand, not grey */
   --color-line-strong:    #9A8794;  /* input borders (3:1 on white) */
 
   /* Status */

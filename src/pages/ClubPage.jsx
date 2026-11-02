@@ -27,7 +27,7 @@ const BENEFIT_ICONS = [Percent, Sparkles, Gift, BadgeCheck];
 /** The card itself: plum, with the name and number once the member has them. */
 function ClubCard({ name, cardNo, since, className }) {
     return (
-        <div className={cn('relative aspect-[1.586/1] w-full max-w-sm overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary to-primary-deep p-5 text-white shadow-lg', className)} role="img" aria-label={`Chikit Club Card${name ? ` for ${name}` : ''}`}>
+        <div className={cn('relative aspect-[1.586/1] w-full max-w-sm overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary-deep to-primary-night p-5 text-white shadow-[0_24px_48px_rgb(67_26_67/0.35)]', className)} role="img" aria-label={`Chikit Club Card${name ? ` for ${name}` : ''}`}>
             <span className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-white/8" aria-hidden="true" />
             <span className="pointer-events-none absolute -bottom-20 -left-10 size-56 rounded-full bg-accent/20" aria-hidden="true" />
             <div className="relative flex h-full flex-col justify-between">
@@ -300,24 +300,24 @@ export default function ClubPage() {
     return (
         <>
             <Seo title={club.cardName} description={`${club.cardName}: ${club.tagline || 'member prices on most of the Chikit range.'}`} path="/club" />
-            <section className="border-b border-line bg-canvas-alt">
+            <section className="bg-brand-beige text-primary-deep">
                 <div className="container-page grid items-center gap-8 py-10 lg:grid-cols-2 lg:gap-14 lg:py-16">
                     <div>
-                        <p className="eyebrow mb-3">Free to join</p>
-                        <h1>{club.cardName}</h1>
-                        <p className="mt-4 max-w-lg text-lead text-muted">{club.tagline}</p>
+                        <p className="mb-3 text-caption font-semibold uppercase tracking-[0.18em] text-accent-ink">Free to join</p>
+                        <h1 className="text-primary-deep">{club.cardName}</h1>
+                        <p className="mt-4 max-w-lg text-lead text-primary-deep/80">{club.tagline}</p>
                         <ul className="mt-6 space-y-3">
                             {benefits.map((benefit, i) => {
                                 const Icon = BENEFIT_ICONS[i % BENEFIT_ICONS.length];
                                 return (
-                                    <li key={benefit} className="flex items-center gap-3 text-body text-ink">
-                                        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-surface text-primary shadow-xs ring-1 ring-line"><Icon size={17} aria-hidden="true" /></span>
+                                    <li key={benefit} className="flex items-center gap-3 text-body text-primary-deep">
+                                        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-accent shadow-xs"><Icon size={17} aria-hidden="true" /></span>
                                         {benefit}
                                     </li>
                                 );
                             })}
                         </ul>
-                        {club.discountPercent > 0 && <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-small font-semibold text-ink"><Crown size={16} aria-hidden="true" /> Save {club.discountPercent}% on most products</p>}
+                        {club.discountPercent > 0 && <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-small font-semibold text-white shadow-md"><Crown size={16} className="text-accent" aria-hidden="true" /> Save {club.discountPercent}% on most products</p>}
                     </div>
                     {/* On a phone the sign-up form is what the visitor came for, so the big card only shows there once they are a member. */}
                     <div className={cn('flex justify-center lg:justify-end', !member && 'max-lg:hidden')}>

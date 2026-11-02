@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Plus, ShoppingBag, X } from 'lucide-react';
-import Button from '@/components/ui/Button';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
 import { imageUrl } from '@/services/api';
@@ -13,10 +12,10 @@ function PickTile({ product, picked, full, onToggle }) {
     const soldOut = typeof product.stock === 'number' && product.stock <= 0;
     const blocked = soldOut || (!picked && full);
     return (
-        <article className={cn('flex flex-col overflow-hidden rounded-lg border bg-surface transition-shadow', picked ? 'border-primary shadow-md ring-1 ring-primary' : 'border-line hover:shadow-sm')}>
+        <article className={cn('flex flex-col overflow-hidden rounded-lg border bg-surface transition-shadow', picked ? 'border-primary shadow-md ring-2 ring-primary' : 'border-line hover:shadow-md')}>
             <div className="relative aspect-[4/5] bg-canvas-alt">
                 <img src={imageUrl(product.images?.[0], 480)} alt="" width="480" height="600" loading="lazy" className="size-full object-contain mix-blend-multiply" />
-                {picked && <span className="absolute left-3 top-3 grid size-8 place-items-center rounded-full bg-primary text-white shadow-md"><Check size={16} aria-hidden="true" /></span>}
+                {picked && <span className="absolute left-3 top-3 grid size-8 place-items-center rounded-full bg-primary text-accent shadow-md"><Check size={16} aria-hidden="true" /></span>}
                 {soldOut && <span className="absolute inset-x-3 bottom-3 rounded-full bg-surface/95 py-1.5 text-center text-caption font-semibold text-ink">Sold out</span>}
             </div>
             <div className="flex flex-1 flex-col gap-2 p-3">
@@ -88,18 +87,21 @@ export default function MixBox({ offer, products }) {
                 ))}
             </ul>
 
-            <div className="safe-area-pb fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/97 px-3 pt-3 shadow-[0_-8px_24px_rgb(67_26_67/0.10)] backdrop-blur sm:px-6" role="region" aria-label="Your box">
-                <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-2">
+            <div className="safe-area-pb fixed inset-x-0 bottom-0 z-40 bg-primary-deep text-white shadow-[0_-12px_32px_rgb(43_15_43/0.35)]" role="region" aria-label="Your box">
+                <div className="h-1 bg-white/15" role="progressbar" aria-valuemin={0} aria-valuemax={slots} aria-valuenow={picked.length} aria-label="Products picked">
+                    <div className="h-full bg-accent transition-[width] duration-300 ease-out" style={{ width: `${(picked.length / slots) * 100}%` }} />
+                </div>
+                <div className="mx-auto flex max-w-5xl flex-col gap-3 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                    <div className="flex items-center gap-2.5">
                         {Array.from({ length: slots }, (_, i) => {
                             const product = picked[i];
                             return product ? (
-                                <button key={product.id} type="button" onClick={() => toggle(product)} aria-label={`Remove ${product.title} from the box`} className="group relative size-14 overflow-hidden rounded-lg border border-primary bg-canvas-alt sm:size-16">
+                                <button key={product.id} type="button" onClick={() => toggle(product)} aria-label={`Remove ${product.title} from the box`} className="group relative size-12 overflow-hidden rounded-xl border-2 border-accent bg-canvas-alt sm:size-16">
                                     <img src={imageUrl(product.images?.[0], 120)} alt="" width="64" height="64" className="size-full object-contain mix-blend-multiply" />
-                                    <span className="absolute inset-0 grid place-items-center bg-ink/55 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"><X size={16} aria-hidden="true" /></span>
+                                    <span className="absolute inset-0 grid place-items-center bg-primary-night/70 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"><X size={16} aria-hidden="true" /></span>
                                 </button>
                             ) : (
-                                <span key={`empty-${i}`} className="grid size-14 place-items-center rounded-lg border border-dashed border-line-strong text-caption text-subtle sm:size-16">{i + 1}</span>
+                                <span key={`empty-${i}`} className="grid size-12 place-items-center rounded-xl border-2 border-dashed border-white/30 font-display text-h4 text-white/50 sm:size-16">{i + 1}</span>
                             );
                         })}
                     </div>
@@ -107,19 +109,19 @@ export default function MixBox({ offer, products }) {
                         <p className="text-right leading-tight">
                             {full ? (
                                 <>
-                                    <span className="block text-caption text-muted">Box total{saving > 0 && <> · <span className="font-semibold text-success">you save {formatPrice(saving)}</span></>}</span>
+                                    <span className="block text-caption text-white/75">Box total{saving > 0 && <> · <span className="font-semibold text-accent">you save {formatPrice(saving)}</span></>}</span>
                                     <span className="flex items-baseline justify-end gap-2">
-                                        {saving > 0 && <span className="text-small text-muted line-through">{formatPrice(plain)}</span>}
-                                        <span className="font-display text-h4 text-primary">{formatPrice(boxPrice)}</span>
+                                        {saving > 0 && <span className="text-small text-white/60 line-through">{formatPrice(plain)}</span>}
+                                        <span className="font-display text-h3 text-accent">{formatPrice(boxPrice)}</span>
                                     </span>
                                 </>
                             ) : (
-                                <span className="block text-small font-medium text-ink">Pick {slots - picked.length} more <span className="block text-caption font-normal text-muted">any {slots} for {formatPrice(offer.price)}</span></span>
+                                <span className="block text-small font-semibold text-white">Pick {slots - picked.length} more <span className="block text-caption font-normal text-white/70">any {slots} for {formatPrice(offer.price)}</span></span>
                             )}
                         </p>
                         <div className="flex gap-2">
-                            <Button variant="outline" disabled={!full} onClick={() => commit(false)} aria-label="Add the box to the bag"><ShoppingBag size={17} aria-hidden="true" /><span className="max-sm:hidden">Add to bag</span></Button>
-                            <Button disabled={!full} onClick={() => commit(true)}>Buy now</Button>
+                            <button type="button" disabled={!full} onClick={() => commit(false)} aria-label="Add the box to the bag" className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/40 px-4 text-small font-semibold text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:border-white/15 disabled:text-white/35 disabled:hover:bg-transparent"><ShoppingBag size={17} aria-hidden="true" /><span className="max-sm:hidden">Add to bag</span></button>
+                            <button type="button" disabled={!full} onClick={() => commit(true)} className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 text-small font-semibold text-primary-deep transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-white/15 disabled:text-white/35">Buy now</button>
                         </div>
                     </div>
                 </div>
