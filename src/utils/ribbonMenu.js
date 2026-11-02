@@ -1,7 +1,7 @@
 /** The five items of the top ribbon, in order. The admin can rename each and switch each on or off. */
 export const DEFAULT_RIBBON_MENU = [
     { key: 'new', label: 'New Launches', enabled: true },
-    { key: 'concern', label: 'Concern', enabled: true },
+    { key: 'concern', label: 'Health Needs', enabled: true },
     { key: 'offers', label: 'Offers', enabled: true },
     { key: 'club', label: 'Chikit Club Card', enabled: true },
     { key: 'help', label: 'WhatsApp Help', enabled: true },

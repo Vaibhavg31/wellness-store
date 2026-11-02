@@ -142,7 +142,6 @@ export function RibbonPanels({ openMenu, onClose }) {
     const { plan } = useCategoryPlan();
     const { offers } = useOffers();
     const concerns = useMemo(() => activeConcerns(content.extras), [content.extras]);
-    const labels = useMemo(() => Object.fromEntries(ribbonItems(content.extras).map((i) => [i.key, i.label])), [content.extras]);
     const panelRef = useRef(null);
 
     useEffect(() => {
@@ -160,7 +159,7 @@ export function RibbonPanels({ openMenu, onClose }) {
             {openMenu === 'concern' && (
                 <div className="container-page py-6 lg:py-8">
                     <div className="mb-4 flex items-end justify-between gap-4">
-                        <p className="eyebrow">Shop by {String(labels.concern || 'concern').toLowerCase()}</p>
+                        <p className="eyebrow">Shop by health need</p>
                         <Link to="/shop" onClick={onClose} className="text-small font-medium text-primary hover:underline">All products</Link>
                     </div>
                     <ul className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 lg:gap-x-4">

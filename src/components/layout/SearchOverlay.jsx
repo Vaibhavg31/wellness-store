@@ -68,7 +68,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
                         type="search"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search products, concerns…"
+                        placeholder="Search products or health needs…"
                         aria-label="Search products"
                         enterKeyHint="search"
                         autoComplete="off"

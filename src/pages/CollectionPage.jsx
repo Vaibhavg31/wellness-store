@@ -57,7 +57,7 @@ export default function ConcernPage() {
     if (!concern) {
         return (
             <div className="container-page py-24 text-center">
-                <h1>We couldn’t find that concern</h1>
+                <h1>We couldn’t find that health need</h1>
                 <p className="mt-3 text-muted">It may have been renamed. Pick one below, or browse everything.</p>
                 <div className="mt-6 flex flex-wrap justify-center gap-2">
                     {concerns.map((c) => <Link key={c.slug} to={`/concern/${c.slug}`} className="rounded-full border border-line-strong px-4 py-2 text-small font-medium text-ink hover:border-primary hover:text-primary">{c.label}</Link>)}
@@ -78,7 +78,7 @@ export default function ConcernPage() {
             <PageHeader
                 compact
                 crumbs={[{ label: 'Home', href: '/' }, { label: 'Shop', href: '/shop' }, { label: concern.label }]}
-                eyebrow="Shop by concern"
+                eyebrow="Shop by health need"
                 title={concern.label}
                 description="Ayurvedic formulations chosen for this goal."
             />

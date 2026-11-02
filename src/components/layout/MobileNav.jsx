@@ -74,7 +74,7 @@ export default function MobileNav({ isOpen, onClose, links }) {
                         </ul>
                         {ribbon.concern && concerns.length > 0 && (
                             <>
-                                <p className="eyebrow mb-2 mt-6 px-4">Shop by {ribbon.concern.toLowerCase()}</p>
+                                <p className="eyebrow mb-2 mt-6 px-4">Shop by health need</p>
                                 <ul className="grid grid-cols-2 gap-1">
                                     {concerns.map((c) => <li key={c.slug}><Link to={`/concern/${c.slug}`} onClick={onClose} className="block rounded-lg px-4 py-2.5 text-small font-medium text-ink transition-colors hover:bg-primary-soft">{c.label}</Link></li>)}
                                 </ul>
