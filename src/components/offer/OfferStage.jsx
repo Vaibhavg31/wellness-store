@@ -15,7 +15,7 @@ function hasWebGL() {
 }
 
 /** The round beige price seal that sits over the stage: "Any 3 for ₹1,499" or "Buy 1 Get 1 free". */
-function Seal({ offer, className }) {
+export function Seal({ offer, className }) {
     if (offer.kind === 'collection') return null;
     const bogo = offer.kind === 'bogo';
     return (

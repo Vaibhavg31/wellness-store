@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Crown } from 'lucide-react';
-import OfferStage from '@/components/offer/OfferStage';
+import { Seal } from '@/components/offer/OfferStage';
+import { OfferPictures } from '@/components/home/OffersBento';
 import { useOffers } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCustomerSession } from '@/hooks/useCustomerSession';
@@ -42,7 +43,7 @@ export function ClubStrip({ className }) {
 
 /**
  * Every offer that is live, on one deep-plum band. On the Offers page (`page`) an offer is picked on the left and its real Chikit packs
- * stand on the right in 3D with the price on a seal; on the home page the offers are plain cards that open the offer. Offers come from Offers in the admin (a new offer page appears here by itself, an ended or switched-off one
+ * stand on the right as still pictures with the price on a seal (nothing spins or moves); on the home page the offers are plain cards that open the offer. Offers come from Offers in the admin (a new offer page appears here by itself, an ended or switched-off one
  * leaves), and the Club card sits underneath. Shows nothing when no offer is running.
  */
 export default function OffersShowcase({ products, page = false }) {
@@ -98,7 +99,10 @@ export default function OffersShowcase({ products, page = false }) {
                             </Link>
                         </div>
 
-                        <OfferStage offer={active} products={products} className="h-[21rem] sm:h-[27rem] lg:col-span-7 lg:h-[33rem]" />
+                        <div className="relative grid h-[16rem] place-items-center overflow-hidden rounded-[1.75rem] bg-white/5 ring-1 ring-white/15 sm:h-[20rem] lg:col-span-7 lg:h-[26rem]">
+                            <OfferPictures key={active.id} offer={active} products={products} well="bg-accent-tint" tileClass="size-28 sm:size-40 lg:size-48" />
+                            <Seal offer={active} className="absolute right-3 top-3 z-10 sm:right-6 sm:top-5" />
+                        </div>
                     </div>
                 ) : (
                     <>

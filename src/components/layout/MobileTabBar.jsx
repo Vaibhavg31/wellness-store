@@ -38,7 +38,7 @@ export default function MobileTabBar() {
 
     const active = ({ isActive }) => cn(tab, isActive ? 'text-primary' : 'text-muted');
     return (
-        <nav ref={ref} aria-label="Quick navigation" className="safe-area-pb fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/96 pb-1 shadow-[0_-8px_24px_rgb(43_15_43/0.08)] backdrop-blur lg:hidden">
+        <nav ref={ref} aria-label="Quick navigation" className="safe-area-pb fixed inset-x-0 bottom-0 z-40 transform-gpu border-t border-line bg-surface pb-1 shadow-[0_-8px_24px_rgb(43_15_43/0.08)] after:absolute after:inset-x-0 after:top-full after:h-40 after:bg-surface after:content-[''] lg:hidden">
             <div className="flex items-end px-2">
                 <NavLink to="/" end className={active}><Home size={21} aria-hidden="true" />Home</NavLink>
                 <NavLink to="/shop" className={active}><LayoutGrid size={21} aria-hidden="true" />Shop</NavLink>
