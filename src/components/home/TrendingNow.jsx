@@ -49,17 +49,18 @@ export default function TrendingNow() {
     if (chips.length === 0) return null;
 
     return (
-        <section aria-labelledby="trending-title" className="container-page py-6 lg:py-8">
+        <section aria-labelledby="trending-title" className="container-page py-5 lg:py-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
-                <h2 id="trending-title" className="flex shrink-0 items-center gap-2 font-sans text-body font-semibold sm:text-lead">
-                    <TrendingUp size={20} className="text-primary" aria-hidden="true" /> {title}
+                <h2 id="trending-title" className="flex shrink-0 items-center gap-2.5 font-sans text-caption font-semibold uppercase tracking-[0.16em] text-primary-deep">
+                    <span className="grid size-8 place-items-center rounded-full bg-primary text-accent"><TrendingUp size={16} aria-hidden="true" /></span>
+                    {title}
                 </h2>
-                <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 py-0.5 scrollbar-none [mask-image:linear-gradient(to_right,transparent,#000_16px,#000_calc(100%-24px),transparent)] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:[mask-image:none]">
                     {chips.map((chip) => (
                         <li key={chip.query} className="shrink-0">
                             <Link
                                 to={`/shop?search=${encodeURIComponent(chip.query)}`}
-                                className="inline-flex min-h-11 items-center rounded-full border border-line-strong/50 px-4 text-small text-ink transition-colors hover:border-primary hover:text-primary"
+                                className="inline-flex min-h-11 items-center rounded-full bg-canvas-alt px-4 text-small font-medium capitalize text-primary-deep ring-1 ring-accent transition-colors duration-200 hover:bg-primary hover:text-white hover:ring-primary sm:min-h-10"
                             >
                                 {chip.label}
                             </Link>
