@@ -117,7 +117,7 @@ export default function Header() {
                     <button type="button" className={iconButton} onClick={() => setSearchOpen(true)} aria-label="Search">
                         <Search size={20} />
                     </button>
-                    <NavLink to="/wishlist" className={cn(iconButton, 'hidden sm:grid')} aria-label={`Wishlist${wishlistCount ? `, ${wishlistCount} ${wishlistCount === 1 ? 'item' : 'items'}` : ''}`}>
+                    <NavLink to="/wishlist" className={iconButton} aria-label={`Wishlist${wishlistCount ? `, ${wishlistCount} ${wishlistCount === 1 ? 'item' : 'items'}` : ''}`}>
                         <Heart size={20} />
                         <CountBadge count={wishlistCount} />
                     </NavLink>
