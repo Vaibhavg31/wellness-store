@@ -123,7 +123,7 @@ export default function MixBox({ offer, products }) {
             </aside>
 
             {/* Phone: a compact bar pinned to the bottom. */}
-            <div className="safe-area-pb fixed inset-x-0 bottom-0 z-40 bg-primary-deep text-white shadow-[0_-12px_32px_rgb(36_10_38/0.35)] lg:hidden" role="region" aria-label="Your box">
+            <div className="fixed inset-x-0 bottom-[var(--tabbar-h,0px)] z-40 bg-primary-deep text-white shadow-[0_-12px_32px_rgb(36_10_38/0.35)] lg:hidden" role="region" aria-label="Your box">
                 <div className="h-1 bg-white/15"><div className="h-full bg-accent transition-[width] duration-300" style={{ width: `${(picked.length / slots) * 100}%` }} /></div>
                 <div className="space-y-3 px-4 py-3">
                     <div className="flex items-center justify-between gap-3">

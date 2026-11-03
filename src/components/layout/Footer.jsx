@@ -56,7 +56,7 @@ export default function Footer() {
     const collections = categories.slice(0, 7);
 
     return (
-        <footer className="bg-primary-deep pb-24 text-white lg:pb-0">
+        <footer className="bg-primary-deep pb-40 text-white lg:pb-0">
             <div className="container-page pt-14 lg:pt-20">
                 <div className="flex flex-col gap-10 border-b border-white/12 pb-12 lg:flex-row lg:items-end lg:justify-between">
                     <div className="max-w-md">

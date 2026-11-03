@@ -232,7 +232,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
             {!preview && <RecentlyViewed excludeId={product.id} />}
 
             {showMobileBar && (
-                <div className="safe-area-pb fixed inset-x-0 bottom-0 z-40 animate-fade-up border-t border-line bg-surface/97 px-4 py-3 shadow-[0_-8px_24px_rgb(56_18_58/0.1)] backdrop-blur lg:hidden">
+                <div className="fixed inset-x-0 bottom-[var(--tabbar-h,0px)] z-40 animate-fade-up border-t border-line bg-surface/97 px-4 py-3 shadow-[0_-8px_24px_rgb(56_18_58/0.1)] backdrop-blur lg:hidden">
                     <div className="flex items-center gap-3">
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-caption text-muted">{product.title}{activeVariant ? ` · ${activeVariant.label}` : ''}</p>
