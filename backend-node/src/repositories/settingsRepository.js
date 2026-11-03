@@ -55,6 +55,7 @@ const DEFAULTS = {
         bannerSlider: true,
         brandMarquee: true,
         trending: true,
+        bestSellers: true,
         offersSlider: true,
         categoryShelves: true,
         wellRange: true,
@@ -135,6 +136,8 @@ const DEFAULTS = {
         bottomRibbon: { words: [] },
         // "Trending now" search chips under the banner. auto = build them from the products when none are listed.
         trending: { title: 'Trending now', auto: true, keywords: [] },
+        // "Most loved" product shelf above the offers: mode 'auto' = pinned-trending then best sellers, 'custom' = productIds.
+        bestSellers: { title: 'Most loved right now', subtitle: 'What shoppers are adding to their bag this week.', mode: 'auto', productIds: [], count: 4 },
         // "Watch & Shop" reels on the homepage.
         watchShop: { title: 'Watch & Shop', subtitle: 'See it in action, then add it to your bag.', reels: [] },
         // Chikit Club Card membership.
@@ -144,6 +147,8 @@ const DEFAULTS = {
             discountPercent: 10,
             tagline: 'Members pay less on most of the range, every day.',
             benefits: ['Member prices on most products', 'Early access to new launches', 'Birthday surprise from Chikit'],
+            showPrices: true, // show real products with their usual and Club price (home band and the Club page)
+            priceCount: 8, // how many of them
         },
         // Homepage sections whose text used to live in code. Empty = the built-in suggestion is used.
         routines: { title: '', description: '', goals: [] },
@@ -287,6 +292,13 @@ function sanitizeExtras(input) {
                 .filter((k) => k.label)
                 .slice(0, 16),
         },
+        bestSellers: {
+            title: text(e.bestSellers?.title ?? d.bestSellers.title, 40) || d.bestSellers.title,
+            subtitle: text(e.bestSellers?.subtitle ?? d.bestSellers.subtitle, 140),
+            mode: e.bestSellers?.mode === 'custom' ? 'custom' : 'auto',
+            productIds: list(e.bestSellers?.productIds).map((id) => text(id, 64)).filter(Boolean).slice(0, 12),
+            count: Math.min(8, Math.max(2, Number.parseInt(e.bestSellers?.count ?? d.bestSellers.count, 10) || d.bestSellers.count)),
+        },
         watchShop: {
             title: text(e.watchShop?.title ?? d.watchShop.title, 40) || d.watchShop.title,
             subtitle: text(e.watchShop?.subtitle ?? d.watchShop.subtitle, 140),
@@ -307,6 +319,8 @@ function sanitizeExtras(input) {
             discountPercent: Math.min(60, Math.max(0, Number.parseInt(e.club?.discountPercent ?? d.club.discountPercent, 10) || 0)),
             tagline: text(e.club?.tagline ?? d.club.tagline, 140),
             benefits: list(e.club?.benefits ?? d.club.benefits).map((b) => text(b, 100)).filter(Boolean).slice(0, 8),
+            showPrices: e.club?.showPrices === undefined ? d.club.showPrices : Boolean(e.club.showPrices),
+            priceCount: Math.min(12, Math.max(3, Number.parseInt(e.club?.priceCount ?? d.club.priceCount, 10) || d.club.priceCount)),
         },
         popup: {
             categorySlug: String(e.popup?.categorySlug ?? '').trim().slice(0, 64),

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BadgeCheck, Cake, Check, Crown, Gift, Loader2, MailCheck, Percent, Smartphone, Sparkles } from 'lucide-react';
 import Seo from '@/components/seo/Seo';
@@ -10,6 +10,9 @@ import VerifyAnimation from '@/components/ui/VerifyAnimation';
 import CheckoutInlineOtp, { normalizeCheckoutPhone } from '@/components/checkout/CheckoutInlineOtp';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
+import ClubPriceTile from '@/components/club/ClubPriceTile';
+import { useProducts } from '@/hooks/useApi';
+import { clubExamples } from '@/utils/clubExamples';
 import { api } from '@/services/api';
 import { loginUrl } from '@/utils/authRedirect';
 import { lookupPincode, isValidPincode } from '@/utils/pincodeLookup';
@@ -277,6 +280,9 @@ export default function ClubPage() {
     const [step, setStep] = useState(0);
     const [justJoined, setJustJoined] = useState(false);
     const member = Boolean(isAuthenticated && user?.club?.member);
+    const { products } = useProducts();
+    const priceCount = Math.min(12, Math.max(3, Number(club.priceCount) || 8));
+    const examples = useMemo(() => clubExamples(products, priceCount), [products, priceCount]);
 
     const load = useCallback(() => {
         if (!token) return;
@@ -325,6 +331,24 @@ export default function ClubPage() {
                     </div>
                 </div>
             </section>
+
+            {club.showPrices !== false && examples.length > 0 && (
+                <section aria-labelledby="club-prices-title" className="container-page py-10 lg:py-14">
+                    <div className="mx-auto mb-8 max-w-2xl text-center">
+                        <p className="eyebrow mb-3">{member ? 'Your member prices' : 'See the difference'}</p>
+                        <h2 id="club-prices-title">{member ? 'What you pay as a member' : 'Same products. Lower prices.'}</h2>
+                        <p className="mt-3 text-body text-muted lg:text-lead">{member ? 'Your Club price shows on every product while you are signed in. Here is what it saves you on some favourites.' : 'The usual price and the Club price of some of our best-loved products, side by side. Joining is free.'}</p>
+                    </div>
+                    <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+                        {examples.map((p) => <li key={p.id}><ClubPriceTile product={p} member={member} /></li>)}
+                    </ul>
+                    <div className="mt-8 flex justify-center">
+                        {member
+                            ? <Link to="/shop"><Button size="lg" variant="outline">Shop with member prices</Button></Link>
+                            : <a href="#join" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Join the Club, it is free</a>}
+                    </div>
+                </section>
+            )}
 
             <section id="join" className="container-page scroll-mt-24 py-10 lg:py-14">
                 <div className="mx-auto max-w-xl">

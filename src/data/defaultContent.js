@@ -80,6 +80,7 @@ export const DEFAULT_SITE_CONTENT = {
         bannerSlider: true,
         brandMarquee: true,
         trending: true,
+        bestSellers: true,
         offersSlider: true,
         categoryShelves: true,
         wellRange: true,
@@ -255,6 +256,7 @@ export const DEFAULT_SITE_CONTENT = {
         bottomRibbon: { words: [] },
         ribbon: { items: [] }, // [{ icon, title, sub }] running promise ribbon (empty = built from the delivery settings)
         trending: { title: 'Trending now', auto: true, keywords: [] }, // search chips under the banner: [{ label, query }]
+        bestSellers: { title: 'Most loved right now', subtitle: 'What shoppers are adding to their bag this week.', mode: 'auto', productIds: [], count: 4 }, // product shelf above the offers
         watchShop: { title: 'Watch & Shop', subtitle: 'See it in action, then add it to your bag.', reels: [] }, // [{ id, title, videoUrl, poster, productId }]
         club: {
             enabled: true,
@@ -262,6 +264,8 @@ export const DEFAULT_SITE_CONTENT = {
             discountPercent: 10,
             tagline: 'Members pay less on most of the range, every day.',
             benefits: ['Member prices on most products', 'Early access to new launches', 'Birthday surprise from Chikit'],
+            showPrices: true, // show real products with their usual and Club price (home band and the Club page)
+            priceCount: 8, // how many of them
         },
         // Text for sections that fall back to the built-in suggestions in src/data/*.js while these are empty
         routines: { title: '', description: '', goals: [] },

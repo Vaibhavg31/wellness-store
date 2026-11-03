@@ -172,3 +172,44 @@ export function WatchShopEditor({ extras, onChange, adminToken, products }) {
         </div>
     );
 }
+
+/** "Most loved products": the shelf before the offers. Automatic, or the products the admin picks, in order. */
+export function BestSellersEditor({ extras, onChange, products }) {
+    const b = extras.bestSellers;
+    const set = (patch) => onChange({ bestSellers: { ...b, ...patch } });
+    const ids = b.productIds ?? [];
+    return (
+        <div className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+                <AdminField label="Heading"><Input value={b.title} maxLength={40} onChange={(e) => set({ title: e.target.value })} /></AdminField>
+                <AdminField label="Line under it"><Input value={b.subtitle} maxLength={140} onChange={(e) => set({ subtitle: e.target.value })} /></AdminField>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+                <AdminField label="Which products">
+                    <select className={selectClass} value={b.mode} onChange={(e) => set({ mode: e.target.value })}>
+                        <option value="auto">Automatic: Trending products, then Best sellers</option>
+                        <option value="custom">I choose the products</option>
+                    </select>
+                </AdminField>
+                {b.mode === 'auto' && (
+                    <AdminField label="How many" hint="2 to 8; 4 sits neatly in one row on a computer.">
+                        <Input type="number" min="2" max="8" value={b.count} onChange={(e) => set({ count: e.target.value })} />
+                    </AdminField>
+                )}
+            </div>
+            {b.mode === 'auto' && <p className="text-xs text-admin-muted">Mark a product “Trending” or “Best seller” on its product page to put it here. Out-of-stock products move to the end.</p>}
+            {b.mode === 'custom' && (
+                <div className="space-y-2">
+                    {ids.map((id, i) => (
+                        <div key={i} className="grid items-end gap-3 sm:grid-cols-[1fr_auto]">
+                            <AdminField label={i === 0 ? 'Product' : undefined}><ProductSearchSelect products={products} value={id} onChange={(next) => set({ productIds: ids.map((x, n) => (n === i ? next : x)) })} placeholder="Search product…" emptyOptionLabel="No product" /></AdminField>
+                            <RowTools index={i} count={ids.length} onMove={(a, c) => set({ productIds: move(ids, a, c) })} onRemove={() => set({ productIds: ids.filter((_, n) => n !== i) })} />
+                        </div>
+                    ))}
+                    {ids.length < 8 && <Button variant="outline" size="sm" onClick={() => set({ productIds: [...ids, ''] })}><Plus size={14} /> Add a product</Button>}
+                    <p className="text-xs text-admin-muted">Needs at least 2 products with a photo, or the shelf hides itself.</p>
+                </div>
+            )}
+        </div>
+    );
+}

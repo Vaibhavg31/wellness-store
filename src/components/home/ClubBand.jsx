@@ -4,11 +4,12 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Check, Crown } from 'lucide-react';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCustomerSession } from '@/hooks/useCustomerSession';
+import ClubPriceTile from '@/components/club/ClubPriceTile';
+import { clubExamples } from '@/utils/clubExamples';
 import { imageUrl } from '@/services/api';
 import { formatPrice, cn } from '@/utils/formatPrice';
 
 const ROTATE_MS = 2600;
-const MAX_EXAMPLES = 6;
 
 /**
  * The Chikit Club, explained by showing it: real products, one after another every couple of seconds, each with a switch between
@@ -26,11 +27,8 @@ export default function ClubBand({ products }) {
     const [on, setOn] = useState(true);
     const [index, setIndex] = useState(0);
     const [paused, setPaused] = useState(false);
-    const examples = useMemo(() => {
-        const withClub = products.filter((p) => p.images?.[0] && Number(p.memberPrice) > 0 && p.memberPrice < p.price);
-        const ranked = [...withClub.filter((p) => p.isBestSeller), ...withClub.filter((p) => !p.isBestSeller)];
-        return ranked.slice(0, MAX_EXAMPLES);
-    }, [products]);
+    const listCount = Math.min(12, Math.max(3, Number(club?.priceCount) || 8));
+    const examples = useMemo(() => clubExamples(products, listCount), [products, listCount]);
     const count = examples.length;
     useEffect(() => {
         if (count < 2 || paused || reduceMotion) return undefined;
@@ -120,6 +118,20 @@ export default function ClubBand({ products }) {
                             )}
                             {member && <p className="mt-4 flex items-center gap-2 rounded-2xl bg-success-tint px-4 py-3 text-small font-semibold text-success"><Check size={16} aria-hidden="true" /> You are a member: this is the price you pay.</p>}
                         </div>
+                    </div>
+                )}
+
+                {club.showPrices !== false && count > 1 && (
+                    <div className="lg:col-span-12">
+                        <p className="mb-3 text-small font-semibold uppercase tracking-[0.14em] text-accent">Usual price and Club price, side by side</p>
+                        <ul className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 xl:grid-cols-6">
+                            {examples.slice(0, 6).map((p, i) => (
+                                <li key={p.id} className="w-[10.5rem] shrink-0 snap-start sm:w-auto">
+                                    <ClubPriceTile product={p} member={member} active={i === index % count} />
+                                </li>
+                            ))}
+                        </ul>
+                        <Link to="/club" className="mt-4 inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-accent hover:underline">See all Club prices <ArrowRight size={16} aria-hidden="true" /></Link>
                     </div>
                 )}
             </div>

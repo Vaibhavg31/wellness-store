@@ -17,7 +17,7 @@ import OfferPanel from '@/components/offer/OfferPanel';
 import Input from '@/components/ui/Input';
 import { AdminErrorBanner, AdminSaveBar, AdminSelect } from '@/components/admin/AdminUi';
 import BannerManager from '@/components/admin/BannerManager';
-import { ConcernsEditor, FeatureRibbonEditor, RibbonMenuEditor, TrendingEditor, WatchShopEditor } from '@/components/admin/StorefrontEditors';
+import { BestSellersEditor, ConcernsEditor, FeatureRibbonEditor, RibbonMenuEditor, TrendingEditor, WatchShopEditor } from '@/components/admin/StorefrontEditors';
 import HeroProductPicker from '@/components/admin/HeroProductPicker';
 import { DayRitualEditor, HerbsEditor, PacksEditor, RoutinesEditor } from '@/components/admin/SectionEditors';
 import {
@@ -64,6 +64,7 @@ const SECTION_LABELS = {
     videoBanner: 'Video Banner',
     brandMarquee: 'Running Ribbon (delivery · payments · purity)',
     trending: 'Trending Now (search chips)',
+    bestSellers: 'Most loved products (before the offers)',
     watchShop: 'Watch & Shop (videos)',
     wellRange: 'The Chikit Well range',
     offersSlider: 'Offers slider',
@@ -93,6 +94,7 @@ const SECTION_META = {
     hero: { tag: 'core', title: 'Hero', desc: 'The first screen: your headline and a showcase of product cards. Needs: products with a cover photo (pick up to 5 below, or leave it on automatic).' },
     brandMarquee: { tag: 'core', title: 'Running ribbon', desc: 'A slow-moving ribbon under the top banner: free delivery, secure payments, pure herbs. Needs: nothing (it is built from your delivery settings); edit the lines below if you wish.' },
     trending: { tag: 'core', title: 'Trending now', desc: 'Quick search words under the banner. Needs: nothing (built from your products), or write your own words.' },
+    bestSellers: { tag: 'core', title: 'Most loved products', desc: 'A short shelf of your best-selling products, placed right before the offers. Automatic (products marked Trending, then Best sellers) or the products you pick. Drag it to move it.' },
     bottomRibbon: { tag: 'core', title: 'Bottom running ribbon', desc: 'A slow-moving ribbon of brand words just above the footer, matching the announcement ribbon at the top of the page. Needs: nothing; edit the words below if you wish.' },
     offersSlider: { tag: 'core', title: 'Offers slider', desc: 'Every live offer (Pick any 3, Buy 1 Get 1, and any offer page you add) as bold tiles, with the Chikit Club band right under them. The offers fill themselves from Offers in the admin; the Club band is switched on and worded in Club.' },
     wellRange: { tag: 'core', title: 'The Chikit Well range', desc: 'Your product series (HimWell, HerWell, GutWell …) with their icons. A series shows "Coming soon" until a product of it is live; set a product\'s series on its product page. Needs: nothing.' },
@@ -476,6 +478,9 @@ export default function AdminContentPage() {
 
             case 'trending':
                 return <div className="pt-3"><TrendingEditor extras={content.extras} onChange={updateExtras} /></div>;
+
+            case 'bestSellers':
+                return <div className="pt-3"><BestSellersEditor extras={content.extras} onChange={updateExtras} products={products} /></div>;
 
             case 'watchShop':
                 return <div className="pt-3"><WatchShopEditor extras={content.extras} onChange={updateExtras} adminToken={adminToken} products={products} /></div>;

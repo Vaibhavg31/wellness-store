@@ -6,6 +6,7 @@ import { BannerSlider, PromoBanners } from '@/components/home/BannerSection';
 import ShopByNeed from '@/components/home/ShopByNeed';
 import CategoryScroller from '@/components/home/CategoryScroller';
 import TrendingNow from '@/components/home/TrendingNow';
+import MostLoved from '@/components/home/MostLoved';
 import WatchShop from '@/components/home/WatchShop';
 import WellRange from '@/components/home/WellRange';
 import BottomRibbon from '@/components/home/BottomRibbon';
@@ -38,6 +39,7 @@ function buildSections({ products, loading }) {
         routineBuilder: () => <RoutineBuilder products={products} />,
         categoryShelves: () => <CategoryScroller products={products} loading={loading} />,
         trending: () => <TrendingNow />,
+        bestSellers: () => <MostLoved />,
         watchShop: () => <WatchShop products={products} />,
         wellRange: () => <WellRange products={products} />,
         bottomRibbon: () => <BottomRibbon />,
