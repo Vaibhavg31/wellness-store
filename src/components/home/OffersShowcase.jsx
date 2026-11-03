@@ -6,7 +6,6 @@ import { OfferPictures } from '@/components/home/OffersBento';
 import { useOffers } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCustomerSession } from '@/hooks/useCustomerSession';
-import { maxSaving, mixWorth } from '@/utils/offerPacks';
 import { formatPrice, cn } from '@/utils/formatPrice';
 
 const KIND_LABEL = { mix_match: 'Pick & Mix', bogo: 'Buy 1 Get 1', collection: 'Offer' };
@@ -51,8 +50,6 @@ export default function OffersShowcase({ products, page = false }) {
     const [activeId, setActiveId] = useState(null);
     useEffect(() => { if (offers.length > 0 && !offers.some((o) => o.id === activeId)) setActiveId(offers[0].id); }, [offers, activeId]);
     const active = offers.find((o) => o.id === activeId) ?? offers[0];
-    const savings = useMemo(() => new Map(offers.map((o) => [o.id, maxSaving(o, products)])), [offers, products]);
-    const worths = useMemo(() => new Map(offers.map((o) => [o.id, mixWorth(o, products)])), [offers, products]);
     if (offers.length === 0 || !active) return null;
 
     const Heading = page ? 'h1' : 'h2';
@@ -71,7 +68,6 @@ export default function OffersShowcase({ products, page = false }) {
                             <ul role="tablist" aria-label="Live offers" className="mt-7 space-y-3">
                                 {offers.map((offer) => {
                                     const selected = offer.id === active.id;
-                                    const saving = savings.get(offer.id) ?? 0;
                                     return (
                                         <li key={offer.id}>
                                             <button
@@ -83,9 +79,8 @@ export default function OffersShowcase({ products, page = false }) {
                                             >
                                                 <span className="flex items-center justify-between gap-3">
                                                     <span className="text-caption font-semibold uppercase tracking-[0.14em] text-peach">{KIND_LABEL[offer.kind]}</span>
-                                                    {saving > 0 && <span className="rounded-full bg-accent px-2.5 py-0.5 text-caption font-semibold text-primary-deep">Save up to {formatPrice(saving)}</span>}
                                                 </span>
-                                                <span className="mt-1.5 block font-display text-h3 leading-tight text-white">{offerHeadline(offer)}{(savings.get(offer.id) ?? 0) > 0 && <span className="ml-2 text-small font-normal text-white/60 line-through"><span className="sr-only">Worth </span>{formatPrice(worths.get(offer.id))}</span>}</span>
+                                                <span className="mt-1.5 block font-display text-h3 leading-tight text-white">{offerHeadline(offer)}</span>
                                                 {offer.summary && <span className={cn('mt-1 block text-small text-white/70', !selected && 'max-sm:hidden')}>{offer.summary}</span>}
                                             </button>
                                         </li>
@@ -116,17 +111,14 @@ export default function OffersShowcase({ products, page = false }) {
                         </div>
                         <ul aria-label="Live offers" className="mt-8 grid gap-4 md:grid-cols-2 lg:gap-6">
                             {offers.map((offer) => {
-                                const saving = savings.get(offer.id) ?? 0;
                                 return (
                                     <li key={offer.id}>
                                         <Link to={`/offers/${offer.slug}`} className="group flex h-full flex-col justify-between gap-6 rounded-2xl border border-white/20 bg-white/5 p-6 transition-colors duration-200 hover:border-accent hover:bg-white/10 sm:p-8">
                                             <span>
                                                 <span className="flex items-center justify-between gap-3">
                                                     <span className="text-caption font-semibold uppercase tracking-[0.14em] text-peach">{KIND_LABEL[offer.kind]}</span>
-                                                    {saving > 0 && <span className="rounded-full bg-accent px-2.5 py-0.5 text-caption font-semibold text-primary-deep">Save up to {formatPrice(saving)}</span>}
                                                 </span>
                                                 <span className="mt-3 block font-display text-h2 leading-tight text-white">{offerHeadline(offer)}</span>
-                                                {saving > 0 && <span className="mt-1 block text-small text-white/70"><span className="line-through"><span className="sr-only">Worth </span>{formatPrice(worths.get(offer.id))}</span> of products, bought one by one</span>}
                                                 {offer.summary && <span className="mt-2 block text-small text-white/75">{offer.summary}</span>}
                                             </span>
                                             <span className="inline-flex items-center gap-2 text-small font-semibold text-accent">Shop this offer <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>

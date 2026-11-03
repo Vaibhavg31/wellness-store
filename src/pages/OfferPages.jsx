@@ -11,7 +11,6 @@ import { ProductGridSkeleton } from '@/components/shop/ProductGrid';
 import { useOffers, useProducts } from '@/hooks/useApi';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
-import { maxSaving, mixWorth } from '@/utils/offerPacks';
 import { breadcrumbJsonLd } from '@/utils/seoSchema';
 import { formatPrice } from '@/utils/formatPrice';
 
@@ -103,8 +102,6 @@ export function OfferPage() {
         return products.filter((p) => order.has(p.id)).sort((a, b) => order.get(a.id) - order.get(b.id));
     }, [offer, products]);
 
-    const saving = offer ? maxSaving(offer, products) : 0;
-    const worth = offer ? mixWorth(offer, products) : 0;
 
     if (!offersLoading && !offer) {
         return (
@@ -143,12 +140,8 @@ export function OfferPage() {
                     {offer?.summary && <p className="mt-2 max-w-xl text-body text-white/75 sm:text-lead">{offer.summary}</p>}
                     {offer?.kind === 'mix_match' && (
                         <div className="mt-5 inline-flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-accent px-5 py-3.5 text-primary-deep shadow-lg sm:px-6 sm:py-4">
-                            <span className="flex items-baseline gap-2.5">
-                                <span className="font-display text-h2 leading-none">{formatPrice(offer.price)}</span>
-                                {worth > offer.price && <span className="text-lead font-semibold leading-none text-primary-deep/60 line-through decoration-2"><span className="sr-only">Worth </span>{formatPrice(worth)}</span>}
-                            </span>
-                            <span className="text-small font-medium">for any {offer.pickCount}, each product once</span>
-                            {saving > 0 && <span className="rounded-full bg-primary px-3 py-1 text-caption font-semibold text-white">Save up to {formatPrice(saving)}</span>}
+                            <span className="font-display text-h2 leading-none">{formatPrice(offer.price)}</span>
+                            <span className="text-small font-medium">for any {offer.pickCount} products you choose, whatever their price</span>
                         </div>
                     )}
                     {offer?.kind === 'bogo' && <p className="mt-5 inline-flex rounded-2xl bg-accent px-6 py-4 text-small font-medium text-primary-deep shadow-lg">Add a product and the second one is on us. You pay for one of the pair.</p>}

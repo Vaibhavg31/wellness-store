@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useOffers } from '@/hooks/useApi';
-import { maxSaving, mixWorth, offerPool } from '@/utils/offerPacks';
+import { offerPool } from '@/utils/offerPacks';
 import { imageUrl } from '@/services/api';
 import { formatPrice, cn } from '@/utils/formatPrice';
 
@@ -42,8 +42,6 @@ export function OfferPictures({ offer, products, className, tileClass, well, eag
 function OfferTile({ offer, tone, products, size }) {
     const t = TONES[tone];
     const words = offerWords(offer);
-    const saving = maxSaving(offer, products);
-    const worth = mixWorth(offer, products);
     const tileClass = size === 'lg' ? 'size-28 sm:size-44' : 'size-24 sm:size-36';
 
     return (
@@ -54,19 +52,12 @@ function OfferTile({ offer, tone, products, size }) {
                     {words.top}
                     {words.bottom && <span className="block">{words.bottom}</span>}
                 </p>
-                {saving > 0 && worth > offer.price && (
-                    <p className="mt-3 flex flex-wrap items-baseline gap-x-2 text-small">
-                        <span className="text-lead font-semibold line-through decoration-2 opacity-75"><span className="sr-only">Worth </span>{formatPrice(worth)}</span>
-                        <span className="opacity-80">of products, bought one by one</span>
-                    </p>
-                )}
             </div>
 
             <OfferPictures offer={offer} products={products} well={t.well} tileClass={tileClass} className="relative z-0 -mr-4 mt-3 justify-end sm:absolute sm:-right-8 sm:top-1/2 sm:mr-0 sm:mt-0 sm:-translate-y-[55%]" />
 
             <div className="relative z-10 flex flex-wrap items-center gap-3">
                 <span className={cn('inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-small font-semibold transition-transform group-hover:translate-x-0.5', t.cta)}>Shop this offer <ArrowRight size={16} aria-hidden="true" /></span>
-                {saving > 0 && <span className={cn('rounded-full px-3 py-1.5 text-caption font-semibold', t.chip)}>Save up to {formatPrice(saving)}</span>}
             </div>
         </Link>
     );
