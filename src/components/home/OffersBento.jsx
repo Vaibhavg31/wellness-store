@@ -31,7 +31,7 @@ export function OfferPictures({ offer, products, className, tileClass, well = 'b
     return (
         <div className={cn('pointer-events-none flex items-end', className)} aria-hidden="true">
             {pictures.map((p, i) => (
-                <span key={p.key} className={cn('block overflow-hidden rounded-[1.4rem] shadow-lg ring-4 ring-white/10 transition-transform duration-500 group-hover:-translate-y-1', well, tileClass, i === 1 && '-ml-8 -translate-y-6 sm:-ml-12', i === 2 && '-ml-8 translate-y-2 sm:-ml-12', i === 0 && 'translate-y-3 -rotate-3', pictures.length === 2 && i === 1 && 'translate-y-0 rotate-3')}>
+                <span key={p.key} className={cn('block overflow-hidden rounded-[1.4rem] shadow-lg ring-4 ring-white/10 transition-transform duration-500 group-hover:-translate-y-1', well, tileClass, i === 1 && '-ml-8 -translate-y-2 sm:-ml-12 sm:-translate-y-6', i === 2 && '-ml-8 translate-y-2 sm:-ml-12', i === 0 && 'translate-y-3 -rotate-3', pictures.length === 2 && i === 1 && 'translate-y-0 rotate-3')}>
                     <img src={imageUrl(p.src, 360)} alt="" width="176" height="176" loading="lazy" className="size-full object-contain mix-blend-multiply" />
                 </span>
             ))}
@@ -55,7 +55,7 @@ export function OfferTile({ offer, tone, products, size }) {
                 </p>
             </div>
 
-            <OfferPictures offer={offer} products={products} well={t.well} tileClass={tileClass} className="relative z-0 -mr-4 justify-end sm:absolute sm:-right-8 sm:top-1/2 sm:mr-0 sm:-translate-y-[55%]" />
+            <OfferPictures offer={offer} products={products} well={t.well} tileClass={tileClass} className="relative z-0 -mr-4 mt-3 justify-end sm:absolute sm:-right-8 sm:top-1/2 sm:mr-0 sm:mt-0 sm:-translate-y-[55%]" />
 
             <div className="relative z-10 flex flex-wrap items-center gap-3">
                 <span className={cn('inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-small font-bold transition-transform group-hover:translate-x-0.5', t.cta)}>Shop this offer <ArrowRight size={16} aria-hidden="true" /></span>
