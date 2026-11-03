@@ -1,59 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
 import Skeleton from '@/components/ui/Skeleton';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
 import { cn } from '@/utils/formatPrice';
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/** One row of products that can be swiped (phone) or paged with the arrows (desktop). */
-function ProductRail({ products, label }) {
-    const scroller = useRef(null);
-    // Up to four products fit one tidy grid (two across on a phone); more than that becomes a swipe row.
-    if (products.length <= 4) {
-        return (
-            <ul aria-label={label} className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-6">
-                {products.map((product) => <li key={product.id} className="min-w-0"><ProductCard product={product} /></li>)}
-            </ul>
-        );
-    }
-    const slide = (direction) => {
-        const node = scroller.current;
-        if (node) node.scrollBy({ left: direction * node.clientWidth * 0.85, behavior: reducedMotion() ? 'auto' : 'smooth' });
-    };
-    return (
-        <div className="group/rail relative">
-            <ul
-                ref={scroller}
-                aria-label={label}
-                className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-pl-4 px-4 pb-2 sm:-mx-6 sm:scroll-pl-6 sm:px-6 lg:mx-0 lg:gap-6 lg:scroll-pl-0 lg:px-0"
-            >
-                {products.map((product) => (
-                    <li key={product.id} className="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-[calc(25%-1.125rem)]">
-                        <ProductCard product={product} />
-                    </li>
-                ))}
-            </ul>
-            {products.length > 4 && (
-                <>
-                    <button type="button" onClick={() => slide(-1)} aria-label="Scroll products left" className="absolute -left-5 top-[38%] hidden size-11 -translate-y-1/2 place-items-center rounded-full border border-line-strong bg-surface text-ink shadow-md transition-colors hover:border-primary hover:text-primary lg:grid">
-                        <ChevronLeft size={20} />
-                    </button>
-                    <button type="button" onClick={() => slide(1)} aria-label="Scroll products right" className="absolute -right-5 top-[38%] hidden size-11 -translate-y-1/2 place-items-center rounded-full border border-line-strong bg-surface text-ink shadow-md transition-colors hover:border-primary hover:text-primary lg:grid">
-                        <ChevronRight size={20} />
-                    </button>
-                </>
-            )}
-        </div>
-    );
-}
+const PER_SECTION = 8;
 
 /**
- * The whole range on one straight page. A bar of buttons (New Launches, Bestsellers, then each category) sticks under
- * the header; the page below is one section per button, so scrolling is all it takes to see every category, and the
- * bar highlights the section on screen. Tapping a button glides to its section.
+ * The whole range on one straight page, the way Oziva does it: a bar of tabs (New Launches, Bestsellers, then every category) sticks under
+ * the header and follows the scroll, and each section below is a grid of products with a "View all" link. Tapping a tab glides to it.
  */
 export default function CategoryScroller({ products, loading }) {
     const { plan } = useCategoryPlan();
@@ -61,41 +19,32 @@ export default function CategoryScroller({ products, loading }) {
     const [barTop, setBarTop] = useState(0);
     const barRef = useRef(null);
     const chipRefs = useRef({});
-    const clickLock = useRef(0);
+    const lock = useRef(0);
 
     const sections = useMemo(() => {
-        const launches = [...products].sort((a, b) => (Number(b.isNew) - Number(a.isNew)) || (new Date(b.createdAt || 0) - new Date(a.createdAt || 0))).slice(0, 12);
-        const best = products.filter((p) => p.isBestSeller);
+        const launches = [...products].sort((a, b) => (Number(b.isNew) - Number(a.isNew)) || (new Date(b.createdAt || 0) - new Date(a.createdAt || 0))).slice(0, 8);
         return [
-            { id: 'new-launches', label: 'New Launches', title: 'New Launches', subtitle: 'Fresh from Chikit', items: launches, href: '/new-launches' },
-            { id: 'bestsellers', label: 'Bestsellers', title: 'Bestsellers', subtitle: 'Most loved by our customers', items: best, href: '/shop?sort=popularity' },
-            ...plan.map((c) => ({
-                id: `cat-${c.slug}`, label: c.label, title: c.label, subtitle: c.subtitle || '', image: c.image, items: products.filter((p) => p.category === c.slug), href: `/category/${c.slug}`,
-            })),
+            { id: 'new-launches', label: 'New Launches', title: 'New launches', subtitle: 'Fresh from Chikit', items: launches, href: '/new-launches' },
+            { id: 'bestsellers', label: 'Bestsellers', title: 'Bestsellers', subtitle: 'Most loved by our customers', items: products.filter((p) => p.isBestSeller), href: '/shop?sort=popularity' },
+            ...plan.map((c) => ({ id: `cat-${c.slug}`, label: c.label, title: c.label, subtitle: c.subtitle || '', items: products.filter((p) => p.category === c.slug), href: `/category/${c.slug}` })),
         ].filter((s) => s.items.length > 0);
     }, [products, plan]);
 
-    // The sticky bar sits under the header; the header's visible height changes on phones (its strip slides away on the way down).
+    // The sticky bar sits under the header, which is itself sticky: read its height so the two stack without a gap.
     useEffect(() => {
-        const read = () => {
-            const offset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-offset')) || 0;
-            setBarTop(offset);
-        };
+        const read = () => setBarTop(document.querySelector('header')?.getBoundingClientRect().height ?? 0);
         read();
-        const observer = new MutationObserver(read);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
-        return () => observer.disconnect();
-    }, []);
+        window.addEventListener('resize', read);
+        return () => window.removeEventListener('resize', read);
+    }, [sections.length]);
 
-    // Which section is on screen: the last one whose top has passed just under the bar.
     useEffect(() => {
         if (sections.length === 0) return undefined;
         let frame = 0;
         const update = () => {
             frame = 0;
-            if (Date.now() < clickLock.current) return;
-            // A little below the bar, so a section that has just been scrolled to counts even while the phone header is still tucking away.
-            const line = (barRef.current?.getBoundingClientRect().bottom ?? 0) + 100;
+            if (Date.now() < lock.current) return;
+            const line = (barRef.current?.getBoundingClientRect().bottom ?? 0) + 120;
             let current = '';
             for (const s of sections) {
                 const node = document.getElementById(`range-${s.id}`);
@@ -110,39 +59,29 @@ export default function CategoryScroller({ products, loading }) {
         return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); if (frame) cancelAnimationFrame(frame); };
     }, [sections]);
 
-    // Keep the highlighted button in view inside the bar.
     useEffect(() => {
         const chip = chipRefs.current[activeId];
         const bar = barRef.current?.querySelector('[data-chip-row]');
         if (!chip || !bar) return;
-        const target = chip.offsetLeft - (bar.clientWidth - chip.offsetWidth) / 2;
-        bar.scrollTo({ left: Math.max(0, target), behavior: reducedMotion() ? 'auto' : 'smooth' });
+        bar.scrollTo({ left: Math.max(0, chip.offsetLeft - (bar.clientWidth - chip.offsetWidth) / 2), behavior: reducedMotion() ? 'auto' : 'smooth' });
     }, [activeId]);
 
     const goTo = useCallback((id) => {
         const node = document.getElementById(`range-${id}`);
         if (!node) return;
         setActiveId(id);
-        clickLock.current = Date.now() + 900; // do not let the scroll-spy fight the glide
-        // Going down, the menu steps away and only this bar remains; going up, the menu comes back above it. Leave room for what will be there.
-        const bar = barRef.current?.getBoundingClientRect().height ?? 48;
-        const menu = document.querySelector('header')?.offsetHeight ?? 0;
-        const goingUp = node.getBoundingClientRect().top < 0;
-        node.style.scrollMarginTop = `${Math.round(bar + 16 + (goingUp ? menu : 0))}px`;
+        lock.current = Date.now() + 900;
+        node.style.scrollMarginTop = `${Math.round((barRef.current?.getBoundingClientRect().height ?? 56) + (document.querySelector('header')?.offsetHeight ?? 0) + 12)}px`;
         node.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
     }, []);
 
     if (!loading && products.length === 0) return null;
 
     return (
-        <section aria-label="Shop the range" className="relative">
-            <div
-                ref={barRef}
-                style={{ top: barTop }}
-                className="sticky z-30 border-b border-line bg-canvas/95 backdrop-blur transition-[top] duration-300 ease-[var(--ease-out-soft)]"
-            >
+        <section aria-label="Shop the range" className="relative bg-canvas">
+            <div ref={barRef} style={{ top: barTop }} className="sticky z-30 border-y border-line bg-canvas/95 backdrop-blur">
                 <div className="container-page">
-                    <div data-chip-row role="tablist" aria-label="Jump to a category" className="-mx-4 flex gap-6 overflow-x-auto px-4 pr-10 scrollbar-none [mask-image:linear-gradient(to_right,#000_92%,transparent)] sm:mx-0 sm:gap-8 sm:px-0">
+                    <div data-chip-row role="tablist" aria-label="Jump to a category" className="-mx-4 flex gap-2 overflow-x-auto px-4 py-2.5 pr-10 scrollbar-none [mask-image:linear-gradient(to_right,#000_92%,transparent)] sm:mx-0 sm:px-0">
                         {sections.map((s) => {
                             const active = activeId === s.id;
                             return (
@@ -153,17 +92,13 @@ export default function CategoryScroller({ products, loading }) {
                                     role="tab"
                                     aria-selected={active}
                                     onClick={() => goTo(s.id)}
-                                    className={cn(
-                                        // Text tabs with a plum underline under the section on screen, like the brand book's own menu.
-                                        'relative min-h-12 shrink-0 whitespace-nowrap text-small font-medium transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors',
-                                        active ? 'text-primary after:bg-primary' : 'text-muted after:bg-transparent hover:text-ink',
-                                    )}
+                                    className={cn('min-h-10 shrink-0 whitespace-nowrap rounded-full px-4 text-small font-bold transition-colors', active ? 'bg-primary text-white shadow-sm' : 'bg-accent-tint text-primary-deep ring-1 ring-line hover:bg-accent')}
                                 >
                                     {s.label}
                                 </button>
                             );
                         })}
-                        {loading && sections.length === 0 && Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="my-3.5 h-5 w-24 shrink-0 rounded" />)}
+                        {loading && sections.length === 0 && Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-10 w-28 shrink-0 rounded-full" />)}
                     </div>
                 </div>
             </div>
@@ -171,21 +106,21 @@ export default function CategoryScroller({ products, loading }) {
             <div className="container-page">
                 {loading && sections.length === 0 && (
                     <div className="grid grid-cols-2 gap-4 py-10 lg:grid-cols-4" aria-hidden="true">
-                        {Array.from({ length: 4 }, (_, i) => <div key={i}><Skeleton className="aspect-[4/5] rounded-lg" /><Skeleton className="mt-3 h-4 w-3/4" /></div>)}
+                        {Array.from({ length: 4 }, (_, i) => <div key={i}><Skeleton className="aspect-[4/5] rounded-[1.25rem]" /><Skeleton className="mt-3 h-4 w-3/4" /></div>)}
                     </div>
                 )}
                 {sections.map((s) => (
-                    <section key={s.id} id={`range-${s.id}`} aria-labelledby={`range-title-${s.id}`} style={{ scrollMarginTop: 64 }} className="py-6 lg:py-9">
-                        <div className="mb-5 flex items-end justify-between gap-4 lg:mb-7">
+                    <section key={s.id} id={`range-${s.id}`} aria-labelledby={`range-title-${s.id}`} className="py-9 lg:py-12">
+                        <div className="mb-6 flex items-end justify-between gap-4">
                             <div>
                                 <h2 id={`range-title-${s.id}`} className="text-h3">{s.title}</h2>
                                 {s.subtitle && <p className="mt-1 text-small text-muted">{s.subtitle}</p>}
                             </div>
-                            <Link to={s.href} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-small font-medium text-primary hover:underline">
-                                View all <ArrowRight size={16} aria-hidden="true" />
-                            </Link>
+                            <Link to={s.href} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-small font-bold text-primary hover:underline">View all <ArrowRight size={16} aria-hidden="true" /></Link>
                         </div>
-                        <ProductRail products={s.items} label={s.title} />
+                        <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-10">
+                            {s.items.slice(0, PER_SECTION).map((product, i) => <li key={product.id} className="min-w-0"><ProductCard product={product} priority={i < 2 && s.id === 'new-launches'} /></li>)}
+                        </ul>
                     </section>
                 ))}
             </div>

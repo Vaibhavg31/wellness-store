@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Play, ShoppingBag, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import Price from '@/components/ui/Price';
+import Price from '@/components/commerce/Price';
 import { useCart } from '@/contexts/CartContext';
 import { useToast, showCartToast } from '@/contexts/ToastContext';
 import { useDialog } from '@/hooks/useDialog';
@@ -44,7 +44,7 @@ export function ReelProduct({ product, compact = false, onBuy }) {
                 <img src={imageUrl(product.images?.[0], 120)} alt="" width="44" height="44" loading="lazy" className="size-11 shrink-0 rounded-md bg-canvas-alt object-cover" />
                 <span className="min-w-0">
                     <span className="block truncate text-small font-medium text-ink">{product.title}</span>
-                    <Price price={product.price} originalPrice={product.originalPrice} className="text-small" />
+                    <Price item={product} size="sm" />
                 </span>
             </Link>
             <Button disabled={outOfStock} onClick={buy} className="w-full"><ShoppingBag size={15} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Buy now'}</Button>

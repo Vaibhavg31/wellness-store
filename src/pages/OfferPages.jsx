@@ -1,66 +1,71 @@
 import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { BadgePercent, Gift, ShoppingBag, ShoppingCart, Package } from 'lucide-react';
+import { BadgePercent, Gift, Package, ShoppingBag, ShoppingCart } from 'lucide-react';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
 import Button from '@/components/ui/Button';
 import ProductCard from '@/components/product/ProductCard';
 import MixBox from '@/components/offer/MixBox';
-import OfferStage from '@/components/offer/OfferStage';
-import OffersShowcase, { ClubStrip } from '@/components/home/OffersShowcase';
+import ClubBand from '@/components/home/ClubBand';
+import { OfferPictures, OfferTile } from '@/components/home/OffersBento';
 import { ProductGridSkeleton } from '@/components/shop/ProductGrid';
 import { useOffers, useProducts } from '@/hooks/useApi';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
-import { maxSaving } from '@/utils/offerPacks';
+import { maxSaving, offerPool } from '@/utils/offerPacks';
 import { breadcrumbJsonLd } from '@/utils/seoSchema';
 import { formatPrice } from '@/utils/formatPrice';
 
 const KIND_LABEL = { mix_match: 'Pick & Mix', bogo: 'Buy 1 Get 1 Free', collection: 'Offer' };
+const TONES = ['plum', 'beige', 'ivory'];
 
 const STEPS = [
-    { icon: Package, title: 'Choose your products', text: 'Open an offer and pick the products you like. Each offer says exactly what it covers.' },
-    { icon: ShoppingCart, title: 'Add it to your bag', text: 'A box or a pair goes into the bag as one line, so nothing gets lost on the way to checkout.' },
-    { icon: BadgePercent, title: 'Pay the offer price', text: 'The price is worked out for you. Club member prices apply to everything outside an offer, and coupons still work.' },
+    { icon: Package, title: 'Choose your products', text: 'Open an offer and pick what you like. Each offer says exactly what it covers.' },
+    { icon: ShoppingCart, title: 'Add it to your bag', text: 'A box or a pair goes in as one line, so nothing gets lost on the way to checkout.' },
+    { icon: BadgePercent, title: 'Pay the offer price', text: 'The price is worked out for you. Club prices apply to everything outside an offer, and coupons still work.' },
 ];
 
-/** /offers: every live offer on the plum stage, how offers work, and the Club card. */
+/** /offers: every live offer as a bold tile, how offers work, and the Club. */
 export function OffersHubPage() {
     const { offers, loading } = useOffers();
     const { products } = useProducts();
     return (
         <>
             <Seo title="Offers" description="Pick & Mix boxes, Buy 1 Get 1 Free and more offers on Chikit Ayurvedic wellness." path="/offers" />
-            {offers.length > 0 ? <OffersShowcase page products={products} /> : (
-                <section className="bg-gradient-to-br from-primary-deep to-primary-night py-16 text-center text-white">
-                    <div className="container-page">
-                        <h1 className="text-white">Offers</h1>
-                        {!loading && <p className="mx-auto mt-3 max-w-md text-white/75">No offers are running right now. Check back soon, or join the Chikit Club for member prices.</p>}
-                    </div>
-                </section>
-            )}
-            <section className="bg-canvas-alt py-12 lg:py-16" aria-labelledby="how-offers-work">
+            <section className="bg-accent-tint border-b border-line">
+                <div className="container-page py-12 lg:py-16">
+                    <p className="eyebrow">Save more</p>
+                    <h1 className="mt-3 text-primary-deep">Offers</h1>
+                    <p className="mt-3 max-w-xl text-lead text-primary-deep/80">Pick your own box or double up on a favourite. New offers appear here the moment they start.</p>
+                </div>
+            </section>
+            <section className="bg-canvas py-10 lg:py-14">
+                <div className="container-page">
+                    {!loading && offers.length === 0 && <p className="py-12 text-center text-muted">No offers are running right now. Check back soon, or <Link to="/club" className="font-bold text-primary underline">join the Chikit Club</Link> for member prices.</p>}
+                    <ul className="grid gap-4 md:grid-cols-2 lg:gap-6">
+                        {offers.map((offer, i) => <li key={offer.id}><OfferTile offer={offer} tone={TONES[i % 3]} products={products} size="lg" /></li>)}
+                    </ul>
+                </div>
+            </section>
+            <section className="bg-accent-tint py-12 lg:py-16" aria-labelledby="how-offers-work">
                 <div className="container-page">
                     <h2 id="how-offers-work" className="text-h3">How our offers work</h2>
-                    <ol className="mt-8 grid gap-6 md:grid-cols-3">
+                    <ol className="mt-8 grid gap-5 md:grid-cols-3">
                         {STEPS.map(({ icon: Icon, title, text }, i) => (
-                            <li key={title} className="rounded-2xl bg-surface p-6 shadow-xs ring-1 ring-line">
-                                <span className="flex items-center gap-3">
-                                    <span className="grid size-11 place-items-center rounded-full bg-primary text-accent"><Icon size={20} aria-hidden="true" /></span>
-                                    <span className="text-caption font-semibold uppercase tracking-[0.14em] text-accent-ink">Step {i + 1}</span>
-                                </span>
-                                <h3 className="mt-4 font-sans text-h4">{title}</h3>
+                            <li key={title} className="rounded-[1.5rem] bg-surface p-6 ring-1 ring-line">
+                                <span className="flex items-center gap-3"><span className="grid size-11 place-items-center rounded-full bg-primary text-accent"><Icon size={20} aria-hidden="true" /></span><span className="text-caption font-bold uppercase tracking-[0.14em] text-accent-ink">Step {i + 1}</span></span>
+                                <h3 className="mt-4 font-sans text-h4 font-bold">{title}</h3>
                                 <p className="mt-2 text-small text-muted">{text}</p>
                             </li>
                         ))}
                     </ol>
-                    {offers.length === 0 && <ClubStrip className="mt-10" />}
                 </div>
             </section>
+            <ClubBand products={products} />
         </>
     );
 }
 
-/** The BOGO product tile: the product card plus a button that adds the pair. */
+/** The BOGO product tile: the product card plus buttons that add the pair. */
 function BogoTile({ offer, product }) {
     const { addBogoPair } = useCart();
     const { showToast } = useToast();
@@ -78,7 +83,7 @@ function BogoTile({ offer, product }) {
         <div className="flex h-full flex-col gap-3">
             <div className="relative">
                 <ProductCard product={product} action={false} />
-                <span className="pointer-events-none absolute left-2.5 top-11 z-10 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent shadow-sm">Buy 1 Get 1</span>
+                <span className="pointer-events-none absolute left-3 top-12 z-10 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent shadow-sm">Buy 1 Get 1</span>
             </div>
             <p className="text-center text-caption text-muted">Pay <strong className="text-ink">{formatPrice(product.price)}</strong> for 2</p>
             <div className="mt-auto grid grid-cols-2 gap-2">
@@ -95,14 +100,7 @@ export function OfferPage() {
     const { offers, loading: offersLoading } = useOffers();
     const { products, loading: productsLoading } = useProducts();
     const offer = offers.find((o) => o.slug === slug);
-
-    const eligible = useMemo(() => {
-        if (!offer) return [];
-        if (offer.allProducts) return products;
-        const order = new Map(offer.productIds.map((id, i) => [id, i]));
-        return products.filter((p) => order.has(p.id)).sort((a, b) => order.get(a.id) - order.get(b.id));
-    }, [offer, products]);
-
+    const eligible = useMemo(() => (offer ? offerPool(offer, products) : []), [offer, products]);
     const saving = offer ? maxSaving(offer, products) : 0;
 
     if (!offersLoading && !offer) {
@@ -128,28 +126,25 @@ export function OfferPage() {
                     jsonLd={breadcrumbJsonLd(SITE_URL, [{ name: 'Home', path: '/' }, { name: 'Offers', path: '/offers' }, { name: offer.title, path: `/offers/${offer.slug}` }])}
                 />
             )}
-            <section className="relative isolate overflow-hidden bg-gradient-to-br from-primary-deep via-primary-deep to-primary-night text-white">
-                <div className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-primary/40 blur-3xl" aria-hidden="true" />
-                <div className="container-page relative grid items-center gap-6 py-8 lg:grid-cols-12 lg:gap-10 lg:py-12">
-                    <div className="lg:col-span-7">
-                        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-small text-white/70">
-                            <Link to="/" className="hover:text-white">Home</Link><span aria-hidden="true">/</span>
-                            <Link to="/offers" className="hover:text-white">Offers</Link><span aria-hidden="true">/</span>
-                            <span className="text-white">{offer?.title ?? '…'}</span>
-                        </nav>
-                        <p className="mt-6 text-caption font-semibold uppercase tracking-[0.18em] text-peach">{offer ? KIND_LABEL[offer.kind] : ''}</p>
-                        <h1 className="mt-3 text-white">{offer?.title ?? 'Loading…'}</h1>
-                        {offer?.summary && <p className="mt-3 max-w-xl text-lead text-white/75">{offer.summary}</p>}
-                        {offer?.kind === 'mix_match' && (
-                            <p className="mt-6 inline-flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-2xl bg-accent px-6 py-4 text-primary-deep shadow-lg">
-                                <span className="font-display text-h2 leading-none">{formatPrice(offer.price)}</span>
-                                <span className="text-small font-medium">for any {offer.pickCount}, each product once</span>
-                                {saving > 0 && <span className="rounded-full bg-primary px-3 py-0.5 text-caption font-semibold text-white">Save up to {formatPrice(saving)}</span>}
-                            </p>
-                        )}
-                        {offer?.kind === 'bogo' && <p className="mt-6 inline-flex rounded-2xl bg-accent px-6 py-4 text-small font-medium text-primary-deep shadow-lg">Add a product and the second one is on us. You pay for one of the pair.</p>}
-                    </div>
-                    {offer && <OfferStage offer={offer} products={products} seal={false} className="h-60 sm:h-72 lg:col-span-5 lg:h-80" />}
+            <section className="bg-gradient-to-br from-primary-deep via-primary-deep to-primary-night text-white">
+                <div className="container-page relative py-10 lg:py-14">
+                    {offer && <OfferPictures offer={offer} products={products} well="bg-accent-tint" tileClass="size-44 xl:size-52" className="absolute right-6 top-1/2 hidden -translate-y-1/2 lg:flex xl:right-10" />}
+                    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-small text-white/70">
+                        <Link to="/" className="hover:text-white">Home</Link><span aria-hidden="true">/</span>
+                        <Link to="/offers" className="hover:text-white">Offers</Link><span aria-hidden="true">/</span>
+                        <span className="text-white">{offer?.title ?? '…'}</span>
+                    </nav>
+                    <p className="mt-6 text-caption font-bold uppercase tracking-[0.18em] text-peach">{offer ? KIND_LABEL[offer.kind] : ''}</p>
+                    <h1 className="mt-3 max-w-3xl text-white">{offer?.title ?? 'Loading…'}</h1>
+                    {offer?.summary && <p className="mt-3 max-w-xl text-lead text-white/75">{offer.summary}</p>}
+                    {offer?.kind === 'mix_match' && (
+                        <p className="mt-6 inline-flex flex-wrap items-baseline gap-x-3 gap-y-1.5 rounded-2xl bg-accent px-6 py-4 text-primary-deep shadow-lg">
+                            <span className="font-display text-h2 leading-none">{formatPrice(offer.price)}</span>
+                            <span className="text-small font-semibold">for any {offer.pickCount}, each product once</span>
+                            {saving > 0 && <span className="rounded-full bg-primary px-3 py-0.5 text-caption font-bold text-white">Save up to {formatPrice(saving)}</span>}
+                        </p>
+                    )}
+                    {offer?.kind === 'bogo' && <p className="mt-6 inline-flex rounded-2xl bg-accent px-6 py-4 text-small font-semibold text-primary-deep shadow-lg">Add a product and the second one is on us. You pay for one of the pair.</p>}
                 </div>
             </section>
             <div className="container-page py-8 lg:py-12">

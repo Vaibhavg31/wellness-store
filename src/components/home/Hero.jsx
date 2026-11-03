@@ -1,93 +1,82 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
-import { LazyMotion, MotionConfig, domAnimation, m } from 'framer-motion';
-import Button from '@/components/ui/Button';
-import Magnetic from '@/components/ui/Magnetic';
-import HeroDeck from '@/components/home/HeroDeck';
+import { ArrowRight, BadgeCheck, Crown, FlaskConical, Star, Truck } from 'lucide-react';
+import { useOffers, useReviews } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
+import { imageUrl } from '@/services/api';
+import { formatPrice, cn } from '@/utils/formatPrice';
 
-const EASE = [0.22, 1, 0.36, 1];
-const rise = (delay) => ({ initial: { opacity: 0, y: 22 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.7, ease: EASE } });
-
-/** Admin-pinned hero products first, then best sellers and new arrivals; at most five. */
-function buildSlides(products, hero) {
-    const withImage = products.filter((p) => p.images?.[0]);
-    const pinned = (hero.productImageIds ?? []).map((id) => withImage.find((p) => p.id === id)).filter(Boolean);
-    const rest = withImage
-        .filter((p) => !pinned.includes(p))
-        .sort((a, b) => (b.isBestSeller || b.isNew ? 1 : 0) - (a.isBestSeller || a.isNew ? 1 : 0));
-    return [...pinned, ...rest].slice(0, 5).map((p) => ({
-        id: p.id,
-        product: p,
-        title: p.title,
-        href: `/product/${p.id}`,
-        image: p.images[0],
-        eyebrow: p.isNew ? 'New arrival' : p.isBestSeller ? 'Best seller' : 'Featured',
-    }));
+/** Three products for the collage: bestsellers first, then newest, only those with a picture. */
+function collage(products) {
+    const ranked = products
+        .filter((p) => p.images?.[0])
+        .sort((a, b) => (Number(b.isBestSeller) - Number(a.isBestSeller)) || (Number(b.isNew) - Number(a.isNew)));
+    return ranked.slice(0, 3);
 }
 
-/** Headline words slide up out of a mask, one after another. */
-function RevealWords({ text, delay = 0 }) {
-    return text.split(' ').map((word, i) => (
-        <span key={`${word}-${i}`} className="mr-[0.25em] inline-block overflow-hidden pb-[0.14em] align-bottom -mb-[0.14em]">
-            <m.span className="inline-block" initial={{ y: '115%' }} animate={{ y: 0 }} transition={{ delay: delay + i * 0.08, duration: 0.85, ease: EASE }}>{word}</m.span>
-        </span>
-    ));
+function CollageCard({ product, className }) {
+    return (
+        <Link to={`/product/${product.id}`} className={cn('group absolute w-[40%] rounded-[1.5rem] bg-surface p-2 shadow-lg ring-1 ring-primary/5 transition-transform duration-500 hover:z-30 hover:scale-[1.03]', className)}>
+            <span className="block aspect-[4/5] overflow-hidden rounded-[1.1rem] bg-accent-tint">
+                <img src={imageUrl(product.images[0], 420)} alt="" width="420" height="525" decoding="async" className="size-full object-contain mix-blend-multiply" />
+            </span>
+            <span className="block truncate px-1.5 pb-1 pt-2 text-caption font-bold text-ink sm:text-small">{product.title}</span>
+            <span className="block px-1.5 pb-1 text-caption font-semibold text-primary">{formatPrice(product.price)}</span>
+        </Link>
+    );
 }
 
-export default function Hero({ products, loading = false }) {
+/**
+ * The first screen: a promise, two clear ways in (shop, or the Pick & Mix offer) and the real packs standing on a beige arch. The
+ * message is brand-controlled; the collage, the offer price and the rating all come from the live shop.
+ */
+export default function Hero({ products }) {
     const { content } = useSiteContent();
-    const hero = content.hero;
-
-    const slides = useMemo(() => {
-        const fromProducts = buildSlides(products, hero);
-        if (fromProducts.length > 0) return fromProducts;
-        /* no product photos yet: show the brand picture from the admin, if there is one */
-        return (hero.images ?? []).filter(Boolean).slice(0, 1).map((image) => ({ id: image, product: null, title: 'Shop the Chikit range', href: '/shop', image, eyebrow: 'Chikit' }));
-    }, [products, hero]);
+    const { offers } = useOffers();
+    const { reviews } = useReviews();
+    const picks = useMemo(() => collage(products), [products]);
+    const mix = offers.find((o) => o.kind === 'mix_match');
+    const average = reviews.length ? reviews.reduce((s, r) => s + (Number(r.rating) || 0), 0) / reviews.length : 0;
+    const club = picks.find((p) => Number(p.memberPrice) > 0 && p.memberPrice < p.price);
+    const threshold = content.delivery?.freeThreshold;
 
     return (
-        <MotionConfig reducedMotion="user">
-            <LazyMotion features={domAnimation}>
-                <section className="relative overflow-hidden bg-canvas">
-                    <div className="pointer-events-none absolute -right-40 -top-24 size-[46rem] rounded-full" style={{ background: 'radial-gradient(closest-side, var(--color-primary-soft), transparent)' }} aria-hidden="true" />
-                    <div className="container-page relative grid items-center gap-6 py-6 sm:gap-8 sm:py-12 lg:grid-cols-[1fr_1.05fr] lg:gap-10 lg:py-10">
-                        <div>
-                            {hero.badge && (
-                                <m.p {...rise(0.05)} className="mb-3 inline-flex sm:mb-5 items-center gap-2 rounded-full bg-primary-tint px-4 py-1.5 text-caption font-semibold text-primary-deep">
-                                    <ShieldCheck size={14} aria-hidden="true" /> {hero.badge}
-                                </m.p>
-                            )}
-                            <h1>
-                                <RevealWords text={hero.headline} delay={0.1} />
-                                <span className="text-primary"><RevealWords text={hero.headlineAccent} delay={0.1 + hero.headline.split(' ').length * 0.08} /></span>
-                            </h1>
-                            <m.p {...rise(0.45)} className="mt-5 hidden max-w-xl text-lead text-muted sm:block">{hero.subheadline}</m.p>
-                            <m.div {...rise(0.55)} className="mt-4 flex flex-wrap gap-3 sm:mt-8">
-                                <Magnetic>
-                                    <Link to={hero.primaryCta?.href || '/shop'}>
-                                        <Button size="lg">
-                                            {hero.primaryCta?.label || 'Shop now'} <ArrowRight size={18} aria-hidden="true" />
-                                        </Button>
-                                    </Link>
-                                </Magnetic>
-                                <Magnetic>
-                                    <Link to="/about"><Button size="lg" variant="outline">Our story</Button></Link>
-                                </Magnetic>
-                            </m.div>
-                        </div>
-
-                        <m.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.9, ease: EASE }} className="min-w-0">
-                            {slides.length > 0 ? (
-                                <HeroDeck items={slides} />
-                            ) : (
-                                loading && <div className="skeleton mx-auto aspect-[1/0.82] w-full max-w-[34rem] rounded-xl sm:aspect-[1/0.8]" aria-hidden="true" />
-                            )}
-                        </m.div>
+        <section className="relative overflow-hidden bg-canvas">
+            <div className="pointer-events-none absolute -right-40 -top-40 size-[34rem] rounded-full bg-accent/60 blur-2xl" aria-hidden="true" />
+            <div className="container-page relative grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-12 lg:gap-6 lg:py-20">
+                <div className="lg:col-span-6 lg:pr-6">
+                    <p className="inline-flex items-center gap-2 rounded-full bg-accent px-3.5 py-1.5 text-caption font-bold uppercase tracking-[0.14em] text-primary-deep"><BadgeCheck size={14} aria-hidden="true" /> Ayurveda · Lab tested · Clean label</p>
+                    <h1 className="mt-5 text-balance">Ayurveda, made <em className="font-medium italic text-primary">simple</em> for everyday health.</h1>
+                    <p className="mt-5 max-w-lg text-lead text-muted">Honest ingredients, tested in a lab and made with care. Find what you need by health goal, and pay less when you join the Club.</p>
+                    <div className="mt-8 flex flex-col gap-3 sm:flex-row [&>a]:justify-center">
+                        <Link to="/shop" className="inline-flex min-h-13 items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-body font-bold text-white shadow-md transition-colors hover:bg-primary-hover">Shop all products <ArrowRight size={18} aria-hidden="true" /></Link>
+                        {mix ? (
+                            <Link to={`/offers/${mix.slug}`} className="inline-flex min-h-13 items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-body font-bold text-primary-deep transition-colors hover:bg-accent-hover">Any {mix.pickCount} for {formatPrice(mix.price)}</Link>
+                        ) : (
+                            <Link to="/club" className="inline-flex min-h-13 items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-body font-bold text-primary-deep hover:bg-accent-hover"><Crown size={18} aria-hidden="true" /> Join the Club</Link>
+                        )}
                     </div>
-                </section>
-            </LazyMotion>
-        </MotionConfig>
+                    <ul className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-small text-muted">
+                        {average > 0 && <li className="flex items-center gap-1.5"><Star size={16} strokeWidth={0} className="fill-star" aria-hidden="true" /><strong className="text-ink">{average.toFixed(1)}</strong> from {reviews.length} reviews</li>}
+                        <li className="flex items-center gap-1.5"><FlaskConical size={16} className="text-primary" aria-hidden="true" /> Lab tested</li>
+                        {threshold > 0 && <li className="flex items-center gap-1.5"><Truck size={16} className="text-primary" aria-hidden="true" /> Free delivery over {formatPrice(threshold)}</li>}
+                    </ul>
+                </div>
+
+                <div className="relative mx-auto aspect-[1/1.05] w-full max-w-[34rem] lg:col-span-6 lg:max-w-none">
+                    <div className="absolute inset-x-[10%] bottom-0 top-[6%] rounded-t-[999px] rounded-b-[2rem] bg-accent" aria-hidden="true" />
+                    <div className="absolute right-[6%] top-[14%] size-20 rounded-full bg-primary/90" aria-hidden="true" />
+                    {picks[1] && <CollageCard product={picks[1]} className="left-[0%] top-[36%] z-10 -rotate-[5deg]" />}
+                    {picks[2] && <CollageCard product={picks[2]} className="right-[0%] top-[40%] z-10 rotate-[5deg]" />}
+                    {picks[0] && <CollageCard product={picks[0]} className="left-1/2 top-[6%] z-20 w-[46%] -translate-x-1/2" />}
+                    {club && (
+                        <Link to="/club" className="absolute bottom-[2%] left-[8%] z-30 flex items-center gap-2.5 rounded-2xl bg-primary-deep px-4 py-3 text-white shadow-lg transition-transform hover:-translate-y-0.5">
+                            <span className="grid size-9 place-items-center rounded-full bg-gold-soft text-gold"><Crown size={17} aria-hidden="true" /></span>
+                            <span className="text-caption leading-tight"><span className="block font-bold">{formatPrice(club.memberPrice)} with Club</span><span className="block text-white/70">Free to join</span></span>
+                        </Link>
+                    )}
+                </div>
+            </div>
+        </section>
     );
 }

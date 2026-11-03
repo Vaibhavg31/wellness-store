@@ -13,7 +13,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; color: var(--color-ink); letter-spacing: -0.01em; text-wrap: balance; }
+  h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 500; color: var(--color-ink); letter-spacing: -0.015em; text-wrap: balance; font-optical-sizing: auto; }
   h1 { font-size: var(--text-h1); line-height: var(--text-h1--line-height); }
   h2 { font-size: var(--text-h2); line-height: var(--text-h2--line-height); }
   h3 { font-size: var(--text-h3); line-height: var(--text-h3--line-height); }
@@ -44,7 +44,7 @@
   .section { padding-block: 3rem; }
   @media (min-width: 1024px) { .section { padding-block: 5rem; } }
 
-  .eyebrow { font-size: var(--text-caption); font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-accent-ink); }
+  .eyebrow { font-size: var(--text-caption); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-accent-ink); }
   .skeleton { position: relative; overflow: hidden; background: var(--color-canvas-alt); }
   .skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.6), transparent); animation: var(--animate-shimmer); }
   .scrollbar-none { scrollbar-width: none; }

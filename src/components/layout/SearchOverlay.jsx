@@ -1,133 +1,98 @@
-import { useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, X } from 'lucide-react';
-import { useDialog } from '@/hooks/useDialog';
-import { usePresence } from '@/hooks/usePresence';
-import { useDebounce } from '@/hooks';
-import { useCategories, useProducts } from '@/hooks/useApi';
+import { ArrowRight, Search, TrendingUp, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { useSiteContent } from '@/contexts/SiteContentContext';
+import { useProducts } from '@/hooks/useApi';
+import { searchProducts } from '@/utils/searchProducts';
+import { suggestKeywords } from '@/utils/trending';
 import { imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
-import { humanizeSlug } from '@/utils/products';
-import { searchProducts } from '@/utils/searchProducts';
 
-function ProductRow({ product, onClose }) {
-    return (
-        <li>
-            <Link to={`/product/${product.id}`} onClick={onClose} className="flex items-center gap-3 rounded-lg p-2 hover:bg-primary-soft">
-                <img src={imageUrl(product.images?.[0], 96)} alt="" width="48" height="48" loading="lazy" className="size-12 shrink-0 rounded-md bg-canvas-alt object-cover" />
-                <span className="min-w-0 flex-1">
-                    <span className="block truncate text-small font-medium text-ink">{product.title}</span>
-                    <span className="block text-caption text-muted">{humanizeSlug(product.category)}</span>
-                </span>
-                <span className="text-small font-medium text-ink">{formatPrice(product.price)}</span>
-            </Link>
-        </li>
-    );
-}
-
-export default function SearchOverlay({ isOpen, onClose }) {
-    const panelRef = useDialog(isOpen, onClose);
-    const navigate = useNavigate();
+/**
+ * Search: a full-screen sheet on a phone, a wide panel under the header on a desktop. Before typing it offers what is trending;
+ * while typing it shows the best matches (same ranked search as the shop page) with their pictures and prices.
+ */
+export default function SearchOverlay({ open, onClose }) {
+    const { content } = useSiteContent();
     const { products } = useProducts();
-    const { categories } = useCategories();
+    const navigate = useNavigate();
+    const inputRef = useRef(null);
     const [query, setQuery] = useState('');
-    const debounced = useDebounce(query.trim().toLowerCase(), 150);
 
-    const results = useMemo(() => {
-        if (!debounced) return [];
-        return searchProducts(products, debounced, { categories }).slice(0, 6);
-    }, [products, debounced, categories]);
+    useEffect(() => {
+        if (!open) return undefined;
+        setQuery('');
+        const t = setTimeout(() => inputRef.current?.focus(), 60);
+        const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+        document.addEventListener('keydown', onKey);
+        document.body.style.overflow = 'hidden';
+        return () => { clearTimeout(t); document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+    }, [open, onClose]);
 
-    const popular = useMemo(() => [...products].sort((a, b) => (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0)).slice(0, 4), [products]);
+    const trending = useMemo(() => {
+        const own = content.extras?.trending?.keywords ?? [];
+        return own.length > 0 ? own : suggestKeywords(products, 8);
+    }, [content.extras, products]);
+    const results = useMemo(() => (query.trim().length >= 2 ? searchProducts(products, query).slice(0, 6) : []), [products, query]);
 
-    const { mounted, closing } = usePresence(isOpen);
-    if (!mounted) return null;
+    if (!open) return null;
 
-    const submit = (event) => {
-        event.preventDefault();
-        if (!query.trim()) return;
-        onClose();
-        navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
-    };
+    const go = (q) => { onClose(); navigate(`/shop?search=${encodeURIComponent(q)}`); };
 
     return createPortal(
-        <div className={closing ? 'pointer-events-none fixed inset-0 z-[100]' : 'fixed inset-0 z-[100]'}>
-            <div className={`absolute inset-0 bg-ink/50 ${closing ? 'animate-fade-out' : 'animate-fade-in'}`} onClick={onClose} aria-hidden="true" />
-            <div
-                ref={panelRef}
-                role="dialog"
-                aria-modal="true"
-                aria-label="Search products"
-                tabIndex={-1}
-                className={`relative mx-auto mt-0 w-full max-w-2xl bg-surface p-4 shadow-lg focus:outline-none sm:mt-20 sm:rounded-xl sm:p-6 ${closing ? 'animate-fade-down' : 'animate-fade-up'}`}
-            >
-                <form onSubmit={submit} className="flex items-center gap-3" role="search">
-                    <Search size={20} className="shrink-0 text-muted" aria-hidden="true" />
+        <div className="fixed inset-0 z-[110] flex flex-col bg-canvas animate-fade-in sm:bg-primary-night/50 sm:p-6 sm:pt-24 sm:backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-label="Search products">
+            <div className="absolute inset-0 hidden sm:block" onClick={onClose} aria-hidden="true" />
+            <div className="relative mx-auto flex w-full max-w-2xl flex-1 flex-col overflow-hidden bg-canvas sm:max-h-[78dvh] sm:flex-none sm:rounded-[1.75rem] sm:shadow-lg">
+                <form onSubmit={(e) => { e.preventDefault(); if (query.trim()) go(query.trim()); }} className="flex items-center gap-3 border-b border-line px-4 py-3.5 sm:px-6">
+                    <Search size={20} className="shrink-0 text-primary" aria-hidden="true" />
                     <input
-                        type="search"
+                        ref={inputRef}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search products or health needs…"
-                        aria-label="Search products"
+                        type="search"
                         enterKeyHint="search"
-                        autoComplete="off"
-                        autoCapitalize="off"
-                        spellCheck={false}
-                        className="h-11 min-w-0 flex-1 bg-transparent text-body text-ink placeholder:text-subtle focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+                        placeholder="Search for ashwagandha, hair, sleep..."
+                        aria-label="Search products"
+                        className="min-w-0 flex-1 bg-transparent text-body text-ink placeholder:text-subtle focus:outline-none [&::-webkit-search-cancel-button]:hidden"
                     />
-                    {query && (
-                        <button type="button" onClick={(e) => { setQuery(''); e.currentTarget.form?.querySelector('input')?.focus(); }} className="grid size-9 shrink-0 place-items-center rounded-full bg-canvas-alt text-muted hover:text-ink" aria-label="Clear search">
-                            <X size={14} />
-                        </button>
-                    )}
-                    <button type="button" onClick={onClose} className="grid size-9 shrink-0 place-items-center rounded-full hover:bg-canvas-alt" aria-label="Close search">
-                        <X size={18} />
-                    </button>
+                    <button type="button" onClick={onClose} aria-label="Close search" className="grid size-10 shrink-0 place-items-center rounded-full bg-canvas-alt text-ink hover:bg-accent"><X size={18} aria-hidden="true" /></button>
                 </form>
 
-                {!debounced && categories.length > 0 && (
-                    <div className="mt-4 border-t border-line pt-4">
-                        <p className="mb-3 text-caption font-semibold uppercase tracking-wider text-muted">Shop by category</p>
-                        <ul className="flex flex-wrap gap-2">
-                            {categories.slice(0, 8).map((c) => (
-                                <li key={c.slug}>
-                                    <Link to={`/category/${c.slug}`} onClick={onClose} className="inline-flex min-h-10 items-center rounded-full border border-line-strong px-4 text-small font-medium text-ink transition-colors hover:border-primary hover:text-primary">{c.label}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-
-                {!debounced && popular.length > 0 && (
-                    <div className="mt-4 border-t border-line pt-4">
-                        <p className="mb-2 text-caption font-semibold uppercase tracking-wider text-muted">Popular right now</p>
-                        <ul className="space-y-1">
-                            {popular.map((p) => <ProductRow key={p.id} product={p} onClose={onClose} />)}
-                        </ul>
-                    </div>
-                )}
-
-                {debounced && (
-                    <div className="mt-4 border-t border-line pt-4">
-                        {results.length === 0 ? (
-                            <div className="py-6 text-center">
-                                <p className="text-muted">No products found for “{query}”.</p>
-                                <p className="mt-1 text-small text-muted">Check the spelling, or try a category such as “immunity”.</p>
-                                <Link to="/shop" onClick={onClose} className="mt-4 inline-flex min-h-11 items-center rounded-full border border-primary px-5 text-small font-semibold text-primary hover:bg-primary-soft">Browse all products</Link>
-                            </div>
-                        ) : (
-                            <ul className="space-y-1">
-                                {results.map((p) => <ProductRow key={p.id} product={p} onClose={onClose} />)}
+                <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
+                    {query.trim().length < 2 ? (
+                        <>
+                            <p className="mb-3 flex items-center gap-2 text-caption font-bold uppercase tracking-[0.16em] text-accent-ink"><TrendingUp size={14} aria-hidden="true" /> Trending now</p>
+                            <ul className="flex flex-wrap gap-2">
+                                {trending.map((chip) => (
+                                    <li key={chip.query}>
+                                        <button type="button" onClick={() => go(chip.query)} className="min-h-10 rounded-full bg-accent-tint px-4 text-small font-semibold capitalize text-primary-deep ring-1 ring-line transition-colors hover:bg-primary hover:text-white hover:ring-primary">{chip.label}</button>
+                                    </li>
+                                ))}
                             </ul>
-                        )}
-                        {results.length > 0 && (
-                            <button type="button" onClick={submit} className="mt-3 w-full rounded-full py-2.5 text-small font-medium text-primary hover:bg-primary-soft">
-                                See all results
-                            </button>
-                        )}
-                    </div>
-                )}
+                        </>
+                    ) : results.length === 0 ? (
+                        <p className="py-10 text-center text-muted">Nothing matches &ldquo;{query}&rdquo;. Try another word, like an ingredient or a health need.</p>
+                    ) : (
+                        <>
+                            <ul className="space-y-1">
+                                {results.map((p) => (
+                                    <li key={p.id}>
+                                        <Link to={`/product/${p.id}`} onClick={onClose} className="flex items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-accent-tint">
+                                            <span className="size-14 shrink-0 overflow-hidden rounded-xl bg-accent-tint"><img src={imageUrl(p.images?.[0], 120)} alt="" width="56" height="56" className="size-full object-contain mix-blend-multiply" /></span>
+                                            <span className="min-w-0 flex-1">
+                                                <span className="block truncate text-small font-semibold text-ink">{p.title}</span>
+                                                <span className="block text-caption text-muted">{formatPrice(p.price)}</span>
+                                            </span>
+                                            <ArrowRight size={16} className="text-subtle" aria-hidden="true" />
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                            <button type="button" onClick={() => go(query.trim())} className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white hover:bg-primary-hover">See all results for &ldquo;{query.trim()}&rdquo; <ArrowRight size={16} aria-hidden="true" /></button>
+                        </>
+                    )}
+                </div>
             </div>
         </div>,
         document.body,

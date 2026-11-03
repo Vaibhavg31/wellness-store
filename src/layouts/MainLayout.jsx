@@ -3,10 +3,11 @@ import PageLoader from '@/components/layout/PageLoader';
 import AnnouncementBar from '@/components/layout/AnnouncementBar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import MobileTabBar from '@/components/layout/MobileTabBar';
 import PageTransition from '@/components/layout/PageTransition';
 import CartDrawer from '@/components/cart/CartDrawer';
+import ClubSheet from '@/components/commerce/ClubSheet';
 import SiteSchema from '@/components/seo/SiteSchema';
-import OfferTab from '@/components/offer/OfferTab';
 import BackToTop from '@/components/layout/BackToTop';
 
 export default function MainLayout() {
@@ -19,13 +20,14 @@ export default function MainLayout() {
             <AnnouncementBar />
             <Header />
             <CartDrawer />
+            <ClubSheet />
             <main id="main" className="min-h-[100dvh] flex-1">
                 <Suspense fallback={<PageLoader />}>
                     <PageTransition />
                 </Suspense>
             </main>
             <Footer />
-            <OfferTab />
+            <MobileTabBar />
             <BackToTop />
         </div>
     );

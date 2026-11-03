@@ -1,73 +1,46 @@
 import Hero from '@/components/home/Hero';
 import Seo from '@/components/seo/Seo';
 import FeatureRibbon from '@/components/home/FeatureRibbon';
-import VideoBanner from '@/components/home/VideoBanner';
-import { BannerSlider, PromoBanners } from '@/components/home/BannerSection';
-import ShopByNeed from '@/components/home/ShopByNeed';
+import NeedsRow from '@/components/home/NeedsRow';
+import OffersBento from '@/components/home/OffersBento';
+import ClubBand from '@/components/home/ClubBand';
+import { BannerSlider } from '@/components/home/BannerSection';
 import CategoryScroller from '@/components/home/CategoryScroller';
 import TrendingNow from '@/components/home/TrendingNow';
 import WatchShop from '@/components/home/WatchShop';
 import WellRange from '@/components/home/WellRange';
 import BottomRibbon from '@/components/home/BottomRibbon';
-import OffersShowcase from '@/components/home/OffersShowcase';
-import BundleSection from '@/components/home/BundleSection';
-import DayRitual from '@/components/home/DayRitual';
-import RoutineBuilder from '@/components/home/RoutineBuilder';
-import HerbAtlas from '@/components/home/HerbAtlas';
-import PackExplorerSection from '@/components/home/PackExplorer/PackExplorerSection';
-import DoshaQuiz from '@/components/home/DoshaQuiz';
 import WhyChoose from '@/components/home/WhyChoose';
 import Testimonials from '@/components/home/Testimonials';
-import InstagramGallery from '@/components/home/InstagramGallery';
-import NewsletterSection from '@/components/home/NewsletterSection';
 import { useProducts } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 
 /**
- * One entry per admin-toggleable homepage section (site_section_toggles.section_key).
- * Order and visibility come from the admin's saved settings; this map only supplies the component.
- * Each block has its own shape on purpose, so the page keeps changing pace as it scrolls.
+ * The home page, in a fixed order built for how people shop: a promise, trust, a way in by health goal, the offers, the Club, then the
+ * whole range on one page, and finally proof. The admin's section switches still apply to the parts that have one.
  */
-function buildSections({ products, loading }) {
-    return {
-        hero: () => <Hero products={products} loading={loading} />,
-        brandMarquee: () => <FeatureRibbon />,
-        videoBanner: () => <VideoBanner />,
-        categories: () => <ShopByNeed />,
-        routineBuilder: () => <RoutineBuilder products={products} />,
-        categoryShelves: () => <CategoryScroller products={products} loading={loading} />,
-        trending: () => <TrendingNow />,
-        watchShop: () => <WatchShop products={products} />,
-        wellRange: () => <WellRange products={products} />,
-        bottomRibbon: () => <BottomRibbon />,
-        offersSlider: () => <OffersShowcase products={products} />,
-        banners: () => <PromoBanners />,
-        bannerSlider: () => <BannerSlider />,
-        dayRitual: () => <DayRitual products={products} />,
-        packExplorer: () => <PackExplorerSection products={products} />,
-        herbAtlas: () => <HerbAtlas products={products} />,
-        doshaQuiz: () => <DoshaQuiz products={products} loading={loading} />,
-        bundles: () => <BundleSection />,
-        whyChoose: () => <WhyChoose />,
-        reviews: () => <Testimonials />,
-        instagram: () => <InstagramGallery />,
-        newsletter: () => <NewsletterSection />,
-    };
-}
-
 export default function HomePage() {
     const { products, loading } = useProducts();
     const { content } = useSiteContent();
-    const sections = content.sections ?? {};
-    const renderers = buildSections({ products, loading });
+    const on = (key) => content.sections?.[key] !== false;
 
     return (
         <>
             <Seo path="/" />
             <h1 className="sr-only">Chikit: Ayurveda and Wellness</h1>
-            {Object.keys(sections)
-                .filter((key) => sections[key] !== false && renderers[key])
-                .map((key) => <div key={key} className="contents">{renderers[key]()}</div>)}
+            <Hero products={products} loading={loading} />
+            {on('brandMarquee') && <FeatureRibbon />}
+            <NeedsRow />
+            {on('offersSlider') && <OffersBento products={products} />}
+            <ClubBand products={products} />
+            {on('bannerSlider') && <BannerSlider />}
+            {on('trending') && <TrendingNow />}
+            {on('categoryShelves') && <CategoryScroller products={products} loading={loading} />}
+            {on('wellRange') && <WellRange products={products} />}
+            {on('watchShop') && <WatchShop products={products} />}
+            {on('whyChoose') && <WhyChoose />}
+            {on('reviews') && <Testimonials />}
+            {on('bottomRibbon') && <BottomRibbon />}
         </>
     );
 }

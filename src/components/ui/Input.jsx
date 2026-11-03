@@ -4,7 +4,7 @@ import { cn } from '@/utils/formatPrice';
 
 export const fieldClass = (error) =>
     cn(
-        'w-full rounded-md border bg-surface px-4 text-body text-ink placeholder:text-subtle',
+        'w-full rounded-xl border bg-surface px-4 text-body text-ink placeholder:text-subtle',
         'transition-[border-color,box-shadow] duration-200',
         'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20',
         'disabled:bg-disabled disabled:text-subtle',
@@ -15,7 +15,7 @@ export function Field({ id, label, error, hint, children }) {
     return (
         <div className="w-full">
             {label && (
-                <label htmlFor={id} className="mb-1.5 block text-small font-medium text-ink">
+                <label htmlFor={id} className="mb-1.5 block text-small font-semibold text-ink">
                     {label}
                 </label>
             )}

@@ -34,3 +34,22 @@ export function mixTotal(listPrices, boxPrice) {
 export function priceFor(item, isMember) {
     return isMember && item?.memberPrice ? item.memberPrice : item.price;
 }
+
+/**
+ * What the Chikit Club does to a bag, line by line (offer and bundle lines never take the Club price):
+ *  - applied:   what a member is already saving (list price minus what they pay)
+ *  - potential: what a guest would save by joining (list price minus Club price)
+ */
+export function clubSavings(items, isMember) {
+    let applied = 0;
+    let potential = 0;
+    items.forEach(({ product, quantity }) => {
+        if (product.offerId || product.bundleId) return;
+        const list = Number(product.listPrice ?? product.price) || 0;
+        const member = Number(product.memberPrice) || 0;
+        if (!(member > 0 && member < list)) return;
+        if (isMember) applied += (list - Number(product.price)) * quantity;
+        else potential += (list - member) * quantity;
+    });
+    return { applied: round2(Math.max(0, applied)), potential: round2(Math.max(0, potential)) };
+}

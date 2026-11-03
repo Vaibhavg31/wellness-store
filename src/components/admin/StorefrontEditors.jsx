@@ -4,7 +4,7 @@ import Input from '@/components/ui/Input';
 import ProductSearchSelect from '@/components/admin/ProductSearchSelect';
 import { AdminField, ImageUploadField, VideoUploadField } from '@/components/admin/ContentEditor';
 import { RIBBON_ICONS, defaultRibbonItems } from '@/components/home/FeatureRibbon';
-import { CONCERN_ICONS } from '@/components/layout/ShopRibbon';
+import { CONCERN_ICONS } from '@/utils/concernIcons';
 import { DEFAULT_CONCERNS, concernSlug } from '@/utils/concerns';
 import { DEFAULT_RIBBON_MENU } from '@/utils/ribbonMenu';
 

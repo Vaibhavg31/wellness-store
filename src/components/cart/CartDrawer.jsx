@@ -5,6 +5,7 @@ import Drawer from '@/components/ui/Drawer';
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import QuantityStepper from '@/components/ui/QuantityStepper';
+import ClubSavings from '@/components/commerce/ClubSavings';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -70,7 +71,7 @@ export default function CartDrawer() {
                     <ul className="flex-1 divide-y divide-line">
                         {items.map((item) => (
                             <li key={lineKey(item)} className="flex gap-3 py-4 first:pt-0">
-                                <img src={imageUrl(item.product.images?.[0])} alt="" width="64" height="64" className="size-16 shrink-0 rounded-md bg-canvas-alt object-cover" />
+                                <img src={imageUrl(item.product.images?.[0])} alt="" width="64" height="64" className="size-20 shrink-0 rounded-2xl bg-accent-tint object-contain mix-blend-multiply" />
                                 <div className="min-w-0 flex-1">
                                     <p className="line-clamp-2 text-small font-medium text-ink">{item.product.title}</p>
                                     {item.product.bundleTitle && <p className="mt-0.5 text-caption text-accent-ink">Part of {item.product.bundleTitle}</p>}
@@ -155,6 +156,8 @@ export default function CartDrawer() {
                                 </div>
                             </div>
                         )}
+
+                        <ClubSavings onNavigate={closeCartDrawer} />
 
                         <p className="flex items-baseline justify-between">
                             <span className="text-small text-muted">Subtotal</span>

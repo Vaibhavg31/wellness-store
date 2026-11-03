@@ -2,20 +2,20 @@ import { forwardRef } from 'react';
 import { cn } from '@/utils/formatPrice';
 
 const variants = {
-    primary: 'bg-primary text-white hover:bg-primary-hover active:bg-primary-deep',
-    secondary: 'bg-primary-tint text-primary-deep hover:bg-primary-tint/70 active:bg-primary-tint',
-    outline: 'border border-primary text-primary hover:bg-primary-soft active:bg-primary-tint',
-    ghost: 'text-ink hover:bg-canvas-alt active:bg-primary-tint',
-    accent: 'bg-accent text-ink hover:bg-accent-hover active:bg-accent',
+    primary: 'bg-primary text-white shadow-xs hover:bg-primary-hover hover:shadow-md active:bg-primary-deep',
+    secondary: 'bg-accent text-primary-deep hover:bg-accent-hover active:bg-accent',
+    outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white active:bg-primary-deep',
+    ghost: 'text-ink hover:bg-accent-tint active:bg-accent',
+    accent: 'bg-accent text-primary-deep hover:bg-accent-hover active:bg-accent',
     danger: 'bg-danger text-white hover:bg-danger/90 active:bg-danger',
 };
 // Legacy alias still referenced by admin screens.
 variants.turmeric = variants.accent;
 
 const sizes = {
-    sm: 'h-9 px-4 text-small',
-    md: 'h-11 px-6 text-small',
-    lg: 'h-12 px-8 text-body',
+    sm: 'h-10 px-5 text-small',
+    md: 'h-12 px-7 text-small',
+    lg: 'h-14 px-9 text-body',
 };
 
 const Button = forwardRef(function Button(
@@ -29,7 +29,7 @@ const Button = forwardRef(function Button(
             disabled={disabled || loading}
             aria-busy={loading || undefined}
             className={cn(
-                'inline-flex items-center justify-center gap-2 rounded-full font-medium whitespace-nowrap select-none',
+                'inline-flex items-center justify-center gap-2 rounded-full font-bold whitespace-nowrap select-none',
                 'transition-[background-color,color,transform,box-shadow] duration-200 active:scale-[0.98]',
                 'disabled:bg-disabled disabled:text-subtle disabled:border-transparent disabled:active:scale-100',
                 variants[variant],
