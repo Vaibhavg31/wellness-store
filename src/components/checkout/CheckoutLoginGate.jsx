@@ -35,8 +35,8 @@ export default function CheckoutLoginGate() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm sm:text-[15px] text-ink line-clamp-1">{item.product.title}</p>
                     <p className="text-sm text-muted">Qty {item.quantity}</p>
+                    <CartLinePrice product={item.product} quantity={item.quantity} align="start" className="mt-0.5 text-sm sm:text-[15px]" />
                   </div>
-                  <CartLinePrice product={item.product} quantity={item.quantity} className="shrink-0 text-sm sm:text-[15px]" />
                 </div>))}
               {items.length > 4 && (<p className="text-sm text-muted">+{items.length - 4} more items</p>)}
             </div>

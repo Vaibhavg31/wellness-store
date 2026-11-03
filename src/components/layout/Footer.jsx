@@ -82,7 +82,7 @@ export default function Footer() {
     ).slice(0, COLLECTION_LIMIT);
 
     return (
-        <footer className="bg-primary-deep pb-40 text-white lg:pb-0">
+        <footer className="bg-primary-deep pb-[calc(var(--tabbar-h,0px)+1.5rem)] text-white lg:pb-0">
             <div className="container-page grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:py-16">
                 <div className="min-w-0 lg:col-span-4">
                     <img src="/brand/chikit-logo-beige.webp" alt="Chikit, Ayurveda and Wellness" width="480" height="147" className="h-14 w-auto" />

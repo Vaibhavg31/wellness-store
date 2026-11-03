@@ -15,7 +15,7 @@ function ProductRail({ products, label }) {
     if (products.length <= 4) {
         return (
             <ul aria-label={label} className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-6">
-                {products.map((product) => <li key={product.id} className="min-w-0"><ProductCard product={product} /></li>)}
+                {products.map((product) => <li key={product.id} className={cn('min-w-0', products.length === 1 && 'max-sm:col-span-2')}><ProductCard product={product} wide={products.length === 1} /></li>)}
             </ul>
         );
     }

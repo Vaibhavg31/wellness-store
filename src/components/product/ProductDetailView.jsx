@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Share2, ShoppingBag } from 'lucide-react';
+import { Crown, Heart, Share2, ShoppingBag } from 'lucide-react';
 import ProductGallery from '@/components/product/ProductGallery';
 import VariantPicker from '@/components/product/VariantPicker';
 import ProductTabs from '@/components/product/ProductTabs';
@@ -288,10 +288,10 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                     <div className="flex items-center gap-3">
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-caption text-muted">{product.title}{activeVariant ? ` — ${activeVariant.label}` : ''}</p>
-                            <p className="font-display text-h4 text-primary">{formatPrice(price)}</p>
+                            <p className="flex items-center gap-1 font-display text-h4 text-primary">{memberView && <Crown size={14} aria-label="Club price" />}{formatPrice(price)}</p>
                         </div>
-                        <Button variant="outline" disabled={outOfStock} onClick={handleAddToCart} aria-label="Add to bag"><ShoppingBag size={18} aria-hidden="true" /></Button>
-                        <Button variant="outline" disabled={outOfStock} onClick={handleBuyNow}>{outOfStock ? 'Sold out' : 'Buy now'}</Button>
+                        <Button disabled={outOfStock} onClick={handleAddToCart} className="shrink-0 px-4"><ShoppingBag size={17} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add'}</Button>
+                        {!outOfStock && <Button variant="outline" onClick={handleBuyNow} className="shrink-0 px-4">Buy now</Button>}
                     </div>
                 </div>
             )}

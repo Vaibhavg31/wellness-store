@@ -317,7 +317,7 @@ export default function ClubPage() {
                                 );
                             })}
                         </ul>
-                        {club.discountPercent > 0 && <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-small font-semibold text-white shadow-md"><Crown size={16} className="text-accent" aria-hidden="true" /> Save {club.discountPercent}% on most products</p>}
+                        {!member && <a href="#join" className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Join the Club, it is free</a>}
                     </div>
                     {/* On a phone the sign-up form is what the visitor came for, so the big card only shows there once they are a member. */}
                     <div className={cn('flex justify-center lg:justify-end', !member && 'max-lg:hidden')}>
@@ -326,7 +326,7 @@ export default function ClubPage() {
                 </div>
             </section>
 
-            <section className="container-page py-10 lg:py-14">
+            <section id="join" className="container-page scroll-mt-24 py-10 lg:py-14">
                 <div className="mx-auto max-w-xl">
                     {club.enabled === false && <p className="rounded-lg bg-warning-tint p-4 text-center text-warning">The club is not taking new members right now. Please check back soon.</p>}
 

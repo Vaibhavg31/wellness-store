@@ -164,7 +164,7 @@ export default function MixBox({ offer, products }) {
     );
 
     return (
-        <div className="pb-36 lg:pb-0">
+        <div>
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-10">
                 <div>
                     <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
@@ -188,8 +188,8 @@ export default function MixBox({ offer, products }) {
                 </aside>
             </div>
 
-            {/* Phone: a compact bar above the tab bar. */}
-            <div className="fixed inset-x-0 bottom-[var(--tabbar-h,0px)] z-40 border-t border-line bg-surface shadow-[0_-12px_32px_rgb(43_15_43/0.14)] lg:hidden" role="region" aria-label="Your box">
+            {/* Phone: a compact bar pinned just above the tab bar. It sticks inside this section, so at the end of the page it rests above the footer instead of covering it. */}
+            <div className="sticky bottom-[var(--tabbar-h,0px)] z-40 -mx-4 mt-8 border-t border-line bg-surface shadow-[0_-12px_32px_rgb(43_15_43/0.14)] sm:-mx-6 lg:hidden" role="region" aria-label="Your box">
                 <div className="h-1 bg-line" role="progressbar" aria-valuemin={0} aria-valuemax={slots} aria-valuenow={picked.length} aria-label="Products picked">
                     <div className="h-full bg-primary transition-[width] duration-300 ease-out" style={{ width: `${(picked.length / slots) * 100}%` }} />
                 </div>

@@ -81,7 +81,7 @@ function BogoTile({ offer, product }) {
                 <span className="pointer-events-none absolute left-2.5 top-11 z-10 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent shadow-sm">Buy 1 Get 1</span>
             </div>
             <p className="text-center text-caption text-muted">Pay <strong className="text-ink">{formatPrice(product.price)}</strong> for 2 <span className="line-through"><span className="sr-only">Worth </span>{formatPrice(product.price * 2)}</span></p>
-            <div className="mt-auto grid grid-cols-2 gap-2">
+            <div className="mt-auto grid gap-2 min-[480px]:grid-cols-2">
                 <Button variant="outline" size="sm" disabled={soldOut} onClick={() => add(false)}><ShoppingBag size={14} aria-hidden="true" /> Add 2</Button>
                 <Button size="sm" disabled={soldOut} onClick={() => add(true)}>Buy now</Button>
             </div>

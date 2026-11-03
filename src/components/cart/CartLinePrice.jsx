@@ -13,13 +13,13 @@ export function isClubLine(product) {
  * with a crown and both the usual price and the original struck through; any other line shows its original price struck through.
  * The same figures appear in the bag, on the bag page and in the checkout summary.
  */
-export default function CartLinePrice({ product, quantity, className }) {
+export default function CartLinePrice({ product, quantity, className, align = 'end' }) {
     const pay = product.price * quantity;
     const club = isClubLine(product);
     const usual = club && product.listPrice > product.price ? product.listPrice * quantity : 0;
     const mrp = product.originalPrice * quantity > Math.max(pay, usual) ? product.originalPrice * quantity : 0;
     return (
-        <span className={cn('flex flex-wrap items-baseline justify-end gap-x-1.5', className)}>
+        <span className={cn('flex flex-wrap items-baseline gap-x-1.5', align === 'start' ? 'justify-start' : 'justify-end', className)}>
             {usual > 0 && <span className="text-caption text-muted line-through"><span className="sr-only">Price without Club </span>{formatPrice(usual)}</span>}
             {mrp > 0 && <span className={cn('text-caption line-through', club ? 'text-subtle' : 'text-muted')}><span className="sr-only">Original price </span>{formatPrice(mrp)}</span>}
             <span className={cn('inline-flex items-baseline gap-1 font-semibold', club ? 'text-primary' : 'text-ink')}>

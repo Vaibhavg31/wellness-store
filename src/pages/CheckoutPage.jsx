@@ -660,8 +660,8 @@ export default function CheckoutPage() {
                                     <div className="min-w-0 flex-1">
                                         <p className="line-clamp-1 text-small text-ink">{item.product.title}</p>
                                         <p className="text-small text-muted">Qty: {item.quantity}{isClubLine(item.product) && <span className="ml-2 text-accent-ink">Club price</span>}</p>
+                                        <CartLinePrice product={item.product} quantity={item.quantity} align="start" className="mt-0.5 text-small" />
                                     </div>
-                                    <CartLinePrice product={item.product} quantity={item.quantity} className="shrink-0 text-small" />
                                 </li>
                             ))}
                         </ul>

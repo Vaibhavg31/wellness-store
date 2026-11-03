@@ -43,7 +43,7 @@ export default function MobileTabBar() {
                 <NavLink to="/" end className={active}><Home size={21} aria-hidden="true" />Home</NavLink>
                 <NavLink to="/shop" className={active}><LayoutGrid size={21} aria-hidden="true" />Shop</NavLink>
                 <Link to="/club" className={cn('relative flex flex-1 flex-col items-center gap-0.5 text-[11px] font-semibold text-primary-deep', stacked ? 'min-h-14 justify-center' : 'justify-end pb-1.5')} aria-label={member ? 'My Club card' : 'Join the Chikit Club'}>
-                    <span className={cn('grid place-items-center rounded-full bg-primary text-accent', stacked ? 'size-7' : '-mt-6 size-12 shadow-lg ring-4 ring-surface')}><Crown size={stacked ? 16 : 22} aria-hidden="true" /></span>
+                    <span className={cn('grid place-items-center rounded-full bg-primary text-accent', stacked ? 'size-[21px]' : '-mt-6 size-12 shadow-lg ring-4 ring-surface')}><Crown size={stacked ? 13 : 22} aria-hidden="true" /></span>
                     {member ? 'My Club' : 'Club'}
                 </Link>
                 <button type="button" onClick={openCartDrawer} className={cn(tab, 'text-muted')}>

@@ -34,9 +34,10 @@ function oneLiner(product) {
 
 /**
  * The product tile used across the shop: picture, name, one-line benefit, rating, price, Club price and a full-width Add to bag.
- * `action={false}` hides the button where the page brings its own (Buy 1 Get 1).
+ * `action={false}` hides the button where the page brings its own (Buy 1 Get 1). `wide` lays it out sideways (picture left, details
+ * right) on a phone, for a row that holds a single product, so it fills the row instead of leaving half of it empty.
  */
-function ProductCard({ product, priority = false, action = true }) {
+function ProductCard({ product, priority = false, action = true, wide = false }) {
     const { addToCart, isMember } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { showToast } = useToast();
@@ -66,8 +67,8 @@ function ProductCard({ product, priority = false, action = true }) {
 
 
     return (
-        <article className="group relative flex h-full flex-col">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-canvas-alt">
+        <article className={cn('group relative flex h-full flex-col', wide && 'max-sm:flex-row max-sm:gap-4')}>
+            <div className={cn('relative aspect-[4/5] overflow-hidden rounded-2xl bg-canvas-alt', wide && 'max-sm:w-[46%] max-sm:shrink-0 max-sm:self-start')}>
                 <Link to={href} tabIndex={-1} aria-hidden="true" className="block size-full">
                     <FadeImage
                         src={imageUrl(primary, 480)}
@@ -99,7 +100,7 @@ function ProductCard({ product, priority = false, action = true }) {
                 </button>
             </div>
 
-            <div className="flex flex-1 flex-col pt-3">
+            <div className={cn('flex flex-1 flex-col pt-3', wide && 'max-sm:justify-center max-sm:pt-0')}>
                 <h3 className="font-sans text-small font-medium leading-snug text-ink sm:text-[0.9375rem]">
                     <Link to={href} className="line-clamp-2 transition-colors after:absolute after:inset-0 after:content-[''] hover:text-primary">
                         {product.title}
