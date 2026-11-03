@@ -79,7 +79,6 @@ export default function OffersShowcase({ products, page = false }) {
                                                 role="tab"
                                                 aria-selected={selected}
                                                 onClick={() => setActiveId(offer.id)}
-                                                onMouseEnter={() => setActiveId(offer.id)}
                                                 className={cn('group w-full rounded-2xl border p-4 text-left transition-colors duration-200 sm:p-5', selected ? 'border-accent bg-white/10' : 'border-white/15 hover:border-white/40 hover:bg-white/5')}
                                             >
                                                 <span className="flex items-center justify-between gap-3">
@@ -99,9 +98,13 @@ export default function OffersShowcase({ products, page = false }) {
                             </Link>
                         </div>
 
-                        <div className="relative grid h-[16rem] place-items-center overflow-hidden rounded-[1.75rem] bg-white/5 ring-1 ring-white/15 sm:h-[20rem] lg:col-span-7 lg:h-[26rem]">
-                            <OfferPictures key={active.id} offer={active} products={products} well="bg-accent-tint" tileClass="size-28 sm:size-40 lg:size-48" />
-                            <Seal offer={active} className="absolute right-3 top-3 z-10 sm:right-6 sm:top-5" />
+                        <div className="relative h-[16rem] overflow-hidden rounded-[1.75rem] bg-white/5 ring-1 ring-white/15 sm:h-[20rem] lg:col-span-7 lg:h-[26rem]">
+                            {offers.map((offer) => (
+                                <div key={offer.id} aria-hidden={offer.id !== active.id} className={cn('absolute inset-0 grid place-items-center', offer.id === active.id ? 'visible' : 'invisible')}>
+                                    <OfferPictures offer={offer} products={products} eager well="bg-accent-tint" tileClass="size-28 sm:size-40 lg:size-48" />
+                                    <Seal offer={offer} className="absolute right-3 top-3 z-10 sm:right-6 sm:top-5" />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 ) : (

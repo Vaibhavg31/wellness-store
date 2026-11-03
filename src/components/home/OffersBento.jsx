@@ -22,7 +22,7 @@ const TONES = {
 };
 
 /** The pictures that sit on an offer: up to three different products (the same product twice for Buy 1 Get 1), as light tiles that overlap. */
-export function OfferPictures({ offer, products, className, tileClass, well }) {
+export function OfferPictures({ offer, products, className, tileClass, well, eager = false }) {
     const pictures = useMemo(() => {
         const pool = offerPool(offer, products).filter((p) => p.images?.[0]);
         const chosen = offer.kind === 'bogo' ? (pool[0] ? [pool[0], pool[0]] : []) : pool.slice(0, 3);
@@ -31,8 +31,8 @@ export function OfferPictures({ offer, products, className, tileClass, well }) {
     return (
         <div className={cn('pointer-events-none flex items-end', className)} aria-hidden="true">
             {pictures.map((p, i) => (
-                <span key={p.key} className={cn('block overflow-hidden rounded-[1.4rem] shadow-lg ring-4 ring-white/10 transition-transform duration-500 group-hover:-translate-y-1', well, tileClass, i === 1 && '-ml-8 -translate-y-2 sm:-ml-12 sm:-translate-y-6', i === 2 && '-ml-8 translate-y-2 sm:-ml-12', i === 0 && 'translate-y-3 -rotate-3', pictures.length === 2 && i === 1 && 'translate-y-0 rotate-3')}>
-                    <img src={imageUrl(p.src, 360)} alt="" width="176" height="176" loading="lazy" className="size-full object-contain mix-blend-multiply" />
+                <span key={p.key} className={cn('block overflow-hidden rounded-[1.4rem] shadow-lg ring-4 ring-white/10', well, tileClass, i === 1 && '-ml-8 -translate-y-2 sm:-ml-12 sm:-translate-y-6', i === 2 && '-ml-8 translate-y-2 sm:-ml-12', i === 0 && 'translate-y-3', pictures.length === 2 && i === 1 && 'translate-y-0')}>
+                    <img src={imageUrl(p.src, 360)} alt="" width="176" height="176" loading={eager ? 'eager' : 'lazy'} decoding="async" className="size-full object-contain mix-blend-multiply" />
                 </span>
             ))}
         </div>
