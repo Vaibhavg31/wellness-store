@@ -3,3 +3,7 @@
 @import "./styles/tokens.css";
 @import "./styles/base.css";
 @import "./styles/admin.css";
+
+/* Admin tables scroll inside their own box. Without this, a wide table still widens the whole page on a phone (the page then
+   zooms out and can be dragged sideways); paint containment keeps its overflow inside the box. */
+.admin-table-shell .overflow-x-auto { contain: paint; }

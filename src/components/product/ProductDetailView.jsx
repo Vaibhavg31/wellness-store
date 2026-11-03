@@ -69,11 +69,13 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
         if (product?.id && !preview) recordProductView(product.id);
     }, [product?.id, preview]);
 
-    // Show the sticky mobile buy bar once the main buy box has scrolled out of view.
+    // Show the sticky mobile buy bar whenever the real Add to bag / Buy now buttons are not usable on screen: scrolled past, still
+    // below the fold, or hidden behind the phone's bottom tab bar (its height is taken off the bottom of the visible area).
     useEffect(() => {
         const el = buyBoxRef.current;
         if (!el) return undefined;
-        const observer = new IntersectionObserver(([entry]) => setShowMobileBar(!entry.isIntersecting), { threshold: 0 });
+        const tabbar = Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tabbar-h'), 10) || 0;
+        const observer = new IntersectionObserver(([entry]) => setShowMobileBar(!entry.isIntersecting), { threshold: 0.6, rootMargin: `0px 0px -${tabbar}px 0px` });
         observer.observe(el);
         return () => observer.disconnect();
     }, [product?.id]);
@@ -184,7 +186,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                 </div>
 
                 <div className="min-w-0">
-                    <div ref={buyBoxRef}>
+                    <div>
                         <p className="eyebrow mb-2">{categoryLabel}</p>
                         <h1 className="text-h2">{product.title}</h1>
                         {product.reviewCount > 0 && <Rating value={product.rating} count={`${product.reviewCount} reviews`} className="mt-3" />}
@@ -220,7 +222,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                             </button>
                         </div>
 
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div ref={buyBoxRef} className="mt-4 grid gap-3 sm:grid-cols-2">
                             <Button size="lg" disabled={outOfStock} onClick={handleAddToCart}><ShoppingBag size={18} aria-hidden="true" /> Add to bag</Button>
                             <Button size="lg" variant="outline" disabled={outOfStock} onClick={handleBuyNow}>Buy now</Button>
                         </div>
@@ -284,7 +286,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
             {!preview && <RecentlyViewed excludeId={product.id} />}
 
             {showMobileBar && (
-                <div className="fixed inset-x-0 bottom-[var(--tabbar-h,0px)] z-40 animate-fade-up border-t border-line bg-surface/95 px-4 py-3 backdrop-blur lg:hidden">
+                <div className="fixed inset-x-0 bottom-[var(--tabbar-h,0px)] z-40 animate-fade-up border-t border-line bg-surface px-4 py-3 lg:hidden">
                     <div className="flex items-center gap-3">
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-caption text-muted">{product.title}{activeVariant ? ` — ${activeVariant.label}` : ''}</p>

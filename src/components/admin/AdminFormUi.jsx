@@ -50,7 +50,7 @@ export function OptionalSection({ icon: Icon, title, description, enabled, onTog
                     : 'border-admin-border bg-admin-surface-alt'
             }`}
         >
-            <div className="flex items-center gap-3 p-4 sm:px-5 sm:py-4">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 p-4 sm:flex-nowrap sm:px-5 sm:py-4">
                 {Icon && (
                     <div
                         className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
@@ -63,12 +63,12 @@ export function OptionalSection({ icon: Icon, title, description, enabled, onTog
                 <button
                     type="button"
                     onClick={() => onToggle(!enabled)}
-                    className="flex-1 min-w-0 text-left rounded-lg -my-1 py-1 hover:opacity-90 transition-opacity"
+                    className="min-w-[12rem] flex-1 text-left rounded-lg -my-1 py-1 hover:opacity-90 transition-opacity sm:min-w-0"
                 >
                     <p className="text-sm font-semibold text-ink">{title}</p>
                     <p className="text-xs text-admin-muted mt-0.5 leading-relaxed">{description}</p>
                 </button>
-                <div className="flex items-center gap-2.5 shrink-0 pl-1">
+                <div className="ml-auto flex shrink-0 items-center gap-2.5 pl-1">
                     <span
                         className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${
                             enabled ? 'text-primary' : 'text-admin-muted'

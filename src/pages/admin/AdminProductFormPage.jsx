@@ -1233,7 +1233,7 @@ export default function AdminProductFormPage() {
 
                 {/* One slim bar with the two things you can do here. (It used to repeat the price, category and image count that are
                     already on the page, and a second "Preview page" button that is already at the top.) */}
-                <div className="sticky bottom-0 z-10 -mx-1 flex items-center justify-end gap-3 border-t border-admin-border bg-admin-surface/95 px-1 py-3 backdrop-blur">
+                <div className="sticky bottom-0 z-10 -mx-1 flex items-center justify-end gap-3 border-t border-admin-border bg-admin-surface px-1 py-3 after:absolute after:inset-x-0 after:top-full after:h-10 after:bg-admin-surface after:content-['']">
                     <Button
                         type="button"
                         variant="outline"
