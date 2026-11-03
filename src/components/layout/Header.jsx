@@ -38,12 +38,8 @@ export default function Header() {
     const [openMenu, setOpenMenu] = useState(null); // 'concern' | 'offers' | null: the ribbon panel that is showing
     const headerRef = useRef(null);
     const mainRowRef = useRef(null);
-    const stripRef = useRef(null);
     const leaveTimer = useRef(0);
     const links = content.navLinks ?? [];
-    // Buying pages keep the phone header to one row: the category strip would only pull attention (and the price below the fold).
-    const noStrip = /^\/(product\/|checkout)/.test(pathname);
-    const stripHidden = direction === 'down' || noStrip;
     // On the homepage the category bar sticks to the page while you read down, so the menu above it steps out of the way
     // (and returns on the way up): the same words are never stacked twice in the corner of the screen.
     const tuckAway = pathname === '/' && direction === 'down';
@@ -56,15 +52,13 @@ export default function Header() {
         const root = document.documentElement;
         const publish = () => {
             const main = tuckAway ? 0 : (mainRowRef.current?.getBoundingClientRect().height ?? 0);
-            const strip = tuckAway || stripHidden || noStrip ? 0 : (stripRef.current?.getBoundingClientRect().height ?? 0);
-            root.style.setProperty('--header-offset', `${Math.round(main + strip)}px`);
+            root.style.setProperty('--header-offset', `${Math.round(main)}px`);
         };
         publish();
         const observer = new ResizeObserver(publish);
         if (mainRowRef.current) observer.observe(mainRowRef.current);
-        if (stripRef.current) observer.observe(stripRef.current);
         return () => { observer.disconnect(); root.style.removeProperty('--header-offset'); };
-    }, [stripHidden, noStrip, tuckAway]);
+    }, [tuckAway]);
 
     // A panel opens on click, and on hover for a mouse (hovering on the same pill again keeps it, leaving closes it).
     const toggleMenu = useCallback((key, hover = false) => {
@@ -109,7 +103,7 @@ export default function Header() {
         // the finger, which flips the scroll direction again and made the header flicker on phones. The header box keeps
         // its height; its transparent gap lets taps through (pointer-events), only the two rows take them.
         <header ref={headerRef} onMouseLeave={scheduleClose} onMouseEnter={() => clearTimeout(leaveTimer.current)} className={cn('pointer-events-none sticky top-0 z-50 transition-transform duration-300 ease-[var(--ease-out-soft)] lg:pointer-events-auto', tuckAway && '-translate-y-full lg:pointer-events-none')} inert={tuckAway ? true : undefined}>
-            <div ref={mainRowRef} className={cn('pointer-events-auto relative z-10 border-b bg-accent transition-shadow duration-300', scrolled && stripHidden ? 'border-line shadow-sm' : 'border-transparent', scrolled ? 'lg:border-line lg:shadow-sm' : 'lg:border-transparent', !stripHidden && 'shadow-none')}>
+            <div ref={mainRowRef} className={cn('pointer-events-auto relative z-10 border-b bg-accent transition-shadow duration-300', scrolled ? 'border-line shadow-sm' : 'border-transparent')}>
             <div className="container-page flex h-16 items-center gap-2 min-[340px]:gap-4 lg:h-20">
                 <button type="button" className={cn(iconButton, 'lg:hidden -ml-2')} onClick={() => setMenuOpen(true)} aria-label="Open menu">
                     <Menu size={22} />
@@ -127,27 +121,13 @@ export default function Header() {
                         <Heart size={20} />
                         <CountBadge count={wishlistCount} />
                     </NavLink>
-                    <AccountMenu iconButtonClass={iconButton} />
+                    <div className="hidden lg:block"><AccountMenu iconButtonClass={iconButton} /></div>
                     <button type="button" className={iconButton} onClick={openCartDrawer} aria-label={`Bag${cartCount ? `, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}` : ''}`}>
                         <ShoppingBag size={20} />
                         <CountBadge count={cartCount} />
                     </button>
                 </div>
             </div>
-            </div>
-
-            {/* On phones the category strip slides up under the main row while reading down and returns on the way up. */}
-            <div
-                ref={stripRef}
-                className={cn(
-                    'pointer-events-auto relative z-0 border-b bg-accent transition-[transform,opacity] duration-300 ease-[var(--ease-out-soft)] will-change-transform lg:hidden',
-                    noStrip && 'hidden',
-                    stripHidden ? 'pointer-events-none -translate-y-full border-transparent opacity-0' : cn('translate-y-0 opacity-100', scrolled ? 'border-line shadow-sm' : 'border-transparent'),
-                )}
-                aria-hidden={stripHidden ? 'true' : undefined}
-                inert={stripHidden ? true : undefined}
-            >
-                <ShopRibbon variant="phone" openMenu={openMenu} onToggle={toggleMenu} />
             </div>
 
             <RibbonPanels openMenu={openMenu} onClose={closeMenu} />

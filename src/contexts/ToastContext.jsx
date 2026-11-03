@@ -31,7 +31,7 @@ export function ToastProvider({ children }) {
         <ToastContext.Provider value={value}>
             {children}
             <div
-                className="pointer-events-none fixed bottom-4 right-4 z-[110] flex max-w-[calc(100vw-2rem)] flex-col gap-2 sm:bottom-6 sm:right-6 sm:max-w-sm"
+                className="pointer-events-none fixed bottom-[calc(var(--tabbar-h,0px)+1rem)] right-4 z-[110] flex max-w-[calc(100vw-2rem)] flex-col gap-2 sm:bottom-6 sm:right-6 sm:max-w-sm"
                 role="region"
                 aria-live="polite"
                 aria-label="Notifications"

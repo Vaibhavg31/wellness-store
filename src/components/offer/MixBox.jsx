@@ -87,7 +87,7 @@ export default function MixBox({ offer, products }) {
                 ))}
             </ul>
 
-            <div className="safe-area-pb fixed inset-x-0 bottom-0 z-40 bg-primary-deep text-white shadow-[0_-12px_32px_rgb(43_15_43/0.35)]" role="region" aria-label="Your box">
+            <div className="fixed inset-x-0 bottom-[var(--tabbar-h,0px)] z-40 bg-primary-deep text-white shadow-[0_-12px_32px_rgb(43_15_43/0.35)]" role="region" aria-label="Your box">
                 <div className="h-1 bg-white/15" role="progressbar" aria-valuemin={0} aria-valuemax={slots} aria-valuenow={picked.length} aria-label="Products picked">
                     <div className="h-full bg-accent transition-[width] duration-300 ease-out" style={{ width: `${(picked.length / slots) * 100}%` }} />
                 </div>

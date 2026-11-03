@@ -67,7 +67,7 @@ export default function OfferTab() {
                     // Phones: a compact pill at the bottom-left (clear of the chat button). Larger screens: the slim edge tab.
                     busyOnPhone && 'max-sm:hidden',
                     scrollingDown && 'max-sm:pointer-events-none max-sm:!opacity-0',
-                    'fixed bottom-4 left-4 z-40 flex animate-fade-up items-center gap-1.5 sm:bottom-auto sm:top-[60%] sm:-translate-y-1/2 sm:flex-col sm:gap-2 sm:animate-none',
+                    'fixed bottom-[calc(var(--tabbar-h,0px)+1rem)] left-4 z-40 flex animate-fade-up items-center gap-1.5 sm:bottom-auto sm:top-[60%] sm:-translate-y-1/2 sm:flex-col sm:gap-2 sm:animate-none',
                     right ? 'sm:left-auto sm:right-0 sm:animate-edge-in-right' : 'sm:left-0 sm:animate-edge-in-left',
                 )}>
                     <button

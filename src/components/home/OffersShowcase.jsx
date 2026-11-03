@@ -21,7 +21,6 @@ export function ClubStrip({ className }) {
     const club = content.extras?.club;
     if (!club || club.enabled === false) return null;
     const member = Boolean(isAuthenticated && user?.club?.member);
-    const percent = Number(club.discountPercent) || 0;
     return (
         <div className={cn('flex flex-col gap-5 rounded-2xl bg-accent p-6 text-primary-deep shadow-lg sm:flex-row sm:items-center sm:justify-between sm:p-8', className)}>
             <div className="flex items-center gap-4">
@@ -29,7 +28,7 @@ export function ClubStrip({ className }) {
                 <div>
                     <p className="text-caption font-semibold uppercase tracking-[0.14em] text-accent-ink">{club.cardName}</p>
                     <p className="mt-1 font-display text-h4 leading-snug sm:text-h3">
-                        {member ? 'Your member prices are on, on every product.' : percent > 0 ? `Members pay ${percent}% less on most products.` : 'Members get lower prices on most products.'}
+                        {member ? 'Your member prices are on, on every product.' : 'Members get lower prices on most products.'}
                     </p>
                     {!member && <p className="mt-1 text-small text-primary-deep/80">Free to join. No minimum purchase. Your card is ready in a minute.</p>}
                 </div>

@@ -8,6 +8,7 @@ import CartDrawer from '@/components/cart/CartDrawer';
 import SiteSchema from '@/components/seo/SiteSchema';
 import OfferTab from '@/components/offer/OfferTab';
 import BackToTop from '@/components/layout/BackToTop';
+import MobileTabBar from '@/components/layout/MobileTabBar';
 
 export default function MainLayout() {
     return (
@@ -26,6 +27,7 @@ export default function MainLayout() {
             </main>
             <Footer />
             <OfferTab />
+            <MobileTabBar />
             <BackToTop />
         </div>
     );
