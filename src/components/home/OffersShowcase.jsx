@@ -5,7 +5,7 @@ import OfferStage from '@/components/offer/OfferStage';
 import { useOffers } from '@/hooks/useApi';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCustomerSession } from '@/hooks/useCustomerSession';
-import { maxSaving } from '@/utils/offerPacks';
+import { maxSaving, mixWorth } from '@/utils/offerPacks';
 import { formatPrice, cn } from '@/utils/formatPrice';
 
 const KIND_LABEL = { mix_match: 'Pick & Mix', bogo: 'Buy 1 Get 1', collection: 'Offer' };
@@ -51,6 +51,7 @@ export default function OffersShowcase({ products, page = false }) {
     useEffect(() => { if (offers.length > 0 && !offers.some((o) => o.id === activeId)) setActiveId(offers[0].id); }, [offers, activeId]);
     const active = offers.find((o) => o.id === activeId) ?? offers[0];
     const savings = useMemo(() => new Map(offers.map((o) => [o.id, maxSaving(o, products)])), [offers, products]);
+    const worths = useMemo(() => new Map(offers.map((o) => [o.id, mixWorth(o, products)])), [offers, products]);
     if (offers.length === 0 || !active) return null;
 
     const Heading = page ? 'h1' : 'h2';
@@ -84,7 +85,7 @@ export default function OffersShowcase({ products, page = false }) {
                                                     <span className="text-caption font-semibold uppercase tracking-[0.14em] text-peach">{KIND_LABEL[offer.kind]}</span>
                                                     {saving > 0 && <span className="rounded-full bg-accent px-2.5 py-0.5 text-caption font-semibold text-primary-deep">Save up to {formatPrice(saving)}</span>}
                                                 </span>
-                                                <span className="mt-1.5 block font-display text-h3 leading-tight text-white">{offerHeadline(offer)}</span>
+                                                <span className="mt-1.5 block font-display text-h3 leading-tight text-white">{offerHeadline(offer)}{(savings.get(offer.id) ?? 0) > 0 && <span className="ml-2 text-small font-normal text-white/60 line-through"><span className="sr-only">Worth </span>{formatPrice(worths.get(offer.id))}</span>}</span>
                                                 {offer.summary && <span className={cn('mt-1 block text-small text-white/70', !selected && 'max-sm:hidden')}>{offer.summary}</span>}
                                             </button>
                                         </li>
@@ -118,6 +119,7 @@ export default function OffersShowcase({ products, page = false }) {
                                                     {saving > 0 && <span className="rounded-full bg-accent px-2.5 py-0.5 text-caption font-semibold text-primary-deep">Save up to {formatPrice(saving)}</span>}
                                                 </span>
                                                 <span className="mt-3 block font-display text-h2 leading-tight text-white">{offerHeadline(offer)}</span>
+                                                {saving > 0 && <span className="mt-1 block text-small text-white/70"><span className="line-through"><span className="sr-only">Worth </span>{formatPrice(worths.get(offer.id))}</span> of products, bought one by one</span>}
                                                 {offer.summary && <span className="mt-2 block text-small text-white/75">{offer.summary}</span>}
                                             </span>
                                             <span className="inline-flex items-center gap-2 text-small font-semibold text-accent">Shop this offer <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>

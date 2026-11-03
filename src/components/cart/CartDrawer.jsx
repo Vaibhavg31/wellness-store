@@ -9,6 +9,8 @@ import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { formatPrice } from '@/utils/formatPrice';
+import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
+import ClubSavings from '@/components/cart/ClubSavings';
 import { api, imageUrl } from '@/services/api';
 import { loginUrl } from '@/utils/authRedirect';
 
@@ -32,7 +34,7 @@ export default function CartDrawer() {
     const {
         items, isDrawerOpen, closeCartDrawer, updateQuantity, removeFromCart, removeOfferGroup, itemCount, subtotal,
         showFreeDeliveryUpsell, amountUntilFreeDelivery, freeDeliveryProgress,
-        couponCode, couponDetails, autoAppliedCoupon, applyCoupon, removeCoupon, isMember,
+        couponCode, couponDetails, autoAppliedCoupon, applyCoupon, removeCoupon,
     } = useCart();
     const { isAuthenticated } = useAuth();
     const { showToast, dismissAll } = useToast();
@@ -75,7 +77,7 @@ export default function CartDrawer() {
                                     <p className="line-clamp-2 text-small font-medium text-ink">{item.product.title}</p>
                                     {item.product.bundleTitle && <p className="mt-0.5 text-caption text-accent-ink">Part of {item.product.bundleTitle}</p>}
                                     {item.product.offerTitle && <p className="mt-0.5 text-caption text-accent-ink">{item.product.offerTitle}</p>}
-                                    {!item.product.offerId && !item.product.bundleId && isMember && item.product.memberPrice && item.product.price === item.product.memberPrice && <p className="mt-0.5 text-caption text-accent-ink">Chikit Club price</p>}
+                                    {isClubLine(item.product) && <p className="mt-0.5 text-caption text-accent-ink">{item.product.offerGroup ? 'Box priced at your Chikit Club prices' : 'Chikit Club price'}</p>}
                                     <div className="mt-2 flex items-center justify-between gap-2">
                                         {item.product.bundleId || item.product.offerGroup ? (
                                             <span className="text-caption text-muted">Qty {item.quantity}</span>
@@ -89,10 +91,7 @@ export default function CartDrawer() {
                                                 className="scale-90 origin-left"
                                             />
                                         )}
-                                        <span className="flex items-baseline gap-1.5">
-                                            {item.product.originalPrice > item.product.price && <span className="text-caption text-muted line-through">{formatPrice(item.product.originalPrice * item.quantity)}</span>}
-                                            <span className="text-small font-semibold text-ink">{formatPrice(item.product.price * item.quantity)}</span>
-                                        </span>
+                                        <CartLinePrice product={item.product} quantity={item.quantity} className="text-small" />
                                     </div>
                                 </div>
                                 {!item.product.bundleId && (
@@ -155,6 +154,8 @@ export default function CartDrawer() {
                                 </div>
                             </div>
                         )}
+
+                        <ClubSavings onNavigate={closeCartDrawer} />
 
                         <p className="flex items-baseline justify-between">
                             <span className="text-small text-muted">Subtotal</span>

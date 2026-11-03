@@ -99,7 +99,9 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
     // A signed-in club member sees (and pays) the member price; everyone else sees what joining would save.
     const memberView = Boolean(isMember && memberPrice);
     const price = memberView ? memberPrice : listPrice;
-    const originalPrice = memberView ? listPrice : (activeVariant ? activeVariant.originalPrice : product.originalPrice);
+    const originalPrice = activeVariant ? activeVariant.originalPrice : product.originalPrice;
+    // What the shopper saves against the highest price on show (the original price, or the usual price when there is no original).
+    const youSave = Math.max(0, Math.max(originalPrice || 0, listPrice) - price);
     const discount = memberView ? 0 : (activeVariant ? activeVariant.discount : product.discount);
     const stock = activeVariant ? activeVariant.stock : product.stock;
     const outOfStock = stock <= 0;
@@ -188,9 +190,9 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                         {product.reviewCount > 0 && <Rating value={product.rating} count={`${product.reviewCount} reviews`} className="mt-3" />}
 
                         <div className="mt-5 flex flex-wrap items-center gap-3 border-b border-line pb-6">
-                            <Price price={price} originalPrice={originalPrice} size="lg" />
+                            <Price price={listPrice} originalPrice={originalPrice} memberPrice={memberPrice} isMember={isMember} size="lg" />
                             {discount > 0 && <span className="rounded-full bg-primary-tint px-2.5 py-0.5 text-caption font-semibold text-primary-deep">{discount}% off</span>}
-                            {originalPrice > price && <span className="text-small font-medium text-success">You save {formatPrice(originalPrice - price)}</span>}
+                            {youSave > 0 && <span className="text-small font-medium text-success">You save {formatPrice(youSave)}</span>}
                             <ClubPrice memberPrice={memberPrice} className="py-1" />
                         </div>
 

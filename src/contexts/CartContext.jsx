@@ -5,7 +5,7 @@ import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { trackEvent } from '@/utils/analytics';
-import { bogoUnitPrice, mixUnitPrices } from '@/utils/pricing';
+import { bogoUnitPrice, mixBoxPricing, repriceMixBoxes } from '@/utils/pricing';
 
 const CartContext = createContext(null);
 const AUTO_SKIP_KEY = 'chikit-auto-coupon-skipped';
@@ -154,7 +154,8 @@ export function CartProvider({ children }) {
     // Sign in (or out) and the bag's plain lines switch to member (or normal) prices straight away.
     useEffect(() => {
         setItems((prev) => {
-            const next = prev.map((item) => ({ ...item, product: withMembership(item.product, isMember) }));
+            // Plain lines take (or lose) the Club price; a Pick & Mix box is re-priced as the better of box price and Club prices.
+            const next = repriceMixBoxes(prev.map((item) => ({ ...item, product: withMembership(item.product, isMember) })), isMember);
             return next.some((item, i) => item.product.price !== prev[i].product.price) ? next : prev;
         });
     }, [isMember, setItems]);
@@ -237,7 +238,8 @@ export function CartProvider({ children }) {
         const bases = rawProducts.map(resolveCartProduct);
         if (bases.length !== offer.pickCount || new Set(bases.map((b) => b.id)).size !== bases.length) return false;
         if (bases.some((b) => typeof b.stock === 'number' && b.stock < 1)) return false;
-        const units = mixUnitPrices(bases.map((b) => b.price), offer.price);
+        // A member pays the lower of the box price and the Club prices of the same products; a guest always pays the box price.
+        const { units, byClub } = mixBoxPricing(bases.map((b) => b.price), bases.map((b) => b.memberPrice), offer.price, isMember);
         const group = `box-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
         const lines = bases.map((base, i) => ({
             product: {
@@ -246,6 +248,9 @@ export function CartProvider({ children }) {
                 price: units[i],
                 originalPrice: Math.max(base.originalPrice || 0, base.price),
                 memberPrice: null,
+                clubAlt: base.memberPrice ?? null,
+                offerPrice: offer.price,
+                mixByClub: byClub,
                 offerId: offer.id,
                 offerGroup: group,
                 offerKind: 'mix_match',
@@ -259,7 +264,7 @@ export function CartProvider({ children }) {
         setCartPulse((n) => n + 1);
         lines.forEach(({ product }) => trackEvent('add_to_cart', { productId: product.id, value: product.price, qty: 1, label: 'mix_box', path: window.location.pathname }));
         return true;
-    }, [setItems]);
+    }, [setItems, isMember]);
 
     const removeOfferGroup = useCallback((offerGroup) => {
         setItems((prev) => prev.filter((item) => item.product.offerGroup !== offerGroup));

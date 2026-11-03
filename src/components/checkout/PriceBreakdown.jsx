@@ -3,6 +3,7 @@ import { formatPrice } from '@/utils/formatPrice';
 import { Truck } from 'lucide-react';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { deliveryWindow } from '@/utils/delivery';
+import ClubSavings from '@/components/cart/ClubSavings';
 
 export default function PriceBreakdown({ showUpsell = true, totalClassName = 'text-primary' }) {
     const {
@@ -24,6 +25,7 @@ export default function PriceBreakdown({ showUpsell = true, totalClassName = 'te
 
     return (
         <div className="space-y-3 text-sm sm:text-[15px]">
+            <ClubSavings />
             <div className="flex justify-between">
                 <span className="text-muted">Subtotal</span>
                 <span className="font-medium">{formatPrice(subtotal)}</span>

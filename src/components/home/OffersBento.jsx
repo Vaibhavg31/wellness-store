@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useOffers } from '@/hooks/useApi';
-import { maxSaving, offerPool } from '@/utils/offerPacks';
+import { maxSaving, mixWorth, offerPool } from '@/utils/offerPacks';
 import { imageUrl } from '@/services/api';
 import { formatPrice, cn } from '@/utils/formatPrice';
 
@@ -22,7 +22,7 @@ const TONES = {
 };
 
 /** The pictures that sit on an offer: up to three different products (the same product twice for Buy 1 Get 1), as light tiles that overlap. */
-function OfferPictures({ offer, products, className, tileClass, well }) {
+export function OfferPictures({ offer, products, className, tileClass, well }) {
     const pictures = useMemo(() => {
         const pool = offerPool(offer, products).filter((p) => p.images?.[0]);
         const chosen = offer.kind === 'bogo' ? (pool[0] ? [pool[0], pool[0]] : []) : pool.slice(0, 3);
@@ -43,6 +43,7 @@ function OfferTile({ offer, tone, products, size }) {
     const t = TONES[tone];
     const words = offerWords(offer);
     const saving = maxSaving(offer, products);
+    const worth = mixWorth(offer, products);
     const tileClass = size === 'lg' ? 'size-28 sm:size-44' : 'size-24 sm:size-36';
 
     return (
@@ -53,6 +54,12 @@ function OfferTile({ offer, tone, products, size }) {
                     {words.top}
                     {words.bottom && <span className="block">{words.bottom}</span>}
                 </p>
+                {saving > 0 && worth > offer.price && (
+                    <p className="mt-3 flex flex-wrap items-baseline gap-x-2 text-small">
+                        <span className="text-lead font-semibold line-through decoration-2 opacity-75"><span className="sr-only">Worth </span>{formatPrice(worth)}</span>
+                        <span className="opacity-80">of products, bought one by one</span>
+                    </p>
+                )}
             </div>
 
             <OfferPictures offer={offer} products={products} well={t.well} tileClass={tileClass} className="relative z-0 -mr-4 mt-3 justify-end sm:absolute sm:-right-8 sm:top-1/2 sm:mr-0 sm:mt-0 sm:-translate-y-[55%]" />

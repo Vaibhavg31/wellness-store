@@ -64,8 +64,6 @@ function ProductCard({ product, priority = false, action = true }) {
         showToast(wished ? 'Removed from wishlist' : 'Saved to wishlist', wished ? 'info' : 'success');
     };
 
-    const showPrice = isMember && product.memberPrice ? product.memberPrice : product.price;
-    const wasPrice = isMember && product.memberPrice ? product.price : product.originalPrice;
 
     return (
         <article className="group relative flex h-full flex-col">
@@ -116,7 +114,7 @@ function ProductCard({ product, priority = false, action = true }) {
                     </p>
                 )}
                 <div className="mt-auto pt-2">
-                    <Price price={showPrice} originalPrice={wasPrice} />
+                    <Price price={product.price} originalPrice={product.originalPrice} memberPrice={product.memberPrice} isMember={isMember} />
                     <ClubPrice memberPrice={product.memberPrice} compact className="relative z-10 mt-1.5" />
                 </div>
                 {action && (

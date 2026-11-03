@@ -22,7 +22,7 @@ import * as razorpay from '../services/razorpayService.js';
 import * as emailService from '../services/emailService.js';
 import { recordPurchase } from '../lib/analytics.js';
 import { clubConfig, memberPriceFor } from '../lib/club.js';
-import { bogoUnitPrice, mixUnitPrices, round2 } from '../lib/pricing.js';
+import { bogoUnitPrice, mixBoxPricing, round2 } from '../lib/pricing.js';
 
 const router = Router();
 const repo = new OrderRepository();
@@ -188,7 +188,8 @@ async function validatePaymentMethod(payment, items) {
 /**
  * Prices every bag line from the database (never from what the browser sent) and checks stock.
  * Lines can be priced four ways: a bundle's share, an offer page (Buy 1 Get 1 pairs, Pick & Mix boxes), the Chikit Club
- * member price (members only), or the plain price. Offers and the club price never stack on the same line.
+ * member price (members only), or the plain price. Offers and the club price never stack on the same line; a member's Pick & Mix
+ * box is priced the better of the box price and the Club prices of the same products (mixBoxPricing).
  */
 async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
     if (rawItems.length === 0) throw new HttpError('Cart is empty', 400);
@@ -251,6 +252,9 @@ async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
         }
 
         const listPrice = variant ? variant.price : Number(product.price || 0);
+        const memberUnit = variant
+            ? memberPriceFor({ price: variant.price, clubPrice: variant.clubPrice, eligible: product.clubEligible !== false }, club)
+            : product.memberPrice;
         let price = listPrice;
         let offerRef = null;
 
@@ -264,16 +268,13 @@ async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
                 if (qty !== 1) throw new HttpError(`Each product can be picked once in "${offer.title}"`, 400);
                 const key = `${offerId}|${String(line.offerGroup || 'box')}`;
                 if (!mixLines.has(key)) mixLines.set(key, []);
-                mixLines.get(key).push({ index: built.length, listPrice, offer, productId });
+                mixLines.get(key).push({ index: built.length, listPrice, memberUnit, offer, productId });
             } else {
                 throw new HttpError(`"${offer.title}" is not a pricing offer`, 400);
             }
             offerRef = offer;
         } else if (isMember) {
-            const member = variant
-                ? memberPriceFor({ price: variant.price, clubPrice: variant.clubPrice, eligible: product.clubEligible !== false }, club)
-                : product.memberPrice;
-            if (member) price = member;
+            if (memberUnit) price = memberUnit;
         }
 
         built.push({
@@ -289,8 +290,12 @@ async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
         const { offer } = group[0];
         if (group.length !== offer.pickCount) throw new HttpError(`Your "${offer.title}" box needs exactly ${offer.pickCount} different products`, 400);
         if (new Set(group.map((g) => g.productId)).size !== group.length) throw new HttpError('Each product can only be picked once in a box', 400);
-        const units = mixUnitPrices(group.map((g) => g.listPrice), offer.price);
-        group.forEach((g, i) => { built[g.index].price = units[i]; });
+        // A member pays the lower of the box price and the Club prices of the same products (see mixBoxPricing).
+        const { units, byClub } = mixBoxPricing(group.map((g) => g.listPrice), group.map((g) => g.memberUnit), offer.price, isMember);
+        group.forEach((g, i) => {
+            built[g.index].price = units[i];
+            if (byClub) built[g.index].offerTitle = club.cardName;
+        });
     }
 
     const subtotal = built.reduce((sum, item) => sum + item.price * item.quantity, 0);

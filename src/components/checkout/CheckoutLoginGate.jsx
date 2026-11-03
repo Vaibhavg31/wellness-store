@@ -5,6 +5,7 @@ import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl } from '@/services/api';
 import Button from '@/components/ui/Button';
 import { loginUrl } from '@/utils/authRedirect';
+import CartLinePrice from '@/components/cart/CartLinePrice';
 export default function CheckoutLoginGate() {
     const { items, total } = useCart();
     return (<div className="pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-canvas pt-2 sm:pt-4">
@@ -35,7 +36,7 @@ export default function CheckoutLoginGate() {
                     <p className="text-sm sm:text-[15px] text-ink line-clamp-1">{item.product.title}</p>
                     <p className="text-sm text-muted">Qty {item.quantity}</p>
                   </div>
-                  <p className="text-sm sm:text-[15px] font-medium">{formatPrice(item.product.price * item.quantity)}</p>
+                  <CartLinePrice product={item.product} quantity={item.quantity} className="shrink-0 text-sm sm:text-[15px]" />
                 </div>))}
               {items.length > 4 && (<p className="text-sm text-muted">+{items.length - 4} more items</p>)}
             </div>

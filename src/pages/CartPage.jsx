@@ -19,6 +19,7 @@ import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl } from '@/services/api';
 import { loginUrl } from '@/utils/authRedirect';
 import { humanizeSlug } from '@/utils/products';
+import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
 
 const removeButton = 'grid size-9 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-danger-tint hover:text-danger';
 
@@ -74,16 +75,14 @@ function LineEntry({ item, onRemove, onQuantity }) {
                     <div className="min-w-0">
                         <Link to={`/product/${product.id}`}><h3 className="line-clamp-2 font-sans text-body font-medium hover:text-primary">{product.title}</h3></Link>
                         <p className="mt-0.5 text-caption text-muted">{product.variantLabel || humanizeSlug(product.category)}</p>
-                        {product.offerTitle && <p className="mt-0.5 text-caption font-medium text-accent-ink">{product.offerTitle}</p>}
+                        {product.offerTitle && <p className="mt-0.5 text-caption font-medium text-accent-ink">{isClubLine(product) && product.offerGroup ? 'Box priced at your Chikit Club prices' : product.offerTitle}</p>}
+                        {isClubLine(product) && !product.offerGroup && <p className="mt-0.5 text-caption font-medium text-accent-ink">Chikit Club price</p>}
                     </div>
                     <button type="button" onClick={() => onRemove(product.id, product.title, product.variantId, product.offerId)} className={removeButton} aria-label={`Remove ${product.title}`}><Trash2 size={16} /></button>
                 </div>
                 <div className="mt-auto flex items-center justify-between gap-3 pt-3">
                     <QuantityStepper value={quantity} min={product.offerKind === 'bogo' ? 2 : 1} step={product.offerKind === 'bogo' ? 2 : 1} max={typeof product.stock === 'number' ? product.stock : 99} onChange={(q) => onQuantity(product.id, q, variant)} />
-                    <span className="flex items-baseline gap-2">
-                        {product.originalPrice > product.price && <span className="text-small text-muted line-through">{formatPrice(product.originalPrice * quantity)}</span>}
-                        <span className="font-semibold text-ink">{formatPrice(product.price * quantity)}</span>
-                    </span>
+                    <CartLinePrice product={product} quantity={quantity} className="text-body" />
                 </div>
             </div>
         </li>

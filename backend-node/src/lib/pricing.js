@@ -28,3 +28,22 @@ export function mixUnitPrices(listPrices, boxPrice) {
     });
     return units;
 }
+
+/**
+ * A Pick & Mix box for one shopper. Everyone pays the box price (or the plain total when that is lower). A Chikit Club member
+ * pays whichever is lower for them: the box price, or the Club prices of the same products bought one by one. An offer and a
+ * Club price never add up on one line, so a member is never worse off for opening the Club or for choosing the box.
+ * `memberPrices[i]` is that product's Club price, or null/0 when it has none. Returns the unit price of each line and which
+ * way it was priced. Mirrored in the storefront (src/utils/pricing.js); the server's answer is the one charged.
+ */
+export function mixBoxPricing(listPrices, memberPrices, boxPrice, isMember) {
+    const units = mixUnitPrices(listPrices, boxPrice);
+    const boxTotal = round2(units.reduce((sum, p) => sum + p, 0));
+    if (!isMember) return { units, byClub: false, boxTotal, clubTotal: null };
+    const clubUnits = listPrices.map((list, i) => {
+        const member = Number(memberPrices?.[i]) || 0;
+        return member > 0 && member < Number(list) ? member : Number(list);
+    });
+    const clubTotal = round2(clubUnits.reduce((sum, p) => sum + p, 0));
+    return clubTotal < boxTotal ? { units: clubUnits, byClub: true, boxTotal, clubTotal } : { units, byClub: false, boxTotal, clubTotal };
+}

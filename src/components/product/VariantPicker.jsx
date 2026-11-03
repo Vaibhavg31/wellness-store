@@ -47,11 +47,12 @@ export default function VariantPicker({ variants, activeId, onChange, productIma
                 {variants.map((v) => {
                     const active = v.id === activeId;
                     const soldOut = v.stock <= 0;
-                    const savings = v.originalPrice > v.price ? v.originalPrice - v.price : 0;
                     const perDay = estimateDailyCost(v.label, v.price);
                     const units = Math.max(1, v.units || 1);
                     const photo = imageUrl(v.image || productImage, 160);
-                    const shownPrice = isMember && v.memberPrice ? v.memberPrice : v.price;
+                    const member = Boolean(isMember && v.memberPrice && v.memberPrice < v.price);
+                    const shownPrice = member ? v.memberPrice : v.price;
+                    const savings = Math.max(0, Math.max(v.originalPrice || 0, v.price) - shownPrice);
                     const eachPrice = units > 1 ? shownPrice / units : 0;
                     return (
                         <button
@@ -75,8 +76,9 @@ export default function VariantPicker({ variants, activeId, onChange, productIma
                             </span>
                             <span className="mt-auto flex items-end justify-between gap-2 border-t border-line px-3 py-2.5 sm:flex-col sm:items-center sm:gap-0.5">
                                 <span className="flex flex-wrap items-baseline justify-center gap-x-1.5">
-                                    <span className="font-display text-h4">{formatPrice(shownPrice)}</span>
-                                    {(isMember && v.memberPrice ? v.price : v.originalPrice) > shownPrice && <span className="text-caption text-muted line-through">{formatPrice(isMember && v.memberPrice ? v.price : v.originalPrice)}</span>}
+                                    <span className={cn('inline-flex items-center gap-1 font-display text-h4', member && 'text-primary')}>{member && <Crown size={13} aria-label="Club price" />}{formatPrice(shownPrice)}</span>
+                                    {member && <span className="text-caption text-muted line-through">{formatPrice(v.price)}</span>}
+                                    {v.originalPrice > Math.max(v.price, shownPrice) && <span className="text-caption text-subtle line-through">{formatPrice(v.originalPrice)}</span>}
                                 </span>
                                 <span className="flex flex-col items-end gap-0.5 sm:items-center">
                                     {eachPrice > 0 && !soldOut && <span className="text-caption text-muted">{formatPrice(eachPrice)} each</span>}

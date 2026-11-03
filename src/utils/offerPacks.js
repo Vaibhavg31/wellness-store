@@ -26,10 +26,19 @@ export function stageProducts(offer, products, looks = {}) {
     return picked;
 }
 
-/** What a Pick & Mix box can save at most: the priciest N products against the box price. 0 when it cannot save. */
-export function maxSaving(offer, products) {
+/**
+ * What the products of a Pick & Mix box would cost bought one by one, at most: the priciest N products at their shop prices
+ * (the figure the saving is measured against). 0 when the shop has fewer than N products for it.
+ */
+export function mixWorth(offer, products) {
     if (offer?.kind !== 'mix_match') return 0;
     const prices = offerPool(offer, products).map((p) => p.price).sort((a, b) => b - a).slice(0, offer.pickCount);
     if (prices.length < offer.pickCount) return 0;
-    return Math.max(0, prices.reduce((s, p) => s + p, 0) - offer.price);
+    return prices.reduce((s, p) => s + p, 0);
+}
+
+/** What a Pick & Mix box can save at most: its worth against the box price. 0 when it cannot save. */
+export function maxSaving(offer, products) {
+    const worth = mixWorth(offer, products);
+    return worth > offer.price ? worth - offer.price : 0;
 }

@@ -27,6 +27,7 @@ import DeliveryAddressForm from '@/components/checkout/DeliveryAddressForm';
 import CouponInput from '@/components/checkout/CouponInput';
 import ActiveCoupons from '@/components/checkout/ActiveCoupons';
 import PriceBreakdown from '@/components/checkout/PriceBreakdown';
+import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
 
 const OTP_FLOW_KEY = 'chikit-checkout-otp-flow';
 const MAX_SAVED_ADDRESSES = 3;
@@ -658,9 +659,9 @@ export default function CheckoutPage() {
                                     <img src={imageUrl(item.product.images[0])} alt="" width="56" height="64" className="h-16 w-14 shrink-0 rounded-md object-cover" />
                                     <div className="min-w-0 flex-1">
                                         <p className="line-clamp-1 text-small text-ink">{item.product.title}</p>
-                                        <p className="text-small text-muted">Qty: {item.quantity}</p>
+                                        <p className="text-small text-muted">Qty: {item.quantity}{isClubLine(item.product) && <span className="ml-2 text-accent-ink">Club price</span>}</p>
                                     </div>
-                                    <p className="text-small font-medium">{formatPrice(item.product.price * item.quantity)}</p>
+                                    <CartLinePrice product={item.product} quantity={item.quantity} className="shrink-0 text-small" />
                                 </li>
                             ))}
                         </ul>

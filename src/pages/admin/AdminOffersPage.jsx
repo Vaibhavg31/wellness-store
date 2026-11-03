@@ -208,7 +208,7 @@ export default function AdminOffersPage() {
                                 <Input label="Products in a box" type="number" min="2" max="10" value={form.pickCount} onChange={(e) => set({ pickCount: e.target.value })} />
                             </div>
                             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.allProducts} onChange={(e) => set({ allProducts: e.target.checked })} /> Any product can go in the box</label>
-                            <p className="text-xs text-admin-muted">A product can be picked only once per box. If the chosen products would cost less than the box price, the shopper simply pays their normal total.</p>
+                            <p className="text-xs text-admin-muted">A product can be picked only once per box. If the chosen products would cost less than the box price, the shopper simply pays their normal total. The shop shows the box price against what the products cost one by one (struck through) on the offer poster and page, worked out from your live product prices. A Chikit Club member pays whichever is lower for them: the box price, or the Club prices of the same products. An offer never stacks on top of a Club price.</p>
                         </div>
                     )}
 

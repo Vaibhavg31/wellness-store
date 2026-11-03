@@ -5,13 +5,13 @@ import Seo, { SITE_URL } from '@/components/seo/Seo';
 import Button from '@/components/ui/Button';
 import ProductCard from '@/components/product/ProductCard';
 import MixBox from '@/components/offer/MixBox';
-import OfferStage from '@/components/offer/OfferStage';
+import { OfferPictures } from '@/components/home/OffersBento';
 import OffersShowcase, { ClubStrip } from '@/components/home/OffersShowcase';
 import { ProductGridSkeleton } from '@/components/shop/ProductGrid';
 import { useOffers, useProducts } from '@/hooks/useApi';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
-import { maxSaving } from '@/utils/offerPacks';
+import { maxSaving, mixWorth } from '@/utils/offerPacks';
 import { breadcrumbJsonLd } from '@/utils/seoSchema';
 import { formatPrice } from '@/utils/formatPrice';
 
@@ -80,7 +80,7 @@ function BogoTile({ offer, product }) {
                 <ProductCard product={product} action={false} />
                 <span className="pointer-events-none absolute left-2.5 top-11 z-10 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent shadow-sm">Buy 1 Get 1</span>
             </div>
-            <p className="text-center text-caption text-muted">Pay <strong className="text-ink">{formatPrice(product.price)}</strong> for 2</p>
+            <p className="text-center text-caption text-muted">Pay <strong className="text-ink">{formatPrice(product.price)}</strong> for 2 <span className="line-through"><span className="sr-only">Worth </span>{formatPrice(product.price * 2)}</span></p>
             <div className="mt-auto grid grid-cols-2 gap-2">
                 <Button variant="outline" size="sm" disabled={soldOut} onClick={() => add(false)}><ShoppingBag size={14} aria-hidden="true" /> Add 2</Button>
                 <Button size="sm" disabled={soldOut} onClick={() => add(true)}>Buy now</Button>
@@ -104,6 +104,7 @@ export function OfferPage() {
     }, [offer, products]);
 
     const saving = offer ? maxSaving(offer, products) : 0;
+    const worth = offer ? mixWorth(offer, products) : 0;
 
     if (!offersLoading && !offer) {
         return (
@@ -130,30 +131,31 @@ export function OfferPage() {
             )}
             <section className="relative isolate overflow-hidden bg-gradient-to-br from-primary-deep via-primary-deep to-primary-night text-white">
                 <div className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-primary/40 blur-3xl" aria-hidden="true" />
-                <div className="container-page relative grid items-center gap-6 py-8 lg:grid-cols-12 lg:gap-10 lg:py-12">
-                    <div className="lg:col-span-7">
-                        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-small text-white/70">
-                            <Link to="/" className="hover:text-white">Home</Link><span aria-hidden="true">/</span>
-                            <Link to="/offers" className="hover:text-white">Offers</Link><span aria-hidden="true">/</span>
-                            <span className="text-white">{offer?.title ?? '…'}</span>
-                        </nav>
-                        <p className="mt-6 text-caption font-semibold uppercase tracking-[0.18em] text-peach">{offer ? KIND_LABEL[offer.kind] : ''}</p>
-                        <h1 className="mt-3 text-white">{offer?.title ?? 'Loading…'}</h1>
-                        {offer?.summary && <p className="mt-3 max-w-xl text-lead text-white/75">{offer.summary}</p>}
-                        {offer?.kind === 'mix_match' && (
-                            <p className="mt-6 inline-flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-2xl bg-accent px-6 py-4 text-primary-deep shadow-lg">
+                <div className="container-page relative py-6 sm:py-8 lg:py-12">
+                    {offer && <OfferPictures offer={offer} products={products} well="bg-accent-tint" tileClass="size-40 xl:size-48" className="absolute right-6 top-1/2 hidden -translate-y-1/2 lg:flex xl:right-10" />}
+                    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-small text-white/70">
+                        <Link to="/" className="hover:text-white">Home</Link><span aria-hidden="true">/</span>
+                        <Link to="/offers" className="hover:text-white">Offers</Link><span aria-hidden="true">/</span>
+                        <span className="text-white">{offer?.title ?? '…'}</span>
+                    </nav>
+                    <p className="mt-4 text-caption font-semibold uppercase tracking-[0.18em] text-peach sm:mt-6">{offer ? KIND_LABEL[offer.kind] : ''}</p>
+                    <h1 className="mt-2 max-w-2xl text-balance text-white lg:max-w-[60%]">{offer?.title ?? 'Loading…'}</h1>
+                    {offer?.summary && <p className="mt-2 max-w-xl text-body text-white/75 sm:text-lead">{offer.summary}</p>}
+                    {offer?.kind === 'mix_match' && (
+                        <div className="mt-5 inline-flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-accent px-5 py-3.5 text-primary-deep shadow-lg sm:px-6 sm:py-4">
+                            <span className="flex items-baseline gap-2.5">
                                 <span className="font-display text-h2 leading-none">{formatPrice(offer.price)}</span>
-                                <span className="text-small font-medium">for any {offer.pickCount}, each product once</span>
-                                {saving > 0 && <span className="rounded-full bg-primary px-3 py-0.5 text-caption font-semibold text-white">Save up to {formatPrice(saving)}</span>}
-                            </p>
-                        )}
-                        {offer?.kind === 'bogo' && <p className="mt-6 inline-flex rounded-2xl bg-accent px-6 py-4 text-small font-medium text-primary-deep shadow-lg">Add a product and the second one is on us. You pay for one of the pair.</p>}
-                    </div>
-                    {offer && <OfferStage offer={offer} products={products} seal={false} className="h-60 sm:h-72 lg:col-span-5 lg:h-80" />}
+                                {worth > offer.price && <span className="text-lead font-semibold leading-none text-primary-deep/60 line-through decoration-2"><span className="sr-only">Worth </span>{formatPrice(worth)}</span>}
+                            </span>
+                            <span className="text-small font-medium">for any {offer.pickCount}, each product once</span>
+                            {saving > 0 && <span className="rounded-full bg-primary px-3 py-1 text-caption font-semibold text-white">Save up to {formatPrice(saving)}</span>}
+                        </div>
+                    )}
+                    {offer?.kind === 'bogo' && <p className="mt-5 inline-flex rounded-2xl bg-accent px-6 py-4 text-small font-medium text-primary-deep shadow-lg">Add a product and the second one is on us. You pay for one of the pair.</p>}
                 </div>
             </section>
             <div className="container-page py-8 lg:py-12">
-                {offer?.description && <p className="mb-8 max-w-2xl text-muted">{offer.description}</p>}
+                {offer?.description && offer.kind !== 'mix_match' && <p className="mb-8 max-w-2xl text-muted">{offer.description}</p>}
                 {loading && <ProductGridSkeleton />}
                 {!loading && offer?.kind === 'mix_match' && <MixBox offer={offer} products={eligible} />}
                 {!loading && offer?.kind === 'bogo' && (
