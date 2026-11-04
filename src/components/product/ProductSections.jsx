@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { Check, ChevronLeft, ChevronRight, ChevronDown, CircleHelp, FlaskConical, Leaf, ListChecks, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, CircleHelp, Leaf } from 'lucide-react';
 import { ReelVideo, ReelViewer } from '@/components/video/Reels';
 import { imageUrl } from '@/services/api';
 import { cn } from '@/utils/formatPrice';
@@ -43,80 +43,16 @@ export function HeroIngredients({ product }) {
     );
 }
 
-/** The product's photo in a round frame, used on the info panels. */
-function Photo({ product, className }) {
-    return <img src={imageUrl(product.images?.[0], 560)} alt="" width="280" height="280" loading="lazy" className={cn('aspect-square rounded-full border-4 border-surface bg-canvas-alt object-cover shadow-md', className)} />;
-}
-
-/**
- * Information banners so a shopper can read everything without hunting: pictures the admin uploaded for this product,
- * and (until there are any) panels written from the product's own benefits, steps and ingredients.
- */
+/** Information banners: the pictures the admin uploaded for this product. Nothing is generated, so a page never repeats what the tabs already say. */
 export function InfoBanners({ product }) {
     const uploaded = product.infoBanners ?? [];
-    const benefits = (product.features ?? []).slice(0, 4);
-    const steps = (product.howToUse ?? []).slice(0, 4);
-    const made = (product.ingredients ?? []).slice(0, 4);
-    if (uploaded.length === 0 && benefits.length === 0 && steps.length === 0 && made.length === 0) return null;
-
+    if (uploaded.length === 0) return null;
     return (
         <section aria-label="Product information" className="section bg-canvas-alt">
             <div className="container-page grid gap-5 lg:gap-6">
                 {uploaded.map((b) => (
                     <img key={b.image} src={imageUrl(b.image, 1400)} alt={b.alt || ''} loading="lazy" className="w-full rounded-xl object-cover shadow-sm" />
                 ))}
-                {uploaded.length === 0 && (
-                    <>
-                        {benefits.length > 0 && (
-                            <div className="grid items-center gap-6 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-tint via-surface to-accent-tint p-6 ring-1 ring-line sm:p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:p-12">
-                                <div className="flex justify-center"><Photo product={product} className="w-48 sm:w-60 lg:w-72" /></div>
-                                <div>
-                                    <p className="font-display text-h4 text-muted">How it</p>
-                                    <h2 className="font-display text-h2 text-primary">works</h2>
-                                    <ul className="mt-5 space-y-3">
-                                        {benefits.map((benefit) => (
-                                            <li key={benefit} className="flex items-center gap-3 rounded-xl bg-surface/80 px-4 py-3 text-body font-medium text-ink shadow-xs ring-1 ring-line">
-                                                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-white"><Check size={17} aria-hidden="true" /></span>
-                                                {benefit}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        )}
-                        {steps.length > 0 && (
-                            <div className="rounded-2xl bg-primary p-6 text-white sm:p-8 lg:p-12">
-                                <p className="eyebrow !text-accent-hover">Simple to follow</p>
-                                <h2 className="mt-1 font-display text-h2 text-white">Easy to consume</h2>
-                                <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                                    {steps.map((step, i) => (
-                                        <li key={step} className="rounded-xl bg-white/10 p-4 ring-1 ring-white/15">
-                                            <span className="grid size-8 place-items-center rounded-full bg-accent text-small font-bold text-ink">{i + 1}</span>
-                                            <p className="mt-3 text-small leading-relaxed text-white/95">{step}</p>
-                                        </li>
-                                    ))}
-                                </ol>
-                            </div>
-                        )}
-                        {made.length > 0 && (
-                            <div className="rounded-2xl bg-surface p-6 ring-1 ring-line sm:p-8 lg:p-10">
-                                <div className="flex items-center gap-3">
-                                    <span className="grid size-10 place-items-center rounded-full bg-accent-tint text-accent-ink"><FlaskConical size={20} aria-hidden="true" /></span>
-                                    <h2 className="font-display text-h3">Made with</h2>
-                                </div>
-                                <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                                    {made.map((item) => (
-                                        <li key={item.name} className="rounded-xl bg-canvas p-4">
-                                            <p className="flex items-center gap-2 font-semibold text-ink"><Sparkles size={15} className="text-accent-ink" aria-hidden="true" />{item.name}</p>
-                                            {item.benefit && <p className="mt-1 text-small text-muted">{item.benefit}</p>}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <p className="mt-5 flex items-center gap-2 text-small text-muted"><ListChecks size={16} className="text-success" aria-hidden="true" /> Lab tested, FSSAI licensed and free from artificial colours.</p>
-                            </div>
-                        )}
-                    </>
-                )}
             </div>
         </section>
     );

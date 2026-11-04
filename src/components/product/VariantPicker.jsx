@@ -36,14 +36,14 @@ function Bottles({ units, src, size }) {
 }
 
 /**
- * Pack options as cards: each shows its bottles, name, price (and member price), what is saved, and a ribbon such as
- * "Super Saver". One column of rows on a phone, three cards across on a wide screen.
+ * Pack options as cards in one horizontal row: each shows its bottles, name, price (and member price), what is saved, and a
+ * ribbon such as "Super Saver". Swipes sideways on a phone; fills the width on a wide screen.
  */
 export default function VariantPicker({ variants, activeId, onChange, productImage, isMember = false }) {
     return (
         <fieldset>
             <legend className="mb-3 text-small font-semibold text-ink">Choose your pack</legend>
-            <div className="grid gap-3 max-sm:gap-2.5 sm:grid-cols-3">
+            <div className={cn('flex snap-x snap-mandatory gap-2.5 overflow-x-auto scroll-pl-4 pb-1 scrollbar-none max-sm:-mx-4 max-sm:px-4 sm:grid sm:overflow-visible sm:pb-0', variants.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3')}>
                 {variants.map((v) => {
                     const active = v.id === activeId;
                     const soldOut = v.stock <= 0;
@@ -62,25 +62,25 @@ export default function VariantPicker({ variants, activeId, onChange, productIma
                             onClick={() => onChange(v.id)}
                             aria-pressed={active}
                             className={cn(
-                                'relative flex flex-col overflow-hidden rounded-lg border-2 bg-surface text-left transition-colors',
+                                'relative flex w-[44%] min-w-[9.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-lg border-2 bg-surface text-left transition-colors sm:w-auto sm:min-w-0 sm:shrink',
                                 active ? 'border-primary bg-primary-soft shadow-sm' : 'border-line hover:border-primary/50',
                                 soldOut && 'cursor-not-allowed opacity-50',
                             )}
                         >
-                            <span className="flex items-center gap-3 px-3 pb-2.5 pt-3 sm:flex-col sm:gap-2 sm:px-3 sm:pt-4">
+                            <span className="flex flex-col items-center gap-2 px-3 pb-2.5 pt-3 sm:pt-4">
                                 <Bottles units={units} src={photo} size={units > 3 ? 44 : 52} />
-                                <span className="min-w-0 sm:text-center">
+                                <span className="min-w-0 text-center">
                                     <span className={cn('block text-small font-semibold', active ? 'text-primary' : 'text-ink')}>{v.label}</span>
                                     {v.netQuantity && <span className="block text-caption text-muted">{v.netQuantity}</span>}
                                 </span>
                             </span>
-                            <span className="mt-auto flex items-end justify-between gap-2 border-t border-line px-3 py-2.5 sm:flex-col sm:items-center sm:gap-0.5">
+                            <span className="mt-auto flex flex-col items-center gap-0.5 border-t border-line px-3 py-2.5">
                                 <span className="flex flex-wrap items-baseline justify-center gap-x-1.5">
                                     <span className={cn('inline-flex items-center gap-1 font-display text-h4', member && 'text-primary')}>{member && <Crown size={13} aria-label="Club price" />}{formatPrice(shownPrice)}</span>
                                     {member && <span className="text-caption text-muted line-through">{formatPrice(v.price)}</span>}
                                     {v.originalPrice > Math.max(v.price, shownPrice) && <span className="text-caption text-subtle line-through">{formatPrice(v.originalPrice)}</span>}
                                 </span>
-                                <span className="flex flex-col items-end gap-0.5 sm:items-center">
+                                <span className="flex flex-col items-center gap-0.5 text-center">
                                     {eachPrice > 0 && !soldOut && <span className="text-caption text-muted">{formatPrice(eachPrice)} each</span>}
                                     {!eachPrice && perDay && !soldOut && <span className="text-caption text-muted">≈ {formatPrice(perDay)}/day</span>}
                                     {savings > 0 && !soldOut && <span className="text-caption font-semibold text-success">Save {formatPrice(savings)}</span>}

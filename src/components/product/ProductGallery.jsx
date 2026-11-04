@@ -10,7 +10,7 @@ const SWIPE_PX = 40;
 
 /**
  * Main image + thumbnails. On phones the photo is square (so the name and price stay near the first screen), swipes
- * left/right between photos and shows dots instead of the thumbnail row. Resets to the first image when `images` changes.
+ * left/right between photos; a row of thumbnails sits under the photo on every screen (tap one to switch). Resets to the first image when `images` changes.
  */
 export default function ProductGallery({ images, title, tags = [] }) {
     const [selected, setSelected] = useState(0);
@@ -38,7 +38,8 @@ export default function ProductGallery({ images, title, tags = [] }) {
     };
 
     return (
-        <div className="mx-auto min-w-0 lg:max-w-[min(100%,calc((100svh-13rem)*0.8))]">
+        <div className="mx-auto min-w-0 lg:flex lg:max-w-[min(100%,calc((100svh-13rem)*0.8+5.5rem))] lg:flex-row-reverse lg:items-start lg:gap-3">
+            <div className="min-w-0 lg:flex-1">
             <div
                 className="relative aspect-square cursor-zoom-in touch-pan-y overflow-hidden rounded-xl bg-canvas-alt sm:aspect-[4/5]"
                 onTouchStart={onTouchStart}
@@ -72,26 +73,13 @@ export default function ProductGallery({ images, title, tags = [] }) {
                 {count > 1 && (
                     <>
                         <p className="absolute right-3 top-3 rounded-full bg-surface/85 px-2.5 py-1 text-caption font-medium tabular-nums text-ink sm:hidden" aria-hidden="true">{selected + 1} / {count}</p>
-                        <div className="absolute inset-x-0 bottom-3 flex justify-center gap-1.5 sm:hidden">
-                            {images.map((img, i) => (
-                                <button
-                                    key={`${img}-${i}`}
-                                    type="button"
-                                    onClick={() => setSelected(i)}
-                                    aria-label={`View image ${i + 1}`}
-                                    aria-current={selected === i}
-                                    className="grid size-6 place-items-center"
-                                >
-                                    <span className={cn('block h-2 rounded-full transition-all', selected === i ? 'w-5 bg-primary' : 'w-2 bg-ink/25')} />
-                                </button>
-                            ))}
-                        </div>
                     </>
                 )}
             </div>
+            </div>
 
             {count > 1 && (
-                <ul className="mt-3 hidden gap-2.5 overflow-x-auto pb-1 scrollbar-none sm:flex">
+                <ul className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:gap-2.5 lg:mt-0 lg:max-h-[calc(100svh-13rem)] lg:flex-col lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0" aria-label="Product photos">
                     {images.map((img, i) => (
                         <li key={`${img}-${i}`} className="shrink-0">
                             <button
@@ -99,7 +87,7 @@ export default function ProductGallery({ images, title, tags = [] }) {
                                 onClick={() => setSelected(i)}
                                 aria-label={`View image ${i + 1}`}
                                 aria-current={selected === i}
-                                className={cn('size-16 overflow-hidden rounded-md border-2 transition-[border-color,opacity] sm:size-20', selected === i ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100')}
+                                className={cn('size-14 overflow-hidden rounded-md border-2 bg-canvas-alt transition-[border-color,opacity] sm:size-20 lg:size-[4.5rem]', selected === i ? 'border-primary' : 'border-line opacity-70 hover:opacity-100')}
                             >
                                 <img src={imageUrl(img, 160)} alt="" width="80" height="80" loading="lazy" className="size-full bg-canvas-alt object-contain mix-blend-multiply" />
                             </button>

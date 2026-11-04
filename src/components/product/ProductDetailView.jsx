@@ -87,7 +87,8 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
     const categoryLabel = categories.find((c) => c.slug === product.category)?.label ?? humanizeSlug(product.category);
 
     // Pack-size variants each carry their own price/stock; products without variants use their own values.
-    const variants = product.variants || [];
+    // Smallest pack first (by units, then price) so the row always reads left to right from least to most.
+    const variants = [...(product.variants || [])].sort((a, b) => (a.units || 1) - (b.units || 1) || a.price - b.price);
     const hasVariants = product.hasVariants && variants.length > 0;
     const activeVariant = hasVariants
         ? (variants.find((v) => v.id === selectedVariantId) || variants.find((v) => v.isDefault) || variants[0])
@@ -199,7 +200,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                         </div>
 
                         {hasVariants && (
-                            <div className="mt-8"><VariantPicker variants={variants} activeId={activeVariant?.id} onChange={setSelectedVariantId} productImage={product.images?.[0]} isMember={isMember} /></div>
+                            <div className="mt-5"><VariantPicker variants={variants} activeId={activeVariant?.id} onChange={setSelectedVariantId} productImage={product.images?.[0]} isMember={isMember} /></div>
                         )}
 
                         {outOfStock ? (
