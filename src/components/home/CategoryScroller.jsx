@@ -12,8 +12,9 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 /** One row of products that can be swiped (phone) or paged with the arrows (desktop). */
 function ProductRail({ products, label }) {
     const scroller = useRef(null);
-    // Up to four products fit one tidy grid (two across on a phone); more than that becomes a swipe row.
-    if (products.length <= 4) {
+    // One or two products sit in a tidy grid; three or more become a swipe row on every screen (on a wide screen up to four fit without scrolling,
+    // and the arrows appear only when there are more than that).
+    if (products.length <= 2) {
         return (
             <ul aria-label={label} className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-6">
                 {products.map((product) => <li key={product.id} className={cn('min-w-0', products.length === 1 && 'max-sm:col-span-2')}><ProductCard product={product} wide={products.length === 1} /></li>)}
