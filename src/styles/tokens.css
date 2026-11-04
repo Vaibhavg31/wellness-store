@@ -15,7 +15,6 @@
   --color-primary:        #602460;  /* buttons, links, headings accents, logo colour */
   --color-primary-hover:  #4E1C4E;  /* hover */
   --color-primary-deep:   #431A43;  /* active / pressed, dark bands, footer */
-  --color-footer:         #1D1D21;  /* the footer: a neutral charcoal, deliberately not the brand plum or beige */
   --color-primary-night:  #2B0F2B;  /* the deepest plum: the end of the gradient on feature bands (offers, club) */
   --color-primary-tint:   #F6EDF4;  /* selected, soft badges, icon wells */
   --color-primary-soft:   #FBF6FA;  /* faint hover wash */
