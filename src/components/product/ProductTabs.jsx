@@ -79,6 +79,15 @@ export default function ProductTabs({ product, reviews }) {
         const timer = setTimeout(() => rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 600);
         return () => clearTimeout(timer);
     }, []);
+    // The star rating near the price asks for the reviews: open that tab and bring it into view.
+    useEffect(() => {
+        const show = () => {
+            setActive('reviews');
+            requestAnimationFrame(() => rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        };
+        window.addEventListener('chikit:show-reviews', show);
+        return () => window.removeEventListener('chikit:show-reviews', show);
+    }, []);
     const baseId = useId();
 
     // Tabs appear only when the product actually has that content.

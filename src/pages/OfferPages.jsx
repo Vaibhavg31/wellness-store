@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { BadgePercent, Gift, ShoppingBag, ShoppingCart, Package } from 'lucide-react';
+import { BadgePercent, Gift, Minus, Package, Plus, ShoppingBag, ShoppingCart } from 'lucide-react';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
 import Button from '@/components/ui/Button';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -10,7 +10,7 @@ import { OfferPictures } from '@/components/home/OffersBento';
 import OffersShowcase, { ClubStrip } from '@/components/home/OffersShowcase';
 import { ProductGridSkeleton } from '@/components/shop/ProductGrid';
 import { useOffers, useProducts } from '@/hooks/useApi';
-import { useCart } from '@/contexts/CartContext';
+import { MAX_PER_ITEM, useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
 import { breadcrumbJsonLd } from '@/utils/seoSchema';
 import { formatPrice } from '@/utils/formatPrice';
@@ -65,18 +65,16 @@ export function OffersHubPage() {
  * "Buy 1 + 1 FREE" and the shopper pays for one. (Under the hood the pair is two units, each priced at half.)
  */
 function BogoTile({ offer, product }) {
-    const { addBogoPair, items, openCartDrawer } = useCart();
+    const { addBogoPair, items, updateQuantity } = useCart();
     const { showToast } = useToast();
     const soldOut = typeof product.stock === 'number' && product.stock < 2;
-    const inBag = items.find((i) => i.product.offerId === offer.id && i.product.id === product.id)?.quantity ?? 0;
+    const line = items.find((i) => i.product.offerId === offer.id && i.product.id === product.id);
+    const sets = (line?.quantity ?? 0) / 2;
+    const maxSets = Math.floor(Math.min(typeof product.stock === 'number' ? product.stock : 99, MAX_PER_ITEM * 2) / 2);
     const add = () => {
-        if (addBogoPair(offer, product)) {
-            showToast(`${product.title}: your free one is added too`, 'success');
-            openCartDrawer();
-        } else {
-            showToast('Sorry, there is not enough stock for another free one', 'error');
-        }
+        if (!addBogoPair(offer, product)) showToast(`You can order up to ${maxSets} of these`, 'error');
     };
+    const change = (next) => updateQuantity(product.id, next * 2, { variantId: line?.product.variantId, offerId: offer.id });
     return (
         <div className="flex h-full flex-col gap-3">
             <div className="relative">
@@ -84,8 +82,18 @@ function BogoTile({ offer, product }) {
                 <span className="pointer-events-none absolute left-2.5 top-11 z-10 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent shadow-sm">Buy 1 Get 1 FREE</span>
             </div>
             <p className="text-center text-small font-medium text-success">{soldOut ? 'Sold out' : 'Add one, get the second free'}</p>
-            {inBag > 0 && <p className="-mt-1 text-center text-caption font-semibold text-ink">In your bag: Buy {inBag / 2} + {inBag / 2} FREE</p>}
-            <Button size="sm" className="mt-auto w-full" disabled={soldOut} onClick={add}><ShoppingBag size={14} aria-hidden="true" /> Add to bag</Button>
+            {sets > 0 ? (
+                <div className="mt-auto">
+                    <div className="flex h-10 w-full items-center justify-between rounded-full bg-primary text-white" role="group" aria-label="Sets in your bag">
+                        <button type="button" onClick={() => change(sets - 1)} className="grid size-10 place-items-center rounded-full hover:bg-white/15" aria-label={sets === 1 ? 'Remove from bag' : 'Decrease quantity'}><Minus size={16} aria-hidden="true" /></button>
+                        <span className="text-small font-semibold tabular-nums" aria-live="polite">{sets}</span>
+                        <button type="button" onClick={() => change(sets + 1)} disabled={sets >= maxSets} className="grid size-10 place-items-center rounded-full hover:bg-white/15 disabled:opacity-40 disabled:hover:bg-transparent" aria-label="Increase quantity"><Plus size={16} aria-hidden="true" /></button>
+                    </div>
+                    <p className="mt-1.5 text-center text-caption font-semibold text-success">Buy {sets} + {sets} FREE in your bag</p>
+                </div>
+            ) : (
+                <Button size="sm" className="mt-auto w-full" disabled={soldOut} onClick={add}><ShoppingBag size={14} aria-hidden="true" /> Add to bag</Button>
+            )}
         </div>
     );
 }

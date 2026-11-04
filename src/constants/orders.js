@@ -47,10 +47,13 @@ export function normalizeStatus(status) {
     return LEGACY_STATUS_ALIASES[status] || status;
 }
 
+/** Where a customer's return request stands (orders.return_status). */
+export const RETURN_STATUS_LABELS = { requested: 'Return requested', approved: 'Return approved', rejected: 'Return declined', received: 'Return received' };
+
 export function getStatusLabel(status, audience = 'admin') {
     const normalized = normalizeStatus(status);
     const found = ORDER_STATUSES.find((s) => s.value === normalized);
-    if (!found) return status;
+    if (!found) return RETURN_STATUS_LABELS[String(status).replace(/^return_/, '')] ?? status;
     return audience === 'user' ? found.userLabel : found.adminLabel;
 }
 

@@ -113,6 +113,15 @@ const COLUMNS = [
     ['order_items', 'offer_title', 'VARCHAR(160) NULL'],
     // When the after-delivery review request email went out (lib/reviewRequests.js), so it is sent once.
     ['orders', 'review_request_sent_at', 'DATETIME NULL'],
+    // Why an order was cancelled, and a return the customer asked for (see lib/orderReasons.js and the order routes).
+    ['orders', 'cancel_reason', 'VARCHAR(100) NULL'],
+    ['orders', 'cancel_note', 'VARCHAR(500) NULL'],
+    ['orders', 'cancelled_by', 'VARCHAR(20) NULL'],
+    ['orders', 'return_status', 'VARCHAR(20) NULL'],
+    ['orders', 'return_reason', 'VARCHAR(100) NULL'],
+    ['orders', 'return_note', 'VARCHAR(500) NULL'],
+    ['orders', 'return_requested_at', 'DATETIME(6) NULL'],
+    ['orders', 'return_resolved_at', 'DATETIME(6) NULL'],
 ];
 
 async function hasTable(pool, table) {

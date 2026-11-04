@@ -11,6 +11,7 @@ import CheckoutInlineOtp, { normalizeCheckoutPhone } from '@/components/checkout
 import { useAuth } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import ClubPriceTile from '@/components/club/ClubPriceTile';
+import { celebrate } from '@/utils/celebrate';
 import { useProducts } from '@/hooks/useApi';
 import { clubExamples } from '@/utils/clubExamples';
 import { api } from '@/services/api';
@@ -298,7 +299,7 @@ export default function ClubPage() {
 
     const onPhoneDone = (phone) => { updateUser({ phone, phoneVerified: true }); setStatus((s) => (s ? { ...s, phone, needs: { ...s.needs, phone: false } } : s)); setStep(1); };
     const onEmailDone = () => { updateUser({ emailVerified: true }); setStatus((s) => (s ? { ...s, needs: { ...s.needs, email: false } } : s)); setStep(2); };
-    const onJoined = (profile) => { updateUser(profile); setJustJoined(true); load(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    const onJoined = (profile) => { updateUser(profile); setJustJoined(true); celebrate({ pieces: 220 }); load(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
     const benefits = club.benefits ?? [];
     const since = user?.club?.joinedAt ? new Date(user.club.joinedAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '';

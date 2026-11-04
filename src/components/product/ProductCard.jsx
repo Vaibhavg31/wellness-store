@@ -1,13 +1,14 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Heart, ShoppingBag, Star } from 'lucide-react';
+import { Heart, Star } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import FadeImage from '@/components/ui/FadeImage';
 import Price from '@/components/ui/Price';
 import ClubPrice from '@/components/product/ClubPrice';
+import AddToBag from '@/components/product/AddToBag';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
-import { useToast, showCartToast } from '@/contexts/ToastContext';
+import { useToast } from '@/contexts/ToastContext';
 import { imageUrl } from '@/services/api';
 import { cn } from '@/utils/formatPrice';
 
@@ -38,27 +39,13 @@ function oneLiner(product) {
  * right) on a phone, for a row that holds a single product, so it fills the row instead of leaving half of it empty.
  */
 function ProductCard({ product, priority = false, action = true, wide = false }) {
-    const { addToCart, isMember } = useCart();
+    const { isMember } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { showToast } = useToast();
-    const [added, setAdded] = useState(false);
 
     const wished = isInWishlist(product.id);
-    const outOfStock = typeof product.stock === 'number' && product.stock <= 0;
     const [primary, secondary] = product.images ?? [];
     const href = `/product/${product.id}`;
-
-    const handleAdd = () => {
-        if (outOfStock) return showToast('Out of stock', 'error');
-        if (addToCart(product)) {
-            showCartToast(showToast, product);
-            setAdded(true);
-            setTimeout(() => setAdded(false), 1800);
-        } else {
-            showToast('You already have the maximum available quantity in your bag', 'error');
-        }
-        return undefined;
-    };
 
     const handleWishlist = () => {
         toggleWishlist(product);
@@ -118,23 +105,7 @@ function ProductCard({ product, priority = false, action = true, wide = false })
                     <Price price={product.price} originalPrice={product.originalPrice} memberPrice={product.memberPrice} isMember={isMember} />
                     <ClubPrice memberPrice={product.memberPrice} compact className="relative z-10 mt-1.5" />
                 </div>
-                {action && (
-                    <button
-                        type="button"
-                        onClick={handleAdd}
-                        disabled={outOfStock || added}
-                        aria-label={outOfStock ? `${product.title} is sold out` : `Add ${product.title} to bag`}
-                        className={cn(
-                            'relative z-10 mt-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border text-small font-semibold transition-colors',
-                            added ? 'border-success bg-success text-white' : 'border-primary/40 text-primary hover:border-primary hover:bg-primary hover:text-white',
-                            'disabled:cursor-not-allowed',
-                            outOfStock && 'border-line-strong text-subtle hover:bg-transparent hover:text-subtle',
-                        )}
-                    >
-                        {added ? <Check size={16} aria-hidden="true" /> : <ShoppingBag size={16} aria-hidden="true" />}
-                        {outOfStock ? 'Sold out' : added ? 'Added' : 'Add to bag'}
-                    </button>
-                )}
+                {action && <AddToBag product={product} className="mt-3" />}
             </div>
         </article>
     );

@@ -266,6 +266,8 @@ export const DEFAULT_SITE_CONTENT = {
             benefits: ['Member prices on most products', 'Early access to new launches', 'Birthday surprise from Chikit'],
             showPrices: true, // show real products with their usual and Chikit Club price (home band and the Club page)
             priceCount: 8, // how many of them
+            birthdayMessage: 'Wishing you a year of good health and good days. Thank you for being part of the Chikit Club.',
+            birthdayCode: '', // optional gift code for the birthday greeting (a hidden coupon)
         },
         // Text for sections that fall back to the built-in suggestions in src/data/*.js while these are empty
         routines: { title: '', description: '', goals: [] },

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Crown, Heart, Share2, ShoppingBag } from 'lucide-react';
+import { Crown, Heart, Share2, ShoppingBag, Star } from 'lucide-react';
 import ProductGallery from '@/components/product/ProductGallery';
 import VariantPicker from '@/components/product/VariantPicker';
 import ProductTabs from '@/components/product/ProductTabs';
 import ReviewForm from '@/components/product/ReviewForm';
 import ProductCard from '@/components/product/ProductCard';
+import AddToBag from '@/components/product/AddToBag';
 import BundleCard from '@/components/product/BundleCard';
 import RecentlyViewed from '@/components/product/RecentlyViewed';
 import DeliveryCheck from '@/components/product/DeliveryCheck';
@@ -16,8 +17,6 @@ import { HeroIngredients, InfoBanners, ProductFaq, ProductVideos } from '@/compo
 import { Banner } from '@/components/home/BannerSection';
 import Button from '@/components/ui/Button';
 import Price from '@/components/ui/Price';
-import Rating from '@/components/ui/Rating';
-import QuantityStepper from '@/components/ui/QuantityStepper';
 import SectionHeader from '@/components/ui/SectionHeader';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
@@ -31,7 +30,7 @@ import { copyText } from '@/utils/copyText';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
-import { useToast, showCartToast } from '@/contexts/ToastContext';
+import { useToast } from '@/contexts/ToastContext';
 import { useBundles, useCategories, useProducts } from '@/hooks/useApi';
 import { recordProductView } from '@/hooks/useRecentlyViewed';
 
@@ -40,27 +39,46 @@ import { recordProductView } from '@/hooks/useRecentlyViewed';
  * so what the admin sees is exactly what shoppers get. In `preview` mode nothing is recorded or changed: no search
  * tags, no recently-viewed entry, no cart / wishlist changes, no review posting.
  */
+/**
+ * The star rating under the product name: the average (4.5) and how many reviews it comes from. Tapping it opens the Reviews tab and scrolls
+ * straight to the reviews; with none yet it takes the shopper to the review form instead.
+ */
+function RatingLink({ rating, count }) {
+    const go = () => {
+        if (count > 0) window.dispatchEvent(new Event('chikit:show-reviews'));
+        else document.getElementById('write-review')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    return (
+        <button type="button" onClick={go} className="group mt-3 inline-flex min-h-9 items-center gap-2.5 text-left" aria-label={count > 0 ? `Rated ${Number(rating).toFixed(1)} out of 5 from ${count} reviews. See the reviews` : 'No reviews yet. Write the first review'}>
+            {count > 0 ? (
+                <>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-success px-2 py-1 text-small font-semibold leading-none text-white">{Number(rating).toFixed(1)} <Star size={13} strokeWidth={0} className="fill-white" aria-hidden="true" /></span>
+                    <span className="text-small font-medium text-ink underline-offset-4 group-hover:underline">{count} {count === 1 ? 'review' : 'reviews'}</span>
+                </>
+            ) : (
+                <span className="text-small text-muted underline-offset-4 group-hover:text-primary group-hover:underline">No reviews yet. Be the first to review</span>
+            )}
+        </button>
+    );
+}
+
 export default function ProductDetailView({ product, reviews = [], refetchReviews = () => {}, productBanners = [], preview = false }) {
     const { products } = useProducts();
     const { bundles } = useBundles();
     const { categories } = useCategories();
-    const { addToCart, isMember } = useCart();
+    const { isMember } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { showToast } = useToast();
     const { content } = useSiteContent();
 
     const [selectedVariantId, setSelectedVariantId] = useState(null);
-    const [quantity, setQuantity] = useState(1);
     const [showMobileBar, setShowMobileBar] = useState(false);
     const buyBoxRef = useRef(null);
 
     useEffect(() => {
-        setQuantity(1);
         const variants = product?.variants;
         setSelectedVariantId(variants?.length ? (variants.find((v) => v.isDefault) || variants[0]).id : null);
     }, [product?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(() => setQuantity(1), [selectedVariantId]);
 
     // Recorded once per product, not on every variant change while comparing pack sizes.
     useEffect(() => {
@@ -132,13 +150,10 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
         showToast((await copyText(url)) ? 'Link copied' : url, 'success');
     };
 
-    const handleAddToCart = () => {
-        if (preview) return previewOnly();
-        if (outOfStock) return showToast('This item is out of stock', 'error');
-        if (addToCart(cartProduct, quantity)) showCartToast(showToast, cartProduct);
-        else showToast('You already have the maximum available quantity in your bag', 'error');
-        return undefined;
-    };
+    // The one buying button: Add to bag, which turns into a quantity stepper once the product is in the bag. A draft preview adds nothing.
+    const buyButton = (size) => (preview
+        ? <Button size="lg" className="w-full" disabled={outOfStock} onClick={previewOnly}><ShoppingBag size={18} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add to bag'}</Button>
+        : <AddToBag product={cartProduct} size={size} />);
 
     const handleWishlist = () => {
         if (preview) return previewOnly();
@@ -179,7 +194,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                     <div>
                         <p className="eyebrow mb-2">{categoryLabel}</p>
                         <h1 className="text-h2">{product.title}</h1>
-                        {product.reviewCount > 0 && <Rating value={product.rating} count={`${product.reviewCount} reviews`} className="mt-3" />}
+                        <RatingLink rating={product.rating} count={product.reviewCount || reviews.length} />
 
                         <div className="mt-5 flex flex-wrap items-center gap-3 border-b border-line pb-6">
                             <Price price={listPrice} originalPrice={originalPrice} memberPrice={memberPrice} isMember={isMember} size="lg" />
@@ -197,7 +212,6 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                         ) : stock <= 5 && <p className="mt-6 font-medium text-warning">Only {stock} left in stock</p>}
 
                         <div className="mt-6 flex items-center gap-3">
-                            <QuantityStepper value={quantity} onChange={setQuantity} max={Math.max(1, stock || 1)} />
                             <button
                                 type="button"
                                 onClick={handleWishlist}
@@ -213,7 +227,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                         </div>
 
                         <div ref={buyBoxRef} className="mt-4">
-                            <Button size="lg" className="w-full" disabled={outOfStock} onClick={handleAddToCart}><ShoppingBag size={18} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add to bag'}</Button>
+                            {buyButton('large')}
                         </div>
                         <PaymentAssurance className="mt-4" />
                     </div>
@@ -257,7 +271,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                 </section>
             )}
 
-            <section className="section">
+            <section id="write-review" className="section scroll-mt-24">
                 <div className="container-page" inert={preview || undefined}><ReviewForm product={product} onSubmitted={refetchReviews} /></div>
             </section>
 
@@ -281,7 +295,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                             <p className="truncate text-caption text-muted">{product.title}{activeVariant ? ` — ${activeVariant.label}` : ''}</p>
                             <p className="flex items-center gap-1 font-display text-h4 text-primary">{memberView && <Crown size={14} aria-label="Chikit Club price" />}{formatPrice(price)}</p>
                         </div>
-                        <Button disabled={outOfStock} onClick={handleAddToCart} className="shrink-0 px-6"><ShoppingBag size={17} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add to bag'}</Button>
+                        <div className="w-44 shrink-0">{buyButton('card')}</div>
                     </div>
                 </div>
             )}

@@ -90,6 +90,11 @@ export default function AdminClubPage() {
                     <label className="flex items-center gap-2 self-end pb-2 text-sm"><input type="checkbox" checked={club.showPrices !== false} onChange={(e) => setClub({ ...club, showPrices: e.target.checked })} /> Show products with their usual and Club price (home page band and the Club page)</label>
                     {club.showPrices !== false && <Input label="How many products to show" type="number" min="3" max="12" value={club.priceCount ?? 8} onChange={(e) => setClub({ ...club, priceCount: e.target.value })} />}
                 </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <Input label="Birthday greeting" value={club.birthdayMessage ?? ''} maxLength={200} onChange={(e) => setClub({ ...club, birthdayMessage: e.target.value })} />
+                    <Input label="Birthday gift code (optional)" value={club.birthdayCode ?? ''} maxLength={40} placeholder="A hidden coupon, e.g. BDAY20" onChange={(e) => setClub({ ...club, birthdayCode: e.target.value.toUpperCase() })} />
+                </div>
+                <p className="text-xs text-admin-muted">On a member&apos;s birthday the site greets them with confetti and this message. If you add a code, it is shown as their gift: create it in Coupons as a hidden code first.</p>
                 <p className="text-xs text-admin-muted">These are your best sellers that have a Club price, with the rupees the Club saves. No percentage is shown to shoppers.</p>
                 <div><Button variant="turmeric" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save club settings'}</Button></div>
             </AdminSection>

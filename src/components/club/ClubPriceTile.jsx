@@ -1,27 +1,39 @@
 import { Link } from 'react-router-dom';
-import { Crown, ShoppingBag } from 'lucide-react';
+import { Crown, Sparkles } from 'lucide-react';
 import { imageUrl } from '@/services/api';
-import { useCart } from '@/contexts/CartContext';
-import { useToast } from '@/contexts/ToastContext';
+import AddToBag from '@/components/product/AddToBag';
 import { formatPrice, cn } from '@/utils/formatPrice';
 
 /**
- * One product with its two prices side by side: the usual price and the Chikit Club price, and the rupees the Club saves.
- * A member sees the same tile worded as "Your price" and can add the product straight to the bag; anyone else gets a button
- * to join the Chikit Club instead (the member price only applies once they have joined).
+ * One product with its two prices, and the rupees the Chikit Club saves.
+ *  - A member gets the premium card: deep plum, their price large in beige, "You save ₹X", and Add to bag that turns into a quantity stepper.
+ *  - Anyone else sees the usual price against the Chikit Club price, and one button to join (the member price only applies once they have).
  * No percentage is quoted; the difference is shown in rupees.
  */
 export default function ClubPriceTile({ product, member = false, active = false, joinHref = '/club#join', className }) {
-    const { addToCart, openCartDrawer } = useCart();
-    const { showToast } = useToast();
     const saving = product.price - product.memberPrice;
-    const soldOut = typeof product.stock === 'number' && product.stock <= 0;
+    const joinClass = 'mt-3 inline-flex min-h-11 w-full items-center justify-center gap-1 whitespace-nowrap rounded-full bg-accent px-2 text-caption font-semibold text-primary-deep transition-colors hover:bg-accent-hover min-[420px]:gap-1.5 min-[420px]:text-small';
 
-    const add = () => {
-        if (addToCart(product, 1)) openCartDrawer();
-        else showToast('Sorry, this product is out of stock', 'error');
-    };
-    const buttonClass = 'mt-2 inline-flex min-h-11 w-full items-center justify-center gap-1 whitespace-nowrap rounded-full px-2 text-caption font-semibold transition-colors min-[420px]:gap-1.5 min-[420px]:text-small';
+    if (member) {
+        return (
+            <div className={cn('relative flex h-full flex-col overflow-hidden rounded-2xl bg-gradient-to-b from-primary-deep to-primary p-3 text-white shadow-md ring-1 ring-accent/50 transition-shadow hover:shadow-lg', active && 'ring-2 ring-accent', className)}>
+                <span className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-primary-deep/85 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-accent backdrop-blur"><Crown size={11} aria-hidden="true" /> Member</span>
+                <Link to={`/product/${product.id}`} className="group flex flex-1 flex-col">
+                    <span className="block aspect-square overflow-hidden rounded-xl bg-accent">
+                        <img src={imageUrl(product.images[0], 320)} alt="" width="240" height="240" loading="lazy" decoding="async" className="size-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105" />
+                    </span>
+                    <span className="mt-3 line-clamp-2 min-h-[2.5rem] text-small font-semibold leading-snug">{product.title}</span>
+                    <span className="mt-2 flex items-baseline gap-2">
+                        <span className="font-display text-h3 leading-none text-accent">{formatPrice(product.memberPrice)}</span>
+                        <span className="text-small text-white/60 line-through"><span className="sr-only">Usual price </span>{formatPrice(product.price)}</span>
+                    </span>
+                    <span className="mt-1 text-caption text-white/70">Your Chikit Club price</span>
+                    <span className="mt-2.5 inline-flex items-center justify-center gap-1.5 rounded-full bg-accent/15 px-2.5 py-1.5 text-center text-caption font-semibold text-accent ring-1 ring-accent/30"><Sparkles size={12} aria-hidden="true" /> You save {formatPrice(saving)}</span>
+                </Link>
+                <AddToBag product={product} tone="dark" className="mt-3" />
+            </div>
+        );
+    }
 
     return (
         <div className={cn('flex h-full flex-col overflow-hidden rounded-2xl bg-surface p-3 text-ink shadow-sm ring-2 transition-shadow hover:shadow-md', active ? 'ring-accent' : 'ring-transparent', className)}>
@@ -36,21 +48,15 @@ export default function ClubPriceTile({ product, member = false, active = false,
                         <span className="text-small text-muted line-through">{formatPrice(product.price)}</span>
                     </span>
                     <span className="flex items-center justify-between gap-2">
-                        <span className="inline-flex items-center gap-1 whitespace-nowrap text-caption font-semibold text-primary"><Crown size={12} aria-hidden="true" /> {member ? 'Your price' : 'Chikit Club'}</span>
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap text-caption font-semibold text-primary"><Crown size={12} aria-hidden="true" /> Chikit Club</span>
                         <span className="text-lead font-semibold leading-none text-primary">{formatPrice(product.memberPrice)}</span>
                     </span>
                 </span>
-                <span className="mt-2.5 rounded-full bg-success-tint px-2.5 py-1 text-center text-caption font-semibold text-success">{member ? 'You save' : 'Save'} {formatPrice(saving)}</span>
+                <span className="mt-2.5 rounded-full bg-success-tint px-2.5 py-1 text-center text-caption font-semibold text-success">Save {formatPrice(saving)}</span>
             </Link>
-            {member ? (
-                <button type="button" onClick={add} disabled={soldOut} className={cn(buttonClass, 'bg-primary text-white hover:bg-primary-hover disabled:bg-disabled disabled:text-subtle')}>
-                    <ShoppingBag size={15} aria-hidden="true" /> {soldOut ? 'Sold out' : 'Add to bag'}
-                </button>
-            ) : joinHref.startsWith('#') ? (
-                <a href={joinHref} className={cn(buttonClass, 'bg-accent text-primary-deep hover:bg-accent-hover')}><Crown size={15} className="text-primary" aria-hidden="true" /> Join Chikit Club</a>
-            ) : (
-                <Link to={joinHref} className={cn(buttonClass, 'bg-accent text-primary-deep hover:bg-accent-hover')}><Crown size={15} className="text-primary" aria-hidden="true" /> Join Chikit Club</Link>
-            )}
+            {joinHref.startsWith('#')
+                ? <a href={joinHref} className={joinClass}><Crown size={15} className="text-primary" aria-hidden="true" /> Join Chikit Club</a>
+                : <Link to={joinHref} className={joinClass}><Crown size={15} className="text-primary" aria-hidden="true" /> Join Chikit Club</Link>}
         </div>
     );
 }

@@ -4,9 +4,58 @@ import { ImageUploadField, VideoUploadField } from '@/components/admin/ContentEd
 import { activeConcerns } from '@/utils/concerns';
 import { WELL_SERIES } from '@/utils/wellRange';
 import { formatPrice } from '@/utils/formatPrice';
+import { videoSource } from '@/utils/videoEmbed';
 
 const addButton = 'inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary-soft px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary-tint';
 const removeButton = 'shrink-0 rounded-lg p-2.5 text-danger transition-colors hover:bg-danger-tint';
+
+const KIND_NAME = { youtube: 'YouTube video', instagram: 'Instagram post or reel', vimeo: 'Vimeo video', file: 'video file', link: 'link (opens in a new tab)' };
+
+/** One product video: either a file uploaded here, or a link someone pasted (a customer's own video on YouTube, Instagram or Vimeo). */
+function VideoSourceField({ video, onChange, adminToken }) {
+    const external = /^https?:\/\//i.test(video.url);
+    const mode = video._mode ?? (external ? 'link' : 'upload');
+    const found = videoSource(video.url);
+    const pick = (next) => { if (next !== mode) onChange({ _mode: next, url: '' }); };
+    const tab = (value, label) => (
+        <button
+            type="button"
+            role="radio"
+            aria-checked={mode === value}
+            onClick={() => pick(value)}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${mode === value ? 'bg-primary text-white' : 'text-admin-muted hover:text-ink'}`}
+        >
+            {label}
+        </button>
+    );
+    return (
+        <div className="space-y-2">
+            <div role="radiogroup" aria-label="Where the video comes from" className="inline-flex gap-1 rounded-lg border border-admin-border bg-admin-surface p-1">
+                {tab('upload', 'Upload a video')}
+                {tab('link', 'Paste a link')}
+            </div>
+            {mode === 'upload' ? (
+                <VideoUploadField label="Video" value={video.url} onChange={({ url }) => onChange({ url, _mode: 'upload' })} adminToken={adminToken} />
+            ) : (
+                <div>
+                    <FormLabel>Video link</FormLabel>
+                    <input
+                        type="url"
+                        inputMode="url"
+                        value={video.url}
+                        onChange={(e) => onChange({ url: e.target.value.trim(), _mode: 'link' })}
+                        className={fieldClass}
+                        placeholder="https://www.youtube.com/watch?v=… or an Instagram / Vimeo link"
+                    />
+                    <p className="mt-1.5 text-xs text-admin-muted">
+                        {found.kind !== 'none' ? `Found a ${KIND_NAME[found.kind]}. ` : ''}
+                        YouTube links show their own cover picture; for Instagram and Vimeo, add a cover picture below.
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+}
 
 /**
  * The newer product settings: which concerns it belongs to, its Chikit Club price, the videos shown under the questions
@@ -74,7 +123,7 @@ export default function ProductExtrasEditor({ form, update, siteContent, adminTo
             <OptionalSection
                 icon={Film}
                 title="Videos"
-                description="Short videos shown under the questions on the product page."
+                description="Videos shown under the questions on the product page: upload a file, or paste the link of a customer's video (YouTube, Instagram, Vimeo)."
                 enabled={form.videos.length > 0}
                 onToggle={(v) => update('videos', v ? [{ url: '', poster: '', title: '' }] : [])}
             >
@@ -85,7 +134,7 @@ export default function ProductExtrasEditor({ form, update, siteContent, adminTo
                                 <input value={v.title} onChange={(e) => setVideo(i, { title: e.target.value })} className={fieldClass} placeholder="Title (optional)" aria-label={`Video ${i + 1} title`} />
                                 <button type="button" className={removeButton} onClick={() => update('videos', form.videos.filter((_, x) => x !== i))} aria-label={`Remove video ${i + 1}`}><Trash2 size={15} /></button>
                             </div>
-                            <VideoUploadField label="Video" value={v.url} onChange={({ url }) => setVideo(i, { url })} adminToken={adminToken} />
+                            <VideoSourceField video={v} onChange={(patch) => setVideo(i, patch)} adminToken={adminToken} />
                             <ImageUploadField label="Cover picture" value={v.poster} onChange={(poster) => setVideo(i, { poster })} adminToken={adminToken} />
                         </div>
                     ))}

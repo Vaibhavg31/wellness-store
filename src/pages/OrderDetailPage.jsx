@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Copy, FileText, MapPin, MessageCircle, Package, Phone, RotateCcw, Sparkles, Star, Truck } from 'lucide-react';
+import { Copy, FileText, MapPin, MessageCircle, Package, Phone, RotateCcw, Sparkles, Star, Truck, Undo2, XCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
@@ -13,11 +13,12 @@ import SignInPrompt from '@/components/auth/SignInPrompt';
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import OrderJourney from '@/components/orders/OrderJourney';
 import OrderLineItems from '@/components/orders/OrderLineItems';
+import OrderReasonDialog, { useOrderReasons } from '@/components/orders/OrderReasonDialog';
 import { useWhatsApp } from '@/hooks/useWhatsApp';
 import { useCart } from '@/contexts/CartContext';
 import { useProducts } from '@/hooks/useApi';
 import { reorderItems, reorderSummaryMessage } from '@/utils/reorder';
-import { formatOrderDate, isTerminalStatus, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
+import { RETURN_STATUS_LABELS, formatOrderDate, isTerminalStatus, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
 import { useToast } from '@/contexts/ToastContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { deliveryWindow } from '@/utils/delivery';
@@ -37,6 +38,8 @@ export default function OrderDetailPage() {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [dialog, setDialog] = useState(null); // 'cancel' | 'return'
+    const rules = useOrderReasons();
 
     useEffect(() => {
         if (!isAuthenticated || !token || !id) {
@@ -79,6 +82,14 @@ export default function OrderDetailPage() {
     const delivered = normalizeStatus(order.status) === 'delivered';
     const shipping = order.shipping || {};
     const eta = !isTerminalStatus(order.status) ? deliveryWindow(content.extras.delivery, new Date(order.createdAt)) : null;
+    const status = normalizeStatus(order.status);
+    // Cancel until the parcel ships; ask for a return after delivery, within the return window.
+    const canCancel = ['placed', 'confirmed'].includes(status) || order.status === 'packed';
+    const windowDays = rules?.returnWindowDays ?? 7;
+    const deliveredEntry = [...(order.statusHistory || [])].reverse().find((h) => normalizeStatus(h.status) === 'delivered');
+    const deliveredOn = new Date(deliveredEntry?.at || order.updatedAt || order.createdAt).getTime();
+    const daysLeft = Math.ceil(windowDays - (Date.now() - deliveredOn) / 86400000);
+    const canReturn = delivered && !order.returnStatus && daysLeft > 0;
     const reviewable = delivered ? [...new Map(order.items.filter((i) => i.productId).map((i) => [i.productId, i])).values()] : [];
 
     return (
@@ -113,6 +124,30 @@ export default function OrderDetailPage() {
                 )}
 
                 <div className="mb-8"><OrderJourney order={order} /></div>
+
+                {status === 'cancelled' && (order.cancelReason || order.cancelledBy) && (
+                    <section className={`${card} mb-8`} aria-labelledby="order-cancelled">
+                        <h2 id="order-cancelled" className="mb-2 flex items-center gap-2 font-sans text-h4"><XCircle size={18} className="text-danger" aria-hidden="true" /> Cancelled</h2>
+                        <p className="text-small text-muted">{order.cancelledBy === 'customer' ? 'You cancelled this order.' : 'This order was cancelled by Chikit.'}{order.cancelReason ? <> Reason: <strong className="text-ink">{order.cancelReason}</strong>.</> : null}</p>
+                        {order.cancelNote && <p className="mt-1 text-small text-muted">“{order.cancelNote}”</p>}
+                        {order.payment === 'razorpay' && order.paymentStatus === 'paid' && (
+                            <p className="mt-3 rounded-lg bg-primary-soft px-3 py-2 text-small text-ink">{order.refundStatus === 'refunded' ? 'Your refund has been processed.' : 'Your refund is being processed. It reaches your original payment method in 5 to 7 working days.'}</p>
+                        )}
+                    </section>
+                )}
+
+                {order.returnStatus && (
+                    <section className={`${card} mb-8`} aria-labelledby="order-return">
+                        <h2 id="order-return" className="mb-2 flex items-center gap-2 font-sans text-h4"><Undo2 size={18} aria-hidden="true" /> {RETURN_STATUS_LABELS[order.returnStatus] ?? 'Return'}</h2>
+                        <p className="text-small text-muted">Reason: <strong className="text-ink">{order.returnReason}</strong>{order.returnNote ? ` (${order.returnNote})` : ''}</p>
+                        {(() => {
+                            const last = [...(order.statusHistory || [])].reverse().find((h) => h.status === `return_${order.returnStatus}`);
+                            return last?.note && order.returnStatus !== 'requested' ? <p className="mt-2 rounded-lg bg-canvas-alt px-3 py-2 text-small text-ink">Message from Chikit: {last.note}</p> : null;
+                        })()}
+                        {order.returnStatus === 'requested' && <p className="mt-2 text-small text-muted">We have your request and will get back to you soon.</p>}
+                        {order.returnStatus === 'rejected' && <p className="mt-2 text-small text-muted">Need to talk it through? Use “Need help?” below and we will sort it out.</p>}
+                    </section>
+                )}
 
                 {reviewable.length > 0 && (
                     <section className={`${card} mb-8`} aria-labelledby="order-review">
@@ -155,6 +190,14 @@ export default function OrderDetailPage() {
                     </section>
                 </div>
 
+                {(canCancel || canReturn) && (
+                    <section className={`${card} mb-8`} aria-labelledby="order-changes">
+                        <h2 id="order-changes" className="mb-1 font-sans text-h4">{canCancel ? 'Changed your mind?' : 'Something not right?'}</h2>
+                        <p className="mb-4 text-small text-muted">{canCancel ? 'You can cancel this order until it ships. Stock and any coupon you used are released straight away.' : `You can ask for a return within ${windowDays} days of delivery (${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} left).`}</p>
+                        <Button variant="outline" onClick={() => setDialog(canCancel ? 'cancel' : 'return')}>{canCancel ? <><XCircle size={16} aria-hidden="true" /> Cancel order</> : <><Undo2 size={16} aria-hidden="true" /> Return this order</>}</Button>
+                    </section>
+                )}
+
                 <div className="flex flex-col gap-3 sm:flex-row">
                     <Link to="/shop" className="flex-1"><Button className="w-full">Continue shopping</Button></Link>
                     <a href={getWhatsAppUrl(`Hi, I have a question about my order ${order.id}`)} target="_blank" rel="noopener noreferrer" className="flex-1">
@@ -163,6 +206,7 @@ export default function OrderDetailPage() {
                     <Button variant="outline" className="flex-1" onClick={() => openInvoice(order, content)}><FileText size={16} aria-hidden="true" /> Invoice</Button>
                 </div>
             </div>
+            <OrderReasonDialog mode={dialog || 'cancel'} order={order} token={token} isOpen={Boolean(dialog)} onClose={() => setDialog(null)} onDone={setOrder} showToast={showToast} />
         </div>
     );
 }

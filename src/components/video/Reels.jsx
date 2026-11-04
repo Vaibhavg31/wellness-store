@@ -9,6 +9,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useDialog } from '@/hooks/useDialog';
 import { usePresence } from '@/hooks/usePresence';
 import { imageUrl } from '@/services/api';
+import { videoSource } from '@/utils/videoEmbed';
 import { trackEvent } from '@/utils/analytics';
 import { cn } from '@/utils/formatPrice';
 
@@ -54,26 +55,30 @@ export function ReelProduct({ product, compact = false, onBuy }) {
 export function ReelVideo({ reel, onOpen, label }) {
     const ref = useRef(null);
     const [playing, setPlaying] = useState(false);
+    const source = videoSource(reel.videoUrl);
+    const cover = reel.poster ? imageUrl(reel.poster, 600) : source.thumb;
 
     useEffect(() => {
         const node = ref.current;
-        if (!node || !reel.videoUrl || reducedMotion() || dataSaver()) return undefined;
+        if (!node || source.kind !== 'file' || reducedMotion() || dataSaver()) return undefined;
         const observer = new IntersectionObserver(([entry]) => {
             if (entry.isIntersecting && entry.intersectionRatio >= 0.6) node.play().then(() => setPlaying(true)).catch(() => {});
             else { node.pause(); setPlaying(false); }
         }, { threshold: [0, 0.6, 1] });
         observer.observe(node);
         return () => observer.disconnect();
-    }, [reel.videoUrl]);
+    }, [reel.videoUrl, source.kind]);
 
     return (
         <button type="button" onClick={onOpen} aria-label={`Play: ${label}`} className="group relative block aspect-[9/16] w-full overflow-hidden rounded-xl bg-ink">
-            {reel.videoUrl ? (
+            {source.kind === 'file' ? (
                 <video ref={ref} className="absolute inset-0 size-full object-cover" muted loop playsInline preload="none" poster={reel.poster ? imageUrl(reel.poster, 600) : undefined}>
                     <source src={imageUrl(reel.videoUrl)} type={videoType(reel.videoUrl)} />
                 </video>
+            ) : cover ? (
+                <img src={cover} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
             ) : (
-                <img src={imageUrl(reel.poster, 600)} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-br from-primary-deep to-primary" aria-hidden="true" />
             )}
             <span className={cn('absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-ink/10 transition-opacity', playing && 'opacity-60')} aria-hidden="true" />
             <span className={cn('absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-primary shadow-md transition-opacity group-hover:opacity-100', playing ? 'opacity-0' : 'opacity-100')} aria-hidden="true">
@@ -98,15 +103,24 @@ export function ReelViewer({ reels, index, productFor, onIndex, onClose }) {
     }, [index, reels.length, onIndex]);
     if (!mounted || !reel) return null;
     const product = productFor(reel);
+    const source = videoSource(reel.videoUrl);
 
     return createPortal(
         <div className={cn('fixed inset-0 z-[100] flex items-center justify-center bg-ink/90 p-3', closing && 'pointer-events-none')} onClick={onClose}>
             <div ref={panelRef} role="dialog" aria-modal="true" aria-label={reel.title || 'Video'} tabIndex={-1} onClick={(e) => e.stopPropagation()} className={cn('relative flex max-h-[94dvh] w-full max-w-sm flex-col overflow-hidden rounded-2xl bg-surface shadow-lg focus:outline-none', closing ? 'animate-fade-down' : 'animate-fade-up')}>
                 <div className="relative min-h-0 flex-1 bg-ink">
-                    {reel.videoUrl ? (
+                    {source.kind === 'file' ? (
                         <video key={reel.id} className="mx-auto max-h-[68dvh] w-full object-contain" autoPlay loop playsInline controls poster={reel.poster ? imageUrl(reel.poster, 900) : undefined}>
                             <source src={imageUrl(reel.videoUrl)} type={videoType(reel.videoUrl)} />
                         </video>
+                    ) : source.embed ? (
+                        <div className={cn('mx-auto w-full', source.tall ? 'h-[68dvh]' : 'aspect-video')}>
+                            <iframe key={reel.id} src={source.embed(true)} title={reel.title || 'Video'} className="size-full border-0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />
+                        </div>
+                    ) : source.kind === 'link' ? (
+                        <div className="grid h-64 place-items-center px-6 text-center">
+                            <a href={source.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 text-small font-semibold text-primary-deep"><Play size={16} fill="currentColor" aria-hidden="true" /> Watch this video</a>
+                        </div>
                     ) : (
                         <img src={imageUrl(reel.poster, 900)} alt={reel.title} className="mx-auto max-h-[68dvh] w-full object-contain" />
                     )}

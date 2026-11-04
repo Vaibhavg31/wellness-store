@@ -23,6 +23,7 @@ import * as emailService from '../services/emailService.js';
 import { recordPurchase } from '../lib/analytics.js';
 import { clubConfig, memberPriceFor } from '../lib/club.js';
 import { bogoUnitPrice, mixBoxPricing, round2 } from '../lib/pricing.js';
+import { CANCEL_REASONS, CANCELLABLE_STATUSES, RETURN_REASONS, RETURN_WINDOW_DAYS, reasonLabel } from '../lib/orderReasons.js';
 
 const router = Router();
 const repo = new OrderRepository();
@@ -216,6 +217,8 @@ async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
         const qty = Number.parseInt(line.quantity ?? 0, 10);
 
         if (!productId || qty < 1) throw new HttpError('Each item needs a productId and quantity ≥ 1', 400);
+        // Nobody needs more than 9 of one item (a Buy 1 Get 1 line holds the free ones too, so 18). Bundles have their own fixed quantity.
+        if (!bundleId && qty > (offerId ? 18 : 9)) throw new HttpError(`You can order up to 9 of one item. Please lower the quantity.`, 400);
 
         const product = await products.getPublicById(productId);
         if (!product) throw new HttpError(`Product unavailable: ${productId}`, 400);
@@ -391,7 +394,7 @@ router.get('/orders/admin/export', asyncRoute(async (req, res) => {
 
     const headers = ['Order ID', 'Date', 'Status', 'Source', 'Customer Name', 'Email', 'Phone', 'City', 'State',
         'Pincode', 'Address', 'Items', 'Subtotal', 'Discount', 'Delivery Fee', 'Total', 'Revenue', 'Payment',
-        'Payment Status', 'Coupon', 'Tracking', 'Carrier', 'User ID'];
+        'Payment Status', 'Coupon', 'Tracking', 'Carrier', 'User ID', 'Cancel Reason', 'Return Status', 'Return Reason'];
 
     const rows = orders.map((order) => {
         const shipping = order.shipping || {};
@@ -403,6 +406,7 @@ router.get('/orders/admin/export', asyncRoute(async (req, res) => {
             String(order.subtotal || 0), String(order.discountAmount || 0), String(order.deliveryFee || 0), String(order.total || 0),
             String(revenueForOrder(order)), order.payment || '', order.paymentStatus || '', order.couponCode || '',
             order.trackingNumber || '', order.carrier || '', order.userId || '',
+            order.cancelReason || '', order.returnStatus || '', order.returnReason || '',
         ];
     });
 
@@ -470,6 +474,11 @@ router.post('/orders/admin/create-direct', asyncRoute(async (req, res) => {
     sendJson(res, enrichOrder(created), 201);
 }, 'Failed to create direct order'));
 
+/** The short lists the cancel / return forms offer, and the rules around them, so the storefront and admin never drift from the server. */
+router.get('/orders/reasons', asyncRoute(async (req, res) => {
+    sendJson(res, { cancel: CANCEL_REASONS, return: RETURN_REASONS, returnWindowDays: RETURN_WINDOW_DAYS, cancellableStatuses: CANCELLABLE_STATUSES });
+}, 'Failed to load reasons'));
+
 router.get('/orders/admin/:id', asyncRoute(async (req, res) => {
     requireAdmin(req);
     const order = await repo.getById(req.params.id);
@@ -502,6 +511,12 @@ router.put('/orders/:id/status', asyncRoute(async (req, res) => {
     }
 
     const changes = buildStatusChange(existing, status, note || null, 'admin');
+    if (status === 'cancelled' && prev !== 'cancelled') {
+        changes.cancelledBy = 'admin';
+        const picked = reasonLabel(CANCEL_REASONS, String(body.reason || ''));
+        if (picked) changes.cancelReason = picked;
+        if (note) changes.cancelNote = note.slice(0, 500);
+    }
     const updated = await repo.update(req.params.id, changes);
     if (updated && prev !== status) await dispatchOrderEmail(updated, status, prev);
 
@@ -702,6 +717,84 @@ router.post('/orders/track', asyncRoute(async (req, res) => {
 
     sendJson(res, publicTrackingView(order));
 }, 'Failed to look up order'));
+
+/** Reads { reason, note } from a request: a known reason id, and a note that "Other" must have. Returns { label, note }. */
+function readReason(body, list) {
+    const label = reasonLabel(list, String(body?.reason || ''));
+    if (!label) throw new HttpError('Please choose a reason.', 400);
+    const note = String(body?.note || '').trim().slice(0, 500);
+    if (body.reason === 'other' && note.length < 3) throw new HttpError('Please tell us a little more about the reason.', 400);
+    return { label, note };
+}
+
+function deliveredAt(order) {
+    const entries = (order.statusHistory ?? []).filter((h) => h.status === 'delivered');
+    return entries.length > 0 ? entries[entries.length - 1].at : order.updatedAt;
+}
+
+/** A customer cancels their own order, before it ships. Stock and the coupon come back; an online payment is flagged for refund. */
+router.post('/orders/:id/cancel', asyncRoute(async (req, res) => {
+    const payload = await requireCustomer(req);
+    const order = await repo.getById(req.params.id);
+    if (!order || order.userId !== payload.userId) return sendError(res, 'Order not found', 404);
+    if (order.status === 'cancelled') return sendError(res, 'This order is already cancelled.', 400);
+    if (!CANCELLABLE_STATUSES.includes(order.status)) return sendError(res, 'This order has already been shipped, so it can no longer be cancelled. You can ask for a return after it is delivered.', 400);
+    const { label, note } = readReason(req.body, CANCEL_REASONS);
+
+    await restoreStockForOrder(order);
+    await releaseCouponForOrder(order);
+    const changes = buildStatusChange(order, 'cancelled', `Cancelled by the customer: ${label}${note ? ` (${note})` : ''}`, 'customer');
+    changes.cancelReason = label;
+    changes.cancelNote = note || null;
+    changes.cancelledBy = 'customer';
+    if (order.payment === 'razorpay' && order.paymentStatus === 'paid' && !order.refundStatus) changes.refundStatus = 'pending';
+    const updated = await repo.update(order.id, changes);
+    if (updated) await dispatchOrderEmail(updated, 'cancelled', order.status);
+    sendJson(res, enrichOrder(updated));
+}, 'Failed to cancel order'));
+
+/** A customer asks to return a delivered order (within the return window). The shop then approves or declines it in Admin. */
+router.post('/orders/:id/return', asyncRoute(async (req, res) => {
+    const payload = await requireCustomer(req);
+    const order = await repo.getById(req.params.id);
+    if (!order || order.userId !== payload.userId) return sendError(res, 'Order not found', 404);
+    if (order.status !== 'delivered') return sendError(res, 'A return can be asked for once the order is delivered.', 400);
+    if (order.returnStatus) return sendError(res, 'A return has already been requested for this order.', 400);
+    const since = deliveredAt(order);
+    if (since && Date.now() - new Date(since).getTime() > RETURN_WINDOW_DAYS * 86_400_000) {
+        return sendError(res, `The ${RETURN_WINDOW_DAYS}-day return window for this order has passed.`, 400);
+    }
+    const { label, note } = readReason(req.body, RETURN_REASONS);
+
+    const now = new Date().toISOString();
+    const history = [...(order.statusHistory ?? []), { status: 'return_requested', at: now, by: 'customer', note: `${label}${note ? ` (${note})` : ''}` }];
+    const updated = await repo.update(order.id, {
+        returnStatus: 'requested', returnReason: label, returnNote: note || null, returnRequestedAt: now, statusHistory: history, updatedAt: now,
+    });
+    sendJson(res, enrichOrder(updated));
+}, 'Failed to request return'));
+
+/** Admin answers a return request: approve, decline (with a reason for the customer), or mark the parcel received (the order becomes Returned). */
+router.put('/orders/:id/return', asyncRoute(async (req, res) => {
+    requireAdmin(req);
+    const existing = await repo.getById(req.params.id);
+    if (!existing) return sendError(res, 'Order not found', 404);
+    if (!existing.returnStatus) return sendError(res, 'No return was requested for this order.', 400);
+    const action = String(req.body?.action || '');
+    const note = String(req.body?.note || '').trim().slice(0, 500);
+    const next = { approve: 'approved', reject: 'rejected', received: 'received' }[action];
+    if (!next) return sendError(res, 'action must be approve, reject or received', 400);
+    if (next === 'rejected' && note.length < 3) return sendError(res, 'Please tell the customer why the return is declined.', 400);
+
+    const now = new Date().toISOString();
+    const history = [...(existing.statusHistory ?? []), { status: `return_${next}`, at: now, by: 'admin', note }];
+    const changes = { returnStatus: next, returnResolvedAt: now, statusHistory: history, updatedAt: now };
+    if (next === 'received') {
+        Object.assign(changes, buildStatusChange({ ...existing, statusHistory: history }, 'returned', note || 'Return received', 'admin'));
+    }
+    const updated = await repo.update(existing.id, changes);
+    sendJson(res, enrichOrder(updated));
+}, 'Failed to update return'));
 
 router.post('/orders/cancel-pending', asyncRoute(async (req, res) => {
     const payload = await requireCustomer(req);

@@ -149,6 +149,8 @@ const DEFAULTS = {
             benefits: ['Member prices on most products', 'Early access to new launches', 'Birthday surprise from Chikit'],
             showPrices: true, // show real products with their usual and Club price (home band and the Club page)
             priceCount: 8, // how many of them
+            birthdayMessage: 'Wishing you a year of good health and good days. Thank you for being part of the Chikit Club.',
+            birthdayCode: '', // optional gift code for the birthday greeting (a hidden coupon)
         },
         // Homepage sections whose text used to live in code. Empty = the built-in suggestion is used.
         routines: { title: '', description: '', goals: [] },
@@ -321,6 +323,9 @@ function sanitizeExtras(input) {
             benefits: list(e.club?.benefits ?? d.club.benefits).map((b) => text(b, 100)).filter(Boolean).slice(0, 8),
             showPrices: e.club?.showPrices === undefined ? d.club.showPrices : Boolean(e.club.showPrices),
             priceCount: Math.min(12, Math.max(3, Number.parseInt(e.club?.priceCount ?? d.club.priceCount, 10) || d.club.priceCount)),
+            // Shown to a member on their birthday. The code is optional (a hidden coupon made in Admin → Coupons).
+            birthdayMessage: text(e.club?.birthdayMessage ?? d.club.birthdayMessage, 200),
+            birthdayCode: text(e.club?.birthdayCode ?? d.club.birthdayCode, 40).toUpperCase(),
         },
         popup: {
             categorySlug: String(e.popup?.categorySlug ?? '').trim().slice(0, 64),

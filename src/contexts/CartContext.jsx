@@ -14,10 +14,14 @@ const PENDING_COUPON_KEY = 'chikit-pending-coupon';
 /** The part of the bag a coupon can discount: regular-priced lines (not Buy 1 Get 1, Pick & Mix or bundle lines, which carry their own deal). */
 export const couponEligibleSubtotal = (items) => Math.round(items.filter(({ product }) => !product.bundleId && !product.offerId).reduce((sum, { product, quantity }) => sum + product.price * quantity, 0) * 100) / 100;
 
+/** The most of one item a shopper can put in the bag (a Buy 1 Get 1 line counts the free ones too, so it holds twice as many units). */
+export const MAX_PER_ITEM = 9;
+const capFor = (product) => (product?.offerKind === 'bogo' ? MAX_PER_ITEM * 2 : MAX_PER_ITEM);
+
 function maxQtyFor(product, requested) {
     const stock = typeof product?.stock === 'number' ? product.stock : Infinity;
     if (stock <= 0) return 0;
-    return Math.min(Math.max(0, requested), stock);
+    return Math.min(Math.max(0, requested), stock, capFor(product));
 }
 
 /**
@@ -225,7 +229,7 @@ export function CartProvider({ children }) {
         const prev = itemsRef.current;
         const existing = prev.find((item) => sameLine(item.product, product));
         const nextQty = (existing?.quantity ?? 0) + 2;
-        if (typeof product.stock === 'number' && nextQty > product.stock) return false;
+        if ((typeof product.stock === 'number' && nextQty > product.stock) || nextQty > capFor(product)) return false;
         const next = existing
             ? prev.map((item) => (sameLine(item.product, product) ? { ...item, quantity: nextQty } : item))
             : [...prev, { product, quantity: 2 }];
@@ -277,6 +281,13 @@ export function CartProvider({ children }) {
     const removeOfferGroup = useCallback((offerGroup) => {
         setItems((prev) => prev.filter((item) => item.product.offerGroup !== offerGroup));
     }, [setItems]);
+
+    /** The plain (not offer, not bundle) bag line for this product at its chosen pack size, if any. */
+    const plainLineFor = useCallback((rawProduct) => {
+        const p = resolveCartProduct(rawProduct);
+        return items.find((i) => sameLine(i.product, { ...p, bundleId: null, offerId: null, offerGroup: null })) ?? null;
+    }, [items]);
+    const quantityInBag = useCallback((rawProduct) => plainLineFor(rawProduct)?.quantity ?? 0, [plainLineFor]);
 
     const isBundleInCart = useCallback(
         (bundleId) => items.some((item) => item.product.bundleId === bundleId),
@@ -527,6 +538,8 @@ export function CartProvider({ children }) {
         addBundleToCart,
         removeBundleFromCart,
         isBundleInCart,
+        quantityInBag,
+        plainLineFor,
         addBogoPair,
         addMixBox,
         removeOfferGroup,
@@ -566,6 +579,8 @@ export function CartProvider({ children }) {
         addBundleToCart,
         removeBundleFromCart,
         isBundleInCart,
+        quantityInBag,
+        plainLineFor,
         addBogoPair,
         addMixBox,
         removeOfferGroup,

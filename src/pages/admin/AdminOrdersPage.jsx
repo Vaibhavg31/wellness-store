@@ -38,8 +38,10 @@ import {
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import OrderLineItems from '@/components/orders/OrderLineItems';
 import OrderTimeline from '@/components/orders/OrderTimeline';
+import { useOrderReasons } from '@/components/orders/OrderReasonDialog';
 import {
     ADMIN_STATUS_OPTIONS,
+    RETURN_STATUS_LABELS,
     formatOrderDate,
     getNextStatus,
     getStatusLabel,
@@ -108,14 +110,46 @@ function CustomerSummary({ order }) {
 
 function OrderDetailPanel({ order, adminToken, onUpdated }) {
     const [updating, setUpdating] = useState(false);
+    const [cancelOpen, setCancelOpen] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
+    const [cancelNote, setCancelNote] = useState('');
+    const [returnNote, setReturnNote] = useState('');
+    const [actionError, setActionError] = useState('');
+    const reasons = useOrderReasons();
 
     const nextStatus = getNextStatus(order.status);
 
-    const updateStatus = async (status, note) => {
+    const updateStatus = async (status, note, reason) => {
         setUpdating(true);
+        setActionError('');
         try {
-            await api.put(`/api/orders/${order.id}/status`, { status, note }, adminToken);
+            await api.put(`/api/orders/${order.id}/status`, { status, note, reason }, adminToken);
             await onUpdated();
+        } catch (err) {
+            setActionError(err instanceof Error ? err.message : 'Could not update the order');
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const confirmCancel = async () => {
+        if (!cancelReason) { setActionError('Choose why the order is being cancelled.'); return; }
+        if (cancelReason === 'other' && cancelNote.trim().length < 3) { setActionError('Add a short note for "Other".'); return; }
+        await updateStatus('cancelled', cancelNote.trim() || 'Cancelled by admin', cancelReason);
+        setCancelOpen(false);
+        setCancelReason('');
+        setCancelNote('');
+    };
+
+    const answerReturn = async (action) => {
+        setUpdating(true);
+        setActionError('');
+        try {
+            await api.put(`/api/orders/${order.id}/return`, { action, note: returnNote.trim() }, adminToken);
+            setReturnNote('');
+            await onUpdated();
+        } catch (err) {
+            setActionError(err instanceof Error ? err.message : 'Could not update the return');
         } finally {
             setUpdating(false);
         }
@@ -169,7 +203,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                             variant="outline"
                             size="sm"
                             disabled={updating}
-                            onClick={() => updateStatus('cancelled', 'Cancelled by admin')}
+                            onClick={() => setCancelOpen((v) => !v)}
                             className="w-full normal-case tracking-normal text-xs gap-1.5 text-danger border-danger/30 hover:bg-danger-tint hover:text-danger"
                         >
                             <XCircle size={14} />
@@ -177,6 +211,52 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                         </Button>
                     )}
                 </div>
+            )}
+
+            {cancelOpen && !isTerminalStatus(order.status) && (
+                <div className="rounded-xl border border-danger/30 bg-danger-tint/40 p-4 space-y-3">
+                    <p className="text-sm font-medium text-ink">Why is this order being cancelled?</p>
+                    <select value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} className="w-full text-sm border border-admin-border rounded-lg px-3 py-2.5 bg-admin-surface" aria-label="Cancellation reason">
+                        <option value="">Choose a reason…</option>
+                        {(reasons?.cancel ?? []).map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+                    </select>
+                    <textarea value={cancelNote} onChange={(e) => setCancelNote(e.target.value)} rows={2} maxLength={500} placeholder="Note (required for Other)" className="w-full text-sm border border-admin-border rounded-lg px-3 py-2 bg-admin-surface" />
+                    <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => setCancelOpen(false)} disabled={updating}>Keep order</Button>
+                        <Button size="sm" onClick={confirmCancel} disabled={updating} className="normal-case tracking-normal">{updating ? 'Cancelling…' : 'Confirm cancel'}</Button>
+                    </div>
+                </div>
+            )}
+
+            {actionError && <p role="alert" className="rounded-lg bg-danger-tint px-3 py-2 text-sm text-danger">{actionError}</p>}
+
+            {normalizeStatus(order.status) === 'cancelled' && (order.cancelReason || order.cancelledBy) && (
+                <SectionCard title="Why it was cancelled">
+                    <p className="text-sm text-ink"><strong>{order.cancelReason || 'No reason recorded'}</strong></p>
+                    {order.cancelNote && <p className="text-sm text-admin-muted mt-1">“{order.cancelNote}”</p>}
+                    <p className="text-xs text-admin-muted mt-2">Cancelled by {order.cancelledBy === 'customer' ? 'the customer' : 'admin'}{order.cancelledAt ? ` · ${formatOrderDate(order.cancelledAt)}` : ''}</p>
+                    {order.payment === 'razorpay' && order.paymentStatus === 'paid' && order.refundStatus !== 'refunded' && (
+                        <p className="mt-2 rounded-md bg-warning-tint px-2.5 py-1.5 text-xs text-warning">Paid online: refund pending. Use Refund in the orders list once it is sent.</p>
+                    )}
+                </SectionCard>
+            )}
+
+            {order.returnStatus && (
+                <SectionCard title={`Return · ${RETURN_STATUS_LABELS[order.returnStatus] ?? order.returnStatus}`}>
+                    <p className="text-sm text-ink"><strong>{order.returnReason}</strong></p>
+                    {order.returnNote && <p className="text-sm text-admin-muted mt-1">“{order.returnNote}”</p>}
+                    <p className="text-xs text-admin-muted mt-2">Asked {order.returnRequestedAt ? formatOrderDate(order.returnRequestedAt) : ''}</p>
+                    {['requested', 'approved'].includes(order.returnStatus) && (
+                        <div className="mt-3 space-y-2">
+                            <textarea value={returnNote} onChange={(e) => setReturnNote(e.target.value)} rows={2} maxLength={500} placeholder={order.returnStatus === 'requested' ? 'Message to the customer (needed to decline)' : 'Note (optional)'} className="w-full text-sm border border-admin-border rounded-lg px-3 py-2 bg-admin-surface" />
+                            <div className="flex flex-wrap gap-2">
+                                {order.returnStatus === 'requested' && <Button size="sm" disabled={updating} onClick={() => answerReturn('approve')} className="normal-case tracking-normal">Approve return</Button>}
+                                {order.returnStatus === 'requested' && <Button size="sm" variant="outline" disabled={updating} onClick={() => answerReturn('reject')} className="normal-case tracking-normal text-danger border-danger/30">Decline</Button>}
+                                {order.returnStatus === 'approved' && <Button size="sm" disabled={updating} onClick={() => answerReturn('received')} className="normal-case tracking-normal">Parcel received: mark returned</Button>}
+                            </div>
+                        </div>
+                    )}
+                </SectionCard>
             )}
 
             <SectionCard title="Customer">
@@ -216,7 +296,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                 <select
                     value={order.status}
                     disabled={updating}
-                    onChange={(e) => updateStatus(e.target.value)}
+                    onChange={(e) => (e.target.value === 'cancelled' ? setCancelOpen(true) : updateStatus(e.target.value))}
                     className="w-full text-sm border border-admin-border rounded-lg px-3 py-2.5 bg-admin-surface"
                 >
                     {!ADMIN_STATUS_OPTIONS.some((s) => s.value === order.status) && (
@@ -330,8 +410,9 @@ export default function AdminOrdersPage() {
     };
 
     const stats = useMemo(() => {
-        const counts = { placed: 0, active: 0, delivered: 0, cancelled: 0 };
+        const counts = { placed: 0, active: 0, delivered: 0, cancelled: 0, returns: 0 };
         orders.forEach((o) => {
+            if (o.returnStatus && ['requested', 'approved'].includes(o.returnStatus)) counts.returns++;
             const s = normalizeStatus(o.status);
             if (s === 'placed') counts.placed++;
             else if (s === 'delivered') counts.delivered++;
@@ -341,7 +422,22 @@ export default function AdminOrdersPage() {
         return counts;
     }, [orders]);
 
-    const visibleOrders = useMemo(() => (view === 'all' ? orders : orders.filter((o) => groupOf(o) === view)), [orders, view]);
+    const visibleOrders = useMemo(() => {
+        if (view === 'all') return orders;
+        if (view === 'returns') return orders.filter((o) => o.returnStatus);
+        return orders.filter((o) => groupOf(o) === view);
+    }, [orders, view]);
+
+    // Why customers cancel or return: the count of each reason among the orders shown, biggest first, so the pattern is easy to see.
+    const reasonCounts = useMemo(() => {
+        if (view !== 'cancelled' && view !== 'returns') return [];
+        const tally = new Map();
+        visibleOrders.forEach((o) => {
+            const why = view === 'returns' ? o.returnReason : o.cancelReason;
+            if (why) tally.set(why, (tally.get(why) || 0) + 1);
+        });
+        return [...tally.entries()].sort((a, b) => b[1] - a[1]);
+    }, [visibleOrders, view]);
 
     const allSelected = visibleOrders.length > 0 && selected.size === visibleOrders.length;
     const someSelected = selected.size > 0;
@@ -502,8 +598,18 @@ export default function AdminOrdersPage() {
                     { value: 'active', label: 'In progress', count: stats.active },
                     { value: 'delivered', label: 'Delivered', count: stats.delivered },
                     { value: 'cancelled', label: 'Cancelled', count: stats.cancelled },
+                    { value: 'returns', label: 'Returns', count: stats.returns },
                 ]}
             />
+
+            {reasonCounts.length > 0 && (
+                <div className="rounded-xl border border-admin-border bg-admin-surface p-4">
+                    <p className="text-[11px] font-medium tracking-[0.15em] uppercase text-admin-muted mb-2.5">{view === 'returns' ? 'Why customers return' : 'Why customers cancel'}</p>
+                    <ul className="flex flex-wrap gap-2">
+                        {reasonCounts.map(([why, n]) => <li key={why} className="rounded-full bg-canvas-alt px-3 py-1 text-xs text-ink">{why} <strong className="ml-1 text-primary">{n}</strong></li>)}
+                    </ul>
+                </div>
+            )}
 
             <AdminFilterBar>
                 <AdminSearchInput value={searchInput} onChange={setSearchInput} placeholder="Search order, customer, email or phone…" />
@@ -626,6 +732,8 @@ export default function AdminOrdersPage() {
                                             <td className="p-4 text-xs text-admin-muted whitespace-nowrap">{paymentLabel(order)}</td>
                                             <td className="p-4">
                                                 <OrderStatusBadge status={order.status} />
+                                                {order.returnStatus && <p className="mt-1 text-[11px] font-medium text-warning">{RETURN_STATUS_LABELS[order.returnStatus]}</p>}
+                                                {(order.cancelReason || order.returnReason) && <p className="mt-1 max-w-[11rem] text-[11px] leading-snug text-admin-muted">{order.returnStatus ? order.returnReason : order.cancelReason}</p>}
                                             </td>
                                             <td className="p-4 text-xs text-admin-muted whitespace-nowrap">
                                                 {formatOrderDate(order.createdAt, { time: false })}
