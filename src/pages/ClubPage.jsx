@@ -306,24 +306,24 @@ export default function ClubPage() {
     return (
         <>
             <Seo title={club.cardName} description={`${club.cardName}: ${club.tagline || 'member prices on most of the Chikit range.'}`} path="/club" />
-            <section className="bg-brand-beige text-primary-deep">
-                <div className="container-page grid items-center gap-8 py-10 lg:grid-cols-2 lg:gap-14 lg:py-16">
+            <section className="bg-gradient-to-b from-canvas-alt to-canvas text-primary-deep">
+                <div className="container-page grid items-center gap-8 pb-10 pt-8 lg:grid-cols-2 lg:gap-14 lg:py-16">
                     <div>
-                        <p className="mb-3 text-caption font-semibold uppercase tracking-[0.18em] text-accent-ink">Free to join</p>
+                        <p className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption font-semibold uppercase tracking-[0.14em] text-primary-deep"><Crown size={13} aria-hidden="true" /> Free to join</p>
                         <h1 className="text-primary-deep">{club.cardName}</h1>
-                        <p className="mt-4 max-w-lg text-lead text-primary-deep/80">{club.tagline}</p>
-                        <ul className="mt-6 space-y-3">
+                        <p className="mt-3 max-w-lg text-body text-muted sm:text-lead">{club.tagline}</p>
+                        <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
                             {benefits.map((benefit, i) => {
                                 const Icon = BENEFIT_ICONS[i % BENEFIT_ICONS.length];
                                 return (
-                                    <li key={benefit} className="flex items-center gap-3 text-body text-primary-deep">
-                                        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-accent shadow-xs"><Icon size={17} aria-hidden="true" /></span>
+                                    <li key={benefit} className="flex items-center gap-3 rounded-xl bg-surface p-3 text-small font-medium text-ink ring-1 ring-line">
+                                        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-tint text-primary"><Icon size={17} aria-hidden="true" /></span>
                                         {benefit}
                                     </li>
                                 );
                             })}
                         </ul>
-                        {!member && <a href="#join" className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member</a>}
+                        {!member && <a href="#join" className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover sm:w-auto"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member</a>}
                     </div>
                     {/* On a phone the sign-up form is what the visitor came for, so the big card only shows there once they are a member. */}
                     <div className={cn('flex justify-center lg:justify-end', !member && 'max-lg:hidden')}>
@@ -350,7 +350,8 @@ export default function ClubPage() {
                 </section>
             )}
 
-            <section id="join" className="container-page scroll-mt-24 py-10 lg:py-14">
+            <section id="join" className="scroll-mt-24 border-t border-line bg-canvas">
+                <div className="container-page py-10 lg:py-14">
                 <div className="mx-auto max-w-xl">
                     {club.enabled === false && <p className="rounded-lg bg-warning-tint p-4 text-center text-warning">Chikit Club is not taking new members right now. Please check back soon.</p>}
 
@@ -387,6 +388,7 @@ export default function ClubPage() {
                             )}
                         </div>
                     )}
+                </div>
                 </div>
             </section>
         </>
