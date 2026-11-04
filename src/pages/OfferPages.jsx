@@ -19,7 +19,7 @@ const KIND_LABEL = { mix_match: 'Pick & Mix', bogo: 'Buy 1 Get 1 Free', collecti
 const STEPS = [
     { icon: Package, title: 'Choose your products', text: 'Open an offer and pick the products you like. Each offer says exactly what it covers.' },
     { icon: ShoppingCart, title: 'Add it to your bag', text: 'A box or a pair goes into the bag as one line, so nothing gets lost on the way to checkout.' },
-    { icon: BadgePercent, title: 'Pay the offer price', text: 'The price is worked out for you. Club member prices apply to everything outside an offer, and coupons still work.' },
+    { icon: BadgePercent, title: 'Pay the offer price', text: 'The price is worked out for you. Chikit Club member prices apply to everything outside an offer, and coupons still work.' },
 ];
 
 /** /offers: every live offer on the plum stage, how offers work, and the Club card. */

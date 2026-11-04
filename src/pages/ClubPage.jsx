@@ -323,7 +323,7 @@ export default function ClubPage() {
                                 );
                             })}
                         </ul>
-                        {!member && <a href="#join" className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Join the Club, it is free</a>}
+                        {!member && <a href="#join" className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member, it is free</a>}
                     </div>
                     {/* On a phone the sign-up form is what the visitor came for, so the big card only shows there once they are a member. */}
                     <div className={cn('flex justify-center lg:justify-end', !member && 'max-lg:hidden')}>
@@ -335,31 +335,31 @@ export default function ClubPage() {
             {club.showPrices !== false && examples.length > 0 && (
                 <section aria-labelledby="club-prices-title" className="container-page py-10 lg:py-14">
                     <div className="mx-auto mb-8 max-w-2xl text-center">
-                        <p className="eyebrow mb-3">{member ? 'Your member prices' : 'See the difference'}</p>
-                        <h2 id="club-prices-title">{member ? 'What you pay as a member' : 'Same products. Lower prices.'}</h2>
-                        <p className="mt-3 text-body text-muted lg:text-lead">{member ? 'Your Club price shows on every product while you are signed in. Here is what it saves you on some favourites.' : 'The usual price and the Club price of some of our best-loved products, side by side. Joining is free.'}</p>
+                        <p className="eyebrow mb-3">{member ? 'Chikit Club member prices' : 'See the difference'}</p>
+                        <h2 id="club-prices-title">{member ? 'What you pay as a Chikit Club member' : 'Same products. Lower prices.'}</h2>
+                        <p className="mt-3 text-body text-muted lg:text-lead">{member ? 'Your Club price shows on every product while you are signed in. Here is what it saves you on some favourites.' : 'The usual price and the Chikit Club member price of some of our best-loved products, side by side. Joining is free.'}</p>
                     </div>
                     <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
                         {examples.map((p) => <li key={p.id}><ClubPriceTile product={p} member={member} /></li>)}
                     </ul>
                     <div className="mt-8 flex justify-center">
                         {member
-                            ? <Link to="/shop"><Button size="lg" variant="outline">Shop with member prices</Button></Link>
-                            : <a href="#join" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Join the Club, it is free</a>}
+                            ? <Link to="/shop"><Button size="lg" variant="outline">Shop with Chikit Club member prices</Button></Link>
+                            : <a href="#join" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member, it is free</a>}
                     </div>
                 </section>
             )}
 
             <section id="join" className="container-page scroll-mt-24 py-10 lg:py-14">
                 <div className="mx-auto max-w-xl">
-                    {club.enabled === false && <p className="rounded-lg bg-warning-tint p-4 text-center text-warning">The club is not taking new members right now. Please check back soon.</p>}
+                    {club.enabled === false && <p className="rounded-lg bg-warning-tint p-4 text-center text-warning">Chikit Club is not taking new members right now. Please check back soon.</p>}
 
                     {club.enabled !== false && member && (
                         <div className="rounded-xl border border-line bg-surface p-6 text-center shadow-sm sm:p-8" role="status">
                             {justJoined && <VerifyAnimation size={72} className="mx-auto mb-3 text-success" />}
-                            <h2 className="text-h3">{justJoined ? 'Welcome to the club!' : 'You are a Club member'}</h2>
-                            <p className="mt-2 text-muted">Your member prices show on every product while you are signed in. Card number <strong className="font-mono text-ink">{user.club.cardNo}</strong>.</p>
-                            <Link to="/shop" className="mt-6 inline-block"><Button size="lg">Shop with member prices</Button></Link>
+                            <h2 className="text-h3">{justJoined ? 'Welcome, Chikit Club member!' : 'You are a Chikit Club member'}</h2>
+                            <p className="mt-2 text-muted">Your Chikit Club member prices show on every product while you are signed in. Card number <strong className="font-mono text-ink">{user.club.cardNo}</strong>.</p>
+                            <Link to="/shop" className="mt-6 inline-block"><Button size="lg">Shop with Chikit Club member prices</Button></Link>
                         </div>
                     )}
 

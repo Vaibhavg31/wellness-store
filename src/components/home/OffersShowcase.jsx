@@ -28,13 +28,13 @@ export function ClubStrip({ className }) {
                 <div>
                     <p className="text-caption font-semibold uppercase tracking-[0.14em] text-accent-ink">{club.cardName}</p>
                     <p className="mt-1 font-display text-h4 leading-snug sm:text-h3">
-                        {member ? 'Your member prices are on, on every product.' : 'Members get lower prices on most products.'}
+                        {member ? 'Your Chikit Club member prices are on, on every product.' : 'Chikit Club members get lower prices on most products.'}
                     </p>
                     {!member && <p className="mt-1 text-small text-primary-deep/80">Free to join. No minimum purchase. Your card is ready in a minute.</p>}
                 </div>
             </div>
             <Link to="/club" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-7 text-body font-semibold text-white shadow-md transition-colors hover:bg-primary-hover">
-                {member ? 'View my card' : 'Join the Club free'} <ArrowRight size={18} aria-hidden="true" />
+                {member ? 'View my card' : 'Become a Chikit Club member'} <ArrowRight size={18} aria-hidden="true" />
             </Link>
         </div>
     );

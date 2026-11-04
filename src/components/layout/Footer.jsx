@@ -17,10 +17,10 @@ const COLLECTION_LIMIT = 6;
 /** Pages every shopper may need, linked from the footer whatever the admin's menu holds. */
 const COMPANY_LINKS = [{ label: 'Our story', href: '/about' }, { label: 'Offers', href: '/offers' }, { label: 'Chikit Club Card', href: '/club' }, { label: 'Reviews', href: '/reviews' }];
 const HELP_LINKS = [{ label: 'Track your order', href: '/track-order' }, { label: 'FAQ', href: '/faq' }, { label: 'Contact us', href: '/contact' }];
-// The footer is the brand book's palette page: deep plum with beige headings and soft white links.
+// The footer is a neutral charcoal with white type: no plum, no beige.
 const linkClass = 'inline-flex min-h-11 items-center text-small text-white/75 transition-colors hover:text-white';
-const iconLink = 'grid size-11 place-items-center rounded-full bg-white/10 text-accent transition-colors hover:bg-accent hover:text-primary-deep';
-const heading = 'mb-4 font-sans text-caption font-semibold uppercase tracking-[0.16em] text-accent';
+const iconLink = 'grid size-11 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white hover:text-footer';
+const heading = 'mb-4 font-sans text-caption font-semibold uppercase tracking-[0.16em] text-white';
 
 function NewsletterForm() {
     const { showToast } = useToast();
@@ -42,7 +42,7 @@ function NewsletterForm() {
         }
     };
 
-    if (done) return <p className="text-small font-medium text-accent" role="status">Thank you for subscribing!</p>;
+    if (done) return <p className="text-small font-medium text-white" role="status">Thank you for subscribing!</p>;
 
     return (
         <form onSubmit={submit} className="flex gap-2">
@@ -55,9 +55,9 @@ function NewsletterForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email"
                 autoComplete="email"
-                className="h-11 min-w-0 flex-1 rounded-full border border-line-strong bg-surface px-4 text-small text-ink placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="h-11 min-w-0 flex-1 rounded-full border border-white/25 bg-white/10 px-4 text-small text-white placeholder:text-white/50 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/25"
             />
-            <Button type="submit" variant="accent" loading={loading}>Subscribe</Button>
+            <Button type="submit" loading={loading} className="!bg-white !text-footer hover:!bg-white/85">Subscribe</Button>
         </form>
     );
 }
@@ -82,10 +82,10 @@ export default function Footer() {
     ).slice(0, COLLECTION_LIMIT);
 
     return (
-        <footer className="bg-primary-deep pb-[calc(var(--tabbar-h,0px)+1.5rem)] text-white lg:pb-0">
+        <footer className="bg-footer pb-[calc(var(--tabbar-h,0px)+1.5rem)] text-white lg:pb-0">
             <div className="container-page grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12 lg:py-16">
                 <div className="min-w-0 lg:col-span-4">
-                    <img src="/brand/chikit-logo-beige.webp" alt="Chikit, Ayurveda and Wellness" width="480" height="147" className="h-14 w-auto" />
+                    <img src="/brand/chikit-logo-beige.webp" alt="Chikit, Ayurveda and Wellness" width="480" height="147" className="h-14 w-auto brightness-0 invert" />
                     <p className="mt-4 max-w-xs text-small text-white/70">{footer.description}</p>
                     <ul className="mt-5 flex flex-wrap gap-2">
                         {hasInstagramUrl(instagramUrl) && (
@@ -117,7 +117,7 @@ export default function Footer() {
                             {collections.map((cat) => (
                                 <li key={cat.id}><Link to={`/category/${cat.id}`} className={linkClass}>{cat.label}</Link></li>
                             ))}
-                            <li><Link to="/shop" className={`${linkClass} font-medium !text-accent`}>Shop all</Link></li>
+                            <li><Link to="/shop" className={`${linkClass} font-semibold !text-white underline-offset-4 hover:underline`}>Shop all</Link></li>
                         </ul>
                     </div>
                     <div>
@@ -156,7 +156,7 @@ export default function Footer() {
                         <li><Link to="/refund-policy" className="inline-flex min-h-11 items-center hover:text-white">Returns &amp; Refunds</Link></li>
                         <li>
                             {DEVELOPER_CREDIT}{' '}
-                            <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center px-1 font-medium text-white hover:text-accent">{DEVELOPER_NAME}</a>
+                            <a href={DEVELOPER_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center px-1 font-medium text-white underline-offset-4 hover:underline">{DEVELOPER_NAME}</a>
                         </li>
                     </ul>
                 </div>

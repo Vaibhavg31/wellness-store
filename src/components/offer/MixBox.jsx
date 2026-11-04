@@ -152,7 +152,7 @@ export default function MixBox({ offer, products }) {
             {clubOffer != null && (
                 <Link to="/club" className="mt-2 flex items-start gap-2 rounded-xl bg-accent px-3 py-2.5 text-caption leading-snug text-primary-deep hover:bg-accent-hover">
                     <Crown size={15} className="mt-px shrink-0 text-primary" aria-hidden="true" />
-                    <span><strong>Join the Club, free, and this box costs {formatPrice(clubOffer)}.</strong> Your Club prices beat the box price on these picks.</span>
+                    <span><strong>Become a Chikit Club member, free, and this box costs {formatPrice(clubOffer)}.</strong> Your Club prices beat the box price on these picks.</span>
                 </Link>
             )}
 
@@ -214,7 +214,7 @@ export default function MixBox({ offer, products }) {
                         <button type="button" disabled={!full} onClick={() => commit(false)} className="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={16} aria-hidden="true" /> Add box to bag</button>
                     </div>
                 </div>
-                {clubOffer != null && <Link to="/club" className="flex items-center justify-center gap-1.5 bg-accent px-4 py-1.5 text-caption font-semibold text-primary-deep"><Crown size={13} aria-hidden="true" /> Join the Club, free: this box costs {formatPrice(clubOffer)}</Link>}
+                {clubOffer != null && <Link to="/club" className="flex items-center justify-center gap-1.5 bg-accent px-4 py-1.5 text-caption font-semibold text-primary-deep"><Crown size={13} aria-hidden="true" /> Become a Chikit Club member, free: this box costs {formatPrice(clubOffer)}</Link>}
             </div>
         </div>
     );

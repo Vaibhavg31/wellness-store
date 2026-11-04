@@ -137,7 +137,7 @@ router.post('/club/email-otp/verify', asyncRoute(async (req, res) => {
 router.post('/club/join', asyncRoute(async (req, res) => {
     const payload = await requireCustomer(req);
     const cfg = await clubConfig();
-    if (!cfg.enabled) return sendError(res, 'The club is not open for new members right now.', 403);
+    if (!cfg.enabled) return sendError(res, 'Chikit Club is not open for new members right now.', 403);
 
     const user = await users.getById(String(payload.userId || ''));
     if (!user) return sendError(res, 'User not found', 404);

@@ -9,6 +9,20 @@ const SiteContentContext = createContext({
     refetch: () => {},
 });
 
+/**
+ * The email sign-up used to be called the "Chikit Circle", which reads like a second membership beside the Chikit Club. Content saved
+ * with that name (the shop's stored settings) is shown with the plain wording instead, until someone edits it in the admin.
+ */
+function retireCircle(value) {
+    if (typeof value === 'string') {
+        if (/^(join )?the chikit circle[.!]?$/i.test(value.trim())) return 'Stay in the loop';
+        return value.replace(/(join )?(the )?chikit circle/gi, (_, join) => (join ? 'Join Chikit updates' : 'Chikit updates'));
+    }
+    if (Array.isArray(value)) return value.map(retireCircle);
+    if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, retireCircle(v)]));
+    return value;
+}
+
 const CACHE_KEY = 'chikit-site-content-v1';
 const readCache = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch { return null; } };
 
@@ -53,7 +67,7 @@ export function SiteContentProvider({ children }) {
             });
             merged.sections = Object.fromEntries(ordered.map((key) => [key, sections[key]]));
         }
-        return merged;
+        return retireCircle(merged);
     }, [raw]);
 
     const value = useMemo(

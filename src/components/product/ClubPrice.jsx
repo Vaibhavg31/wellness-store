@@ -28,7 +28,7 @@ export default function ClubPrice({ memberPrice, className, compact = false }) {
                 compact && "relative px-2 py-0.5 text-[11px] before:absolute before:-inset-x-1 before:-inset-y-3 before:content-['']", className)}
         >
             <Crown size={compact ? 11 : 13} aria-hidden="true" />
-            {formatPrice(memberPrice)} <span className="font-medium">{compact ? 'Club price' : 'for Club members'}</span>
+            {formatPrice(memberPrice)} <span className="font-medium">{compact ? 'Club price' : 'for Chikit Club members'}</span>
         </Link>
     );
 }

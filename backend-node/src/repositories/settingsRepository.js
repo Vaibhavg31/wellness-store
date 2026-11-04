@@ -172,7 +172,7 @@ const DEFAULTS = {
             side: 'right',
             couponId: '',
             title: 'Unlock 10% off your first order',
-            subtitle: 'Join the Chikit circle and we will send your code right away.',
+            subtitle: 'Join Chikit updates and we will send your code right away.',
             steps: ['Enter your email', 'Get your coupon code instantly', 'Use it at checkout'],
             requireEmail: true,
             buttonLabel: 'Unlock my code',
