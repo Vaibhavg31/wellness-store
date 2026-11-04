@@ -76,7 +76,7 @@ export default function VariantPicker({ variants, activeId, onChange, productIma
                             </span>
                             <span className="mt-auto flex flex-col items-center gap-0.5 border-t border-line px-3 py-2.5">
                                 <span className="flex flex-wrap items-baseline justify-center gap-x-1.5">
-                                    <span className={cn('inline-flex items-center gap-1 font-display text-h4', member && 'text-primary')}>{member && <Crown size={13} aria-label="Club price" />}{formatPrice(shownPrice)}</span>
+                                    <span className={cn('inline-flex items-center gap-1 font-display text-h4', member && 'text-primary')}>{member && <Crown size={13} aria-label="Chikit Club price" />}{formatPrice(shownPrice)}</span>
                                     {member && <span className="text-caption text-muted line-through">{formatPrice(v.price)}</span>}
                                     {v.originalPrice > Math.max(v.price, shownPrice) && <span className="text-caption text-subtle line-through">{formatPrice(v.originalPrice)}</span>}
                                 </span>

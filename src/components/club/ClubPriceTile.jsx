@@ -4,7 +4,7 @@ import { imageUrl } from '@/services/api';
 import { formatPrice, cn } from '@/utils/formatPrice';
 
 /**
- * One product with its two prices side by side: the usual price and the Club price, and the rupees the Club saves.
+ * One product with its two prices side by side: the usual price and the Chikit Club price, and the rupees the Club saves.
  * A member sees the same tile worded as "Your price". No percentage is quoted; the difference is shown in rupees.
  */
 export default function ClubPriceTile({ product, member = false, active = false, className }) {
@@ -24,11 +24,11 @@ export default function ClubPriceTile({ product, member = false, active = false,
                     <span className="block text-small text-muted line-through">{formatPrice(product.price)}</span>
                 </span>
                 <span>
-                    <span className="flex items-center gap-1 text-caption font-semibold text-primary"><Crown size={11} aria-hidden="true" /> {member ? 'Yours' : 'Club'}</span>
+                    <span className="flex items-center gap-1 text-caption font-semibold text-primary"><Crown size={11} aria-hidden="true" /> {member ? 'Yours' : 'Chikit Club'}</span>
                     <span className="block text-lead font-semibold leading-tight text-primary">{formatPrice(product.memberPrice)}</span>
                 </span>
             </span>
-            <span className="mt-2 rounded-full bg-success-tint px-2.5 py-1 text-center text-caption font-semibold text-success">{member ? 'You save' : 'Club saves you'} {formatPrice(saving)}</span>
+            <span className="mt-2 rounded-full bg-success-tint px-2.5 py-1 text-center text-caption font-semibold text-success">{member ? 'You save' : 'Chikit Club saves you'} {formatPrice(saving)}</span>
         </Link>
     );
 }

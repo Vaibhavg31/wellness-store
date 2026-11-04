@@ -16,7 +16,7 @@ const ROTATE_MS = 2600;
  * "without Club" and "with Club", so the saving is seen in rupees at a glance (no percentage is quoted anywhere). A member sees the
  * same card already switched on, with their status instead of the join button. The rotation pauses while the card is hovered or
  * focused and stays still for anyone who has asked their device for reduced motion (the dots still pick a product).
- * Switched on or off, and worded, in Admin → Club; the prices are each product's own Club price.
+ * Switched on or off, and worded, in Admin → Club; the prices are each product's own Chikit Club price.
  */
 export default function ClubBand({ products }) {
     const { content } = useSiteContent();
@@ -60,7 +60,7 @@ export default function ClubBand({ products }) {
                         ))}
                     </ul>
                     <Link to="/club" className="mt-8 inline-flex min-h-13 items-center gap-2 rounded-full bg-accent px-8 py-3.5 text-body font-semibold text-primary-deep shadow-md transition-colors hover:bg-accent-hover">
-                        {member ? 'View my Club card' : 'Become a Chikit Club member, free'} <ArrowRight size={18} aria-hidden="true" />
+                        {member ? 'View my Chikit Club card' : 'Become a Chikit Club member, free'} <ArrowRight size={18} aria-hidden="true" />
                     </Link>
                 </div>
 
@@ -94,7 +94,7 @@ export default function ClubBand({ products }) {
                                                 <span className={cn('font-display text-h2 leading-none transition-colors', showing ? 'text-primary' : 'text-ink')}>{formatPrice(shownPrice)}</span>
                                                 {example.originalPrice > shownPrice && <span className="text-small text-subtle line-through">{formatPrice(example.originalPrice)}</span>}
                                             </p>
-                                            <p className={cn('mt-1.5 text-small font-semibold transition-opacity', showing ? 'text-success opacity-100' : 'opacity-0')}>Club saves you {formatPrice(example.price - example.memberPrice)}</p>
+                                            <p className={cn('mt-1.5 text-small font-semibold transition-opacity', showing ? 'text-success opacity-100' : 'opacity-0')}> Chikit Club saves you {formatPrice(example.price - example.memberPrice)}</p>
                                         </div>
                                     </motion.div>
                                 </AnimatePresence>
@@ -112,8 +112,8 @@ export default function ClubBand({ products }) {
 
                             {!member && (
                                 <div className="mt-3 flex rounded-full bg-canvas-alt p-1" role="group" aria-label="Compare prices">
-                                    <button type="button" aria-pressed={!on} onClick={() => setOn(false)} className={cn('min-h-11 flex-1 rounded-full text-small font-semibold transition-colors', !on ? 'bg-surface text-ink shadow-sm' : 'text-muted')}>Without Club</button>
-                                    <button type="button" aria-pressed={on} onClick={() => setOn(true)} className={cn('flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full text-small font-semibold transition-colors', on ? 'bg-primary text-white shadow-sm' : 'text-muted')}><Crown size={14} aria-hidden="true" /> With Club</button>
+                                    <button type="button" aria-pressed={!on} onClick={() => setOn(false)} className={cn('min-h-11 flex-1 rounded-full text-small font-semibold transition-colors', !on ? 'bg-surface text-ink shadow-sm' : 'text-muted')}>Without Chikit Club</button>
+                                    <button type="button" aria-pressed={on} onClick={() => setOn(true)} className={cn('flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full text-small font-semibold transition-colors', on ? 'bg-primary text-white shadow-sm' : 'text-muted')}><Crown size={14} aria-hidden="true" /> With Chikit Club</button>
                                 </div>
                             )}
                             {member && <p className="mt-4 flex items-center gap-2 rounded-2xl bg-success-tint px-4 py-3 text-small font-semibold text-success"><Check size={16} aria-hidden="true" /> You are a member: this is the price you pay.</p>}
@@ -123,7 +123,7 @@ export default function ClubBand({ products }) {
 
                 {club.showPrices !== false && count > 1 && (
                     <div className="lg:col-span-12">
-                        <p className="mb-3 text-small font-semibold uppercase tracking-[0.14em] text-accent">Usual price and Club price, side by side</p>
+                        <p className="mb-3 text-small font-semibold uppercase tracking-[0.14em] text-accent">Usual price and Chikit Club price, side by side</p>
                         <ul className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 xl:grid-cols-6">
                             {examples.slice(0, 6).map((p, i) => (
                                 <li key={p.id} className="w-[10.5rem] shrink-0 snap-start sm:w-auto">
@@ -131,7 +131,7 @@ export default function ClubBand({ products }) {
                                 </li>
                             ))}
                         </ul>
-                        <Link to="/club" className="mt-4 inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-accent hover:underline">See all Club prices <ArrowRight size={16} aria-hidden="true" /></Link>
+                        <Link to="/club" className="mt-4 inline-flex min-h-11 items-center gap-1.5 text-small font-semibold text-accent hover:underline">See all Chikit Club prices <ArrowRight size={16} aria-hidden="true" /></Link>
                     </div>
                 )}
             </div>

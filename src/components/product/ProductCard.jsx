@@ -33,7 +33,7 @@ function oneLiner(product) {
 }
 
 /**
- * The product tile used across the shop: picture, name, one-line benefit, rating, price, Club price and a full-width Add to bag.
+ * The product tile used across the shop: picture, name, one-line benefit, rating, price, Chikit Club price and a full-width Add to bag.
  * `action={false}` hides the button where the page brings its own (Buy 1 Get 1). `wide` lays it out sideways (picture left, details
  * right) on a phone, for a row that holds a single product, so it fills the row instead of leaving half of it empty.
  */

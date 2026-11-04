@@ -264,7 +264,7 @@ export const DEFAULT_SITE_CONTENT = {
             discountPercent: 10,
             tagline: 'Members pay less on most of the range, every day.',
             benefits: ['Member prices on most products', 'Early access to new launches', 'Birthday surprise from Chikit'],
-            showPrices: true, // show real products with their usual and Club price (home band and the Club page)
+            showPrices: true, // show real products with their usual and Chikit Club price (home band and the Club page)
             priceCount: 8, // how many of them
         },
         // Text for sections that fall back to the built-in suggestions in src/data/*.js while these are empty

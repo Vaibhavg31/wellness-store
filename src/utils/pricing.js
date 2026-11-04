@@ -37,8 +37,8 @@ export function priceFor(item, isMember) {
 
 /**
  * A Pick & Mix box for one shopper (mirrors backend-node/src/lib/pricing.js). Everyone pays the box price, or the plain total when
- * that is lower. A Chikit Club member pays whichever is lower for them: the box price, or the Club prices of the same products
- * bought one by one. An offer and a Club price never add up on one line.
+ * that is lower. A Chikit Club member pays whichever is lower for them: the box price, or the Chikit Club prices of the same products
+ * bought one by one. An offer and a Chikit Club price never add up on one line.
  */
 export function mixBoxPricing(listPrices, memberPrices, boxPrice, isMember) {
     const units = mixUnitPrices(listPrices, boxPrice);
@@ -54,7 +54,7 @@ export function mixBoxPricing(listPrices, memberPrices, boxPrice, isMember) {
 
 /**
  * Re-prices every Pick & Mix box in a bag for the shopper's current membership, so a box added as a guest is fair the moment they
- * sign in (and goes back to the box price when they sign out). Lines carry `listPrice`, `clubAlt` (that product's Club price) and
+ * sign in (and goes back to the box price when they sign out). Lines carry `listPrice`, `clubAlt` (that product's Chikit Club price) and
  * `offerPrice` (the box price). Other lines are returned untouched.
  */
 export function repriceMixBoxes(items, isMember) {
@@ -82,7 +82,7 @@ export function repriceMixBoxes(items, isMember) {
 /**
  * What the Chikit Club does to a bag, line by line:
  *  - applied:   what a member is already saving (list price minus what they pay)
- *  - potential: what a guest would save by joining (list price minus Club price)
+ *  - potential: what a guest would save by joining (list price minus Chikit Club price)
  * Offer lines are left out of "potential" (the offer is the deal there) and a Pick & Mix box a member prices by Club counts as applied.
  */
 export function clubSavings(items, isMember) {

@@ -36,7 +36,7 @@ function PickTile({ product, picked, full, onToggle, isMember }) {
                     {picked ? <><Check size={15} aria-hidden="true" /> In your box</> : full && !soldOut ? 'Box is full' : <><Plus size={15} aria-hidden="true" /> Add to box</>}
                 </button>
                 {isMember && product.memberPrice > 0 && product.memberPrice < product.price && !picked && (
-                    <p className="-mt-0.5 text-center text-caption text-muted">Club price {formatPrice(product.memberPrice)} on its own</p>
+                    <p className="-mt-0.5 text-center text-caption text-muted">Chikit Club price {formatPrice(product.memberPrice)} on its own</p>
                 )}
             </div>
         </article>
@@ -79,7 +79,7 @@ function Slot({ product, index, onRemove, compact = false }) {
  * "Pick any N for one price", as a short guided flow: choose N products (each once), watch the box fill and the price work itself
  * out, then add the box to the bag. On a computer the box is a panel beside the products; on a phone it is a bar above the tab bar.
  * What the shopper pays is what checkout charges: everyone pays the box price (never more than the products one by one), and a
- * Club member pays whichever is lower for them, the box price or their Club prices (see mixBoxPricing).
+ * Club member pays whichever is lower for them, the box price or their Chikit Club prices (see mixBoxPricing).
  */
 export default function MixBox({ offer, products }) {
     const { addMixBox, isMember, openCartDrawer } = useCart();
@@ -96,7 +96,7 @@ export default function MixBox({ offer, products }) {
     const pricing = useMemo(() => (full ? mixBoxPricing(lists, members, offer.price, isMember) : null), [full, picked, offer.price, isMember]); // eslint-disable-line react-hooks/exhaustive-deps
     const pay = pricing ? pricing.units.reduce((sum, p) => sum + p, 0) : 0;
     const saving = full ? Math.max(0, worth - pay) : 0;
-    // A guest whose Club prices would beat the box is told what joining would make this box cost.
+    // A guest whose Chikit Club prices would beat the box is told what joining would make this box cost.
     const clubOffer = useMemo(() => {
         if (!full || isMember) return null;
         const member = mixBoxPricing(lists, members, offer.price, true);
@@ -137,7 +137,7 @@ export default function MixBox({ offer, products }) {
                 <p className="flex items-baseline justify-between"><span className="text-muted">{full ? 'Worth, bought one by one' : 'Worth so far'}</span><span className={cn(full && saving > 0 && 'text-muted line-through')}>{formatPrice(worth)}</span></p>
                 {full ? (
                     <>
-                        <p className="flex items-baseline justify-between"><span className="font-semibold text-ink">{pricing.byClub ? 'Your Club prices' : 'Box price'}</span><span className="font-display text-h3 text-primary">{formatPrice(pay)}</span></p>
+                        <p className="flex items-baseline justify-between"><span className="font-semibold text-ink">{pricing.byClub ? 'Your Chikit Club prices' : 'Box price'}</span><span className="font-display text-h3 text-primary">{formatPrice(pay)}</span></p>
                         {saving > 0 && <p className="flex items-baseline justify-between font-semibold text-success"><span>You save</span><span>{formatPrice(saving)}</span></p>}
                     </>
                 ) : (
@@ -152,7 +152,7 @@ export default function MixBox({ offer, products }) {
             {clubOffer != null && (
                 <Link to="/club" className="mt-2 flex items-start gap-2 rounded-xl bg-accent px-3 py-2.5 text-caption leading-snug text-primary-deep hover:bg-accent-hover">
                     <Crown size={15} className="mt-px shrink-0 text-primary" aria-hidden="true" />
-                    <span><strong>Become a Chikit Club member, free, and this box costs {formatPrice(clubOffer)}.</strong> Your Club prices beat the box price on these picks.</span>
+                    <span><strong>Become a Chikit Club member, free, and this box costs {formatPrice(clubOffer)}.</strong> Your Chikit Club prices beat the box price on these picks.</span>
                 </Link>
             )}
 

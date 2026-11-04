@@ -17,7 +17,7 @@ export default function ClubPrice({ memberPrice, className, compact = false }) {
     if (isMember) {
         return (
             <span className={cn('inline-flex items-center gap-1 rounded-md bg-accent-tint px-2 py-0.5 text-caption font-semibold text-accent-ink', className)}>
-                <Crown size={12} aria-hidden="true" /> Club price
+                <Crown size={12} aria-hidden="true" /> Chikit Club price
             </span>
         );
     }
@@ -28,7 +28,7 @@ export default function ClubPrice({ memberPrice, className, compact = false }) {
                 compact && "relative px-2 py-0.5 text-[11px] before:absolute before:-inset-x-1 before:-inset-y-3 before:content-['']", className)}
         >
             <Crown size={compact ? 11 : 13} aria-hidden="true" />
-            {formatPrice(memberPrice)} <span className="font-medium">{compact ? 'Club price' : 'for Chikit Club members'}</span>
+            {formatPrice(memberPrice)} <span className="font-medium">{compact ? 'Chikit Club price' : 'for Chikit Club members'}</span>
         </Link>
     );
 }

@@ -36,7 +36,7 @@ function ClubCard({ name, cardNo, since, className }) {
             <div className="relative flex h-full flex-col justify-between">
                 <div className="flex items-start justify-between">
                     <span className="rounded-lg bg-accent px-2.5 py-1.5"><Logo size="sm" /></span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption font-bold uppercase tracking-widest text-ink"><Crown size={13} aria-hidden="true" /> Club</span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-caption font-bold uppercase tracking-widest text-ink"><Crown size={13} aria-hidden="true" /> Chikit Club</span>
                 </div>
                 <div>
                     <p className="font-mono text-lead tracking-[0.18em]">{cardNo || 'CHK-••••-••••••'}</p>
@@ -265,7 +265,7 @@ function DetailsStep({ user, token, onJoined }) {
                 <Input label="State" autoComplete="address-level1" value={form.state} onChange={set('state')} error={errors.state} />
             </div>
             {formError && <p className="rounded-md border border-danger/30 bg-danger-tint px-3 py-2 text-small text-danger" role="alert">{formError}</p>}
-            <Button type="submit" size="lg" className="w-full" loading={busy}>Get my Club Card</Button>
+            <Button type="submit" size="lg" className="w-full" loading={busy}>Get my Chikit Club Card</Button>
             <p className="text-center text-caption text-muted">By joining you agree to our <Link to="/terms" className="underline">terms</Link> and <Link to="/privacy" className="underline">privacy policy</Link>.</p>
         </form>
     );
@@ -323,7 +323,7 @@ export default function ClubPage() {
                                 );
                             })}
                         </ul>
-                        {!member && <a href="#join" className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member, it is free</a>}
+                        {!member && <a href="#join" className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member</a>}
                     </div>
                     {/* On a phone the sign-up form is what the visitor came for, so the big card only shows there once they are a member. */}
                     <div className={cn('flex justify-center lg:justify-end', !member && 'max-lg:hidden')}>
@@ -337,7 +337,7 @@ export default function ClubPage() {
                     <div className="mx-auto mb-8 max-w-2xl text-center">
                         <p className="eyebrow mb-3">{member ? 'Chikit Club member prices' : 'See the difference'}</p>
                         <h2 id="club-prices-title">{member ? 'What you pay as a Chikit Club member' : 'Same products. Lower prices.'}</h2>
-                        <p className="mt-3 text-body text-muted lg:text-lead">{member ? 'Your Club price shows on every product while you are signed in. Here is what it saves you on some favourites.' : 'The usual price and the Chikit Club member price of some of our best-loved products, side by side. Joining is free.'}</p>
+                        <p className="mt-3 text-body text-muted lg:text-lead">{member ? 'Your Chikit Club price shows on every product while you are signed in. Here is what it saves you on some favourites.' : 'The usual price and the Chikit Club member price of some of our best-loved products, side by side. Joining is free.'}</p>
                     </div>
                     <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
                         {examples.map((p) => <li key={p.id}><ClubPriceTile product={p} member={member} /></li>)}
@@ -345,7 +345,7 @@ export default function ClubPage() {
                     <div className="mt-8 flex justify-center">
                         {member
                             ? <Link to="/shop"><Button size="lg" variant="outline">Shop with Chikit Club member prices</Button></Link>
-                            : <a href="#join" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member, it is free</a>}
+                            : <a href="#join" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member</a>}
                     </div>
                 </section>
             )}

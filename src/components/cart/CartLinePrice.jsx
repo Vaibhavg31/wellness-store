@@ -9,7 +9,7 @@ export function isClubLine(product) {
 }
 
 /**
- * The price of one bag line, the way the product page shows it: what is paid, then what it was. A Club line shows the Club price
+ * The price of one bag line, the way the product page shows it: what is paid, then what it was. A Club line shows the Chikit Club price
  * with a crown and both the usual price and the original struck through; any other line shows its original price struck through.
  * The same figures appear in the bag, on the bag page and in the checkout summary.
  */
@@ -20,10 +20,10 @@ export default function CartLinePrice({ product, quantity, className, align = 'e
     const mrp = product.originalPrice * quantity > Math.max(pay, usual) ? product.originalPrice * quantity : 0;
     return (
         <span className={cn('flex flex-wrap items-baseline gap-x-1.5', align === 'start' ? 'justify-start' : 'justify-end', className)}>
-            {usual > 0 && <span className="text-caption text-muted line-through"><span className="sr-only">Price without Club </span>{formatPrice(usual)}</span>}
+            {usual > 0 && <span className="text-caption text-muted line-through"><span className="sr-only">Price without Chikit Club </span>{formatPrice(usual)}</span>}
             {mrp > 0 && <span className={cn('text-caption line-through', club ? 'text-subtle' : 'text-muted')}><span className="sr-only">Original price </span>{formatPrice(mrp)}</span>}
             <span className={cn('inline-flex items-baseline gap-1 font-semibold', club ? 'text-primary' : 'text-ink')}>
-                {club && <Crown size={12} className="self-center" aria-label="Club price" />}
+                {club && <Crown size={12} className="self-center" aria-label="Chikit Club price" />}
                 {formatPrice(pay)}
             </span>
         </span>

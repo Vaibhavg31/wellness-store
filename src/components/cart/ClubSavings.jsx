@@ -8,7 +8,7 @@ import { formatPrice, cn } from '@/utils/formatPrice';
 /**
  * Chikit Club status in the bag and at checkout, where the money is decided. A member sees what the Club is saving on this order;
  * a guest sees what joining would save and a one-tap way to join. Shows nothing when the Club is off or nothing in the bag has a
- * Club price.
+ * Chikit Club price.
  */
 export default function ClubSavings({ className, onNavigate }) {
     const { items, isMember } = useCart();
@@ -21,7 +21,7 @@ export default function ClubSavings({ className, onNavigate }) {
         return (
             <div className={cn('flex items-center gap-3 rounded-xl bg-success-tint px-4 py-3', className)}>
                 <span className="grid size-9 shrink-0 place-items-center rounded-full bg-success text-white"><Check size={17} strokeWidth={3} aria-hidden="true" /></span>
-                <p className="text-small leading-snug text-ink"><strong className="block text-success">Club savings {formatPrice(applied)}</strong>Your Chikit Club member prices are applied to this order.</p>
+                <p className="text-small leading-snug text-ink"><strong className="block text-success">Chikit Club savings {formatPrice(applied)}</strong>Your Chikit Club member prices are applied to this order.</p>
             </div>
         );
     }

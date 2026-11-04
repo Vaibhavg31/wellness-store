@@ -42,9 +42,9 @@ export default function MobileTabBar() {
             <div className="flex items-end px-2">
                 <NavLink to="/" end className={active}><Home size={21} aria-hidden="true" />Home</NavLink>
                 <NavLink to="/shop" className={active}><LayoutGrid size={21} aria-hidden="true" />Shop</NavLink>
-                <Link to="/club" className={cn('relative flex flex-1 flex-col items-center gap-0.5 text-[11px] font-semibold text-primary-deep', stacked ? 'min-h-14 justify-center' : 'justify-end pb-1.5')} aria-label={member ? 'My Club card' : 'Join the Chikit Club'}>
+                <Link to="/club" className={cn('relative flex flex-1 flex-col items-center gap-0.5 text-[11px] font-semibold text-primary-deep', stacked ? 'min-h-14 justify-center' : 'justify-end pb-1.5')} aria-label={member ? 'My Chikit Club card' : 'Join the Chikit Club'}>
                     <span className={cn('grid place-items-center rounded-full bg-primary text-accent', stacked ? 'size-[21px]' : '-mt-6 size-12 shadow-lg ring-4 ring-surface')}><Crown size={stacked ? 13 : 22} aria-hidden="true" /></span>
-                    {member ? 'My Club' : 'Club'}
+                    Chikit Club
                 </Link>
                 <button type="button" onClick={openCartDrawer} className={cn(tab, 'text-muted')}>
                     <span className="relative"><ShoppingBag size={21} aria-hidden="true" />{itemCount > 0 && <span className="absolute -right-2.5 -top-1.5 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-4 text-white">{itemCount}</span>}</span>

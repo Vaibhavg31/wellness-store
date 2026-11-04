@@ -154,7 +154,7 @@ export function CartProvider({ children }) {
     // Sign in (or out) and the bag's plain lines switch to member (or normal) prices straight away.
     useEffect(() => {
         setItems((prev) => {
-            // Plain lines take (or lose) the Club price; a Pick & Mix box is re-priced as the better of box price and Club prices.
+            // Plain lines take (or lose) the Chikit Club price; a Pick & Mix box is re-priced as the better of box price and Chikit Club prices.
             const next = repriceMixBoxes(prev.map((item) => ({ ...item, product: withMembership(item.product, isMember) })), isMember);
             return next.some((item, i) => item.product.price !== prev[i].product.price) ? next : prev;
         });
@@ -238,7 +238,7 @@ export function CartProvider({ children }) {
         const bases = rawProducts.map(resolveCartProduct);
         if (bases.length !== offer.pickCount || new Set(bases.map((b) => b.id)).size !== bases.length) return false;
         if (bases.some((b) => typeof b.stock === 'number' && b.stock < 1)) return false;
-        // A member pays the lower of the box price and the Club prices of the same products; a guest always pays the box price.
+        // A member pays the lower of the box price and the Chikit Club prices of the same products; a guest always pays the box price.
         const { units, byClub } = mixBoxPricing(bases.map((b) => b.price), bases.map((b) => b.memberPrice), offer.price, isMember);
         const group = `box-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
         const lines = bases.map((base, i) => ({

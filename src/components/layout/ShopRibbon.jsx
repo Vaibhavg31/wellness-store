@@ -108,7 +108,7 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
                         return (
                             <NavLink key="club" to="/club" className={({ isActive }) => cn(variant === 'phone' ? 'order-first mr-1' : 'ml-1', 'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-primary font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-primary-hover', variant === 'phone' ? 'px-3.5 py-2 text-small' : 'px-4 py-2 text-small', isActive && 'bg-primary-deep ring-2 ring-primary/25')}>
                                 <Crown size={15} className="text-accent" aria-hidden="true" />
-                                {member ? 'My Club Card' : item.label}
+                                {member ? 'My Chikit Club Card' : item.label}
                             </NavLink>
                         );
                     case 'help':
