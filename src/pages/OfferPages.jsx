@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { BadgePercent, Gift, ShoppingBag, ShoppingCart, Package } from 'lucide-react';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
 import Button from '@/components/ui/Button';
@@ -67,13 +67,12 @@ export function OffersHubPage() {
 function BogoTile({ offer, product }) {
     const { addBogoPair, items, openCartDrawer } = useCart();
     const { showToast } = useToast();
-    const navigate = useNavigate();
     const soldOut = typeof product.stock === 'number' && product.stock < 2;
     const inBag = items.find((i) => i.product.offerId === offer.id && i.product.id === product.id)?.quantity ?? 0;
-    const add = (checkout) => {
+    const add = () => {
         if (addBogoPair(offer, product)) {
-            if (checkout) navigate('/checkout');
-            else { showToast(`${product.title}: your free one is added too`, 'success'); openCartDrawer(); }
+            showToast(`${product.title}: your free one is added too`, 'success');
+            openCartDrawer();
         } else {
             showToast('Sorry, there is not enough stock for another free one', 'error');
         }
@@ -86,10 +85,7 @@ function BogoTile({ offer, product }) {
             </div>
             <p className="text-center text-small font-medium text-success">{soldOut ? 'Sold out' : 'Add one, get the second free'}</p>
             {inBag > 0 && <p className="-mt-1 text-center text-caption font-semibold text-ink">In your bag: Buy {inBag / 2} + {inBag / 2} FREE</p>}
-            <div className="mt-auto grid gap-2 min-[480px]:grid-cols-2">
-                <Button variant="outline" size="sm" disabled={soldOut} onClick={() => add(false)}><ShoppingBag size={14} aria-hidden="true" /> Add to bag</Button>
-                <Button size="sm" disabled={soldOut} onClick={() => add(true)}>Buy now</Button>
-            </div>
+            <Button size="sm" className="mt-auto w-full" disabled={soldOut} onClick={add}><ShoppingBag size={14} aria-hidden="true" /> Add to bag</Button>
         </div>
     );
 }

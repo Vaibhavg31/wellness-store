@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Play, ShoppingBag, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Price from '@/components/ui/Price';
 import { useCart } from '@/contexts/CartContext';
-import { useToast, showCartToast } from '@/contexts/ToastContext';
+import { useToast } from '@/contexts/ToastContext';
 import { useDialog } from '@/hooks/useDialog';
 import { usePresence } from '@/hooks/usePresence';
 import { imageUrl } from '@/services/api';
@@ -17,21 +17,19 @@ const videoType = (url) => VIDEO_MIME[url.split('?')[0].split('.').pop()?.toLowe
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const dataSaver = () => Boolean(navigator.connection?.saveData);
 
-/** The product a reel is about, with a button that puts it in the bag and goes straight to checkout. */
+/** The product a reel is about, with a button that puts it in the bag (and opens the bag). */
 export function ReelProduct({ product, compact = false, onBuy }) {
-    const { addToCart } = useCart();
+    const { addToCart, openCartDrawer } = useCart();
     const { showToast } = useToast();
-    const navigate = useNavigate();
     if (!product) return null;
     const outOfStock = typeof product.stock === 'number' && product.stock <= 0;
 
     const buy = () => {
         if (outOfStock) return showToast('Out of stock', 'error');
         if (addToCart(product)) {
-            showCartToast(showToast, product, 'Added. Proceeding to checkout');
             trackEvent('reel_buy', { productId: product.id, path: window.location.pathname });
             onBuy?.();
-            navigate('/checkout');
+            openCartDrawer();
         } else {
             showToast('You already have the maximum available quantity in your bag', 'error');
         }
@@ -47,7 +45,7 @@ export function ReelProduct({ product, compact = false, onBuy }) {
                     <Price price={product.price} originalPrice={product.originalPrice} className="text-small" />
                 </span>
             </Link>
-            <Button disabled={outOfStock} onClick={buy} className="w-full"><ShoppingBag size={15} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Buy now'}</Button>
+            <Button disabled={outOfStock} onClick={buy} className="w-full"><ShoppingBag size={15} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add to bag'}</Button>
         </div>
     );
 }

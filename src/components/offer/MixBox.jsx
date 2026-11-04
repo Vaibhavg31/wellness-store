@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Check, Crown, Plus, ShoppingBag, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -84,7 +84,6 @@ function Slot({ product, index, onRemove, compact = false }) {
 export default function MixBox({ offer, products }) {
     const { addMixBox, isMember, openCartDrawer } = useCart();
     const { showToast } = useToast();
-    const navigate = useNavigate();
     const [picked, setPicked] = useState([]);
     const slots = offer.pickCount;
     const full = picked.length === slots;
@@ -115,12 +114,12 @@ export default function MixBox({ offer, products }) {
         });
     };
 
-    const commit = (goToCheckout) => {
+    const commit = () => {
         if (!unlocked) return;
         if (addMixBox(offer, picked)) {
             setPicked([]);
-            if (goToCheckout) navigate('/checkout');
-            else { showToast('Your box is in the bag', 'success'); openCartDrawer(); }
+            showToast('Your box is in the bag', 'success');
+            openCartDrawer();
         } else {
             showToast('Could not add this box. Please check the stock and try again.', 'error');
         }
@@ -162,8 +161,7 @@ export default function MixBox({ offer, products }) {
             )}
 
             <div className="mt-4 grid gap-2">
-                <button type="button" disabled={!unlocked} onClick={() => commit(false)} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={17} aria-hidden="true" /> {unlocked ? `Add box to bag · ${formatPrice(pay)}` : short ? 'Pick pricier' : `Pick ${remaining} more`}</button>
-                <button type="button" disabled={!unlocked} onClick={() => commit(true)} className="inline-flex h-11 items-center justify-center rounded-full border border-primary text-small font-semibold text-primary transition-colors hover:bg-primary-soft disabled:cursor-not-allowed disabled:border-line disabled:text-subtle disabled:hover:bg-transparent">Buy now</button>
+                <button type="button" disabled={!unlocked} onClick={commit} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={17} aria-hidden="true" /> {unlocked ? `Add box to bag · ${formatPrice(pay)}` : short ? 'Pick pricier' : `Pick ${remaining} more`}</button>
             </div>
         </>
     );
@@ -221,7 +219,7 @@ export default function MixBox({ offer, products }) {
                         <ul className="flex shrink-0 items-center gap-1.5">
                             {Array.from({ length: slots }, (_, i) => <Slot key={picked[i]?.id ?? `bar-${i}`} product={picked[i]} index={i} onRemove={toggle} compact />)}
                         </ul>
-                        <button type="button" disabled={!unlocked} onClick={() => commit(false)} className="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={16} aria-hidden="true" /> {short ? 'Pick pricier' : 'Add box to bag'}</button>
+                        <button type="button" disabled={!unlocked} onClick={commit} className="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={16} aria-hidden="true" /> {short ? 'Pick pricier' : 'Add box to bag'}</button>
                     </div>
                 </div>
                 {clubOffer != null && unlocked && <Link to="/club" className="flex items-center justify-center gap-1.5 bg-accent px-4 py-1.5 text-caption font-semibold text-primary-deep"><Crown size={13} aria-hidden="true" /> Become a Chikit Club member, free: this box costs {formatPrice(clubOffer)}</Link>}

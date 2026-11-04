@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Crown, Heart, Share2, ShoppingBag } from 'lucide-react';
 import ProductGallery from '@/components/product/ProductGallery';
 import VariantPicker from '@/components/product/VariantPicker';
@@ -42,7 +41,6 @@ import { recordProductView } from '@/hooks/useRecentlyViewed';
  * tags, no recently-viewed entry, no cart / wishlist changes, no review posting.
  */
 export default function ProductDetailView({ product, reviews = [], refetchReviews = () => {}, productBanners = [], preview = false }) {
-    const navigate = useNavigate();
     const { products } = useProducts();
     const { bundles } = useBundles();
     const { categories } = useCategories();
@@ -69,7 +67,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
         if (product?.id && !preview) recordProductView(product.id);
     }, [product?.id, preview]);
 
-    // Show the sticky mobile buy bar whenever the real Add to bag / Buy now buttons are not usable on screen: scrolled past, still
+    // Show the sticky mobile buy bar whenever the real Add to bag button are not usable on screen: scrolled past, still
     // below the fold, or hidden behind the phone's bottom tab bar (its height is taken off the bottom of the visible area).
     useEffect(() => {
         const el = buyBoxRef.current;
@@ -139,15 +137,6 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
         if (outOfStock) return showToast('This item is out of stock', 'error');
         if (addToCart(cartProduct, quantity)) showCartToast(showToast, cartProduct);
         else showToast('You already have the maximum available quantity in your bag', 'error');
-        return undefined;
-    };
-
-    const handleBuyNow = () => {
-        if (preview) return previewOnly();
-        if (outOfStock) return showToast('This item is out of stock', 'error');
-        if (addToCart(cartProduct, quantity)) showCartToast(showToast, cartProduct, 'Added. Proceeding to checkout');
-        else showToast('You already have the maximum available quantity in your bag', 'error');
-        navigate('/checkout');
         return undefined;
     };
 
@@ -223,9 +212,8 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                             </button>
                         </div>
 
-                        <div ref={buyBoxRef} className="mt-4 grid gap-3 sm:grid-cols-2">
-                            <Button size="lg" disabled={outOfStock} onClick={handleAddToCart}><ShoppingBag size={18} aria-hidden="true" /> Add to bag</Button>
-                            <Button size="lg" variant="outline" disabled={outOfStock} onClick={handleBuyNow}>Buy now</Button>
+                        <div ref={buyBoxRef} className="mt-4">
+                            <Button size="lg" className="w-full" disabled={outOfStock} onClick={handleAddToCart}><ShoppingBag size={18} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add to bag'}</Button>
                         </div>
                         <PaymentAssurance className="mt-4" />
                     </div>
@@ -293,8 +281,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                             <p className="truncate text-caption text-muted">{product.title}{activeVariant ? ` — ${activeVariant.label}` : ''}</p>
                             <p className="flex items-center gap-1 font-display text-h4 text-primary">{memberView && <Crown size={14} aria-label="Chikit Club price" />}{formatPrice(price)}</p>
                         </div>
-                        <Button disabled={outOfStock} onClick={handleAddToCart} className="shrink-0 px-4"><ShoppingBag size={17} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add'}</Button>
-                        {!outOfStock && <Button variant="outline" onClick={handleBuyNow} className="shrink-0 px-4">Buy now</Button>}
+                        <Button disabled={outOfStock} onClick={handleAddToCart} className="shrink-0 px-6"><ShoppingBag size={17} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add to bag'}</Button>
                     </div>
                 </div>
             )}

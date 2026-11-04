@@ -1,66 +1,94 @@
 import { Link } from 'react-router-dom';
-import { Lock, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, Lock, MapPin, CreditCard, Smartphone } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl } from '@/services/api';
 import Button from '@/components/ui/Button';
 import { loginUrl } from '@/utils/authRedirect';
-import CartLinePrice from '@/components/cart/CartLinePrice';
+import { formatPrice } from '@/utils/formatPrice';
+import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
+import CheckoutSteps from '@/components/checkout/CheckoutSteps';
+import CouponInput from '@/components/checkout/CouponInput';
+import ActiveCoupons from '@/components/checkout/ActiveCoupons';
+import PriceBreakdown from '@/components/checkout/PriceBreakdown';
+
+const NEXT = [
+    { icon: Smartphone, text: 'Verify your mobile number once' },
+    { icon: MapPin, text: 'Add or pick your delivery address' },
+    { icon: CreditCard, text: 'Pay online or choose cash on delivery' },
+];
+
+/**
+ * Checkout for someone who is not signed in yet: the whole order summary and price breakdown (items, coupon, delivery, total) are
+ * shown exactly as they will be charged, so there are no surprises. Signing in is only needed to place the order, and it brings
+ * the shopper straight back here with the bag unchanged.
+ */
 export default function CheckoutLoginGate() {
     const { items, total } = useCart();
-    return (<div className="pb-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-canvas pt-2 sm:pt-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
-            <Lock size={28} className="text-primary"/>
-          </div>
-          <p className="text-xs tracking-[0.25em] uppercase text-primary mb-2 font-medium">Almost there</p>
-          <h1 className="font-display text-3xl sm:text-4xl text-ink mb-3">Sign in to place your order</h1>
-          <p className="text-muted text-base font-light max-w-md mx-auto">
-            Browse and add items freely. We only ask you to sign in when you&apos;re ready to buy.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-canvas rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-2.5 mb-4">
-              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/8 flex-shrink-0">
-                <ShoppingBag size={16} className="text-primary"/>
-              </span>
-              <h2 className="font-display text-lg sm:text-xl text-ink">Your bag ({items.length})</h2>
-            </div>
-            <div className="space-y-3 max-h-48 overflow-y-auto">
-              {items.slice(0, 4).map((item) => (<div key={item.product.id} className="flex gap-3">
-                  <img src={imageUrl(item.product.images[0])} alt="" className="w-12 h-14 object-cover rounded-lg"/>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm sm:text-[15px] text-ink line-clamp-1">{item.product.title}</p>
-                    <p className="text-sm text-muted">Qty {item.quantity}</p>
-                    <CartLinePrice product={item.product} quantity={item.quantity} align="start" className="mt-0.5 text-sm sm:text-[15px]" />
-                  </div>
-                </div>))}
-              {items.length > 4 && (<p className="text-sm text-muted">+{items.length - 4} more items</p>)}
-            </div>
-            <div className="border-t border-line/60 mt-4 pt-4 flex justify-between items-baseline font-display text-xl">
-              <span className="text-base font-sans text-ink">Total</span>
-              <span className="text-primary">{formatPrice(total)}</span>
-            </div>
-          </div>
-
-          <div className="bg-canvas rounded-2xl p-6 md:p-8 shadow-sm flex flex-col justify-center">
-            <h2 className="font-display text-xl sm:text-2xl text-ink mb-2">Continue to checkout</h2>
-            <p className="text-sm sm:text-base text-muted mb-6">
-              Sign in with Google. No phone number needed yet. We verify your mobile only when you place the order.
-            </p>
-            <Link to={loginUrl('/checkout')} className="block mb-3">
-              <Button variant="turmeric" size="lg" className="w-full">
-                Sign In & Continue
-              </Button>
+    return (
+        <div className="container-page py-8 lg:py-12">
+            <Link to="/cart" className="group mb-5 inline-flex items-center gap-2 text-small text-muted hover:text-primary">
+                <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-0.5" aria-hidden="true" /> Back to bag
             </Link>
-            <Link to="/cart" className="block text-center text-sm text-muted hover:text-primary transition-colors">
-              ← Back to cart
-            </Link>
-          </div>
+
+            <div className="mb-6">
+                <p className="eyebrow mb-2">Secure checkout</p>
+                <h1 className="text-h2">Review your order</h1>
+            </div>
+
+            <CheckoutSteps activeIndex={0} />
+
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:items-start">
+                <aside className="order-1 space-y-6 lg:order-2 lg:col-span-2" aria-label="Order summary">
+                    <ActiveCoupons variant="sidebar" />
+
+                    <div className="space-y-5 rounded-lg border border-line bg-surface p-5 sm:p-6 lg:sticky lg:top-28 lg:p-8">
+                        <h2 className="font-sans text-h4">Order summary</h2>
+
+                        <ul className="max-h-64 space-y-3 overflow-y-auto pr-1">
+                            {items.map((item) => (
+                                <li key={`${item.product.id}-${item.product.variantId || ''}-${item.product.offerGroup || item.product.offerId || ''}`} className="flex gap-3">
+                                    <img src={imageUrl(item.product.images[0])} alt="" width="56" height="64" className="h-16 w-14 shrink-0 rounded-md object-cover" />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="line-clamp-1 text-small text-ink">{item.product.title}</p>
+                                        <p className="text-small text-muted">
+                                            {item.product.offerKind === 'bogo' ? <span className="font-semibold text-success">Buy {item.quantity / 2} + {item.quantity / 2} FREE</span> : <>Qty: {item.quantity}</>}
+                                            {isClubLine(item.product) && <span className="ml-2 text-accent-ink">Chikit Club price</span>}
+                                        </p>
+                                        <CartLinePrice product={item.product} quantity={item.quantity} align="start" className="mt-0.5 text-small" />
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <div className="space-y-2 border-t border-line pt-4 text-small">
+                            <CouponInput compact />
+                            <PriceBreakdown totalClassName="text-primary" />
+                        </div>
+                    </div>
+                </aside>
+
+                <div className="order-2 space-y-5 lg:order-1 lg:col-span-3">
+                    <section className="rounded-lg border border-line bg-surface p-5 sm:p-8" aria-labelledby="signin-title">
+                        <span className="grid size-12 place-items-center rounded-full bg-accent text-primary-deep"><Lock size={22} aria-hidden="true" /></span>
+                        <h2 id="signin-title" className="mt-4 text-h3">Sign in to place your order</h2>
+                        <p className="mt-2 max-w-md text-body text-muted">
+                            Your total is <strong className="text-ink">{formatPrice(total)}</strong>, delivery included. Sign in with Google and you come straight back to this page with your bag as it is.
+                        </p>
+                        <Link to={loginUrl('/checkout')} className="mt-6 block sm:max-w-xs">
+                            <Button size="lg" className="w-full">Sign in &amp; continue</Button>
+                        </Link>
+                        <p className="mt-5 text-caption font-semibold uppercase tracking-[0.14em] text-accent-ink">What happens next</p>
+                        <ul className="mt-3 space-y-2.5">
+                            {NEXT.map(({ icon: Icon, text }) => (
+                                <li key={text} className="flex items-center gap-3 text-small text-ink">
+                                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent-tint text-primary"><Icon size={15} aria-hidden="true" /></span>
+                                    {text}
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>);
+    );
 }

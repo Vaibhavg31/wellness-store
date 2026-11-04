@@ -6,13 +6,11 @@ import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import QuantityStepper from '@/components/ui/QuantityStepper';
 import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { formatPrice } from '@/utils/formatPrice';
 import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
 import ClubSavings from '@/components/cart/ClubSavings';
 import { api, imageUrl } from '@/services/api';
-import { loginUrl } from '@/utils/authRedirect';
 import { couponPreview } from '@/utils/couponPreview';
 
 /**
@@ -36,7 +34,6 @@ export default function CartDrawer() {
         showFreeDeliveryUpsell, amountUntilFreeDelivery, freeDeliveryProgress,
         couponCode, couponDetails, autoAppliedCoupon, applyCoupon, removeCoupon,
     } = useCart();
-    const { isAuthenticated } = useAuth();
     const { showToast, dismissAll } = useToast();
     const [publicOffers, setPublicOffers] = useState([]);
 
@@ -162,7 +159,7 @@ export default function CartDrawer() {
 
                         <div className="grid grid-cols-2 gap-3">
                             <Link to="/cart" onClick={closeCartDrawer}><Button variant="outline" className="w-full">View bag</Button></Link>
-                            <Link to={isAuthenticated ? '/checkout' : loginUrl('/checkout')} onClick={closeCartDrawer}><Button className="w-full">Checkout</Button></Link>
+                            <Link to="/checkout" onClick={closeCartDrawer}><Button className="w-full">Checkout</Button></Link>
                         </div>
                     </div>
                 </div>

@@ -158,7 +158,7 @@ export function WatchShopEditor({ extras, onChange, adminToken, products }) {
                 <AdminField label="Heading"><Input value={w.title} maxLength={40} onChange={(e) => set({ title: e.target.value })} /></AdminField>
                 <AdminField label="Line under it"><Input value={w.subtitle} maxLength={140} onChange={(e) => set({ subtitle: e.target.value })} /></AdminField>
             </div>
-            <p className="text-xs text-admin-muted">Tall (9:16) videos from a phone work best: MP4, a few MB. Each one gets a “Buy now” for its product. The section hides itself when there are no videos.</p>
+            <p className="text-xs text-admin-muted">Tall (9:16) videos from a phone work best: MP4, a few MB. Each one gets an “Add to bag” button for its product. The section hides itself when there are no videos.</p>
             {w.reels.map((r, i) => (
                 <div key={r.id || i} className={rowClass}>
                     <div className="flex justify-end"><RowTools index={i} count={w.reels.length} onMove={(a, b) => set({ reels: move(w.reels, a, b) })} onRemove={() => set({ reels: w.reels.filter((_, x) => x !== i) })} /></div>
