@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Crown } from 'lucide-react';
 import { formatPrice, cn } from '@/utils/formatPrice';
 import { imageUrl } from '@/services/api';
@@ -40,10 +41,21 @@ function Bottles({ units, src, size }) {
  * ribbon such as "Super Saver". Swipes sideways on a phone; fills the width on a wide screen.
  */
 export default function VariantPicker({ variants, activeId, onChange, productImage, isMember = false }) {
+    const rowRef = useRef(null);
+    const first = useRef(true);
+    // On a phone, bring the chosen pack to the middle of the row (sideways only, the page never jumps). Not on first paint.
+    useEffect(() => {
+        if (first.current) { first.current = false; return; }
+        const row = rowRef.current;
+        const card = row?.querySelector('[aria-pressed="true"]');
+        if (!row || !card || row.scrollWidth <= row.clientWidth) return;
+        row.scrollTo({ left: card.offsetLeft - (row.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' });
+    }, [activeId]);
+
     return (
-        <fieldset>
+        <fieldset className="min-w-0">
             <legend className="mb-3 text-small font-semibold text-ink">Choose your pack</legend>
-            <div className={cn('flex snap-x snap-mandatory gap-2.5 overflow-x-auto scroll-pl-4 pb-1 scrollbar-none max-sm:-mx-4 max-sm:px-4 sm:grid sm:overflow-visible sm:pb-0', variants.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3')}>
+            <div ref={rowRef} className={cn('relative flex snap-x snap-mandatory gap-2.5 overflow-x-auto scroll-px-4 overscroll-x-contain pb-1 scrollbar-none max-sm:-mx-4 max-sm:px-4 sm:grid sm:overflow-visible sm:pb-0', variants.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3')}>
                 {variants.map((v) => {
                     const active = v.id === activeId;
                     const soldOut = v.stock <= 0;
@@ -84,7 +96,7 @@ export default function VariantPicker({ variants, activeId, onChange, productIma
                                     {eachPrice > 0 && !soldOut && <span className="text-caption text-muted">{formatPrice(eachPrice)} each</span>}
                                     {!eachPrice && perDay && !soldOut && <span className="text-caption text-muted">≈ {formatPrice(perDay)}/day</span>}
                                     {savings > 0 && !soldOut && <span className="text-caption font-semibold text-success">Save {formatPrice(savings)}</span>}
-                                    {!isMember && v.memberPrice && !soldOut && <span className="inline-flex items-center gap-1 text-caption font-medium text-accent-ink"><Crown size={11} aria-hidden="true" /> {formatPrice(v.memberPrice)} for members</span>}
+                                    {!isMember && v.memberPrice && !soldOut && <span className="mt-0.5 flex flex-col items-center text-center text-caption font-medium leading-tight text-accent-ink"><span className="inline-flex items-center gap-1 font-semibold"><Crown size={11} aria-hidden="true" /> {formatPrice(v.memberPrice)}</span><span>Chikit Club price</span></span>}
                                     {soldOut && <span className="text-caption font-medium text-danger">Out of stock</span>}
                                 </span>
                             </span>
