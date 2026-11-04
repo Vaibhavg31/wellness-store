@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Flame, Sparkles } from 'lucide-react';
+import CategoryRail, { Thumb } from '@/components/shop/CategoryRail';
 import ProductCard from '@/components/product/ProductCard';
 import Skeleton from '@/components/ui/Skeleton';
 import { useCategoryPlan } from '@/hooks/useCategoryPlan';
@@ -60,15 +61,14 @@ export default function CategoryScroller({ products, loading }) {
     const [activeId, setActiveId] = useState('');
     const [barTop, setBarTop] = useState(0);
     const barRef = useRef(null);
-    const chipRefs = useRef({});
     const clickLock = useRef(0);
 
     const sections = useMemo(() => {
         const launches = [...products].sort((a, b) => (Number(b.isNew) - Number(a.isNew)) || (new Date(b.createdAt || 0) - new Date(a.createdAt || 0))).slice(0, 12);
         const best = products.filter((p) => p.isBestSeller);
         return [
-            { id: 'new-launches', label: 'New Launches', title: 'New Launches', subtitle: 'Fresh from Chikit', items: launches, href: '/new-launches' },
-            { id: 'bestsellers', label: 'Bestsellers', title: 'Bestsellers', subtitle: 'Most loved by our customers', items: best, href: '/shop?sort=popularity' },
+            { id: 'new-launches', label: 'New Launches', icon: Sparkles, title: 'New Launches', subtitle: 'Fresh from Chikit', items: launches, href: '/new-launches' },
+            { id: 'bestsellers', label: 'Bestsellers', icon: Flame, title: 'Bestsellers', subtitle: 'Most loved by our customers', items: best, href: '/shop?sort=popularity' },
             ...plan.map((c) => ({
                 id: `cat-${c.slug}`, label: c.label, title: c.label, subtitle: c.subtitle || '', image: c.image, items: products.filter((p) => p.category === c.slug), href: `/category/${c.slug}`,
             })),
@@ -110,15 +110,6 @@ export default function CategoryScroller({ products, loading }) {
         return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); if (frame) cancelAnimationFrame(frame); };
     }, [sections]);
 
-    // Keep the highlighted button in view inside the bar.
-    useEffect(() => {
-        const chip = chipRefs.current[activeId];
-        const bar = barRef.current?.querySelector('[data-chip-row]');
-        if (!chip || !bar) return;
-        const target = chip.offsetLeft - (bar.clientWidth - chip.offsetWidth) / 2;
-        bar.scrollTo({ left: Math.max(0, target), behavior: reducedMotion() ? 'auto' : 'smooth' });
-    }, [activeId]);
-
     const goTo = useCallback((id) => {
         const node = document.getElementById(`range-${id}`);
         if (!node) return;
@@ -139,32 +130,10 @@ export default function CategoryScroller({ products, loading }) {
             <div
                 ref={barRef}
                 style={{ top: barTop }}
-                className="sticky z-30 border-b border-line bg-canvas/95 backdrop-blur transition-[top] duration-300 ease-[var(--ease-out-soft)]"
+                className="sticky z-30 border-b border-line bg-canvas/95 shadow-xs backdrop-blur transition-[top] duration-300 ease-[var(--ease-out-soft)]"
             >
                 <div className="container-page">
-                    <div data-chip-row role="tablist" aria-label="Jump to a category" className="-mx-4 flex gap-6 overflow-x-auto px-4 pr-10 scrollbar-none [mask-image:linear-gradient(to_right,#000_92%,transparent)] sm:mx-0 sm:gap-8 sm:px-0">
-                        {sections.map((s) => {
-                            const active = activeId === s.id;
-                            return (
-                                <button
-                                    key={s.id}
-                                    ref={(node) => { chipRefs.current[s.id] = node; }}
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={active}
-                                    onClick={() => goTo(s.id)}
-                                    className={cn(
-                                        // Text tabs with a plum underline under the section on screen, like the brand book's own menu.
-                                        'relative min-h-12 shrink-0 whitespace-nowrap text-small font-medium transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors',
-                                        active ? 'text-primary after:bg-primary' : 'text-muted after:bg-transparent hover:text-ink',
-                                    )}
-                                >
-                                    {s.label}
-                                </button>
-                            );
-                        })}
-                        {loading && sections.length === 0 && Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="my-3.5 h-5 w-24 shrink-0 rounded" />)}
-                    </div>
+                    <CategoryRail variant="pill" label="Jump to a category" items={sections} activeId={activeId} onSelect={goTo} loading={loading} />
                 </div>
             </div>
 
@@ -177,9 +146,12 @@ export default function CategoryScroller({ products, loading }) {
                 {sections.map((s) => (
                     <section key={s.id} id={`range-${s.id}`} aria-labelledby={`range-title-${s.id}`} style={{ scrollMarginTop: 64 }} className="py-6 lg:py-9">
                         <div className="mb-5 flex items-end justify-between gap-4 lg:mb-7">
-                            <div>
-                                <h2 id={`range-title-${s.id}`} className="text-h3">{s.title}</h2>
-                                {s.subtitle && <p className="mt-1 text-small text-muted">{s.subtitle}</p>}
+                            <div className="flex min-w-0 items-center gap-3 lg:gap-4">
+                                <Thumb item={s} size={56} className="size-12 ring-2 ring-line ring-offset-2 ring-offset-canvas lg:size-14" />
+                                <div className="min-w-0">
+                                    <h2 id={`range-title-${s.id}`} className="text-h3">{s.title}</h2>
+                                    {s.subtitle && <p className="mt-1 text-small text-muted">{s.subtitle}</p>}
+                                </div>
                             </div>
                             <Link to={s.href} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 text-small font-medium text-primary hover:underline">
                                 View all <ArrowRight size={16} aria-hidden="true" />

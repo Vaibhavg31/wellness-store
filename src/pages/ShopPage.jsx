@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Seo from '@/components/seo/Seo';
 import { useSearchParams } from 'react-router-dom';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, LayoutGrid, SlidersHorizontal } from 'lucide-react';
+import CategoryRail from '@/components/shop/CategoryRail';
 import PageHeader from '@/components/ui/PageHeader';
 import Button from '@/components/ui/Button';
 import SearchField from '@/components/shop/SearchField';
@@ -48,6 +49,9 @@ export default function ShopPage() {
         products.forEach((p) => (p.tags ?? []).forEach((t) => seen.add(t)));
         return [...seen].sort((a, b) => a.localeCompare(b));
     }, [products]);
+
+    // The round category row at the top of the list: "All products" first, then each category with its picture.
+    const railItems = useMemo(() => [{ id: 'all', label: 'All products', icon: LayoutGrid }, ...categories.map((c) => ({ id: c.slug, label: c.label, image: c.image }))], [categories]);
 
     const maxPrice = filters.maxPrice === Infinity ? ceiling : filters.maxPrice;
     // "Best match" only makes sense while there is something being searched for.
@@ -130,6 +134,7 @@ export default function ShopPage() {
 
                 <section aria-labelledby="shop-products" className="min-w-0">
                     <h2 id="shop-products" className="sr-only">Products</h2>
+                    <CategoryRail className="mb-5" label="Shop by category" items={railItems} activeId={filters.category} onSelect={(id) => update('category', id)} loading={categories.length === 0} />
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                         <SearchField value={filters.search} onChange={(v) => update('search', v)} placeholder="Search products…" className="sm:flex-1" />
                         <div className="flex items-center gap-3">
