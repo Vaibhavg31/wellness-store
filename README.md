@@ -152,7 +152,7 @@ One set of rules so every screen feels the same. New pages and components should
 
 | Moment | What happens | Where |
 | --- | --- | --- |
-| Moving to another page | The current page **stays on screen** until the next one is ready. A thin plum progress bar shows the wait (it also covers redirects such as sign-in). The new page fades in (0.35 s). There is never a blank "loading" screen between pages. | `App.jsx` (persistent `Suspense`), `RouteProgress`, `PageTransition` |
+| Moving to another page | The current page **stays on screen** until the next one is ready. The new page fades in (0.35 s). There is never a blank "loading" screen between pages. | `App.jsx` (persistent `Suspense`), `PageTransition` |
 | Page code | Each page is lazy-loaded, but its code is warmed when a link is hovered, focused or touched, and during idle time. Skipped on data-saver / 2G. | `src/utils/routeLoaders.js` |
 | Store ↔ sign-in ↔ admin | Separate layouts that swap cleanly, with no fading through a blank frame. Sign-in screens are **solid and crisp**: the card swipes in from the side (rises on phones), never fades. | `RouteGroup`, `AuthShell` |
 | Sign in ⇄ Sign up | Large screens: one wide card whose solid brand panel slides from one side to the other, uncovering the other form. Phones: a card swipe between the two forms. Typed values carry over. | `AuthSlider`, `SwipePanels` |

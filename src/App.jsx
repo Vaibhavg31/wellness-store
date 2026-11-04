@@ -10,7 +10,6 @@ import { loginUrl } from '@/utils/authRedirect';
 import ScrollToTop from '@/components/layout/ScrollToTop';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
-import RouteProgress from '@/components/layout/RouteProgress';
 import RouteTracker from '@/components/layout/RouteTracker';
 import { PREVIEW_PATH } from '@/utils/productPreview';
 import PageLoader from '@/components/layout/PageLoader';
@@ -153,7 +152,6 @@ export default function App() {
                                     <ToastProvider>
                                         <ScrollToTop />
                                         <RouteTracker />
-                                        <RouteProgress />
                                         <AnnouncementPopup />
                                         <Suspense fallback={<PageLoader fullscreen />}>
                                         <RouteGroup>
