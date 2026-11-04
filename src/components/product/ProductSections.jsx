@@ -7,7 +7,7 @@ import { cn } from '@/utils/formatPrice';
 /** A section heading used by every block below the buy box. */
 function Heading({ eyebrow, title, children }) {
     return (
-        <div className="mb-6 flex flex-col gap-1 sm:mb-8 sm:items-center sm:text-center">
+        <div className="mb-5 flex flex-col gap-1 sm:mb-6 sm:items-center sm:text-center">
             {eyebrow && <p className="eyebrow">{eyebrow}</p>}
             <h2 className="text-h3">{title}</h2>
             {children}

@@ -18,7 +18,7 @@ export default function OffersList() {
     };
 
     return (
-        <section aria-labelledby="offers-title" className="mt-6 rounded-lg border border-dashed border-primary/40 bg-primary-soft p-4">
+        <section aria-labelledby="offers-title" className="mt-5 rounded-lg border border-dashed border-primary/40 bg-primary-soft p-4">
             <h2 id="offers-title" className="mb-3 flex items-center gap-2 font-sans text-small font-semibold">
                 <Tag size={16} className="text-primary" aria-hidden="true" /> Available offers
             </h2>
