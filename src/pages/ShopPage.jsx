@@ -3,7 +3,7 @@ import Seo from '@/components/seo/Seo';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, LayoutGrid, SlidersHorizontal } from 'lucide-react';
 import CategoryRail from '@/components/shop/CategoryRail';
-import PageHeader from '@/components/ui/PageHeader';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Button from '@/components/ui/Button';
 import SearchField from '@/components/shop/SearchField';
 import FilterSheet from '@/components/shop/FilterSheet';
@@ -53,6 +53,10 @@ export default function ShopPage() {
     // The round category row at the top of the list: "All products" first, then each category with its picture.
     const railItems = useMemo(() => [{ id: 'all', label: 'All products', icon: LayoutGrid }, ...categories.map((c) => ({ id: c.slug, label: c.label, image: c.image }))], [categories]);
 
+    const activeCategory = filters.category !== 'all' ? categories.find((c) => c.slug === filters.category) : null;
+    const searched = Boolean(filters.search.trim());
+    const heading = searched ? `Results for “${filters.search.trim()}”` : (activeCategory?.label ?? 'Shop all');
+    const blurb = searched ? 'Everything in the range that matches your search.' : (activeCategory?.description || 'Lab-tested, clean-label Ayurvedic wellness.');
     const maxPrice = filters.maxPrice === Infinity ? ceiling : filters.maxPrice;
     // "Best match" only makes sense while there is something being searched for.
     const sortOptions = filters.search.trim() ? SORT_OPTIONS : SORT_OPTIONS.filter((o) => o.value !== 'relevance');
@@ -114,12 +118,18 @@ export default function ShopPage() {
     return (
         <>
             <Seo title="Shop Ayurvedic Wellness Products" description="Shop lab-tested, clean-label Ayurvedic supplements, juices, gummies and personal care from Chikit. Free delivery above the threshold, easy returns and COD." path="/shop" />
-            <PageHeader
-                compact
-                crumbs={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
-                title="Shop all"
-                description="Lab-tested, clean-label Ayurvedic wellness."
-            />
+            <header className="border-b border-line bg-canvas-alt">
+                <div className="container-page pb-5 pt-4 sm:pb-8 sm:pt-6">
+                    <Breadcrumbs crumbs={[{ label: 'Home', href: '/' }, { label: 'Shop', href: activeCategory || searched ? '/shop' : undefined }, ...(activeCategory ? [{ label: activeCategory.label }] : [])]} className="mb-3" />
+                    <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+                        <div className="min-w-0">
+                            <h1 className="text-h2 sm:text-h1">{heading}</h1>
+                            <p className="mt-1.5 max-w-2xl text-small text-muted sm:text-body">{blurb}</p>
+                        </div>
+                    </div>
+                    <CategoryRail className="mt-5 sm:mt-6" surface="alt" label="Shop by category" items={railItems} activeId={filters.category} onSelect={(id) => update('category', id)} loading={categories.length === 0} />
+                </div>
+            </header>
 
             <div className="container-page py-6 lg:grid lg:grid-cols-[15rem_1fr] lg:gap-14 lg:py-12">
                 <aside className="hidden lg:block" aria-label="Filters">
@@ -134,10 +144,10 @@ export default function ShopPage() {
 
                 <section aria-labelledby="shop-products" className="min-w-0">
                     <h2 id="shop-products" className="sr-only">Products</h2>
-                    <CategoryRail className="mb-5" label="Shop by category" items={railItems} activeId={filters.category} onSelect={(id) => update('category', id)} loading={categories.length === 0} />
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <SearchField value={filters.search} onChange={(v) => update('search', v)} placeholder="Search products…" className="sm:flex-1" />
-                        <div className="flex items-center gap-3">
+                    {/* On a phone the search sits in the page and the Filters / Sort row sticks under the header while the list scrolls; wider screens keep one row. */}
+                    <div className="contents sm:flex sm:items-center sm:gap-3">
+                        <SearchField value={filters.search} onChange={(v) => update('search', v)} placeholder="Search products…" className="mb-3 sm:mb-0 sm:flex-1" />
+                        <div className="sticky top-[var(--header-offset,0px)] z-20 -mx-4 flex items-center gap-3 border-b border-line bg-canvas/95 px-4 py-2 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
                             <Button variant="outline" onClick={() => setFilterOpen(true)} className="flex-1 lg:hidden">
                                 <SlidersHorizontal size={16} aria-hidden="true" /> Filters
                                 {activeCount > 0 && <span className="grid size-5 place-items-center rounded-full bg-primary text-caption leading-none text-white">{activeCount}</span>}

@@ -23,7 +23,7 @@ export function Thumb({ item, className, size }) {
  *  - variant "pill":   compact pills with a small round picture (the bar that sticks under the header on the home page).
  * `items` are { id, label, image?, icon? }. Buttons report `aria-pressed`, so it works as a filter or as a jump bar.
  */
-export default function CategoryRail({ items, activeId, onSelect, variant = 'circle', label = 'Categories', className, loading = false }) {
+export default function CategoryRail({ items, activeId, onSelect, variant = 'circle', label = 'Categories', className, loading = false, surface = 'canvas' }) {
     const rowRef = useRef(null);
     const [edge, setEdge] = useState({ start: true, end: false });
 
@@ -89,7 +89,8 @@ export default function CategoryRail({ items, activeId, onSelect, variant = 'cir
                                 item={item}
                                 size={80}
                                 className={cn(
-                                    'size-[4.5rem] ring-2 ring-offset-2 ring-offset-canvas transition-[box-shadow,transform] duration-300 sm:size-20',
+                                    'size-[4.5rem] ring-2 ring-offset-2 transition-[box-shadow,transform] duration-300 sm:size-20',
+                                    surface === 'alt' ? 'ring-offset-canvas-alt' : 'ring-offset-canvas',
                                     active ? 'ring-primary' : 'ring-line group-hover:ring-primary/50',
                                     'group-active:scale-95',
                                 )}
