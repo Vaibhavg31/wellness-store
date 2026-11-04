@@ -23,17 +23,33 @@ export class CouponService {
         return { fee: Number(delivery.fee ?? 99), freeThreshold: Number(delivery.freeThreshold ?? 1999) };
     }
 
-    async resolveAutoApply(subtotal, userId = null) {
-        subtotal = Math.round(Math.max(0, subtotal) * 100) / 100;
+    /**
+     * Coupons only reduce regular-priced products. Lines already priced by an offer (Buy 1 Get 1, Pick & Mix) or a bundle are
+     * left out, so a deal is never discounted twice. "Eligible" is what is left for a coupon to discount (the whole bag by default).
+     */
+    static eligibleSubtotalOf(items) {
+        const sum = (items || []).filter((i) => !i.bundleId && !i.offerId).reduce((t, i) => t + Number(i.price) * Number(i.quantity), 0);
+        return Math.round(sum * 100) / 100;
+    }
+
+    static cleanAmounts(subtotal, eligibleSubtotal) {
+        const full = Math.round(Math.max(0, Number(subtotal) || 0) * 100) / 100;
+        const eligible = Number(eligibleSubtotal);
+        if (eligibleSubtotal === undefined || eligibleSubtotal === null || !Number.isFinite(eligible)) return { full, eligible: full };
+        return { full, eligible: Math.round(Math.min(full, Math.max(0, eligible)) * 100) / 100 };
+    }
+
+    async resolveAutoApply(rawSubtotal, userId = null, rawEligible = undefined) {
+        const { full: subtotal, eligible } = CouponService.cleanAmounts(rawSubtotal, rawEligible);
         if (subtotal <= 0) return null;
 
         let best = null;
         let bestSavings = -1;
 
         for (const coupon of await this.coupons.getAutoApply()) {
-            if ((await this.eligibilityError(coupon, subtotal, userId)) !== null) continue;
+            if ((await this.eligibilityError(coupon, subtotal, userId, eligible)) !== null) continue;
 
-            const breakdown = await this.calculateBreakdown(subtotal, coupon);
+            const breakdown = await this.calculateBreakdown(subtotal, coupon, eligible);
             let savings = Number(breakdown.discountAmount || 0);
             if (breakdown.freeDeliveryFromCoupon && breakdown.deliveryFee <= 0) {
                 const delivery = await this.deliverySettings();
@@ -55,38 +71,41 @@ export class CouponService {
         return best;
     }
 
-    async validate(code, subtotal, userId = null) {
+    async validate(code, rawSubtotal, userId = null, rawEligible = undefined) {
+        const { full: subtotal, eligible } = CouponService.cleanAmounts(rawSubtotal, rawEligible);
         const normalized = CouponService.normalizeCode(code);
         if (!normalized) return { valid: false, message: 'Enter a coupon code' };
 
         const coupon = await this.coupons.findByCode(normalized);
-        if (!coupon) return { valid: false, message: 'Invalid coupon code' };
+        if (!coupon) return { valid: false, message: 'That code is not valid. Please check it and try again.' };
 
-        const error = await this.eligibilityError(coupon, subtotal, userId);
+        const error = await this.eligibilityError(coupon, subtotal, userId, eligible);
         if (error !== null) return { valid: false, message: error };
 
-        const breakdown = await this.calculateBreakdown(subtotal, coupon);
+        const breakdown = await this.calculateBreakdown(subtotal, coupon, eligible);
         return { valid: true, message: this.successMessage(coupon, breakdown), coupon: this.publicCouponShape(coupon), breakdown };
     }
 
-    async calculateBreakdown(subtotal, coupon) {
+    async calculateBreakdown(rawSubtotal, coupon, rawEligible = undefined) {
         const delivery = await this.deliverySettings();
-        subtotal = Math.round(Math.max(0, subtotal) * 100) / 100;
+        const { full: subtotal, eligible } = CouponService.cleanAmounts(rawSubtotal, rawEligible);
 
         const type = coupon.type || 'percent';
         const value = Number(coupon.value || 0);
+        const maxDiscount = Number(coupon.maxDiscount || 0);
 
         let discountAmount = 0;
+        let uncapped = 0;
         const freeDeliveryFromThreshold = subtotal >= delivery.freeThreshold;
         const freeDeliveryFromCoupon = type === 'free_delivery';
 
         if (type === 'percent') {
-            discountAmount = Math.round((subtotal * value / 100) * 100) / 100;
-            const maxDiscount = Number(coupon.maxDiscount || 0);
+            discountAmount = Math.round((eligible * value / 100) * 100) / 100;
+            uncapped = discountAmount;
             if (maxDiscount > 0) discountAmount = Math.min(discountAmount, maxDiscount);
-            discountAmount = Math.min(discountAmount, subtotal);
+            discountAmount = Math.min(discountAmount, eligible);
         } else if (type === 'flat') {
-            discountAmount = Math.min(value, subtotal);
+            discountAmount = Math.min(value, eligible);
         }
 
         let deliveryFee = delivery.fee;
@@ -103,6 +122,11 @@ export class CouponService {
             freeDeliveryFromCoupon,
             couponType: type,
             couponValue: value,
+            // What the coupon touched: it discounts the eligible part only, up to maxDiscount. The storefront shows this plainly.
+            eligibleSubtotal: eligible,
+            excludedSubtotal: Math.round((subtotal - eligible) * 100) / 100,
+            maxDiscount,
+            capped: type === 'percent' && maxDiscount > 0 && uncapped > maxDiscount,
         };
     }
 
@@ -131,7 +155,7 @@ export class CouponService {
     async recordUsage(couponId) { return this.coupons.incrementUsage(couponId); }
     async releaseUsage(couponId) { return this.coupons.decrementUsage(couponId); }
 
-    async eligibilityError(coupon, subtotal, userId) {
+    async eligibilityError(coupon, subtotal, userId, eligibleSubtotal = subtotal) {
         if (!coupon.isEnabled) return 'This coupon is no longer active';
 
         const now = Date.now();
@@ -147,8 +171,20 @@ export class CouponService {
             if (!Number.isNaN(endTs) && now > endTs) return 'This coupon has expired';
         }
 
+        const type = coupon.type || 'percent';
+        const reduces = type === 'percent' || type === 'flat';
+        if (reduces && subtotal > 0 && eligibleSubtotal <= 0) {
+            return 'Coupons work on regular-priced products only. Everything in your bag is already on an offer or bundle price.';
+        }
+        // The minimum counts only what the coupon can discount (a free-delivery coupon looks at the whole bag).
         const minOrder = Number(coupon.minOrderAmount || 0);
-        if (minOrder > 0 && subtotal < minOrder) return `Minimum order of ₹${Math.round(minOrder)} required for this coupon`;
+        const counted = reduces ? eligibleSubtotal : subtotal;
+        if (minOrder > 0 && counted < minOrder) {
+            const gap = Math.ceil(minOrder - counted);
+            return reduces && subtotal > eligibleSubtotal
+                ? `Add ₹${gap} more of regular-priced products to use this coupon (offer and bundle items do not count).`
+                : `Add ₹${gap} more to use this coupon. It needs an order of at least ₹${Math.round(minOrder)}.`;
+        }
 
         const maxUses = Number(coupon.maxUses || 0);
         const usageCount = Number(coupon.usageCount || 0);
@@ -199,8 +235,13 @@ export class CouponService {
         const value = Number(coupon.value || 0);
 
         if (type === 'free_delivery') return 'Free delivery applied!';
-        if (type === 'flat') return `₹${Math.round(value)} off applied!`;
-        if (breakdown.discountAmount > 0) return `${Math.round(value)}% off applied. You save ₹${Math.round(breakdown.discountAmount)}`;
+        const saved = Math.round(breakdown.discountAmount);
+        if (type === 'flat') return `You save ₹${saved} with this coupon`;
+        if (breakdown.discountAmount > 0) {
+            return breakdown.capped
+                ? `${Math.round(value)}% off, capped at ₹${Math.round(breakdown.maxDiscount)}. You save ₹${saved}`
+                : `${Math.round(value)}% off. You save ₹${saved}`;
+        }
         return 'Coupon applied successfully';
     }
 
@@ -214,13 +255,20 @@ export class CouponService {
             value: Number(coupon.value || 0),
             minOrderAmount: Number(coupon.minOrderAmount || 0),
             maxDiscount: Number(coupon.maxDiscount || 0),
+            label: CouponService.labelFor(coupon),
         };
+    }
+
+    static labelFor(coupon) {
+        const type = coupon.type || 'percent';
+        const value = Number(coupon.value || 0);
+        return type === 'free_delivery' ? 'Free Delivery' : type === 'flat' ? `₹${Math.round(value)} OFF` : `${Math.round(value)}% OFF`;
     }
 
     publicListShape(coupon) {
         const type = coupon.type || 'percent';
         const value = Number(coupon.value || 0);
-        const label = type === 'free_delivery' ? 'Free Delivery' : type === 'flat' ? `₹${Math.round(value)} OFF` : `${Math.round(value)}% OFF`;
+        const label = CouponService.labelFor(coupon);
 
         return {
             id: coupon.id || '',
@@ -231,6 +279,7 @@ export class CouponService {
             value,
             label,
             minOrderAmount: Number(coupon.minOrderAmount || 0),
+            maxDiscount: Number(coupon.maxDiscount || 0),
         };
     }
 }

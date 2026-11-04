@@ -95,7 +95,10 @@ export default function MixBox({ offer, products }) {
     const worth = lists.reduce((sum, p) => sum + p, 0);
     const pricing = useMemo(() => (full ? mixBoxPricing(lists, members, offer.price, isMember) : null), [full, picked, offer.price, isMember]); // eslint-disable-line react-hooks/exhaustive-deps
     const pay = pricing ? pricing.units.reduce((sum, p) => sum + p, 0) : 0;
-    const saving = full ? Math.max(0, worth - pay) : 0;
+    // The box price is a saving, so the picks must be worth at least that much. A cheaper trio is simply bought one by one.
+    const short = full && worth < offer.price;
+    const unlocked = full && !short;
+    const saving = unlocked ? Math.max(0, worth - pay) : 0;
     // A guest whose Chikit Club prices would beat the box is told what joining would make this box cost.
     const clubOffer = useMemo(() => {
         if (!full || isMember) return null;
@@ -113,7 +116,7 @@ export default function MixBox({ offer, products }) {
     };
 
     const commit = (goToCheckout) => {
-        if (!full) return;
+        if (!unlocked) return;
         if (addMixBox(offer, picked)) {
             setPicked([]);
             if (goToCheckout) navigate('/checkout');
@@ -123,9 +126,11 @@ export default function MixBox({ offer, products }) {
         }
     };
 
-    const message = full
-        ? (pricing.byClub ? 'Priced at your Chikit Club prices, which beat the box price.' : saving <= 0 ? `These picks cost less than ${formatPrice(offer.price)}, so you pay their normal prices. Add a pricier pick to save more.` : isMember ? 'The box price is your best price for these picks.' : 'Your box is ready.')
-        : `Pick ${remaining} more to unlock ${formatPrice(offer.price)}`;
+    const message = short
+        ? `Your picks come to ${formatPrice(worth)}. Choose products worth at least ${formatPrice(offer.price)} in total to unlock the box price.`
+        : full
+            ? (pricing.byClub ? 'Priced at your Chikit Club prices, which beat the box price.' : isMember ? 'The box price is your best price for these picks.' : 'Your box is ready.')
+            : `Pick ${remaining} more. Together they must be worth at least ${formatPrice(offer.price)} to unlock the box price.`;
 
     const panelBody = (
         <>
@@ -134,22 +139,22 @@ export default function MixBox({ offer, products }) {
             </ul>
 
             <div className="mt-5 space-y-2 border-t border-line pt-4 text-small">
-                <p className="flex items-baseline justify-between"><span className="text-muted">{full ? 'Worth, bought one by one' : 'Worth so far'}</span><span className={cn(full && saving > 0 && 'text-muted line-through')}>{formatPrice(worth)}</span></p>
-                {full ? (
+                <p className="flex items-baseline justify-between"><span className="text-muted">{full ? 'Worth, bought one by one' : 'Worth so far'}</span><span className={cn(unlocked && saving > 0 && 'text-muted line-through')}>{formatPrice(worth)}</span></p>
+                {unlocked ? (
                     <>
                         <p className="flex items-baseline justify-between"><span className="font-semibold text-ink">{pricing.byClub ? 'Your Chikit Club prices' : 'Box price'}</span><span className="font-display text-h3 text-primary">{formatPrice(pay)}</span></p>
                         {saving > 0 && <p className="flex items-baseline justify-between font-semibold text-success"><span>You save</span><span>{formatPrice(saving)}</span></p>}
                     </>
                 ) : (
-                    <p className="flex items-baseline justify-between"><span className="font-semibold text-ink">Box price</span><span className="font-display text-h3 text-primary">{formatPrice(offer.price)}</span></p>
+                    <p className="flex items-baseline justify-between"><span className="font-semibold text-ink">{short ? 'Needed for the box price' : 'Box price'}</span><span className={cn('font-display text-h3', short ? 'text-ink' : 'text-primary')}>{short ? `${formatPrice(offer.price)}+` : formatPrice(offer.price)}</span></p>
                 )}
             </div>
 
-            <p className={cn('mt-3 flex items-start gap-2 rounded-xl px-3 py-2.5 text-caption leading-snug', full ? 'bg-success-tint text-ink' : 'bg-accent-tint text-ink')}>
-                {full ? <Check size={15} className="mt-px shrink-0 text-success" aria-hidden="true" /> : <ArrowRight size={15} className="mt-px shrink-0 text-accent-ink" aria-hidden="true" />}
+            <p className={cn('mt-3 flex items-start gap-2 rounded-xl px-3 py-2.5 text-caption leading-snug', unlocked ? 'bg-success-tint text-ink' : 'bg-accent-tint text-ink')}>
+                {unlocked ? <Check size={15} className="mt-px shrink-0 text-success" aria-hidden="true" /> : <ArrowRight size={15} className="mt-px shrink-0 text-accent-ink" aria-hidden="true" />}
                 <span>{message}</span>
             </p>
-            {clubOffer != null && (
+            {clubOffer != null && unlocked && (
                 <Link to="/club" className="mt-2 flex items-start gap-2 rounded-xl bg-accent px-3 py-2.5 text-caption leading-snug text-primary-deep hover:bg-accent-hover">
                     <Crown size={15} className="mt-px shrink-0 text-primary" aria-hidden="true" />
                     <span><strong>Become a Chikit Club member, free, and this box costs {formatPrice(clubOffer)}.</strong> Your Chikit Club prices beat the box price on these picks.</span>
@@ -157,8 +162,8 @@ export default function MixBox({ offer, products }) {
             )}
 
             <div className="mt-4 grid gap-2">
-                <button type="button" disabled={!full} onClick={() => commit(false)} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={17} aria-hidden="true" /> {full ? `Add box to bag · ${formatPrice(pay)}` : `Pick ${remaining} more`}</button>
-                <button type="button" disabled={!full} onClick={() => commit(true)} className="inline-flex h-11 items-center justify-center rounded-full border border-primary text-small font-semibold text-primary transition-colors hover:bg-primary-soft disabled:cursor-not-allowed disabled:border-line disabled:text-subtle disabled:hover:bg-transparent">Buy now</button>
+                <button type="button" disabled={!unlocked} onClick={() => commit(false)} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={17} aria-hidden="true" /> {unlocked ? `Add box to bag · ${formatPrice(pay)}` : short ? 'Pick pricier' : `Pick ${remaining} more`}</button>
+                <button type="button" disabled={!unlocked} onClick={() => commit(true)} className="inline-flex h-11 items-center justify-center rounded-full border border-primary text-small font-semibold text-primary transition-colors hover:bg-primary-soft disabled:cursor-not-allowed disabled:border-line disabled:text-subtle disabled:hover:bg-transparent">Buy now</button>
             </div>
         </>
     );
@@ -172,7 +177,7 @@ export default function MixBox({ offer, products }) {
                             <p className="text-caption font-semibold uppercase tracking-[0.16em] text-accent-ink">Step 1</p>
                             <h2 className="mt-1 text-h3">Choose any {slots} products</h2>
                         </div>
-                        <p className="text-small text-muted"><strong className="font-semibold text-ink">{picked.length} of {slots}</strong> picked. Each product once.</p>
+                        <p className="text-small text-muted"><strong className="font-semibold text-ink">{picked.length} of {slots}</strong> picked. Each product once, together worth {formatPrice(offer.price)} or more.</p>
                     </div>
                     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
                         {products.map((product) => (
@@ -195,7 +200,12 @@ export default function MixBox({ offer, products }) {
                 </div>
                 <div className="space-y-2.5 px-4 pb-3 pt-2.5">
                     <div className="flex items-baseline justify-between gap-3 leading-tight">
-                        {full ? (
+                        {short ? (
+                            <>
+                                <p className="text-small font-semibold text-ink">Worth {formatPrice(worth)}</p>
+                                <p className="text-caption text-muted">needs <strong className="text-ink">{formatPrice(offer.price)}</strong> or more</p>
+                            </>
+                        ) : full ? (
                             <>
                                 <p className="text-small font-semibold text-success">{saving > 0 ? `You save ${formatPrice(saving)}` : 'Your box is ready'}</p>
                                 <p className="flex items-baseline gap-1.5">{saving > 0 && <span className="text-caption text-muted line-through">{formatPrice(worth)}</span>}<span className="font-display text-h4 text-primary">{formatPrice(pay)}</span></p>
@@ -211,10 +221,10 @@ export default function MixBox({ offer, products }) {
                         <ul className="flex shrink-0 items-center gap-1.5">
                             {Array.from({ length: slots }, (_, i) => <Slot key={picked[i]?.id ?? `bar-${i}`} product={picked[i]} index={i} onRemove={toggle} compact />)}
                         </ul>
-                        <button type="button" disabled={!full} onClick={() => commit(false)} className="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={16} aria-hidden="true" /> Add box to bag</button>
+                        <button type="button" disabled={!unlocked} onClick={() => commit(false)} className="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-disabled disabled:text-subtle"><ShoppingBag size={16} aria-hidden="true" /> {short ? 'Pick pricier' : 'Add box to bag'}</button>
                     </div>
                 </div>
-                {clubOffer != null && <Link to="/club" className="flex items-center justify-center gap-1.5 bg-accent px-4 py-1.5 text-caption font-semibold text-primary-deep"><Crown size={13} aria-hidden="true" /> Become a Chikit Club member, free: this box costs {formatPrice(clubOffer)}</Link>}
+                {clubOffer != null && unlocked && <Link to="/club" className="flex items-center justify-center gap-1.5 bg-accent px-4 py-1.5 text-caption font-semibold text-primary-deep"><Crown size={13} aria-hidden="true" /> Become a Chikit Club member, free: this box costs {formatPrice(clubOffer)}</Link>}
             </div>
         </div>
     );

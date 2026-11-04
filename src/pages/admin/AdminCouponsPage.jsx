@@ -7,6 +7,7 @@ import { api } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { formatPrice } from '@/utils/formatPrice';
+import { copyText } from '@/utils/copyText';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Drawer from '@/components/ui/Drawer';
@@ -40,6 +41,12 @@ const EMPTY_FORM = {
     startsAt: '',
     expiresAt: '',
 };
+
+const DELIVERY_MODES = [
+    { value: 'public', title: 'Shown on the website', text: 'Listed under "Coupons for you" in the bag and at checkout, and on product pages. Anyone can tap to apply it.' },
+    { value: 'hidden', title: 'Hidden code (campaigns)', text: 'Not listed anywhere. Only people you send the code to (email, WhatsApp, SMS, influencers) can use it, by typing it at checkout or opening your campaign link.' },
+    { value: 'auto', title: 'Applied automatically', text: 'Added to the bag by itself when the customer qualifies (for example, free delivery above ₹1,500). No code to type.' },
+];
 
 const AUDIENCE_OPTIONS = [
     { value: 'everyone', label: 'Everyone', icon: Users },
@@ -239,8 +246,11 @@ export default function AdminCouponsPage() {
                                                         <p className="font-mono text-sm font-semibold text-ink tracking-wide">{coupon.code}</p>
                                                         <p className="text-sm text-ink mt-0.5">{coupon.title}</p>
                                                         <div className="flex flex-wrap gap-1.5 mt-2">
-                                                            {coupon.showOnWebsite && coupon.isEnabled && (
+                                                            {coupon.showOnWebsite && !coupon.autoApply && coupon.isEnabled && (
                                                                 <Badge variant="bestseller">On website</Badge>
+                                                            )}
+                                                            {!coupon.showOnWebsite && !coupon.autoApply && coupon.isEnabled && (
+                                                                <Badge variant="default">Hidden code</Badge>
                                                             )}
                                                             {coupon.autoApply && coupon.isEnabled && (
                                                                 <Badge variant="new">Auto apply</Badge>
@@ -422,24 +432,51 @@ export default function AdminCouponsPage() {
                         <input type="checkbox" checked={form.isEnabled} onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })} />
                         Enabled (customers can use this code)
                     </label>
-                    <label className="flex items-center gap-2 text-sm">
-                        <input type="checkbox" checked={form.showOnWebsite} onChange={(e) => setForm({ ...form, showOnWebsite: e.target.checked })} />
-                        Show on website (display in cart &amp; checkout offers)
-                    </label>
-                    <label className="flex items-start gap-2 text-sm">
-                        <input
-                            type="checkbox"
-                            className="mt-0.5"
-                            checked={form.autoApply}
-                            onChange={(e) => setForm({ ...form, autoApply: e.target.checked })}
-                        />
-                        <span>
-                            Auto-apply at checkout when eligible
-                            <span className="block text-xs text-admin-muted mt-0.5">
-                                Applies automatically when min order amount is met (e.g. free delivery above ₹1,500).
-                            </span>
-                        </span>
-                    </label>
+                    <fieldset>
+                        <legend className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">How do customers get this coupon?</legend>
+                        <div className="grid gap-2">
+                            {DELIVERY_MODES.map(({ value, title, text }) => {
+                                const mode = form.autoApply ? 'auto' : form.showOnWebsite ? 'public' : 'hidden';
+                                return (
+                                    <label key={value} className={`flex items-start gap-3 rounded-lg border p-3 text-sm cursor-pointer ${mode === value ? 'border-primary bg-primary/5' : 'border-admin-border'}`}>
+                                        <input
+                                            type="radio"
+                                            name="coupon-delivery"
+                                            className="mt-1"
+                                            checked={mode === value}
+                                            onChange={() => setForm({ ...form, autoApply: value === 'auto', showOnWebsite: value === 'public' })}
+                                        />
+                                        <span>
+                                            <span className="block font-medium text-ink">{title}</span>
+                                            <span className="block text-xs text-admin-muted mt-0.5">{text}</span>
+                                        </span>
+                                    </label>
+                                );
+                            })}
+                        </div>
+                    </fieldset>
+
+                    {!form.autoApply && !form.showOnWebsite && form.code.trim() && (
+                        <div className="rounded-lg border border-admin-border bg-canvas-alt px-3 py-3 text-xs text-admin-muted">
+                            <p className="font-medium text-ink text-sm">Campaign link for this code</p>
+                            <p className="mt-1">Put this link in your email, WhatsApp or SMS. The code is applied for the customer when they open it and have a product in the bag.</p>
+                            <div className="mt-2 flex items-center gap-2">
+                                <code className="min-w-0 flex-1 truncate rounded bg-surface px-2 py-1.5 text-ink">{`${window.location.origin}/?coupon=${form.code.trim().toUpperCase()}`}</code>
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={async () => { (await copyText(`${window.location.origin}/?coupon=${form.code.trim().toUpperCase()}`)) && showToast('Link copied', 'success'); }}
+                                >
+                                    Copy link
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+
+                    <p className="text-xs text-admin-muted">
+                        Every coupon: one per order, and it only discounts regular-priced products. Offer boxes, Buy 1 Get 1 pairs and bundles are never discounted again.
+                    </p>
 
                     <div className="sticky bottom-0 pt-4 pb-2 bg-canvas border-t border-admin-border -mx-5 px-5 sm:-mx-6 sm:px-6 mt-6">
                         <Button variant="turmeric" className="w-full" onClick={handleSave} disabled={saving}>

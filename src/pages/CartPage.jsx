@@ -77,11 +77,17 @@ function LineEntry({ item, onRemove, onQuantity }) {
                         <p className="mt-0.5 text-caption text-muted">{product.variantLabel || humanizeSlug(product.category)}</p>
                         {product.offerTitle && <p className="mt-0.5 text-caption font-medium text-accent-ink">{isClubLine(product) && product.offerGroup ? 'Box priced at your Chikit Club prices' : product.offerTitle}</p>}
                         {isClubLine(product) && !product.offerGroup && <p className="mt-0.5 text-caption font-medium text-accent-ink">Chikit Club price</p>}
+                        {product.offerKind === 'bogo' && <p className="mt-1 inline-flex rounded-full bg-success-tint px-2.5 py-0.5 text-caption font-semibold text-success">Buy {quantity / 2} + {quantity / 2} FREE</p>}
                     </div>
                     <button type="button" onClick={() => onRemove(product.id, product.title, product.variantId, product.offerId)} className={removeButton} aria-label={`Remove ${product.title}`}><Trash2 size={16} /></button>
                 </div>
                 <div className="mt-auto flex items-center justify-between gap-3 pt-3">
-                    <QuantityStepper value={quantity} min={product.offerKind === 'bogo' ? 2 : 1} step={product.offerKind === 'bogo' ? 2 : 1} max={typeof product.stock === 'number' ? product.stock : 99} onChange={(q) => onQuantity(product.id, q, variant)} />
+                    {product.offerKind === 'bogo' ? (
+                        // Buy 1 Get 1 moves in sets: each step is one paid product plus its free one.
+                        <QuantityStepper value={quantity / 2} min={1} max={Math.max(1, Math.floor((typeof product.stock === 'number' ? product.stock : 98) / 2))} onChange={(sets) => onQuantity(product.id, sets * 2, variant)} />
+                    ) : (
+                        <QuantityStepper value={quantity} min={1} max={typeof product.stock === 'number' ? product.stock : 99} onChange={(q) => onQuantity(product.id, q, variant)} />
+                    )}
                     <CartLinePrice product={product} quantity={quantity} className="text-body" />
                 </div>
             </div>

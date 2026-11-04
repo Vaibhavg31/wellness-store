@@ -292,6 +292,9 @@ async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
         if (new Set(group.map((g) => g.productId)).size !== group.length) throw new HttpError('Each product can only be picked once in a box', 400);
         // A member pays the lower of the box price and the Club prices of the same products (see mixBoxPricing).
         const { units, byClub } = mixBoxPricing(group.map((g) => g.listPrice), group.map((g) => g.memberUnit), offer.price, isMember);
+        // The box price is a saving, so the picks must be worth at least that much; a cheaper trio is just bought one by one.
+        const worth = round2(group.reduce((sum, g) => sum + g.listPrice, 0));
+        if (worth < offer.price) throw new HttpError(`The "${offer.title}" box needs products worth at least ₹${Math.round(offer.price)} (yours come to ₹${Math.round(worth)}). Please swap in a pricier product.`, 400);
         group.forEach((g, i) => {
             built[g.index].price = units[i];
             if (byClub) built[g.index].offerTitle = club.cardName;
@@ -746,13 +749,15 @@ router.post('/orders', asyncRoute(async (req, res) => {
 
     const deliverySettings = await couponService.deliverySettings();
     const baseDeliveryFee = subtotal >= deliverySettings.freeThreshold ? 0 : deliverySettings.fee;
+    // A coupon only discounts regular-priced lines: offer and bundle lines already carry their own deal.
+    const eligibleSubtotal = CouponService.eligibleSubtotalOf(items);
 
     if (couponCode) {
-        const validation = await couponService.validate(couponCode, subtotal, payload.userId || '');
+        const validation = await couponService.validate(couponCode, subtotal, payload.userId || '', eligibleSubtotal);
         if (!validation.valid) throw new HttpError(validation.message || 'Invalid coupon', 400);
 
         couponRecord = await coupons.findByCode(couponCode);
-        const breakdown = validation.breakdown || (await couponService.calculateBreakdown(subtotal, couponRecord || {}));
+        const breakdown = validation.breakdown || (await couponService.calculateBreakdown(subtotal, couponRecord || {}, eligibleSubtotal));
         discountAmount = Number(breakdown.discountAmount || 0);
         deliveryFee = Number(breakdown.deliveryFee ?? baseDeliveryFee);
         couponType = breakdown.couponType || '';

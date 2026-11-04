@@ -18,14 +18,14 @@ router.post('/coupons/validate', asyncRoute(async (req, res) => {
     const body = req.body || {};
     const payload = optionalCustomer(req);
     const userId = payload ? String(payload.userId || '') : null;
-    sendJson(res, await service.validate(String(body.code || ''), Number(body.subtotal || 0), userId));
+    sendJson(res, await service.validate(String(body.code || ''), Number(body.subtotal || 0), userId, body.eligibleSubtotal));
 }, 'Failed to validate coupon'));
 
 router.post('/coupons/auto-apply', asyncRoute(async (req, res) => {
     const body = req.body || {};
     const payload = optionalCustomer(req);
     const userId = payload ? String(payload.userId || '') : null;
-    const result = await service.resolveAutoApply(Number(body.subtotal || 0), userId);
+    const result = await service.resolveAutoApply(Number(body.subtotal || 0), userId, body.eligibleSubtotal);
     sendJson(res, result ?? { valid: false, message: 'No eligible auto offer' });
 }, 'Failed to resolve auto offer'));
 

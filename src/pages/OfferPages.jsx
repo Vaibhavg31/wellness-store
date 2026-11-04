@@ -19,8 +19,8 @@ const KIND_LABEL = { mix_match: 'Pick & Mix', bogo: 'Buy 1 Get 1 Free', collecti
 
 const STEPS = [
     { icon: Package, title: 'Choose your products', text: 'Open an offer and pick the products you like. Each offer says exactly what it covers.' },
-    { icon: ShoppingCart, title: 'Add it to your bag', text: 'A box or a pair goes into the bag as one line, so nothing gets lost on the way to checkout.' },
-    { icon: BadgePercent, title: 'Pay the offer price', text: 'The price is worked out for you. Chikit Club member prices apply to everything outside an offer, and coupons still work.' },
+    { icon: ShoppingCart, title: 'Add it to your bag', text: 'A box goes into the bag as one set. For Buy 1 Get 1, the free one is added with your product.' },
+    { icon: BadgePercent, title: 'Pay the offer price', text: 'The price is worked out for you. Coupons work on regular-priced products only, not on offers, and one coupon applies per order.' },
 ];
 
 /** /offers: every live offer as a card that opens it, how offers work, and the Chikit Club strip. */
@@ -60,29 +60,34 @@ export function OffersHubPage() {
     );
 }
 
-/** The BOGO product tile: the product card plus a button that adds the pair. */
+/**
+ * The Buy 1 Get 1 product tile. One tap on "Add to bag" puts the product in the bag with its free second one; the bag shows it as
+ * "Buy 1 + 1 FREE" and the shopper pays for one. (Under the hood the pair is two units, each priced at half.)
+ */
 function BogoTile({ offer, product }) {
-    const { addBogoPair } = useCart();
+    const { addBogoPair, items, openCartDrawer } = useCart();
     const { showToast } = useToast();
     const navigate = useNavigate();
     const soldOut = typeof product.stock === 'number' && product.stock < 2;
+    const inBag = items.find((i) => i.product.offerId === offer.id && i.product.id === product.id)?.quantity ?? 0;
     const add = (checkout) => {
         if (addBogoPair(offer, product)) {
-            showToast(checkout ? 'Pair added. Proceeding to checkout' : `2 × ${product.title} added: you pay for one`, 'success');
             if (checkout) navigate('/checkout');
+            else { showToast(`${product.title}: your free one is added too`, 'success'); openCartDrawer(); }
         } else {
-            showToast('Not enough stock for another pair', 'error');
+            showToast('Sorry, there is not enough stock for another free one', 'error');
         }
     };
     return (
         <div className="flex h-full flex-col gap-3">
             <div className="relative">
                 <ProductCard product={product} action={false} />
-                <span className="pointer-events-none absolute left-2.5 top-11 z-10 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent shadow-sm">Buy 1 Get 1</span>
+                <span className="pointer-events-none absolute left-2.5 top-11 z-10 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent shadow-sm">Buy 1 Get 1 FREE</span>
             </div>
-            <p className="text-center text-caption text-muted">Pay <strong className="text-ink">{formatPrice(product.price)}</strong> for 2 <span className="line-through"><span className="sr-only">Worth </span>{formatPrice(product.price * 2)}</span></p>
+            <p className="text-center text-small font-medium text-success">{soldOut ? 'Sold out' : 'Add one, get the second free'}</p>
+            {inBag > 0 && <p className="-mt-1 text-center text-caption font-semibold text-ink">In your bag: Buy {inBag / 2} + {inBag / 2} FREE</p>}
             <div className="mt-auto grid gap-2 min-[480px]:grid-cols-2">
-                <Button variant="outline" size="sm" disabled={soldOut} onClick={() => add(false)}><ShoppingBag size={14} aria-hidden="true" /> Add 2</Button>
+                <Button variant="outline" size="sm" disabled={soldOut} onClick={() => add(false)}><ShoppingBag size={14} aria-hidden="true" /> Add to bag</Button>
                 <Button size="sm" disabled={soldOut} onClick={() => add(true)}>Buy now</Button>
             </div>
         </div>
@@ -137,14 +142,14 @@ export function OfferPage() {
                     {offer?.kind === 'mix_match' && (
                         <div className="mt-5 inline-flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl bg-surface px-5 py-3.5 shadow-sm ring-1 ring-line sm:px-6 sm:py-4">
                             <span className="font-display text-h2 leading-none text-primary">{formatPrice(offer.price)}</span>
-                            <span className="text-small font-medium text-ink">for any {offer.pickCount} products you choose, whatever their price</span>
+                            <span className="text-small font-medium text-ink">for any {offer.pickCount} products worth {formatPrice(offer.price)} or more together</span>
                         </div>
                     )}
-                    {offer?.kind === 'bogo' && <p className="mt-5 inline-flex rounded-2xl bg-surface px-5 py-3.5 text-small font-medium text-ink shadow-sm ring-1 ring-line sm:px-6 sm:py-4">Add a product and the second one is on us. You pay for one of the pair.</p>}
+                    {offer?.kind === 'bogo' && <p className="mt-5 inline-flex rounded-2xl bg-surface px-5 py-3.5 text-small font-medium text-ink shadow-sm ring-1 ring-line sm:px-6 sm:py-4">Choose a product and add it once. We add a second one free, so you pay for one.</p>}
                 </div>
             </section>
             <div className="container-page py-8 lg:py-12">
-                {offer?.description && offer.kind !== 'mix_match' && <p className="mb-8 max-w-2xl text-muted">{offer.description}</p>}
+                {offer?.description && offer.kind === 'collection' && <p className="mb-8 max-w-2xl text-muted">{offer.description}</p>}
                 {loading && <ProductGridSkeleton />}
                 {!loading && offer?.kind === 'mix_match' && <MixBox offer={offer} products={eligible} />}
                 {!loading && offer?.kind === 'bogo' && (

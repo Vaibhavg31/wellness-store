@@ -9,6 +9,10 @@ import { bogoUnitPrice, mixBoxPricing, repriceMixBoxes } from '@/utils/pricing';
 
 const CartContext = createContext(null);
 const AUTO_SKIP_KEY = 'chikit-auto-coupon-skipped';
+const PENDING_COUPON_KEY = 'chikit-pending-coupon';
+
+/** The part of the bag a coupon can discount: regular-priced lines (not Buy 1 Get 1, Pick & Mix or bundle lines, which carry their own deal). */
+export const couponEligibleSubtotal = (items) => Math.round(items.filter(({ product }) => !product.bundleId && !product.offerId).reduce((sum, { product, quantity }) => sum + product.price * quantity, 0) * 100) / 100;
 
 function maxQtyFor(product, requested) {
     const stock = typeof product?.stock === 'number' ? product.stock : Infinity;
@@ -85,6 +89,8 @@ export function CartProvider({ children }) {
     const [couponCode, setCouponCode] = useLocalStorage('chikit-coupon', '');
     const [couponState, setCouponState] = useState(null);
     const [couponLoading, setCouponLoading] = useState(false);
+    // Why the coupon in the bag stopped applying (shown once, so it never just disappears without a word).
+    const [couponNotice, setCouponNotice] = useState('');
     const [cartPulse, setCartPulse] = useState(0);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [autoApplied, setAutoApplied] = useState(false);
@@ -238,6 +244,8 @@ export function CartProvider({ children }) {
         const bases = rawProducts.map(resolveCartProduct);
         if (bases.length !== offer.pickCount || new Set(bases.map((b) => b.id)).size !== bases.length) return false;
         if (bases.some((b) => typeof b.stock === 'number' && b.stock < 1)) return false;
+        // The box price is a saving: the picks must be worth at least that much (otherwise they are bought one by one).
+        if (bases.reduce((sum, b) => sum + b.price, 0) < offer.price) return false;
         // A member pays the lower of the box price and the Chikit Club prices of the same products; a guest always pays the box price.
         const { units, byClub } = mixBoxPricing(bases.map((b) => b.price), bases.map((b) => b.memberPrice), offer.price, isMember);
         const group = `box-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
@@ -362,6 +370,7 @@ export function CartProvider({ children }) {
 
     const itemCount = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
     const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [items]);
+    const eligibleSubtotal = useMemo(() => couponEligibleSubtotal(items), [items]);
 
     const baseDeliveryFee = subtotal >= freeThreshold ? 0 : deliveryFeeAmount;
     const discountAmount = couponState?.valid ? (couponState.breakdown?.discountAmount ?? 0) : 0;
@@ -372,7 +381,7 @@ export function CartProvider({ children }) {
         ? (couponState.breakdown?.total ?? subtotal + deliveryFee)
         : subtotal + baseDeliveryFee;
 
-    const validateCoupon = useCallback(async (code, currentSubtotal = subtotal, { manual = false } = {}) => {
+    const validateCoupon = useCallback(async (code, currentSubtotal = subtotal, { manual = false, eligible = eligibleSubtotal } = {}) => {
         const normalized = String(code || '').trim().toUpperCase();
         const requestId = ++couponRequestIdRef.current;
 
@@ -385,18 +394,21 @@ export function CartProvider({ children }) {
 
         setCouponLoading(true);
         try {
-            const result = await api.post('/api/coupons/validate', { code: normalized, subtotal: currentSubtotal }, token || undefined);
+            const result = await api.post('/api/coupons/validate', { code: normalized, subtotal: currentSubtotal, eligibleSubtotal: eligible }, token || undefined);
             if (requestId !== couponRequestIdRef.current) return result; // superseded by a newer call — ignore
 
             if (result.valid) {
                 setCouponCode(normalized);
                 setCouponState(result);
+                setCouponNotice('');
                 if (manual) {
                     manualCouponRef.current = true;
                     setAutoApplied(false);
                     clearAutoSkip();
                 }
             } else {
+                // A coupon that was already in the bag and no longer qualifies is dropped with an explanation, never silently.
+                if (!manual) setCouponNotice(`${normalized} was removed. ${result.message || 'It no longer applies to your bag.'}`);
                 setCouponState(null);
                 setCouponCode('');
                 setAutoApplied(false);
@@ -413,19 +425,19 @@ export function CartProvider({ children }) {
         } finally {
             if (requestId === couponRequestIdRef.current) setCouponLoading(false);
         }
-    }, [subtotal, token, setCouponCode, clearAutoSkip]);
+    }, [subtotal, eligibleSubtotal, token, setCouponCode, clearAutoSkip]);
 
     const applyCoupon = useCallback(async (code) => validateCoupon(code, subtotal, { manual: true }), [validateCoupon, subtotal]);
 
-    const tryAutoApply = useCallback(async (currentSubtotal = subtotal) => {
-        if (manualCouponRef.current || autoApplySkipRef.current || currentSubtotal <= 0) {
+    const tryAutoApply = useCallback(async (currentSubtotal = subtotal, eligible = eligibleSubtotal) => {
+        if (manualCouponRef.current || autoApplySkipRef.current || currentSubtotal <= 0 || eligible <= 0) {
             return null;
         }
 
         const requestId = ++couponRequestIdRef.current;
         setCouponLoading(true);
         try {
-            const result = await api.post('/api/coupons/auto-apply', { subtotal: currentSubtotal }, token || undefined);
+            const result = await api.post('/api/coupons/auto-apply', { subtotal: currentSubtotal, eligibleSubtotal: eligible }, token || undefined);
             if (requestId !== couponRequestIdRef.current) return result; // superseded by a newer call — ignore
 
             if (result?.valid && result.coupon?.code) {
@@ -433,6 +445,7 @@ export function CartProvider({ children }) {
                 setCouponCode(normalized);
                 setCouponState(result);
                 setAutoApplied(true);
+                setCouponNotice('');
                 return result;
             }
             return null;
@@ -441,9 +454,10 @@ export function CartProvider({ children }) {
         } finally {
             if (requestId === couponRequestIdRef.current) setCouponLoading(false);
         }
-    }, [subtotal, token, setCouponCode]);
+    }, [subtotal, eligibleSubtotal, token, setCouponCode]);
 
     const removeCoupon = useCallback(() => {
+        setCouponNotice('');
         if (autoApplied) {
             setAutoSkip();
         } else {
@@ -476,7 +490,24 @@ export function CartProvider({ children }) {
         if (!manualCouponRef.current && !autoApplySkipRef.current) {
             tryAutoApply(subtotal);
         }
-    }, [subtotal, items.length]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [subtotal, eligibleSubtotal, items.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // A campaign link (…/?coupon=CODE) keeps its code until the bag has something a coupon can discount, then applies it.
+    useEffect(() => {
+        try {
+            const fromLink = new URLSearchParams(window.location.search).get('coupon');
+            if (fromLink && /^[A-Za-z0-9_-]{2,40}$/.test(fromLink)) sessionStorage.setItem(PENDING_COUPON_KEY, fromLink.toUpperCase());
+        } catch { /* storage blocked: the code can still be typed at checkout */ }
+    }, []);
+
+    useEffect(() => {
+        let pending = '';
+        try { pending = sessionStorage.getItem(PENDING_COUPON_KEY) || ''; } catch { /* ignore */ }
+        if (!pending || eligibleSubtotal <= 0) return;
+        try { sessionStorage.removeItem(PENDING_COUPON_KEY); } catch { /* ignore */ }
+        manualCouponRef.current = true;
+        validateCoupon(pending, subtotal, { manual: true });
+    }, [eligibleSubtotal]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const isInCart = useCallback((productId, { variantId = null, bundleId = null, offerId = null, offerGroup = null } = {}) =>
         items.some((item) => sameLine(item.product, { id: productId, variantId, bundleId, offerId, offerGroup })), [items]);
@@ -510,6 +541,7 @@ export function CartProvider({ children }) {
         openCartDrawer,
         closeCartDrawer,
         subtotal,
+        eligibleSubtotal,
         deliveryFee,
         baseDeliveryFee,
         discountAmount,
@@ -520,6 +552,8 @@ export function CartProvider({ children }) {
         freeDeliveryProgress,
         isInCart,
         couponCode: couponState?.valid ? couponCode : '',
+        couponBreakdown: couponState?.valid ? couponState.breakdown : null,
+        couponNotice,
         couponDetails: couponState?.valid ? couponState.coupon : null,
         couponMessage: couponState?.message || '',
         couponLoading,
@@ -557,6 +591,8 @@ export function CartProvider({ children }) {
         isInCart,
         couponState,
         couponCode,
+        couponNotice,
+        eligibleSubtotal,
         couponLoading,
         autoApplied,
         applyCoupon,

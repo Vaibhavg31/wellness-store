@@ -133,7 +133,7 @@ async function seedStarterOffers(pool) {
     await pool.query(
         `INSERT IGNORE INTO offers (id, slug, title, kind, summary, description, price, pick_count, all_products, is_enabled, sort_order, created_at, updated_at)
          VALUES (?, ?, ?, 'bogo', ?, ?, 0, 3, 0, 1, 1, ?, ?)`,
-        ['offer-buy-1-get-1', 'buy-1-get-1-free', 'Buy 1 Get 1 Free', 'Buy one, get one free on these products.', 'Add two of any product on this page and the second one is on us.', now, now],
+        ['offer-buy-1-get-1', 'buy-1-get-1-free', 'Buy 1 Get 1 Free', 'Buy one, get one free on these products.', 'Choose a product and add it once. We add a second one free, so you pay for one.', now, now],
     );
     for (const [i, row] of best.entries()) {
         await pool.query('INSERT IGNORE INTO offer_products (offer_id, product_id, sort_order) VALUES (?, ?, ?)', ['offer-buy-1-get-1', row.id, i]);

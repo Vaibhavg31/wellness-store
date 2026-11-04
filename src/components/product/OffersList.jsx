@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Check, Copy, Tag } from 'lucide-react';
 import { usePublicCoupons } from '@/hooks/usePublicCoupons';
-import { formatPrice } from '@/utils/formatPrice';
+import { couponConditions, couponTerms } from '@/utils/couponPreview';
 import { copyText } from '@/utils/copyText';
 
-/** "Available offers" on the product page: public coupons with one-tap copy. */
+/** "Coupons" on the product page: public coupons with their rules in plain words and one-tap copy. */
 export default function OffersList() {
     const coupons = usePublicCoupons().slice(0, 3);
     const [copied, setCopied] = useState('');
@@ -20,16 +20,14 @@ export default function OffersList() {
     return (
         <section aria-labelledby="offers-title" className="mt-5 rounded-lg border border-dashed border-primary/40 bg-primary-soft p-4">
             <h2 id="offers-title" className="mb-3 flex items-center gap-2 font-sans text-small font-semibold">
-                <Tag size={16} className="text-primary" aria-hidden="true" /> Available offers
+                <Tag size={16} className="text-primary" aria-hidden="true" /> Coupons at checkout
             </h2>
             <ul className="space-y-3">
                 {coupons.map((coupon) => (
                     <li key={coupon.id} className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
-                            <p className="text-small font-medium text-ink">{coupon.label}{coupon.title ? ` · ${coupon.title}` : ''}</p>
-                            <p className="text-caption text-muted">
-                                {coupon.description}{coupon.minOrderAmount > 0 ? ` (orders above ${formatPrice(coupon.minOrderAmount)})` : ''}
-                            </p>
+                            <p className="text-small font-medium text-ink">{couponTerms(coupon)}</p>
+                            <p className="text-caption text-muted">{couponConditions(coupon).join(' · ')}</p>
                         </div>
                         <button
                             type="button"

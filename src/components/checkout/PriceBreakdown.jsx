@@ -12,6 +12,7 @@ export default function PriceBreakdown({ showUpsell = true, totalClassName = 'te
         discountAmount,
         total,
         couponCode,
+        couponBreakdown,
         showFreeDeliveryUpsell,
         amountUntilFreeDelivery,
         freeDeliveryProgress,
@@ -31,9 +32,12 @@ export default function PriceBreakdown({ showUpsell = true, totalClassName = 'te
                 <span className="font-medium">{formatPrice(subtotal)}</span>
             </div>
             {discountAmount > 0 && (
-                <div className="flex justify-between text-primary">
-                    <span>Coupon{couponCode ? ` (${couponCode})` : ''}</span>
-                    <span className="font-medium">−{formatPrice(discountAmount)}</span>
+                <div>
+                    <div className="flex justify-between text-primary">
+                        <span>Coupon{couponCode ? ` (${couponCode})` : ''}</span>
+                        <span className="font-medium">−{formatPrice(discountAmount)}</span>
+                    </div>
+                    {couponBreakdown?.capped && <p className="mt-0.5 text-caption text-muted">Maximum coupon discount reached ({formatPrice(couponBreakdown.maxDiscount)})</p>}
                 </div>
             )}
             <div className="flex justify-between">

@@ -340,7 +340,7 @@ export default function ClubPage() {
                         <p className="mt-3 text-body text-muted lg:text-lead">{member ? 'Your Chikit Club price shows on every product while you are signed in. Here is what it saves you on some favourites.' : 'The usual price and the Chikit Club member price of some of our best-loved products, side by side. Joining is free.'}</p>
                     </div>
                     <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-                        {examples.map((p) => <li key={p.id}><ClubPriceTile product={p} member={member} /></li>)}
+                        {examples.map((p) => <li key={p.id}><ClubPriceTile product={p} member={member} joinHref="#join" /></li>)}
                     </ul>
                     <div className="mt-8 flex justify-center">
                         {member

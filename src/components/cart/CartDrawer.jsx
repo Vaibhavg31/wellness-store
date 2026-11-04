@@ -13,26 +13,26 @@ import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
 import ClubSavings from '@/components/cart/ClubSavings';
 import { api, imageUrl } from '@/services/api';
 import { loginUrl } from '@/utils/authRedirect';
+import { couponPreview } from '@/utils/couponPreview';
 
 /**
- * Best code-entry offer to suggest while nothing is applied: the highest-value
- * coupon the cart already qualifies for, otherwise the one closest to unlocking.
+ * The coupon to suggest while none is applied: the one that saves the most on this bag, otherwise the one closest to unlocking.
+ * Only regular-priced products count (offer boxes, pairs and bundles already have their own price).
  */
-function pickBestOffer(coupons, subtotal) {
-    if (!coupons.length) return null;
-    const usable = coupons.filter((c) => subtotal >= (c.minOrderAmount || 0));
-    if (usable.length > 0) {
-        return { offer: [...usable].sort((a, b) => (b.value || 0) - (a.value || 0))[0], qualifies: true };
-    }
-    const closest = [...coupons].sort((a, b) => (a.minOrderAmount || 0) - (b.minOrderAmount || 0))[0];
-    return { offer: closest, qualifies: false };
+function pickBestOffer(coupons, bag) {
+    const scored = coupons.map((offer) => ({ offer, preview: couponPreview(offer, bag) }));
+    const ready = scored.filter((c) => c.preview.status === 'ready').sort((a, b) => (b.preview.saves || 0) - (a.preview.saves || 0));
+    if (ready.length > 0) return { offer: ready[0].offer, qualifies: true, saves: ready[0].preview.saves };
+    const short = scored.filter((c) => c.preview.status === 'short').sort((a, b) => a.preview.gap - b.preview.gap);
+    if (short.length > 0) return { offer: short[0].offer, qualifies: false, gap: short[0].preview.gap };
+    return null;
 }
 
 const lineKey = ({ product }) => `${product.id}-${product.variantId || ''}-${product.bundleId || ''}-${product.offerId || ''}-${product.offerGroup || ''}`;
 
 export default function CartDrawer() {
     const {
-        items, isDrawerOpen, closeCartDrawer, updateQuantity, removeFromCart, removeOfferGroup, itemCount, subtotal,
+        items, isDrawerOpen, closeCartDrawer, updateQuantity, removeFromCart, removeOfferGroup, itemCount, subtotal, eligibleSubtotal, discountAmount,
         showFreeDeliveryUpsell, amountUntilFreeDelivery, freeDeliveryProgress,
         couponCode, couponDetails, autoAppliedCoupon, applyCoupon, removeCoupon,
     } = useCart();
@@ -49,7 +49,7 @@ export default function CartDrawer() {
         api.get('/api/coupons/public').then(setPublicOffers).catch(() => setPublicOffers([]));
     }, [isDrawerOpen]);
 
-    const best = !couponCode ? pickBestOffer(publicOffers, subtotal) : null;
+    const best = !couponCode ? pickBestOffer(publicOffers, { subtotal, eligibleSubtotal }) : null;
 
     const quickApply = async (code) => {
         setApplying(true);
@@ -77,17 +77,17 @@ export default function CartDrawer() {
                                     <p className="line-clamp-2 text-small font-medium text-ink">{item.product.title}</p>
                                     {item.product.bundleTitle && <p className="mt-0.5 text-caption text-accent-ink">Part of {item.product.bundleTitle}</p>}
                                     {item.product.offerTitle && <p className="mt-0.5 text-caption text-accent-ink">{item.product.offerTitle}</p>}
+                                    {item.product.offerKind === 'bogo' && <p className="mt-1 inline-flex rounded-full bg-success-tint px-2 py-0.5 text-caption font-semibold text-success">Buy {item.quantity / 2} + {item.quantity / 2} FREE</p>}
                                     {isClubLine(item.product) && <p className="mt-0.5 text-caption text-accent-ink">{item.product.offerGroup ? 'Box priced at your Chikit Club prices' : 'Chikit Club price'}</p>}
                                     <div className="mt-2 flex items-center justify-between gap-2">
                                         {item.product.bundleId || item.product.offerGroup ? (
                                             <span className="text-caption text-muted">Qty {item.quantity}</span>
                                         ) : (
                                             <QuantityStepper
-                                                value={item.quantity}
-                                                min={item.product.offerKind === 'bogo' ? 2 : 1}
-                                                step={item.product.offerKind === 'bogo' ? 2 : 1}
-                                                max={item.product.stock ?? 99}
-                                                onChange={(q) => updateQuantity(item.product.id, q, { variantId: item.product.variantId, offerId: item.product.offerId })}
+                                                value={item.product.offerKind === 'bogo' ? item.quantity / 2 : item.quantity}
+                                                min={1}
+                                                max={item.product.offerKind === 'bogo' ? Math.max(1, Math.floor((item.product.stock ?? 98) / 2)) : (item.product.stock ?? 99)}
+                                                onChange={(q) => updateQuantity(item.product.id, item.product.offerKind === 'bogo' ? q * 2 : q, { variantId: item.product.variantId, offerId: item.product.offerId })}
                                                 className="scale-90 origin-left"
                                             />
                                         )}
@@ -115,15 +115,13 @@ export default function CartDrawer() {
                                 <span className="flex min-w-0 items-center gap-2 text-caption text-ink">
                                     <BadgeCheck size={16} className="shrink-0 text-success" />
                                     <span className="truncate">
-                                        <strong className="font-mono">{couponCode}</strong> applied{couponDetails?.label ? ` — ${couponDetails.label}` : ''}
-                                        {autoAppliedCoupon && <span className="text-muted"> · auto</span>}
+                                        <strong className="font-mono">{couponCode}</strong> applied{discountAmount > 0 ? `: you save ${formatPrice(discountAmount)}` : couponDetails?.label ? `: ${couponDetails.label}` : ''}
+                                        {autoAppliedCoupon && <span className="text-muted"> · added for you</span>}
                                     </span>
                                 </span>
-                                {!autoAppliedCoupon && (
-                                    <button type="button" onClick={removeCoupon} className="grid size-8 shrink-0 place-items-center rounded-full text-muted hover:text-danger" aria-label="Remove coupon">
-                                        <X size={14} />
-                                    </button>
-                                )}
+                                <button type="button" onClick={removeCoupon} className="grid size-8 shrink-0 place-items-center rounded-full text-muted hover:text-danger" aria-label="Remove coupon">
+                                    <X size={14} />
+                                </button>
                             </div>
                         ) : best?.offer && (
                             <div className="flex items-center justify-between gap-3 rounded-lg bg-accent-tint px-3 py-2.5">
@@ -131,9 +129,9 @@ export default function CartDrawer() {
                                     <Sparkles size={16} className="shrink-0 text-accent-ink" />
                                     <span>
                                         {best.qualifies ? (
-                                            <>Use <strong className="font-mono">{best.offer.code}</strong> for {best.offer.label.toLowerCase()}</>
+                                            <>Use <strong className="font-mono">{best.offer.code}</strong> and save {best.saves > 0 ? formatPrice(best.saves) : best.offer.label.toLowerCase()}</>
                                         ) : (
-                                            <>Add <strong>{formatPrice(best.offer.minOrderAmount - subtotal)}</strong> more to unlock <strong className="font-mono">{best.offer.code}</strong></>
+                                            <>Add <strong>{formatPrice(best.gap)}</strong> more to unlock <strong className="font-mono">{best.offer.code}</strong></>
                                         )}
                                     </span>
                                 </span>
