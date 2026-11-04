@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { BadgePercent, Gift, ShoppingBag, ShoppingCart, Package } from 'lucide-react';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
 import Button from '@/components/ui/Button';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ProductCard from '@/components/product/ProductCard';
 import MixBox from '@/components/offer/MixBox';
 import { OfferPictures } from '@/components/home/OffersBento';
@@ -22,29 +23,29 @@ const STEPS = [
     { icon: BadgePercent, title: 'Pay the offer price', text: 'The price is worked out for you. Chikit Club member prices apply to everything outside an offer, and coupons still work.' },
 ];
 
-/** /offers: every live offer on the plum stage, how offers work, and the Club card. */
+/** /offers: every live offer as a card that opens it, how offers work, and the Chikit Club strip. */
 export function OffersHubPage() {
     const { offers, loading } = useOffers();
     const { products } = useProducts();
     return (
         <>
             <Seo title="Offers" description="Pick & Mix boxes, Buy 1 Get 1 Free and more offers on Chikit Ayurvedic wellness." path="/offers" />
-            {offers.length > 0 ? <OffersShowcase page products={products} /> : (
-                <section className="bg-gradient-to-br from-primary-deep to-primary-night py-16 text-center text-white">
+            {offers.length > 0 ? <OffersShowcase products={products} /> : (
+                <section className="bg-gradient-to-b from-canvas-alt to-canvas py-16 text-center">
                     <div className="container-page">
-                        <h1 className="text-white">Offers</h1>
-                        {!loading && <p className="mx-auto mt-3 max-w-md text-white/75">No offers are running right now. Check back soon, or join the Chikit Club for member prices.</p>}
+                        <h1>Offers</h1>
+                        {!loading && <p className="mx-auto mt-3 max-w-md text-muted">No offers are running right now. Check back soon, or join the Chikit Club for member prices.</p>}
                     </div>
                 </section>
             )}
-            <section className="bg-canvas-alt py-12 lg:py-16" aria-labelledby="how-offers-work">
+            <section className="border-t border-line bg-canvas py-12 lg:py-16" aria-labelledby="how-offers-work">
                 <div className="container-page">
                     <h2 id="how-offers-work" className="text-h3">How our offers work</h2>
                     <ol className="mt-8 grid gap-6 md:grid-cols-3">
                         {STEPS.map(({ icon: Icon, title, text }, i) => (
-                            <li key={title} className="rounded-2xl bg-surface p-6 shadow-xs ring-1 ring-line">
+                            <li key={title} className="rounded-2xl bg-canvas-alt p-6 ring-1 ring-line">
                                 <span className="flex items-center gap-3">
-                                    <span className="grid size-11 place-items-center rounded-full bg-primary text-accent"><Icon size={20} aria-hidden="true" /></span>
+                                    <span className="grid size-11 place-items-center rounded-full bg-accent text-primary-deep"><Icon size={20} aria-hidden="true" /></span>
                                     <span className="text-caption font-semibold uppercase tracking-[0.14em] text-accent-ink">Step {i + 1}</span>
                                 </span>
                                 <h3 className="mt-4 font-sans text-h4">{title}</h3>
@@ -126,25 +127,20 @@ export function OfferPage() {
                     jsonLd={breadcrumbJsonLd(SITE_URL, [{ name: 'Home', path: '/' }, { name: 'Offers', path: '/offers' }, { name: offer.title, path: `/offers/${offer.slug}` }])}
                 />
             )}
-            <section className="relative isolate overflow-hidden bg-gradient-to-br from-primary-deep via-primary-deep to-primary-night text-white">
-                <div className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-primary/40 blur-3xl" aria-hidden="true" />
-                <div className="container-page relative py-6 sm:py-8 lg:py-12">
-                    {offer && <OfferPictures offer={offer} products={products} well="bg-accent-tint" tileClass="size-40 xl:size-48" className="absolute right-6 top-1/2 hidden -translate-y-1/2 lg:flex xl:right-10" />}
-                    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-small text-white/70">
-                        <Link to="/" className="hover:text-white">Home</Link><span aria-hidden="true">/</span>
-                        <Link to="/offers" className="hover:text-white">Offers</Link><span aria-hidden="true">/</span>
-                        <span className="text-white">{offer?.title ?? '…'}</span>
-                    </nav>
-                    <p className="mt-4 text-caption font-semibold uppercase tracking-[0.18em] text-peach sm:mt-6">{offer ? KIND_LABEL[offer.kind] : ''}</p>
-                    <h1 className="mt-2 max-w-2xl text-balance text-white lg:max-w-[60%]">{offer?.title ?? 'Loading…'}</h1>
-                    {offer?.summary && <p className="mt-2 max-w-xl text-body text-white/75 sm:text-lead">{offer.summary}</p>}
+            <section className="relative isolate overflow-hidden bg-gradient-to-b from-canvas-alt to-canvas">
+                <div className="container-page relative pb-8 pt-4 sm:pb-10 sm:pt-6 lg:pb-14">
+                    {offer && <OfferPictures offer={offer} products={products} well="bg-surface" tileClass="size-40 xl:size-48" className="absolute right-6 top-1/2 hidden -translate-y-1/2 lg:flex xl:right-10" />}
+                    <Breadcrumbs crumbs={[{ label: 'Home', href: '/' }, { label: 'Offers', href: '/offers' }, { label: offer?.title ?? '…' }]} />
+                    <p className="mt-4 inline-flex items-center rounded-full bg-accent px-3 py-1 text-caption font-semibold uppercase tracking-[0.14em] text-primary-deep sm:mt-5">{offer ? KIND_LABEL[offer.kind] : ''}</p>
+                    <h1 className="mt-3 max-w-2xl text-balance lg:max-w-[60%]">{offer?.title ?? 'Loading…'}</h1>
+                    {offer?.summary && <p className="mt-2 max-w-xl text-body text-muted sm:text-lead">{offer.summary}</p>}
                     {offer?.kind === 'mix_match' && (
-                        <div className="mt-5 inline-flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-accent px-5 py-3.5 text-primary-deep shadow-lg sm:px-6 sm:py-4">
-                            <span className="font-display text-h2 leading-none">{formatPrice(offer.price)}</span>
-                            <span className="text-small font-medium">for any {offer.pickCount} products you choose, whatever their price</span>
+                        <div className="mt-5 inline-flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl bg-surface px-5 py-3.5 shadow-sm ring-1 ring-line sm:px-6 sm:py-4">
+                            <span className="font-display text-h2 leading-none text-primary">{formatPrice(offer.price)}</span>
+                            <span className="text-small font-medium text-ink">for any {offer.pickCount} products you choose, whatever their price</span>
                         </div>
                     )}
-                    {offer?.kind === 'bogo' && <p className="mt-5 inline-flex rounded-2xl bg-accent px-6 py-4 text-small font-medium text-primary-deep shadow-lg">Add a product and the second one is on us. You pay for one of the pair.</p>}
+                    {offer?.kind === 'bogo' && <p className="mt-5 inline-flex rounded-2xl bg-surface px-5 py-3.5 text-small font-medium text-ink shadow-sm ring-1 ring-line sm:px-6 sm:py-4">Add a product and the second one is on us. You pay for one of the pair.</p>}
                 </div>
             </section>
             <div className="container-page py-8 lg:py-12">
