@@ -1,4 +1,3 @@
-import Logo from '@/components/ui/Logo';
 import Seo from '@/components/seo/Seo';
 import SectionHeader from '@/components/ui/SectionHeader';
 import Reveal from '@/components/ui/Reveal';
@@ -15,9 +14,9 @@ export default function AboutPage() {
     return (
         <>
             <Seo title="Our Story" description={about.heroDescription} path="/about" image={storyImage} />
-            <section className="bg-accent">
+            <section className="bg-gradient-to-b from-canvas-alt to-canvas">
                 <div className="container-page py-14 text-center sm:py-20">
-                    <Logo size="lg" className="mx-auto mb-8 sm:h-28" />
+                    <p className="mx-auto mb-5 inline-flex items-center rounded-full bg-accent px-3.5 py-1.5 text-caption font-semibold uppercase tracking-[0.14em] text-primary-deep">Ayurveda and Wellness</p>
                     <h1>{about.heroTitle}</h1>
                     <p className="mx-auto mt-5 max-w-2xl text-lead text-muted">{about.heroDescription}</p>
                 </div>
