@@ -16,21 +16,23 @@ export default function ClubPriceTile({ product, member = false, active = false,
 
     if (member) {
         return (
-            <div className={cn('relative flex h-full flex-col overflow-hidden rounded-2xl bg-gradient-to-b from-primary-deep to-primary p-3 text-white shadow-md ring-1 ring-accent/50 transition-shadow hover:shadow-lg', active && 'ring-2 ring-accent', className)}>
-                <span className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-primary-deep/85 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-accent backdrop-blur"><Crown size={11} aria-hidden="true" /> Member</span>
+            <div className={cn('relative flex h-full flex-col overflow-hidden rounded-2xl bg-surface text-ink shadow-md ring-1 ring-primary/15 transition-shadow hover:shadow-lg', active && 'ring-2 ring-primary', className)}>
                 <Link to={`/product/${product.id}`} className="group flex flex-1 flex-col">
-                    <span className="block aspect-square overflow-hidden rounded-xl bg-accent">
-                        <img src={imageUrl(product.images[0], 320)} alt="" width="240" height="240" loading="lazy" decoding="async" className="size-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105" />
+                    <span className="relative block aspect-square overflow-hidden bg-gradient-to-br from-primary-tint via-white to-accent-tint">
+                        <img src={imageUrl(product.images[0], 320)} alt="" width="240" height="240" loading="lazy" decoding="async" className="size-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-105" />
+                        <span className="absolute left-0 top-3 inline-flex items-center gap-1 rounded-r-full bg-gradient-to-r from-primary-deep to-primary py-1 pl-2 pr-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-accent shadow-sm"><Crown size={11} aria-hidden="true" /> Member</span>
                     </span>
-                    <span className="mt-3 line-clamp-2 min-h-[2.5rem] text-small font-semibold leading-snug">{product.title}</span>
-                    <span className="mt-2 flex items-baseline gap-2">
-                        <span className="font-display text-h3 leading-none text-accent">{formatPrice(product.memberPrice)}</span>
-                        <span className="text-small text-white/60 line-through"><span className="sr-only">Usual price </span>{formatPrice(product.price)}</span>
+                    <span className="flex flex-1 flex-col px-3 pt-3">
+                        <span className="line-clamp-2 min-h-[2.5rem] text-small font-semibold leading-snug text-ink">{product.title}</span>
+                        <span className="mt-2 flex items-baseline gap-2">
+                            <span className="font-display text-h3 leading-none text-primary">{formatPrice(product.memberPrice)}</span>
+                            <span className="text-small text-muted line-through"><span className="sr-only">Usual price </span>{formatPrice(product.price)}</span>
+                        </span>
+                        <span className="mt-1 text-caption text-muted">Your Chikit Club price</span>
+                        <span className="mt-2.5 inline-flex items-center justify-center gap-1.5 self-start rounded-full bg-primary px-3 py-1 text-caption font-semibold text-accent"><Sparkles size={12} aria-hidden="true" /> You save {formatPrice(saving)}</span>
                     </span>
-                    <span className="mt-1 text-caption text-white/70">Your Chikit Club price</span>
-                    <span className="mt-2.5 inline-flex items-center justify-center gap-1.5 rounded-full bg-accent/15 px-2.5 py-1.5 text-center text-caption font-semibold text-accent ring-1 ring-accent/30"><Sparkles size={12} aria-hidden="true" /> You save {formatPrice(saving)}</span>
                 </Link>
-                <AddToBag product={product} tone="dark" className="mt-3" />
+                <div className="p-3 pt-3"><AddToBag product={product} tone="solid" /></div>
             </div>
         );
     }

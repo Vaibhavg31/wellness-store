@@ -59,7 +59,7 @@ export default function AddToBag({ product, size = 'card', tone = 'light', soldO
                 'relative z-10 inline-flex w-full items-center justify-center gap-2 rounded-full border font-semibold transition-colors',
                 dark
                     ? cn('border-accent bg-accent text-primary-deep hover:bg-accent-hover', tall ? 'h-12 text-body' : 'h-10 text-small')
-                    : tall ? 'h-12 border-primary bg-primary text-body text-white hover:bg-primary-hover' : 'h-10 border-primary/40 text-small text-primary hover:border-primary hover:bg-primary hover:text-white',
+                    : tall || tone === 'solid' ? cn('border-primary bg-primary text-white hover:bg-primary-hover', tall ? 'h-12 text-body' : 'h-10 text-small') : tall ? 'h-12 border-primary bg-primary text-body text-white hover:bg-primary-hover' : 'h-10 border-primary/40 text-small text-primary hover:border-primary hover:bg-primary hover:text-white',
                 'disabled:cursor-not-allowed disabled:border-line-strong disabled:bg-transparent disabled:text-subtle disabled:hover:bg-transparent disabled:hover:text-subtle',
                 className,
             )}
