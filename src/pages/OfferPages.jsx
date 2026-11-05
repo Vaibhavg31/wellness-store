@@ -14,7 +14,7 @@ import { useOffers, useProducts } from '@/hooks/useApi';
 import { MAX_PER_ITEM, useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
 import { breadcrumbJsonLd } from '@/utils/seoSchema';
-import { formatPrice } from '@/utils/formatPrice';
+import { formatPrice, tidyRupees } from '@/utils/formatPrice';
 
 const KIND_LABEL = { mix_match: 'Pick & Mix', bogo: 'Buy 1 Get 1 Free', collection: 'Offer' };
 
@@ -126,24 +126,24 @@ export function OfferPage() {
         <>
             {offer && (
                 <Seo
-                    title={offer.title}
-                    description={offer.summary || `Chikit offer: ${offer.title}`}
+                    title={tidyRupees(offer.title)}
+                    description={tidyRupees(offer.summary) || `Chikit offer: ${tidyRupees(offer.title)}`}
                     path={`/offers/${offer.slug}`}
                     image={offer.image}
-                    jsonLd={breadcrumbJsonLd(SITE_URL, [{ name: 'Home', path: '/' }, { name: 'Offers', path: '/offers' }, { name: offer.title, path: `/offers/${offer.slug}` }])}
+                    jsonLd={breadcrumbJsonLd(SITE_URL, [{ name: 'Home', path: '/' }, { name: 'Offers', path: '/offers' }, { name: tidyRupees(offer.title), path: `/offers/${offer.slug}` }])}
                 />
             )}
             <section className="relative isolate overflow-hidden bg-gradient-to-b from-canvas-alt to-canvas">
                 <div className="container-page relative pb-8 pt-4 sm:pb-10 sm:pt-6 lg:pb-14">
                     {offer && <OfferPictures offer={offer} products={products} well="bg-surface" tileClass="size-40 xl:size-48" className="absolute right-6 top-1/2 hidden -translate-y-1/2 lg:flex xl:right-10" />}
-                    <Breadcrumbs crumbs={[{ label: 'Home', href: '/' }, { label: 'Offers', href: '/offers' }, { label: offer?.title ?? '…' }]} />
+                    <Breadcrumbs crumbs={[{ label: 'Home', href: '/' }, { label: 'Offers', href: '/offers' }, { label: tidyRupees(offer?.title) || '…' }]} />
                     <p className="mt-4 inline-flex items-center rounded-full bg-accent px-3 py-1 text-caption font-semibold uppercase tracking-[0.14em] text-primary-deep sm:mt-5">{offer ? KIND_LABEL[offer.kind] : ''}</p>
-                    <h1 className="mt-3 max-w-2xl text-balance lg:max-w-[60%]">{offer?.title ?? 'Loading…'}</h1>
-                    {offer?.summary && <p className="mt-2 max-w-xl text-body text-muted sm:text-lead">{offer.summary}</p>}
+                    <h1 className="mt-3 max-w-2xl text-balance lg:max-w-[60%]">{offer ? tidyRupees(offer.title) : 'Loading…'}</h1>
+                    {offer?.summary && <p className="mt-2 max-w-xl text-body text-muted sm:text-lead">{tidyRupees(offer.summary)}</p>}
                     {offer?.kind === 'mix_match' && (
-                        <div className="mt-5 inline-flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl bg-surface px-5 py-3.5 shadow-sm ring-1 ring-line sm:px-6 sm:py-4">
+                        <div className="mt-5 inline-flex items-center gap-4 rounded-2xl bg-surface px-5 py-3.5 shadow-sm ring-1 ring-line sm:px-6 sm:py-4">
                             <span className="font-display text-h2 leading-none text-primary">{formatPrice(offer.price)}</span>
-                            <span className="text-small font-medium text-ink">for any {offer.pickCount} products worth {formatPrice(offer.price)} or more together</span>
+                            <span className="border-l border-line pl-4 text-small leading-snug text-ink"><strong className="block font-semibold">Box price</strong>for any {offer.pickCount} products worth {formatPrice(offer.price)} or more together</span>
                         </div>
                     )}
                     {offer?.kind === 'bogo' && <p className="mt-5 inline-flex rounded-2xl bg-surface px-5 py-3.5 text-small font-medium text-ink shadow-sm ring-1 ring-line sm:px-6 sm:py-4">Choose a product and add it once. We add a second one free, so you pay for one.</p>}

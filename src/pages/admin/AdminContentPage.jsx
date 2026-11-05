@@ -66,7 +66,6 @@ const SECTION_LABELS = {
     trending: 'Trending Now (search chips)',
     bestSellers: 'Most loved products (before the offers)',
     watchShop: 'Watch & Shop (videos)',
-    wellRange: 'The Chikit Well range',
     offersSlider: 'Offers slider',
     bottomRibbon: 'Bottom running ribbon',
     banners: 'Image Banners (Stacked)',
@@ -97,7 +96,6 @@ const SECTION_META = {
     bestSellers: { tag: 'core', title: 'Most loved products', desc: 'A short shelf of your best-selling products, placed right before the offers. Automatic (products marked Trending, then Best sellers) or the products you pick. Drag it to move it.' },
     bottomRibbon: { tag: 'core', title: 'Bottom running ribbon', desc: 'A slow-moving ribbon of brand words just above the footer, matching the announcement ribbon at the top of the page. Needs: nothing; edit the words below if you wish.' },
     offersSlider: { tag: 'core', title: 'Offers slider', desc: 'Every live offer (Pick any 3, Buy 1 Get 1, and any offer page you add) as bold tiles, with the Chikit Club band right under them. The offers fill themselves from Offers in the admin; the Club band is switched on and worded in Club.' },
-    wellRange: { tag: 'core', title: 'The Chikit Well range', desc: 'Your product series (HimWell, HerWell, GutWell …) with their icons. A series shows "Coming soon" until a product of it is live; set a product\'s series on its product page. Needs: nothing.' },
     watchShop: { tag: 'core', title: 'Watch & Shop', desc: 'Short videos, each with an Add to bag button for its product. Needs: videos and the product each one sells. Hides itself while empty.' },
     categories: { tag: 'core', title: 'Shop by need', desc: 'Large goal tiles that lead into your shop. Needs: a photo on each category (Categories page).' },
     categoryShelves: { tag: 'core', title: 'The range', desc: 'The whole shop on one page: buttons for New Launches, Bestsellers and every category that follow the scroll, with each category\'s products beneath. Needs: products in your categories.' },
@@ -852,10 +850,10 @@ export default function AdminContentPage() {
 
                             <AdminSection title="Homepage Sections" description="Drag a row to reorder it, use the switch to show/hide it, and click a section's name to open its content editor right here. Reordering and show/hide save immediately — no need to press Save for those.">
                                 <SectionToggles
-                                    sections={content.sections}
+                                    sections={Object.fromEntries(Object.entries(content.sections ?? {}).filter(([key]) => key !== 'wellRange'))}
                                     labels={SECTION_LABELS}
                                     meta={SECTION_META}
-                                    onChange={handleSectionsChange}
+                                    onChange={(next) => handleSectionsChange({ ...next, wellRange: false })}
                                     renderContent={renderHomepageSectionContent}
                                 />
                             </AdminSection>

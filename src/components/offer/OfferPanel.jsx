@@ -5,7 +5,7 @@ import { Check, Copy, Gift, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useDialog } from '@/hooks/useDialog';
 import { api } from '@/services/api';
-import { formatPrice } from '@/utils/formatPrice';
+import { formatPrice, tidyRupees } from '@/utils/formatPrice';
 import { copyText } from '@/utils/copyText';
 
 const STORAGE_KEY = 'chikit-offer';
@@ -93,7 +93,7 @@ export default function OfferPanel({ offer, onClose, onUnlocked, preview = false
 
                 <div className="bg-gradient-to-br from-primary to-primary-deep px-6 pb-6 pt-8 text-white">
                     <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-caption font-semibold tracking-wide"><Gift size={14} aria-hidden="true" /> {offer.tabLabel}</span>
-                    <h2 id="offer-title" className="text-h3 text-white">{offer.title}</h2>
+                    <h2 id="offer-title" className="text-h3 text-white">{tidyRupees(offer.title)}</h2>
                     {offer.subtitle && <p className="mt-2 text-small text-white/85">{offer.subtitle}</p>}
                 </div>
 

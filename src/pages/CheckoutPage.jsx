@@ -555,7 +555,7 @@ export default function CheckoutPage() {
             <CheckoutSteps activeIndex={currentStep} />
 
             {/* Mobile / tablet — single sticky CTA */}
-            <div className="sticky top-16 z-30 -mx-4 mb-6 space-y-2 border-b border-line bg-canvas/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+            <div className="sticky top-16 z-30 -mx-4 mb-6 space-y-2 border-b border-line bg-surface px-4 py-3 shadow-sm sm:-mx-6 sm:px-6 lg:hidden">
                 {error && <p className="rounded-md bg-danger-tint px-3 py-2 text-caption text-danger" role="alert">{error}</p>}
                 <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -653,12 +653,12 @@ export default function CheckoutPage() {
                     <div className="space-y-5 rounded-lg border border-line bg-surface p-5 sm:p-6 lg:sticky lg:top-28 lg:p-8">
                         <h2 className="font-sans text-h4">Order summary</h2>
 
-                        <ul className="max-h-64 space-y-3 overflow-y-auto pr-1">
+                        <ul className="max-h-80 space-y-3 overflow-y-auto pr-1">
                             {items.map((item) => (
                                 <li key={`${item.product.id}-${item.product.variantId || ''}`} className="flex gap-3">
                                     <img src={imageUrl(item.product.images[0])} alt="" width="56" height="64" className="h-16 w-14 shrink-0 rounded-md object-cover" />
                                     <div className="min-w-0 flex-1">
-                                        <p className="line-clamp-1 text-small text-ink">{item.product.title}</p>
+                                        <p className="line-clamp-2 text-small font-medium leading-snug text-ink">{item.product.title}</p>
                                         <p className="text-small text-muted">{item.product.offerKind === 'bogo' ? <span className="font-semibold text-success">Buy {item.quantity / 2} + {item.quantity / 2} FREE</span> : <>Qty: {item.quantity}</>}{isClubLine(item.product) && <span className="ml-2 text-accent-ink">Chikit Club price</span>}</p>
                                         <CartLinePrice product={item.product} quantity={item.quantity} align="start" className="mt-0.5 text-small" />
                                     </div>

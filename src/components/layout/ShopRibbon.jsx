@@ -12,7 +12,7 @@ import { activeConcerns } from '@/utils/concerns';
 import { seriesForConcern } from '@/utils/wellRange';
 import { ribbonItems } from '@/utils/ribbonMenu';
 import { imageUrl } from '@/services/api';
-import { formatPrice, cn } from '@/utils/formatPrice';
+import { formatPrice, cn, tidyRupees } from '@/utils/formatPrice';
 
 /** Icons for the starting concern tiles (a concern with its own picture shows that instead). */
 export const CONCERN_ICONS = {
@@ -184,7 +184,7 @@ export function RibbonPanels({ openMenu, onClose }) {
                         {offers.map((offer) => (
                             <li key={offer.id}>
                                 <Link to={`/offers/${offer.slug}`} onClick={onClose} className="flex min-h-12 items-center justify-between gap-3 py-3 text-body text-ink hover:text-primary">
-                                    <span>{offer.title}</span>
+                                    <span>{tidyRupees(offer.title)}</span>
                                     {offer.kind === 'mix_match' && offer.price > 0 && <span className="shrink-0 rounded-full bg-primary-tint px-2.5 py-0.5 text-caption font-semibold text-primary-deep">{formatPrice(offer.price)}</span>}
                                     {offer.kind === 'bogo' && <span className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 text-caption font-semibold text-ink">1 + 1</span>}
                                 </Link>

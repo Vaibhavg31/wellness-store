@@ -8,7 +8,6 @@ import CategoryScroller from '@/components/home/CategoryScroller';
 import TrendingNow from '@/components/home/TrendingNow';
 import MostLoved from '@/components/home/MostLoved';
 import WatchShop from '@/components/home/WatchShop';
-import WellRange from '@/components/home/WellRange';
 import BottomRibbon from '@/components/home/BottomRibbon';
 import OffersBento from '@/components/home/OffersBento';
 import ClubBand from '@/components/home/ClubBand';
@@ -41,7 +40,6 @@ function buildSections({ products, loading }) {
         trending: () => <TrendingNow />,
         bestSellers: () => <MostLoved />,
         watchShop: () => <WatchShop products={products} />,
-        wellRange: () => <WellRange products={products} />,
         bottomRibbon: () => <BottomRibbon />,
         offersSlider: () => <><OffersBento products={products} /><ClubBand products={products} /></>,
         banners: () => <PromoBanners />,

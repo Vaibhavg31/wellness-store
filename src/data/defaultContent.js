@@ -83,7 +83,7 @@ export const DEFAULT_SITE_CONTENT = {
         bestSellers: true,
         offersSlider: true,
         categoryShelves: true,
-        wellRange: true,
+        wellRange: false,
         bottomRibbon: true,
         watchShop: true,
         whyChoose: true,

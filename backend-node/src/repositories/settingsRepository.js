@@ -58,7 +58,7 @@ const DEFAULTS = {
         bestSellers: true,
         offersSlider: true,
         categoryShelves: true,
-        wellRange: true,
+        wellRange: false,
         watchShop: true,
         whyChoose: true,
         reviews: true,

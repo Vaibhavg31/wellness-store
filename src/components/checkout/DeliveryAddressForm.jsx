@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, MapPin, CheckCircle } from 'lucide-react';
 import Input from '@/components/ui/Input';
+import Textarea from '@/components/ui/Textarea';
 import { lookupPincode, isValidPincode } from '@/utils/pincodeLookup';
 import { formatIndianAddress } from '@/utils/formatAddress';
 
@@ -63,32 +64,18 @@ export default function DeliveryAddressForm({ value, onChange, errors = {}, comp
         ? '!rounded-xl !px-4 !py-3 text-sm sm:!rounded-full sm:!px-5 sm:!py-3.5'
         : undefined;
 
-    const labelClass = compact
-        ? 'block text-[10px] sm:text-xs tracking-[0.12em] sm:tracking-[0.15em] uppercase text-muted mb-1.5 sm:mb-2 font-medium'
-        : 'block text-xs tracking-[0.15em] uppercase text-muted mb-2 font-medium';
-
     return (
         <div className={compact ? 'space-y-3 sm:space-y-4' : 'space-y-4'}>
-            <div>
-                <label className={labelClass}>
-                    Street Address
-                </label>
-                <textarea
-                    value={value.address}
-                    onChange={(e) => update({ address: e.target.value })}
-                    rows={compact ? 2 : 3}
-                    required
-                    className={`w-full bg-canvas/60 border focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all duration-300 resize-none text-ink placeholder:text-muted/45 font-light ${
-                        compact
-                            ? 'px-4 py-3 text-sm rounded-xl sm:px-5 sm:py-3.5 sm:text-base sm:rounded-2xl'
-                            : 'px-5 py-3.5 rounded-2xl'
-                    } ${errors.address ? 'border-danger/30' : 'border-line'}`}
-                    placeholder="House / Flat no., Building, Street, Area"
-                />
-                {errors.address && (
-                    <p className="mt-1.5 text-xs text-danger" role="alert">{errors.address}</p>
-                )}
-            </div>
+            <Textarea
+                label="Street address"
+                value={value.address}
+                onChange={(e) => update({ address: e.target.value })}
+                rows={2}
+                required
+                error={errors.address}
+                placeholder="House / Flat no., Building, Street, Area"
+                className="!resize-none !rounded-xl !px-4"
+            />
 
             <Input
                 label="Landmark (optional)"

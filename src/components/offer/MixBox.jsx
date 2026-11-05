@@ -29,7 +29,7 @@ function PickTile({ product, picked, full, onToggle, isMember }) {
                     aria-pressed={picked}
                     className={cn(
                         'inline-flex h-11 items-center justify-center gap-1.5 rounded-full border text-small font-semibold transition-colors',
-                        picked ? 'border-primary bg-primary text-white hover:bg-primary-hover' : 'border-primary text-primary hover:bg-primary-soft',
+                        picked ? 'border-primary/40 bg-primary-tint text-primary hover:bg-primary-tint/70' : 'border-primary bg-primary text-white hover:bg-primary-hover',
                         'disabled:border-line disabled:bg-disabled disabled:text-subtle',
                     )}
                 >
@@ -47,8 +47,8 @@ function PickTile({ product, picked, full, onToggle, isMember }) {
 function Slot({ product, index, onRemove, compact = false }) {
     if (!product) {
         return (
-            <li className={cn('flex items-center gap-3 rounded-xl border-2 border-dashed border-line text-muted', compact ? 'size-12 justify-center' : 'p-3')}>
-                <span className={cn('grid shrink-0 place-items-center rounded-full bg-canvas-alt font-display text-small font-semibold', compact ? 'size-7' : 'size-9')}>{index + 1}</span>
+            <li className={cn('flex items-center gap-3 rounded-xl border-2 border-dashed border-primary/35 text-muted', compact ? 'size-12 justify-center' : 'p-3')}>
+                <span className={cn('grid shrink-0 place-items-center rounded-full bg-primary-tint font-display text-small font-semibold text-primary', compact ? 'size-7' : 'size-9')}>{index + 1}</span>
                 {!compact && <span className="text-small">Pick product {index + 1}</span>}
             </li>
         );
