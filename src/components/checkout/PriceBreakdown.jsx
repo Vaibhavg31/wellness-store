@@ -20,29 +20,43 @@ export default function PriceBreakdown({ showUpsell = true, totalClassName = 'te
     } = useCart();
     const { content } = useSiteContent();
     const eta = deliveryWindow(content.extras.delivery);
-    // What the shopper saves versus list prices, plus any coupon.
-    const listSavings = items.reduce((sum, i) => sum + Math.max(0, (i.product.originalPrice || 0) - i.product.price) * i.quantity, 0);
+    // Total MRP (list prices), then what the offers and Chikit Club prices take off it, so Subtotal is never an unexplained number.
+    const listTotal = items.reduce((sum, i) => sum + Math.max(i.product.originalPrice || 0, i.product.price) * i.quantity, 0);
+    const listSavings = Math.max(0, listTotal - subtotal);
     const totalSavings = listSavings + discountAmount;
 
     return (
         <div className="space-y-3 text-sm sm:text-[15px]">
             <ClubSavings />
-            <div className="flex justify-between">
-                <span className="text-muted">Subtotal</span>
-                <span className="font-medium">{formatPrice(subtotal)}</span>
-            </div>
+            {listSavings > 0 ? (
+                <>
+                    <div className="flex justify-between">
+                        <span className="text-muted">Total MRP</span>
+                        <span className="font-medium">{formatPrice(listTotal)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-muted">Discount on MRP</span>
+                        <span className="font-medium text-success">−{formatPrice(listSavings)}</span>
+                    </div>
+                </>
+            ) : (
+                <div className="flex justify-between">
+                    <span className="text-muted">Subtotal</span>
+                    <span className="font-medium">{formatPrice(subtotal)}</span>
+                </div>
+            )}
             {discountAmount > 0 && (
                 <div>
-                    <div className="flex justify-between text-primary">
-                        <span>Coupon{couponCode ? ` (${couponCode})` : ''}</span>
-                        <span className="font-medium">−{formatPrice(discountAmount)}</span>
+                    <div className="flex justify-between">
+                        <span className="text-muted">Coupon{couponCode ? ` (${couponCode})` : ''}</span>
+                        <span className="font-medium text-success">−{formatPrice(discountAmount)}</span>
                     </div>
                     {couponBreakdown?.capped && <p className="mt-0.5 text-caption text-muted">Maximum coupon discount reached ({formatPrice(couponBreakdown.maxDiscount)})</p>}
                 </div>
             )}
             <div className="flex justify-between">
                 <span className="text-muted">Delivery</span>
-                <span className={`font-medium ${deliveryFee === 0 ? 'text-primary' : ''}`}>
+                <span className={`font-medium ${deliveryFee === 0 ? 'text-success' : ''}`}>
                     {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
                 </span>
             </div>
@@ -66,7 +80,7 @@ export default function PriceBreakdown({ showUpsell = true, totalClassName = 'te
                 <p className="rounded-md bg-success-tint px-3 py-2 text-center text-small font-medium text-success">You are saving {formatPrice(totalSavings)} on this order</p>
             )}
             <div className="border-t border-line/60 pt-4 flex justify-between items-baseline font-display text-xl">
-                <span className="text-base font-sans text-ink">Total</span>
+                <span className="text-base font-sans font-semibold text-ink">Total amount</span>
                 <span className={totalClassName}>{formatPrice(total)}</span>
             </div>
             {eta && <p className="flex items-center gap-2 text-caption text-muted"><Truck size={13} className="text-primary" aria-hidden="true" /> Estimated delivery {eta}</p>}

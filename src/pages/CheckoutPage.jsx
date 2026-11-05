@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, MapPin, Phone, User, CreditCard, ChevronLeft, ShoppingBag, X } from 'lucide-react';
+import { CheckCircle, MapPin, Phone, User, CreditCard, ChevronLeft, ChevronDown, ShoppingBag, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
@@ -84,6 +84,7 @@ export default function CheckoutPage() {
 
     const defaultPayment = razorpayAvailable ? 'razorpay' : codAvailable ? 'cod' : 'cod';
 
+    const [summaryOpen, setSummaryOpen] = useState(false);
     const [placed, setPlaced] = useState(null);
 
     // The success view below renders in place (no route change), so the
@@ -651,8 +652,23 @@ export default function CheckoutPage() {
                     <ActiveCoupons variant="sidebar" />
 
                     <div className="space-y-5 rounded-lg border border-line bg-surface p-5 sm:p-6 lg:sticky lg:top-28 lg:p-8">
-                        <h2 className="font-sans text-h4">Order summary</h2>
+                        <h2 className="hidden font-sans text-h4 lg:block">Order summary</h2>
+                        {/* Phone: the summary folds away so the form is the first thing to fill in; the total stays in view. */}
+                        <button
+                            type="button"
+                            onClick={() => setSummaryOpen((open) => !open)}
+                            aria-expanded={summaryOpen}
+                            aria-controls="checkout-summary"
+                            className="flex w-full items-center justify-between gap-3 text-left lg:hidden"
+                        >
+                            <span className="min-w-0">
+                                <span className="block font-sans text-h4">Order summary</span>
+                                <span className="block text-caption text-muted">{items.length} item{items.length !== 1 ? 's' : ''} · {summaryOpen ? 'tap to hide' : 'tap for items and price details'}</span>
+                            </span>
+                            <span className="flex shrink-0 items-center gap-2 font-display text-h4 text-primary">{formatPrice(total)} <ChevronDown size={18} className={`text-muted transition-transform ${summaryOpen ? 'rotate-180' : ''}`} aria-hidden="true" /></span>
+                        </button>
 
+                        <div id="checkout-summary" className={`space-y-5 ${summaryOpen ? 'block' : 'hidden'} lg:block`}>
                         <ul className="max-h-80 space-y-3 overflow-y-auto pr-1">
                             {items.map((item) => (
                                 <li key={`${item.product.id}-${item.product.variantId || ''}`} className="flex gap-3">
@@ -669,6 +685,7 @@ export default function CheckoutPage() {
                         <div className="space-y-2 border-t border-line pt-4 text-small">
                             <CouponInput compact />
                             <PriceBreakdown totalClassName="text-primary" />
+                        </div>
                         </div>
 
                         {error && <p className="hidden rounded-lg bg-danger-tint p-3 text-small text-danger lg:block" role="alert">{error}</p>}

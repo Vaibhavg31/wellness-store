@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Gift, Shield, ShoppingBag, Trash2, User } from 'lucide-react';
+import { Gift, Heart, ShoppingBag, Trash2, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import PopularPicks from '@/components/shop/PopularPicks';
@@ -9,11 +9,13 @@ import QuantityStepper from '@/components/ui/QuantityStepper';
 import PageHeader from '@/components/ui/PageHeader';
 import CheckoutSteps from '@/components/checkout/CheckoutSteps';
 import CartUpsell from '@/components/cart/CartUpsell';
+import FreeDeliveryBar from '@/components/cart/FreeDeliveryBar';
 import CouponInput from '@/components/checkout/CouponInput';
 import ActiveCoupons from '@/components/checkout/ActiveCoupons';
 import PriceBreakdown from '@/components/checkout/PriceBreakdown';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/contexts/ToastContext';
 import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl } from '@/services/api';
@@ -62,7 +64,7 @@ function BundleEntry({ entry, onRemove }) {
     );
 }
 
-function LineEntry({ item, onRemove, onQuantity }) {
+function LineEntry({ item, onRemove, onQuantity, onMoveToWishlist }) {
     const { product, quantity } = item;
     const variant = { variantId: product.variantId, offerId: product.offerId };
     return (
@@ -78,6 +80,7 @@ function LineEntry({ item, onRemove, onQuantity }) {
                         {product.offerTitle && <p className="mt-0.5 text-caption font-medium text-accent-ink">{isClubLine(product) && product.offerGroup ? 'Box priced at your Chikit Club prices' : product.offerTitle}</p>}
                         {isClubLine(product) && !product.offerGroup && <p className="mt-0.5 text-caption font-medium text-accent-ink">Chikit Club price</p>}
                         {product.offerKind === 'bogo' && <p className="mt-1 inline-flex rounded-full bg-success-tint px-2.5 py-0.5 text-caption font-semibold text-success">Buy {quantity / 2} + {quantity / 2} FREE</p>}
+                        {!product.offerId && <button type="button" onClick={() => onMoveToWishlist(item)} className="mt-1.5 inline-flex min-h-8 items-center gap-1.5 text-caption font-medium text-muted transition-colors hover:text-primary"><Heart size={13} aria-hidden="true" /> Move to wishlist</button>}
                     </div>
                     <button type="button" onClick={() => onRemove(product.id, product.title, product.variantId, product.offerId)} className={removeButton} aria-label={`Remove ${product.title}`}><Trash2 size={16} /></button>
                 </div>
@@ -96,7 +99,8 @@ function LineEntry({ item, onRemove, onQuantity }) {
 }
 
 export default function CartPage() {
-    const { items, updateQuantity, removeFromCart, removeBundleFromCart, removeOfferGroup, syncPrices } = useCart();
+    const { items, total, updateQuantity, removeFromCart, removeBundleFromCart, removeOfferGroup, syncPrices } = useCart();
+    const { addToWishlist } = useWishlist();
     const { isAuthenticated, user } = useAuth();
     const { showToast } = useToast();
 
@@ -108,6 +112,12 @@ export default function CartPage() {
     const handleRemove = (productId, title, variantId, offerId) => {
         removeFromCart(productId, { variantId, offerId });
         showToast(`Removed "${title}" from bag`, 'info');
+    };
+
+    const handleMoveToWishlist = (item) => {
+        addToWishlist(item.product);
+        removeFromCart(item.product.id, { variantId: item.product.variantId, offerId: item.product.offerId });
+        showToast(`Moved "${item.product.title}" to your wishlist`, 'success');
     };
 
     const handleRemoveBundle = (groupId, bundleTitle, isBox) => {
@@ -166,11 +176,12 @@ export default function CartPage() {
 
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
                     <div className="min-w-0 lg:col-span-2">
+                    <FreeDeliveryBar className="mb-4" />
                     <ul className="space-y-3">
                         {entries.map((entry) => (
                             entry.type === 'bundle'
                                 ? <BundleEntry key={`bundle-${entry.group ?? entry.bundleId}`} entry={entry} onRemove={handleRemoveBundle} />
-                                : <LineEntry key={`${entry.item.product.id}::${entry.item.product.variantId ?? ''}::${entry.item.product.offerId ?? ''}`} item={entry.item} onRemove={handleRemove} onQuantity={updateQuantity} />
+                                : <LineEntry key={`${entry.item.product.id}::${entry.item.product.variantId ?? ''}::${entry.item.product.offerId ?? ''}`} item={entry.item} onRemove={handleRemove} onQuantity={updateQuantity} onMoveToWishlist={handleMoveToWishlist} />
                         ))}
                     </ul>
                     <CartUpsell />
@@ -181,13 +192,23 @@ export default function CartPage() {
                         <div className="space-y-5 rounded-lg border border-line bg-surface p-5 sm:p-6 lg:sticky lg:top-28">
                             <h2 className="text-h4">Price details</h2>
                             <CouponInput compact />
-                            <PriceBreakdown />
+                            <PriceBreakdown showUpsell={false} />
                             <Link to="/checkout" className="block"><Button size="lg" className="w-full">Proceed to checkout</Button></Link>
                             <PaymentAssurance className="justify-center" />
-                            <p className="flex items-center justify-center gap-2 text-caption text-muted"><Shield size={14} className="text-primary" aria-hidden="true" /> Secure checkout · COD available</p>
                             <Link to="/shop" className="flex min-h-11 items-center justify-center text-small text-muted hover:text-primary">Continue shopping</Link>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Phone: the total and the checkout button stay in reach above the tab bar while the shopper reads the bag. */}
+            <div className="sticky bottom-[var(--tabbar-h,0px)] z-30 border-t border-line bg-surface px-4 py-3 shadow-[0_-10px_28px_rgb(43_15_43/0.12)] lg:hidden">
+                <div className="mx-auto flex max-w-2xl items-center gap-4">
+                    <div className="min-w-0">
+                        <p className="text-caption text-muted">Total</p>
+                        <p className="font-display text-h4 leading-tight text-primary">{formatPrice(total)}</p>
+                    </div>
+                    <Link to="/checkout" className="min-w-0 flex-1"><Button size="lg" className="w-full">Proceed to checkout</Button></Link>
                 </div>
             </div>
         </>
