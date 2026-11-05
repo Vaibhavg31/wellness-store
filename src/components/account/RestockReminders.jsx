@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { RefreshCw } from 'lucide-react';
-import { useCart } from '@/contexts/CartContext';
+import AddToBag from '@/components/product/AddToBag';
 import { useSiteContent } from '@/contexts/SiteContentContext';
-import { useToast, showCartToast } from '@/contexts/ToastContext';
 import { useProducts } from '@/hooks/useApi';
 import { imageUrl } from '@/services/api';
 import { normalizeStatus } from '@/constants/orders';
@@ -21,8 +19,6 @@ const deliveredAt = (order) => {
  */
 export default function RestockReminders({ orders }) {
     const { content } = useSiteContent();
-    const { addToCart } = useCart();
-    const { showToast } = useToast();
     const { products } = useProducts();
     const afterDays = content.extras.restockReminderDays;
 
@@ -53,7 +49,8 @@ export default function RestockReminders({ orders }) {
             <p className="mb-5 text-small text-muted">You ordered these a while ago. Running low?</p>
             <ul className="grid gap-3 sm:grid-cols-3">
                 {due.map(({ product, days }) => (
-                    <li key={product.id} className="flex items-center gap-3 rounded-lg border border-line bg-surface p-3">
+                    <li key={product.id} className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-3">
+                        <div className="flex items-center gap-3">
                         <Link to={`/product/${product.id}`} className="shrink-0">
                             <img src={imageUrl(product.images[0], 160)} alt="" width="56" height="56" loading="lazy" className="size-14 rounded-md object-cover" />
                         </Link>
@@ -61,14 +58,8 @@ export default function RestockReminders({ orders }) {
                             <Link to={`/product/${product.id}`} className="line-clamp-2 text-small font-medium text-ink hover:text-primary">{product.title}</Link>
                             <p className="text-caption text-muted">Delivered {days} days ago</p>
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => { if (addToCart(product, 1)) showCartToast(showToast, product); }}
-                            aria-label={`Reorder ${product.title}`}
-                            className="grid size-9 shrink-0 place-items-center rounded-full border border-primary text-primary hover:bg-primary-tint"
-                        >
-                            <RefreshCw size={16} aria-hidden="true" />
-                        </button>
+                        </div>
+                        <AddToBag product={product} />
                     </li>
                 ))}
             </ul>

@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { useToast, showCartToast } from '@/contexts/ToastContext';
+import AddToBag from '@/components/product/AddToBag';
 import { useProducts } from '@/hooks/useApi';
 import { imageUrl } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
@@ -11,8 +10,7 @@ const LIMIT = 3;
 
 /** "Complete your routine": in-stock products not already in the bag, preferring the categories being bought. */
 export default function CartUpsell() {
-    const { items, addToCart } = useCart();
-    const { showToast } = useToast();
+    const { items } = useCart();
     const { products } = useProducts();
 
     const suggestions = useMemo(() => {
@@ -28,16 +26,13 @@ export default function CartUpsell() {
 
     if (suggestions.length === 0) return null;
 
-    const add = (product) => {
-        if (addToCart(product, 1)) showCartToast(showToast, product);
-    };
-
     return (
         <section aria-labelledby="upsell-title" className="mt-8">
             <h2 id="upsell-title" className="mb-3 text-h4">Complete your routine</h2>
             <ul className="grid gap-3 sm:grid-cols-3">
                 {suggestions.map((product) => (
-                    <li key={product.id} className="flex items-center gap-3 rounded-lg border border-line bg-surface p-3">
+                    <li key={product.id} className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-3">
+                        <div className="flex items-center gap-3">
                         <Link to={`/product/${product.id}`} className="shrink-0">
                             <img src={imageUrl(product.images[0], 160)} alt="" width="56" height="56" loading="lazy" className="size-14 rounded-md object-cover" />
                         </Link>
@@ -45,14 +40,8 @@ export default function CartUpsell() {
                             <Link to={`/product/${product.id}`} className="line-clamp-2 text-small font-medium text-ink hover:text-primary">{product.title}</Link>
                             <p className="text-caption font-semibold text-primary-deep">{formatPrice(product.price)}</p>
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => add(product)}
-                            aria-label={`Add ${product.title} to bag`}
-                            className="grid size-9 shrink-0 place-items-center rounded-full border border-primary text-primary hover:bg-primary-tint"
-                        >
-                            <Plus size={16} aria-hidden="true" />
-                        </button>
+                        </div>
+                        <AddToBag product={product} />
                     </li>
                 ))}
             </ul>

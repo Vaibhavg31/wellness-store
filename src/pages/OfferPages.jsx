@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { BadgePercent, Gift, Minus, Package, Plus, ShoppingBag, ShoppingCart } from 'lucide-react';
+import { BadgePercent, Gift, Package, ShoppingBag, ShoppingCart } from 'lucide-react';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
 import Button from '@/components/ui/Button';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ProductCard from '@/components/product/ProductCard';
+import { QuantityStepper } from '@/components/product/AddToBag';
 import MixBox from '@/components/offer/MixBox';
 import { OfferPictures } from '@/components/home/OffersBento';
 import OffersShowcase, { ClubStrip } from '@/components/home/OffersShowcase';
@@ -84,15 +85,11 @@ function BogoTile({ offer, product }) {
             <p className="text-center text-small font-medium text-success">{soldOut ? 'Sold out' : 'Add one, get the second free'}</p>
             {sets > 0 ? (
                 <div className="mt-auto">
-                    <div className="flex h-10 w-full items-center justify-between rounded-full bg-primary text-white" role="group" aria-label="Sets in your bag">
-                        <button type="button" onClick={() => change(sets - 1)} className="grid size-10 place-items-center rounded-full hover:bg-white/15" aria-label={sets === 1 ? 'Remove from bag' : 'Decrease quantity'}><Minus size={16} aria-hidden="true" /></button>
-                        <span className="text-small font-semibold tabular-nums" aria-live="polite">{sets}</span>
-                        <button type="button" onClick={() => change(sets + 1)} disabled={sets >= maxSets} className="grid size-10 place-items-center rounded-full hover:bg-white/15 disabled:opacity-40 disabled:hover:bg-transparent" aria-label="Increase quantity"><Plus size={16} aria-hidden="true" /></button>
-                    </div>
+                    <QuantityStepper qty={sets} max={maxSets} onChange={change} title={product.title} />
                     <p className="mt-1.5 text-center text-caption font-semibold text-success">Buy {sets} + {sets} FREE in your bag</p>
                 </div>
             ) : (
-                <Button size="sm" className="mt-auto w-full" disabled={soldOut} onClick={add}><ShoppingBag size={14} aria-hidden="true" /> Add to bag</Button>
+                <button type="button" disabled={soldOut} onClick={add} className="mt-auto inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-primary bg-primary text-small font-semibold text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:border-line-strong disabled:bg-transparent disabled:text-subtle disabled:hover:bg-transparent"><ShoppingBag size={16} aria-hidden="true" /> Add to bag</button>
             )}
         </div>
     );

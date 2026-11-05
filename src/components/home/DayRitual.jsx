@@ -1,8 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ShoppingBag } from 'lucide-react';
 import { LazyMotion, domAnimation, m, useMotionValueEvent, useScroll, useTransform } from 'framer-motion';
-import Button from '@/components/ui/Button';
+import AddToBag from '@/components/product/AddToBag';
 import Price from '@/components/ui/Price';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { DAY_RITUAL } from '@/data/dayRitual';
@@ -69,9 +68,7 @@ function Stage({ stage, index, count, progress, product, active, onAdd, added, l
                                 <span className={cn('block text-small font-semibold group-hover:underline', deep ? 'text-white' : 'text-ink')}>{product.title}</span>
                                 <Price price={product.price} originalPrice={product.originalPrice} className={deep ? '[&_*]:!text-white' : undefined} />
                             </Link>
-                            <Button variant={deep ? 'accent' : 'primary'} onClick={() => onAdd(product)} disabled={added} className="min-w-40">
-                                {added ? <><Check size={16} aria-hidden="true" /> Added</> : <><ShoppingBag size={16} aria-hidden="true" /> Add to bag</>}
-                            </Button>
+                            <div className="w-full max-w-56 sm:w-52"><AddToBag product={product} size="large" tone={deep ? 'dark' : 'solid'} onFirstAdd={() => onAdd(product)} /></div>
                         </div>
 
                         {last && (
@@ -130,12 +127,7 @@ function RitualStory({ stages, copy }) {
     const total = stages.reduce((sum, { product }) => sum + product.price, 0);
     const allAdded = stages.every(({ product }) => addedIds.includes(product.id));
 
-    const add = (product) => {
-        if (addToCart(product, 1)) {
-            setAddedIds((ids) => [...new Set([...ids, product.id])]);
-            showToast(`Added ${product.title} to your bag`, 'success');
-        } else showToast('Could not add this product — please check stock', 'error');
-    };
+    const add = (product) => setAddedIds((ids) => [...new Set([...ids, product.id])]);
     const addAll = () => {
         let ok = 0;
         stages.forEach(({ product }) => { if (addToCart(product, 1)) ok += 1; });

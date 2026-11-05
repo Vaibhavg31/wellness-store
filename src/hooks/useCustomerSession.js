@@ -15,7 +15,7 @@ export function useCustomerSession() {
 
     const welcomeUser = useCallback((name) => {
         const label = (name && String(name).trim()) || user?.name || user?.email?.split('@')[0] || 'there';
-        showToast(`Welcome back, ${label}! Your cart & wishlist are ready.`, 'success');
+        showToast(`Welcome back, ${label}! Your bag & wishlist are ready.`, 'success');
     }, [showToast, user?.name, user?.email]);
 
     const signOut = useCallback(() => {
@@ -23,7 +23,7 @@ export function useCustomerSession() {
 
         void runSignOutTransition(async () => {
             logout();
-            showToast('Signed out. You can keep shopping. Cart & wishlist stay on this device.', 'info');
+            showToast('Signed out. You can keep shopping. Your bag & wishlist stay on this device.', 'info');
             if (PROTECTED_AFTER_LOGOUT.includes(location.pathname)) {
                 navigate('/shop', { replace: true });
             }

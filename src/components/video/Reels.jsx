@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Play, ShoppingBag, X } from 'lucide-react';
-import Button from '@/components/ui/Button';
+import { ChevronLeft, ChevronRight, Play, X } from 'lucide-react';
+import AddToBag from '@/components/product/AddToBag';
 import Price from '@/components/ui/Price';
-import { useCart } from '@/contexts/CartContext';
-import { useToast } from '@/contexts/ToastContext';
 import { useDialog } from '@/hooks/useDialog';
 import { usePresence } from '@/hooks/usePresence';
 import { imageUrl } from '@/services/api';
@@ -20,21 +18,9 @@ const dataSaver = () => Boolean(navigator.connection?.saveData);
 
 /** The product a reel is about, with a button that puts it in the bag (and opens the bag). */
 export function ReelProduct({ product, compact = false, onBuy }) {
-    const { addToCart, openCartDrawer } = useCart();
-    const { showToast } = useToast();
     if (!product) return null;
-    const outOfStock = typeof product.stock === 'number' && product.stock <= 0;
-
-    const buy = () => {
-        if (outOfStock) return showToast('Out of stock', 'error');
-        if (addToCart(product)) {
-            trackEvent('reel_buy', { productId: product.id, path: window.location.pathname });
-            onBuy?.();
-            openCartDrawer();
-        } else {
-            showToast('You already have the maximum available quantity in your bag', 'error');
-        }
-        return undefined;
+    const bought = () => {
+        trackEvent('reel_buy', { productId: product.id, path: window.location.pathname });
     };
 
     return (
@@ -46,7 +32,7 @@ export function ReelProduct({ product, compact = false, onBuy }) {
                     <Price price={product.price} originalPrice={product.originalPrice} className="text-small" />
                 </span>
             </Link>
-            <Button disabled={outOfStock} onClick={buy} className="w-full"><ShoppingBag size={15} aria-hidden="true" /> {outOfStock ? 'Sold out' : 'Add to bag'}</Button>
+            <AddToBag product={product} onFirstAdd={bought} />
         </div>
     );
 }

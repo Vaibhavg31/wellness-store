@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ChevronLeft, ChevronRight, Pause, Play, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { AnimatePresence, animate, m, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
 import Price from '@/components/ui/Price';
-import { useCart } from '@/contexts/CartContext';
-import { useToast } from '@/contexts/ToastContext';
+import AddToBag from '@/components/product/AddToBag';
 import { imageUrl } from '@/services/api';
 import { sampleColour } from '@/utils/sampleColour';
 import { cn } from '@/utils/formatPrice';
@@ -89,14 +88,11 @@ function DeckCard({ item, offset, index, onSelect, dragged, priority, reduced })
 
 export default function HeroDeck({ items }) {
     const reduced = useReducedMotion();
-    const { addToCart } = useCart();
-    const { showToast } = useToast();
     const count = items.length;
 
     const [active, setActive] = useState(0);
     const [userPaused, setUserPaused] = useState(false);
     const [colours, setColours] = useState([]);
-    const [addedId, setAddedId] = useState(null);
 
     const stageRef = useRef(null);
     const dragged = useRef(false);
@@ -188,18 +184,7 @@ export default function HeroDeck({ items }) {
         if (event.key === 'ArrowLeft') { event.preventDefault(); step(-1); }
     };
 
-    const addCurrent = () => {
-        const product = current?.product;
-        if (!product) return;
-        if (addToCart(product, 1)) {
-            setAddedId(product.id);
-            showToast(`Added ${product.title} to your bag`, 'success');
-            setTimeout(() => setAddedId((id) => (id === product.id ? null : id)), 1800);
-        } else showToast('Could not add this product. Please check stock.', 'error');
-    };
-
     if (!current) return null;
-    const justAdded = addedId === current.product?.id;
 
     return (
         <div
@@ -260,14 +245,7 @@ export default function HeroDeck({ items }) {
                     </AnimatePresence>
                 </div>
                 {current.product && (
-                    <button
-                        type="button"
-                        onClick={addCurrent}
-                        aria-label={`Add ${current.title} to bag`}
-                        className={cn('grid size-12 shrink-0 place-items-center rounded-full text-white shadow-md transition-colors', justAdded ? 'bg-success' : 'bg-primary hover:bg-primary-hover')}
-                    >
-                        {justAdded ? <Check size={20} aria-hidden="true" /> : <ShoppingBag size={20} aria-hidden="true" />}
-                    </button>
+                    <AddToBag product={current.product} className="w-36 shrink-0 sm:w-44" />
                 )}
             </div>
 

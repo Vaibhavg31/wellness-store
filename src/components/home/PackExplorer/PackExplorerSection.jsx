@@ -1,12 +1,11 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Check, Hand, RotateCw, ShoppingBag, ZoomIn } from 'lucide-react';
+import { ArrowRight, Check, Hand, RotateCw, ZoomIn } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Price from '@/components/ui/Price';
 import Reveal from '@/components/ui/Reveal';
-import { useCart } from '@/contexts/CartContext';
-import { useToast } from '@/contexts/ToastContext';
+import AddToBag from '@/components/product/AddToBag';
 import { hasPack, packFor } from '@/data/packs';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { imageUrl } from '@/services/api';
@@ -45,15 +44,12 @@ function PhotoFallback({ product }) {
 export default function PackExplorerSection({ products = [] }) {
     const reduced = useReducedMotion();
     const looks = useSiteContent().content.extras.packs ?? {};
-    const { addToCart } = useCart();
-    const { showToast } = useToast();
     const sectionRef = useRef(null);
     const [near, setNear] = useState(false);
     const [onScreen, setOnScreen] = useState(false);
     const [webgl, setWebgl] = useState(false);
     const [sceneReady, setSceneReady] = useState(false);
     const [activeId, setActiveId] = useState(null);
-    const [addedId, setAddedId] = useState(null);
 
     const list = useMemo(() => products.filter((p) => hasPack(p, looks) && p.images?.[0]), [products, looks]);
     const active = list.find((p) => p.id === activeId) ?? list[0];
@@ -73,13 +69,6 @@ export default function PackExplorerSection({ products = [] }) {
 
     const live = near && webgl && !reduced;
     const pack = packFor(active, looks);
-    const add = () => {
-        if (addToCart(active, 1)) {
-            setAddedId(active.id);
-            showToast(`Added ${active.title} to your bag`, 'success');
-            setTimeout(() => setAddedId((id) => (id === active.id ? null : id)), 1800);
-        } else showToast('Could not add this product. Please check stock.', 'error');
-    };
 
     return (
         <LazyMotion features={domAnimation}>
@@ -154,9 +143,7 @@ export default function PackExplorerSection({ products = [] }) {
                                     </m.div>
                                 </AnimatePresence>
                                 <div className="mt-6 flex flex-wrap gap-3">
-                                    <Button size="lg" onClick={add} className={cn('flex-1 sm:flex-none', addedId === active.id && '!bg-success')}>
-                                        {addedId === active.id ? <><Check size={18} aria-hidden="true" /> Added</> : <><ShoppingBag size={18} aria-hidden="true" /> Add to bag</>}
-                                    </Button>
+                                    <div className="min-w-0 flex-1 sm:w-56 sm:flex-none"><AddToBag product={active} size="large" /></div>
                                     <Link to={`/product/${active.id}`} className="flex-1 sm:flex-none">
                                         <Button size="lg" variant="outline" className="w-full">Details <ArrowRight size={18} aria-hidden="true" /></Button>
                                     </Link>
