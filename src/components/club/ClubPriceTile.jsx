@@ -29,7 +29,7 @@ export default function ClubPriceTile({ product, member = false, active = false,
                             <span className="text-small text-muted line-through"><span className="sr-only">Usual price </span>{formatPrice(product.price)}</span>
                         </span>
                         <span className="mt-1 text-caption text-muted">Your Chikit Club price</span>
-                        <span className="mt-2.5 inline-flex items-center justify-center gap-1.5 self-start rounded-full bg-primary px-3 py-1 text-caption font-semibold text-accent"><Sparkles size={12} aria-hidden="true" /> You save {formatPrice(saving)}</span>
+                        <span className="mt-2.5 inline-flex items-center justify-center gap-1.5 self-start rounded-full bg-primary-tint px-3 py-1 text-caption font-semibold text-primary ring-1 ring-primary/15"><Sparkles size={12} aria-hidden="true" /> You save {formatPrice(saving)}</span>
                     </span>
                 </Link>
                 <div className="p-3 pt-3"><AddToBag product={product} tone="solid" /></div>

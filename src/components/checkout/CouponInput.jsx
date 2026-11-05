@@ -45,18 +45,18 @@ export default function CouponInput({ compact = false }) {
         const freeDelivery = couponDetails.type === 'free_delivery';
         const excluded = couponBreakdown?.excludedSubtotal ?? 0;
         return (
-            <div className={`rounded-xl border border-success/30 bg-success-tint ${compact ? 'p-3' : 'p-4'}`}>
+            <div className={`rounded-xl border border-success/40 bg-surface shadow-xs ${compact ? 'p-3' : 'p-4'}`}>
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                        <p className="flex items-center gap-2 text-success">
-                            <CheckCircle size={16} className="shrink-0" aria-hidden="true" />
-                            <span className="font-mono text-small font-semibold tracking-wide">{couponCode}</span>
-                            <span className="rounded-full bg-surface px-2 py-0.5 text-caption font-medium text-success">{autoAppliedCoupon ? 'Added for you' : 'Applied'}</span>
+                        <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <CheckCircle size={16} className="shrink-0 text-success" aria-hidden="true" />
+                            <span className="font-mono text-small font-semibold tracking-wide text-primary">{couponCode}</span>
+                            <span className="whitespace-nowrap rounded-full bg-success-tint px-2 py-0.5 text-caption font-medium text-success">{autoAppliedCoupon ? 'Added for you' : 'Applied'}</span>
                         </p>
-                        <p className="mt-1.5 font-display text-h4 leading-tight text-ink">
+                        <p className="mt-1.5 font-display text-h4 leading-tight text-success">
                             {freeDelivery ? 'Free delivery' : `You save ${formatPrice(discountAmount)}`}
                         </p>
-                        <p className="mt-0.5 text-small text-muted">{couponDetails.title ? `${couponDetails.title} · ` : ''}{couponTerms(couponDetails)}</p>
+                        <p className="mt-0.5 text-small text-muted">{couponDetails.title && !/[%₹]/.test(couponDetails.title) ? `${couponDetails.title} · ` : ''}{couponTerms(couponDetails)}</p>
                     </div>
                     <button
                         type="button"
@@ -71,7 +71,7 @@ export default function CouponInput({ compact = false }) {
                         <X size={16} aria-hidden="true" />
                     </button>
                 </div>
-                <ul className="mt-3 space-y-1.5 border-t border-success/20 pt-3 text-caption leading-snug text-ink">
+                <ul className="mt-3 space-y-1.5 border-t border-line pt-3 text-caption leading-snug text-muted">
                     {couponBreakdown?.capped && (
                         <li className="flex gap-2"><Info size={14} className="mt-px shrink-0 text-accent-ink" aria-hidden="true" /> This coupon gives at most {formatPrice(couponBreakdown.maxDiscount)}, so that is what is taken off.</li>
                     )}

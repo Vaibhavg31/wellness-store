@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check, Crown } from 'lucide-react';
+import { ArrowRight, Crown } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { clubSavings } from '@/utils/pricing';
@@ -19,9 +19,9 @@ export default function ClubSavings({ className, onNavigate }) {
     if (isMember) {
         if (applied <= 0) return null;
         return (
-            <div className={cn('flex items-center gap-3 rounded-xl bg-success-tint px-4 py-3', className)}>
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-success text-white"><Check size={17} strokeWidth={3} aria-hidden="true" /></span>
-                <p className="text-small leading-snug text-ink"><strong className="block text-success">Chikit Club savings {formatPrice(applied)}</strong>Your Chikit Club member prices are applied to this order.</p>
+            <div className={cn('flex items-center gap-3 rounded-xl bg-primary-tint px-4 py-3', className)}>
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-accent"><Crown size={17} aria-hidden="true" /></span>
+                <p className="text-small leading-snug text-ink"><strong className="block text-primary">Chikit Club savings {formatPrice(applied)}</strong>Your Chikit Club member prices are applied to this order.</p>
             </div>
         );
     }
