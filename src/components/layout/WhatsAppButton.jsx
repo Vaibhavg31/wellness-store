@@ -53,13 +53,13 @@ export default function WhatsAppButton() {
                 // On phones the bubble would sit on the buy buttons, the sign-in / checkout buttons and the bag's "+" buttons;
                 // product pages already carry an inline "ask us on WhatsApp" prompt.
                 coversActions ? 'max-lg:hidden bottom-6' : 'bottom-[calc(var(--tabbar-h,0px)+1rem)] sm:bottom-[calc(var(--tabbar-h,0px)+1.5rem)] lg:bottom-6',
-                'safe-area-pb fixed right-4 z-40 grid size-12 place-items-center rounded-full bg-[#25D366] text-white shadow-lg sm:right-6 sm:size-14',
-                'transition-[opacity,transform] duration-300 hover:scale-105',
+                'safe-area-pb fixed right-4 z-40 grid size-12 place-items-center rounded-full bg-[#25D366] text-white ring-2 ring-white shadow-[0_6px_18px_rgba(18,140,70,0.38)] sm:right-6 sm:size-14',
+                'transition-[opacity,transform] duration-300 hover:scale-105 hover:bg-[#20bd5a]',
                 fieldFocused && 'pointer-events-none translate-y-4 opacity-0',
                 (waitOnPhone || scrollingDown) && 'max-lg:pointer-events-none max-lg:translate-y-4 max-lg:opacity-0',
             )}
         >
-            <WhatsAppIcon size={30} />
+            <WhatsAppIcon size={26} className="size-[26px] -translate-x-px translate-y-px sm:size-[30px]" />
         </a>
         </aside>
     );
