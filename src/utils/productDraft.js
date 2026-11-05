@@ -74,7 +74,7 @@ export function draftToProduct(form, { variantsOn = false } = {}) {
         faqs: (form.faqs ?? []).filter((f) => text(f.question) && text(f.answer)),
         concerns: form.concerns ?? [],
         series: form.series ?? '',
-        videos: (form.videos ?? []).filter((v) => v.url || v.poster),
+        videos: (form.videos ?? []).filter((v) => v.url),
         infoBanners: (form.infoBanners ?? []).filter((b) => b.image),
         highlights: (form.highlights ?? []).filter((h) => text(h.title)),
         variants,

@@ -23,7 +23,7 @@ function parseExtras(raw) {
         videos: (Array.isArray(parsed.videos) ? parsed.videos : [])
             .slice(0, 24)
             .map((v) => ({ url: cleanUrl(v?.url, 500), poster: cleanUrl(v?.poster, 500), title: cleanText(v?.title, 90) }))
-            .filter((v) => v.url || v.poster),
+            .filter((v) => v.url),
         infoBanners: (Array.isArray(parsed.infoBanners) ? parsed.infoBanners : [])
             .map((b) => ({ image: cleanText(b?.image, 500), alt: cleanText(b?.alt, 140) }))
             .filter((b) => b.image),

@@ -50,10 +50,10 @@ export function InfoBanners({ product }) {
     const uploaded = product.infoBanners ?? [];
     if (uploaded.length === 0) return null;
     return (
-        <section aria-label="Product information" className="section bg-canvas-alt">
+        <section aria-label="Product banners" className="section">
             <div className="container-page grid gap-5 lg:gap-6">
-                {uploaded.map((b) => (
-                    <img key={b.image} src={imageUrl(b.image, 1400)} alt={b.alt || ''} loading="lazy" className="w-full rounded-xl object-cover shadow-sm" />
+                {uploaded.map((b, i) => (
+                    <img key={`${b.image}-${i}`} src={imageUrl(b.image, 1400)} alt={b.alt || ''} loading="lazy" className="w-full rounded-2xl object-cover shadow-sm" />
                 ))}
             </div>
         </section>
@@ -98,22 +98,23 @@ export function ProductFaq({ product }) {
     );
 }
 
-/** The product's own running ribbon (set in the admin when the product is added): short promises such as "100% natural". */
+/**
+ * The product's own running ribbon (set in the admin when the product is added): short promises such as "100% natural", one line each,
+ * on the brand beige right under the buy section, the way the Ayurveda and wellness brands do it.
+ */
 export function ProductHighlights({ product }) {
     const items = product.highlights ?? [];
     if (items.length === 0) return null;
     return (
-        <section aria-label={`Highlights: ${product.title}`} className="mb-2 border-y border-line bg-canvas-alt text-ink">
-            <Marquee secondsPerItem={3.8} label={product.title}>
+        <section aria-label={`Highlights: ${product.title}`} className="bg-accent text-primary-deep">
+            <Marquee secondsPerItem={3.2} label={product.title}>
                 {items.map((item, i) => {
                     const Icon = RIBBON_ICONS[item.icon] ?? BadgeCheck;
                     return (
-                        <div key={`${item.title}-${i}`} className="flex items-center gap-3 px-6 py-3 sm:px-10">
-                            <Icon size={18} className="shrink-0 text-primary" strokeWidth={1.6} aria-hidden="true" />
-                            <span className="leading-tight">
-                                <span className="block text-caption font-semibold">{item.title}</span>
-                                {item.sub && <span className="block text-[11px] text-muted">{item.sub}</span>}
-                            </span>
+                        <div key={`${item.title}-${i}`} className="flex items-center gap-2.5 px-5 py-3 sm:gap-3 sm:px-8">
+                            <Icon size={18} className="shrink-0 text-primary" strokeWidth={1.7} aria-hidden="true" />
+                            <span className="whitespace-nowrap text-caption font-semibold uppercase tracking-[0.12em] sm:text-small">{item.title}</span>
+                            <span aria-hidden="true" className="ml-2.5 size-1 shrink-0 rounded-full bg-primary/40 sm:ml-5" />
                         </div>
                     );
                 })}
@@ -122,18 +123,18 @@ export function ProductHighlights({ product }) {
     );
 }
 
-/** Short videos and photos about the product (reels style), right under the questions. Each opens larger; videos play with sound. */
+/** Short videos about the product, reels style: a swipeable row of tall tiles, each opening full screen with sound. Uploaded or pasted in the admin. */
 export function ProductVideos({ product }) {
-    const videos = useMemo(() => (product.videos ?? []).map((v, i) => ({ id: `${product.id}-v${i}`, title: v.title, videoUrl: v.url, poster: v.poster })), [product]);
+    const videos = useMemo(() => (product.videos ?? []).filter((v) => v.url).map((v, i) => ({ id: `${product.id}-v${i}`, title: v.title, videoUrl: v.url, poster: v.poster })), [product]);
     const [openIndex, setOpenIndex] = useState(null);
     const scroller = useRef(null);
     if (videos.length === 0) return null;
     const slide = (d) => scroller.current?.scrollBy({ left: d * scroller.current.clientWidth * 0.8, behavior: 'smooth' });
 
     return (
-        <section aria-labelledby="product-videos" className={cn("section", (product.faqs?.length ?? 0) > 0 && "pt-0")}>
+        <section aria-labelledby="product-videos" className="section">
             <div className="container-page">
-                <Heading eyebrow={videos.some((v) => v.videoUrl) ? (videos.some((v) => !v.videoUrl) ? "Watch & see" : "Watch") : "See"} title={<span id="product-videos">See it in action</span>} />
+                <Heading eyebrow="Watch" title={<span id="product-videos">See it in action</span>} />
                 <div className="relative">
                     <ul ref={scroller} className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-pl-4 px-4 pb-2 sm:mx-0 sm:justify-center sm:px-0">
                         {videos.map((reel, i) => (

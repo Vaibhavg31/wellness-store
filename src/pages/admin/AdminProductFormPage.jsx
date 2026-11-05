@@ -495,7 +495,7 @@ export default function AdminProductFormPage() {
                 faqs: form.faqs.filter((f) => f.question.trim() && f.answer.trim()),
                 concerns: form.concerns,
                 series: form.series ?? '',
-                videos: form.videos.filter((v) => v.url || v.poster),
+                videos: form.videos.filter((v) => v.url),
                 infoBanners: form.infoBanners.filter((b) => b.image),
                 highlights: form.highlights.filter((h) => h.title.trim()).map((h) => ({ icon: h.icon, title: h.title.trim(), sub: (h.sub ?? '').trim() })),
                 clubEligible: form.clubEligible,

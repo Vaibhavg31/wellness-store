@@ -11,9 +11,15 @@ const addButton = 'inline-flex items-center gap-1.5 rounded-lg border border-pri
 const removeButton = 'shrink-0 rounded-lg p-2.5 text-danger transition-colors hover:bg-danger-tint';
 
 const moveButton = 'shrink-0 rounded-lg p-2 text-admin-muted transition-colors hover:bg-admin-surface hover:text-ink disabled:cursor-not-allowed disabled:opacity-30';
-const NEW_MEDIA = { url: '', poster: '', title: '', _kind: 'video' };
-/** An entry in the strip is a video (has an address) or a photo (a picture only). */
-const mediaKind = (m) => m._kind ?? (m.url ? 'video' : m.poster ? 'photo' : 'video');
+const NEW_REEL = { url: '', poster: '', title: '' };
+/** Promises an admin can add to the product's running ribbon with one tap. */
+const RIBBON_SUGGESTIONS = [
+    { icon: 'leaf', title: '100% Ayurvedic' },
+    { icon: 'check', title: 'No added sugar' },
+    { icon: 'flask', title: 'Lab tested' },
+    { icon: 'award', title: 'Doctor formulated' },
+    { icon: 'heart', title: 'Made with care' },
+];
 
 const KIND_NAME = { youtube: 'YouTube video', instagram: 'Instagram post or reel', vimeo: 'Vimeo video', file: 'video file', link: 'link (opens in a new tab)' };
 
@@ -77,6 +83,7 @@ export default function ProductExtrasEditor({ form, update, siteContent, adminTo
     const setHighlight = (i, patch) => update('highlights', form.highlights.map((h, x) => (x === i ? { ...h, ...patch } : h)));
     const moveMedia = (i, d) => { const next = [...form.videos]; [next[i], next[i + d]] = [next[i + d], next[i]]; update('videos', next); };
     const moveHighlight = (i, d) => { const next = [...form.highlights]; [next[i], next[i + d]] = [next[i + d], next[i]]; update('highlights', next); };
+    const moveBanner = (i, d) => { const next = [...form.infoBanners]; [next[i], next[i + d]] = [next[i + d], next[i]]; update('infoBanners', next); };
     const setBanner = (i, patch) => update('infoBanners', form.infoBanners.map((b, x) => (x === i ? { ...b, ...patch } : b)));
     const toggleConcern = (slug) => update('concerns', form.concerns.includes(slug) ? form.concerns.filter((c) => c !== slug) : [...form.concerns, slug]);
 
@@ -132,13 +139,13 @@ export default function ProductExtrasEditor({ form, update, siteContent, adminTo
             <OptionalSection
                 icon={Sparkles}
                 title="Running ribbon"
-                description="A slow-moving ribbon of short promises on this product's page, such as '100% natural' or 'Doctor formulated'. Pick an icon, write a short line, and add as many as you like."
+                description="A slim ribbon of short promises that glides across the product page, right under the buy section (for example: 100% Ayurvedic, No added sugar, Lab tested). One short line each, with an icon."
                 enabled={form.highlights.length > 0}
                 onToggle={(v) => update('highlights', v ? [{ icon: 'leaf', title: '', sub: '' }] : [])}
             >
                 <div className="space-y-3">
                     {form.highlights.map((h, i) => (
-                        <div key={i} className="grid gap-3 rounded-xl border border-admin-border bg-admin-surface-alt p-3 sm:grid-cols-[9rem_1fr_1fr_auto] sm:items-end sm:p-4">
+                        <div key={i} className="grid gap-3 rounded-xl border border-admin-border bg-admin-surface-alt p-3 sm:grid-cols-[9rem_1fr_auto] sm:items-end sm:p-4">
                             <div>
                                 <FormLabel>Icon</FormLabel>
                                 <select value={h.icon || 'leaf'} onChange={(e) => setHighlight(i, { icon: e.target.value })} className={fieldClass} aria-label={`Ribbon item ${i + 1} icon`}>
@@ -146,12 +153,8 @@ export default function ProductExtrasEditor({ form, update, siteContent, adminTo
                                 </select>
                             </div>
                             <div>
-                                <FormLabel>Heading</FormLabel>
-                                <input value={h.title} maxLength={60} onChange={(e) => setHighlight(i, { title: e.target.value })} className={fieldClass} placeholder="100% natural" aria-label={`Ribbon item ${i + 1} heading`} />
-                            </div>
-                            <div>
-                                <FormLabel>Small line (optional)</FormLabel>
-                                <input value={h.sub ?? ''} maxLength={90} onChange={(e) => setHighlight(i, { sub: e.target.value })} className={fieldClass} placeholder="No chemicals or fillers" aria-label={`Ribbon item ${i + 1} small line`} />
+                                <FormLabel>Short line</FormLabel>
+                                <input value={h.title} maxLength={40} onChange={(e) => setHighlight(i, { title: e.target.value })} className={fieldClass} placeholder="100% Ayurvedic" aria-label={`Ribbon item ${i + 1} text`} />
                             </div>
                             <div className="flex items-center justify-end gap-1">
                                 <button type="button" className={moveButton} onClick={() => moveHighlight(i, -1)} disabled={i === 0} aria-label={`Move ribbon item ${i + 1} up`}><ArrowUp size={15} /></button>
@@ -161,63 +164,24 @@ export default function ProductExtrasEditor({ form, update, siteContent, adminTo
                         </div>
                     ))}
                 </div>
-                <button type="button" className={addButton} onClick={() => update('highlights', [...form.highlights, { icon: 'leaf', title: '', sub: '' }])}><Plus size={14} /> Add ribbon item</button>
-                <p className="text-xs text-admin-muted">Items without a heading are not saved. They glide right to left under the product details.</p>
-            </OptionalSection>
-
-            <OptionalSection
-                icon={Film}
-                title="Videos and photos"
-                description="A swipeable strip of reels and photos on the product page, shown under the questions. Add as many as you like, in any order: upload a video, paste a link (YouTube, Instagram, Vimeo) or add a photo."
-                enabled={form.videos.length > 0}
-                onToggle={(v) => update('videos', v ? [{ ...NEW_MEDIA }] : [])}
-            >
-                <div className="space-y-4">
-                    {form.videos.map((v, i) => {
-                        const kind = mediaKind(v);
-                        const pickKind = (next) => { if (next !== kind) setVideo(i, next === 'photo' ? { _kind: 'photo', url: '', _mode: undefined } : { _kind: 'video' }); };
-                        const kindTab = (value, label) => (
-                            <button key={value} type="button" role="radio" aria-checked={kind === value} onClick={() => pickKind(value)}
-                                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${kind === value ? 'bg-primary text-white' : 'text-admin-muted hover:text-ink'}`}>
-                                {label}
-                            </button>
-                        );
-                        return (
-                            <div key={i} className="space-y-3 rounded-xl border border-admin-border bg-admin-surface-alt p-3 sm:p-4">
-                                <div className="flex items-center justify-between gap-2">
-                                    <div role="radiogroup" aria-label={`Item ${i + 1} is a`} className="inline-flex gap-1 rounded-lg border border-admin-border bg-admin-surface p-1">
-                                        {kindTab('video', 'Video')}
-                                        {kindTab('photo', 'Photo')}
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <button type="button" className={moveButton} onClick={() => moveMedia(i, -1)} disabled={i === 0} aria-label={`Move item ${i + 1} up`}><ArrowUp size={15} /></button>
-                                        <button type="button" className={moveButton} onClick={() => moveMedia(i, 1)} disabled={i === form.videos.length - 1} aria-label={`Move item ${i + 1} down`}><ArrowDown size={15} /></button>
-                                        <button type="button" className={removeButton} onClick={() => update('videos', form.videos.filter((_, x) => x !== i))} aria-label={`Remove item ${i + 1}`}><Trash2 size={15} /></button>
-                                    </div>
-                                </div>
-                                <input value={v.title} maxLength={90} onChange={(e) => setVideo(i, { title: e.target.value })} className={fieldClass} placeholder="Title (optional)" aria-label={`Item ${i + 1} title`} />
-                                {kind === 'photo' ? (
-                                    <ImageUploadField label="Photo" hint="Tall photos (4:5 or 9:16) look best in the strip." value={v.poster} onChange={(poster) => setVideo(i, { poster })} adminToken={adminToken} />
-                                ) : (
-                                    <>
-                                        <VideoSourceField video={v} onChange={(patch) => setVideo(i, patch)} adminToken={adminToken} />
-                                        <ImageUploadField label="Cover picture" value={v.poster} onChange={(poster) => setVideo(i, { poster })} adminToken={adminToken} />
-                                    </>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
                 <div className="flex flex-wrap gap-2">
-                    <button type="button" className={addButton} onClick={() => update('videos', [...form.videos, { ...NEW_MEDIA }])}><Plus size={14} /> Add video</button>
-                    <button type="button" className={addButton} onClick={() => update('videos', [...form.videos, { ...NEW_MEDIA, _kind: 'photo' }])}><Plus size={14} /> Add photo</button>
+                    <button type="button" className={addButton} onClick={() => update('highlights', [...form.highlights, { icon: 'leaf', title: '', sub: '' }])}><Plus size={14} /> Add ribbon item</button>
                 </div>
+                {form.highlights.length < 3 && (
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-admin-muted">
+                        <span>Quick add:</span>
+                        {RIBBON_SUGGESTIONS.filter((s) => !form.highlights.some((h) => h.title === s.title)).slice(0, 5).map((s) => (
+                            <button key={s.title} type="button" onClick={() => update('highlights', [...form.highlights.filter((h) => h.title.trim()), { ...s, sub: '' }])} className="rounded-full border border-admin-border bg-white px-2.5 py-1 text-xs text-ink transition-colors hover:border-primary/40">{s.title}</button>
+                        ))}
+                    </div>
+                )}
+                <p className="text-xs text-admin-muted">Items without text are not saved. Three to six items look best.</p>
             </OptionalSection>
 
             <OptionalSection
                 icon={ImageIcon}
-                title="Information banners"
-                description="Your own designed banners (how it works, how to take it, ingredients). While there are none, the page shows panels written from the product's own details."
+                title="Banners"
+                description="Wide banner pictures shown one under the other on the product page (how it works, benefits, ingredients, offers). Add as many as you like and put them in the order you want."
                 enabled={form.infoBanners.length > 0}
                 onToggle={(v) => update('infoBanners', v ? [{ image: '', alt: '' }] : [])}
             >
@@ -225,15 +189,48 @@ export default function ProductExtrasEditor({ form, update, siteContent, adminTo
                     {form.infoBanners.map((b, i) => (
                         <div key={i} className="space-y-3 rounded-xl border border-admin-border bg-admin-surface-alt p-3 sm:p-4">
                             <div className="flex items-center justify-between gap-3">
-                                <input value={b.alt} onChange={(e) => setBanner(i, { alt: e.target.value })} className={fieldClass} placeholder="What the banner says (for screen readers)" aria-label={`Banner ${i + 1} description`} />
-                                <button type="button" className={removeButton} onClick={() => update('infoBanners', form.infoBanners.filter((_, x) => x !== i))} aria-label={`Remove banner ${i + 1}`}><Trash2 size={15} /></button>
+                                <input value={b.alt} maxLength={140} onChange={(e) => setBanner(i, { alt: e.target.value })} className={fieldClass} placeholder="What the banner says (for screen readers)" aria-label={`Banner ${i + 1} description`} />
+                                <div className="flex shrink-0 items-center gap-1">
+                                    <button type="button" className={moveButton} onClick={() => moveBanner(i, -1)} disabled={i === 0} aria-label={`Move banner ${i + 1} up`}><ArrowUp size={15} /></button>
+                                    <button type="button" className={moveButton} onClick={() => moveBanner(i, 1)} disabled={i === form.infoBanners.length - 1} aria-label={`Move banner ${i + 1} down`}><ArrowDown size={15} /></button>
+                                    <button type="button" className={removeButton} onClick={() => update('infoBanners', form.infoBanners.filter((_, x) => x !== i))} aria-label={`Remove banner ${i + 1}`}><Trash2 size={15} /></button>
+                                </div>
                             </div>
-                            <ImageUploadField label="Banner image" hint="Full width, about 1400 px wide." value={b.image} onChange={(image) => setBanner(i, { image })} adminToken={adminToken} />
+                            <ImageUploadField label={`Banner ${i + 1}`} hint="Wide picture, about 1400 px across. It fills the page width." value={b.image} onChange={(image) => setBanner(i, { image })} adminToken={adminToken} />
                         </div>
                     ))}
                 </div>
                 <button type="button" className={addButton} onClick={() => update('infoBanners', [...form.infoBanners, { image: '', alt: '' }])}><Plus size={14} /> Add banner</button>
+                <p className="text-xs text-admin-muted">Banners without a picture are not saved.</p>
             </OptionalSection>
+
+            <OptionalSection
+                icon={Film}
+                title="Reels (videos)"
+                description="Short videos shown as a swipeable row of tall reel tiles on the product page. Upload a video file, or paste a YouTube, Instagram or Vimeo link. Add as many as you like."
+                enabled={form.videos.length > 0}
+                onToggle={(v) => update('videos', v ? [{ ...NEW_REEL }] : [])}
+            >
+                <div className="space-y-4">
+                    {form.videos.map((v, i) => (
+                        <div key={i} className="space-y-3 rounded-xl border border-admin-border bg-admin-surface-alt p-3 sm:p-4">
+                            <div className="flex items-center justify-between gap-3">
+                                <input value={v.title} maxLength={90} onChange={(e) => setVideo(i, { title: e.target.value })} className={fieldClass} placeholder="Reel title (optional)" aria-label={`Reel ${i + 1} title`} />
+                                <div className="flex shrink-0 items-center gap-1">
+                                    <button type="button" className={moveButton} onClick={() => moveMedia(i, -1)} disabled={i === 0} aria-label={`Move reel ${i + 1} up`}><ArrowUp size={15} /></button>
+                                    <button type="button" className={moveButton} onClick={() => moveMedia(i, 1)} disabled={i === form.videos.length - 1} aria-label={`Move reel ${i + 1} down`}><ArrowDown size={15} /></button>
+                                    <button type="button" className={removeButton} onClick={() => update('videos', form.videos.filter((_, x) => x !== i))} aria-label={`Remove reel ${i + 1}`}><Trash2 size={15} /></button>
+                                </div>
+                            </div>
+                            <VideoSourceField video={v} onChange={(patch) => setVideo(i, patch)} adminToken={adminToken} />
+                            <ImageUploadField label="Cover picture (optional)" hint="Tall (9:16) works best. YouTube links use their own cover." value={v.poster} onChange={(poster) => setVideo(i, { poster })} adminToken={adminToken} />
+                        </div>
+                    ))}
+                </div>
+                <button type="button" className={addButton} onClick={() => update('videos', [...form.videos, { ...NEW_REEL }])}><Plus size={14} /> Add reel</button>
+                <p className="text-xs text-admin-muted">Reels without a video or link are not saved.</p>
+            </OptionalSection>
+
         </>
     );
 }

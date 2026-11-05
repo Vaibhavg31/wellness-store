@@ -211,40 +211,36 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                             <p className="mt-6 font-medium text-danger">Out of stock</p>
                         ) : stock <= 5 && <p className="mt-6 font-medium text-warning">Only {stock} left in stock</p>}
 
-                        <div className="mt-6 flex items-center gap-3">
+                        <div ref={buyBoxRef} className="mt-6 flex items-start gap-3">
+                            <div className="min-w-0 flex-1">{buyButton('large')}</div>
                             <button
                                 type="button"
                                 onClick={handleWishlist}
                                 aria-pressed={wished}
                                 aria-label={wished ? 'Remove from wishlist' : 'Save to wishlist'}
-                                className={cn('grid size-11 place-items-center rounded-full border transition-colors', wished ? 'border-primary bg-primary-tint text-primary' : 'border-line-strong text-ink hover:border-primary hover:text-primary')}
+                                className={cn('grid size-12 shrink-0 place-items-center rounded-full border transition-colors', wished ? 'border-primary bg-primary-tint text-primary' : 'border-line-strong text-ink hover:border-primary hover:text-primary')}
                             >
                                 <Heart size={20} fill={wished ? 'currentColor' : 'none'} />
                             </button>
-                            <button type="button" onClick={shareProduct} aria-label="Share this product" className="grid size-11 place-items-center rounded-full border border-line-strong text-ink transition-colors hover:border-primary hover:text-primary">
+                            <button type="button" onClick={shareProduct} aria-label="Share this product" className="grid size-12 shrink-0 place-items-center rounded-full border border-line-strong text-ink transition-colors hover:border-primary hover:text-primary">
                                 <Share2 size={19} />
                             </button>
                         </div>
-
-                        <div ref={buyBoxRef} className="mt-4">
-                            {buyButton('large')}
-                        </div>
                         <PaymentAssurance className="mt-4" />
+                        {trustBadges.length > 0 && (
+                            <ul className="mt-4 flex flex-wrap gap-2">
+                                {trustBadges.map(({ icon: Icon, label }) => (
+                                    <li key={label} className="inline-flex items-center gap-1.5 rounded-full bg-canvas-alt px-3 py-1.5 text-caption font-medium text-ink">
+                                        <Icon size={14} className="text-primary" aria-hidden="true" />
+                                        {label}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
 
                     <OffersList />
                     <DeliveryCheck price={price} />
-
-                    {trustBadges.length > 0 && (
-                        <ul className="mt-6 grid grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] gap-3">
-                            {trustBadges.map(({ icon: Icon, label }) => (
-                                <li key={label} className="flex flex-col items-center gap-2 rounded-lg bg-canvas-alt p-3 text-center">
-                                    <Icon size={20} className="text-primary" aria-hidden="true" />
-                                    <span className="text-caption font-medium text-ink">{label}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
 
                     <div className="mt-8"><ProductTabs product={product} reviews={reviews} /></div>
                     <ExpertChat product={product} />
@@ -252,10 +248,10 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
             </div>
 
             <ProductHighlights product={product} />
-            <HeroIngredients product={product} />
             <InfoBanners product={product} />
-            <ProductFaq product={product} />
+            <HeroIngredients product={product} />
             <ProductVideos product={product} />
+            <ProductFaq product={product} />
 
             {productBanners.length > 0 && (
                 <div className="container-page grid gap-4 pb-8 lg:pb-12">{productBanners.map((b) => <Banner key={b.id} banner={b} />)}</div>
