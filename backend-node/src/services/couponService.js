@@ -201,6 +201,16 @@ export class CouponService {
         return this.audienceError(coupon, userId);
     }
 
+    /**
+     * Whether a coupon is still worth showing this shopper in "Coupons for you": not expired, not used up, not already used the most times
+     * they may, and meant for them (a first-order coupon is hidden once they have ordered). The bag is not looked at here, so a coupon that
+     * only needs a bigger bag still shows, with what is missing. A guest who would need to sign in still sees it.
+     */
+    async listableFor(coupon, userId) {
+        const reason = await this.eligibilityError(coupon, 1e9, userId, 1e9);
+        return !reason || (!userId && /^Sign in/.test(reason));
+    }
+
     async audienceError(coupon, userId) {
         const audience = coupon.audience || 'everyone';
         if (audience === 'everyone') return null;

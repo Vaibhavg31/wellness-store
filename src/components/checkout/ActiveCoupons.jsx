@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import { formatPrice, cn } from '@/utils/formatPrice';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Drawer from '@/components/ui/Drawer';
 import { couponConditions, couponPreview, couponTerms } from '@/utils/couponPreview';
 
@@ -25,12 +26,14 @@ export default function ActiveCoupons({ className = '', variant = 'default' }) {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const { applyCoupon, couponCode, subtotal, eligibleSubtotal } = useCart();
     const { showToast } = useToast();
+    const { token } = useAuth();
 
+    // Asked again when someone signs in or out: a coupon this customer has already used (or a first-order coupon after their first order) is not listed.
     useEffect(() => {
         api.get('/api/coupons/public')
             .then(setCoupons)
             .catch(() => setCoupons([]));
-    }, []);
+    }, [token]);
 
     if (coupons.length === 0) return null;
 

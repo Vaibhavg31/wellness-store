@@ -10,8 +10,11 @@ const repo = new CouponRepository();
 const service = new CouponService();
 
 router.get('/coupons/public', asyncRoute(async (req, res) => {
-    const coupons = (await repo.getPublic()).map((c) => service.publicListShape(c));
-    sendJson(res, coupons);
+    const payload = optionalCustomer(req);
+    const userId = payload ? String(payload.userId || '') : null;
+    const all = await repo.getPublic();
+    const flags = await Promise.all(all.map((c) => service.listableFor(c, userId)));
+    sendJson(res, all.filter((_, i) => flags[i]).map((c) => service.publicListShape(c)));
 }, 'Failed to fetch coupons'));
 
 router.post('/coupons/validate', asyncRoute(async (req, res) => {
