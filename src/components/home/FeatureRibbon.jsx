@@ -42,7 +42,7 @@ export default function FeatureRibbon() {
 
     return (
         <section aria-label="Why shop with us" className="border-y border-line bg-canvas-alt text-ink">
-            <Marquee secondsPerItem={6}>
+            <Marquee secondsPerItem={2.7}>
                 {items.map((item) => {
                     const Icon = RIBBON_ICONS[item.icon] ?? BadgeCheck;
                     return (

@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, ChevronDown, CircleHelp, Leaf } from 'lucide-react';
+import { BadgeCheck, ChevronLeft, ChevronRight, ChevronDown, CircleHelp, Leaf } from 'lucide-react';
+import Marquee from '@/components/ui/Marquee';
+import { RIBBON_ICONS } from '@/components/home/FeatureRibbon';
 import { ReelVideo, ReelViewer } from '@/components/video/Reels';
 import { imageUrl } from '@/services/api';
 import { cn } from '@/utils/formatPrice';
@@ -96,7 +98,31 @@ export function ProductFaq({ product }) {
     );
 }
 
-/** Short videos about the product, right under the questions. */
+/** The product's own running ribbon (set in the admin when the product is added): short promises such as "100% natural". */
+export function ProductHighlights({ product }) {
+    const items = product.highlights ?? [];
+    if (items.length === 0) return null;
+    return (
+        <section aria-label={`Highlights: ${product.title}`} className="mb-2 border-y border-line bg-canvas-alt text-ink">
+            <Marquee secondsPerItem={3.8} label={product.title}>
+                {items.map((item, i) => {
+                    const Icon = RIBBON_ICONS[item.icon] ?? BadgeCheck;
+                    return (
+                        <div key={`${item.title}-${i}`} className="flex items-center gap-3 px-6 py-3 sm:px-10">
+                            <Icon size={18} className="shrink-0 text-primary" strokeWidth={1.6} aria-hidden="true" />
+                            <span className="leading-tight">
+                                <span className="block text-caption font-semibold">{item.title}</span>
+                                {item.sub && <span className="block text-[11px] text-muted">{item.sub}</span>}
+                            </span>
+                        </div>
+                    );
+                })}
+            </Marquee>
+        </section>
+    );
+}
+
+/** Short videos and photos about the product (reels style), right under the questions. Each opens larger; videos play with sound. */
 export function ProductVideos({ product }) {
     const videos = useMemo(() => (product.videos ?? []).map((v, i) => ({ id: `${product.id}-v${i}`, title: v.title, videoUrl: v.url, poster: v.poster })), [product]);
     const [openIndex, setOpenIndex] = useState(null);
@@ -105,9 +131,9 @@ export function ProductVideos({ product }) {
     const slide = (d) => scroller.current?.scrollBy({ left: d * scroller.current.clientWidth * 0.8, behavior: 'smooth' });
 
     return (
-        <section aria-labelledby="product-videos" className="section pt-0">
+        <section aria-labelledby="product-videos" className={cn("section", (product.faqs?.length ?? 0) > 0 && "pt-0")}>
             <div className="container-page">
-                <Heading eyebrow="Watch" title={<span id="product-videos">See it in action</span>} />
+                <Heading eyebrow={videos.some((v) => v.videoUrl) ? (videos.some((v) => !v.videoUrl) ? "Watch & see" : "Watch") : "See"} title={<span id="product-videos">See it in action</span>} />
                 <div className="relative">
                     <ul ref={scroller} className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-pl-4 px-4 pb-2 sm:mx-0 sm:justify-center sm:px-0">
                         {videos.map((reel, i) => (
@@ -118,8 +144,8 @@ export function ProductVideos({ product }) {
                     </ul>
                     {videos.length > 4 && (
                         <>
-                            <button type="button" onClick={() => slide(-1)} aria-label="Scroll videos left" className="absolute -left-4 top-1/2 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-line-strong bg-surface shadow-md lg:grid"><ChevronLeft size={18} /></button>
-                            <button type="button" onClick={() => slide(1)} aria-label="Scroll videos right" className="absolute -right-4 top-1/2 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-line-strong bg-surface shadow-md lg:grid"><ChevronRight size={18} /></button>
+                            <button type="button" onClick={() => slide(-1)} aria-label="Scroll left" className="absolute -left-4 top-1/2 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-line-strong bg-surface shadow-md lg:grid"><ChevronLeft size={18} /></button>
+                            <button type="button" onClick={() => slide(1)} aria-label="Scroll right" className="absolute -right-4 top-1/2 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-line-strong bg-surface shadow-md lg:grid"><ChevronRight size={18} /></button>
                         </>
                     )}
                 </div>

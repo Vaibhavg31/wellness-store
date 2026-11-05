@@ -13,7 +13,7 @@ import OffersList from '@/components/product/OffersList';
 import PaymentAssurance from '@/components/product/PaymentAssurance';
 import ExpertChat from '@/components/product/ExpertChat';
 import ClubPrice from '@/components/product/ClubPrice';
-import { HeroIngredients, InfoBanners, ProductFaq, ProductVideos } from '@/components/product/ProductSections';
+import { HeroIngredients, InfoBanners, ProductFaq, ProductHighlights, ProductVideos } from '@/components/product/ProductSections';
 import { Banner } from '@/components/home/BannerSection';
 import Button from '@/components/ui/Button';
 import Price from '@/components/ui/Price';
@@ -251,6 +251,7 @@ export default function ProductDetailView({ product, reviews = [], refetchReview
                 </div>
             </div>
 
+            <ProductHighlights product={product} />
             <HeroIngredients product={product} />
             <InfoBanners product={product} />
             <ProductFaq product={product} />

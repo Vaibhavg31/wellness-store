@@ -79,6 +79,7 @@ router.post('/products', asyncRoute(async (req, res) => {
         concerns: body.concerns ?? [],
         videos: body.videos ?? [],
         infoBanners: body.infoBanners ?? [],
+        highlights: body.highlights ?? [],
         clubEligible: body.clubEligible !== false,
         clubPrice: body.clubPrice ?? null,
         series: body.series ?? '',
@@ -113,7 +114,7 @@ router.put('/products/:id', asyncRoute(async (req, res) => {
     const allowed = ['title', 'price', 'originalPrice', 'discount', 'category', 'tags', 'rating', 'reviewCount',
         'description', 'features', 'badges', 'stock', 'images', 'isNew', 'isBestSeller', 'isTrendingPinned',
         'orbitFeatured', 'orbitSortOrder', 'showTrustBadges', 'isPublished', 'codEnabled', 'onlinePaymentEnabled', 'variants',
-        'ingredients', 'howToUse', 'nutrition', 'faqs', 'concerns', 'videos', 'infoBanners', 'clubEligible', 'clubPrice', 'series'];
+        'ingredients', 'howToUse', 'nutrition', 'faqs', 'concerns', 'videos', 'infoBanners', 'highlights', 'clubEligible', 'clubPrice', 'series'];
 
     const changes = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
     if ('variants' in changes && !Array.isArray(changes.variants)) delete changes.variants;

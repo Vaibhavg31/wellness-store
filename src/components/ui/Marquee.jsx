@@ -6,7 +6,7 @@ import { cn } from '@/utils/formatPrice';
  * link can be tapped or read), and for people who prefer reduced motion it stops and becomes a row they can swipe.
  * `secondsPerItem` sets the pace; it is scaled to how many items one copy holds so a longer ribbon is not faster.
  */
-export default function Marquee({ children, className, trackClassName, secondsPerItem = 7, label }) {
+export default function Marquee({ children, className, trackClassName, secondsPerItem = 4, label }) {
     const items = Children.toArray(children);
     if (items.length === 0) return null;
 
@@ -20,7 +20,7 @@ export default function Marquee({ children, className, trackClassName, secondsPe
 
     return (
         <div className={cn('marquee overflow-hidden', className)} role="group" aria-label={label}>
-            <div className="marquee-track" style={{ '--marquee-duration': `${items.length * repeat * secondsPerItem}s` }}>
+            <div className="marquee-track" style={{ animationDuration: `${items.length * repeat * secondsPerItem}s` }}>
                 {copy(1)}
                 {copy(2)}
             </div>

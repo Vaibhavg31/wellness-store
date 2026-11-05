@@ -24,7 +24,7 @@ export default function AnnouncementBar() {
 
     return (
         <div role="region" aria-label="Announcements" className="bg-primary text-white">
-            <Marquee secondsPerItem={9}>
+            <Marquee secondsPerItem={5.3}>
                 {messages.map((m) => {
                     const body = <span className="inline-flex items-center gap-8 px-4 py-2 text-caption sm:text-small">{m.node}<span aria-hidden="true" className="size-1 rounded-full bg-accent" /></span>;
                     return m.href

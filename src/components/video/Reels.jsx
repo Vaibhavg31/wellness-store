@@ -43,6 +43,8 @@ export function ReelVideo({ reel, onOpen, label }) {
     const [playing, setPlaying] = useState(false);
     const source = videoSource(reel.videoUrl);
     const cover = reel.poster ? imageUrl(reel.poster, 600) : source.thumb;
+    // A photo has no video address; it is shown as a tile that opens larger, with no play button.
+    const isPhoto = source.kind === 'none' && Boolean(reel.poster);
 
     useEffect(() => {
         const node = ref.current;
@@ -56,7 +58,7 @@ export function ReelVideo({ reel, onOpen, label }) {
     }, [reel.videoUrl, source.kind]);
 
     return (
-        <button type="button" onClick={onOpen} aria-label={`Play: ${label}`} className="group relative block aspect-[9/16] w-full overflow-hidden rounded-xl bg-ink">
+        <button type="button" onClick={onOpen} aria-label={isPhoto ? `View photo: ${label}` : `Play: ${label}`} className="group relative block aspect-[9/16] w-full overflow-hidden rounded-xl bg-ink">
             {source.kind === 'file' ? (
                 <video ref={ref} className="absolute inset-0 size-full object-cover" muted loop playsInline preload="none" poster={reel.poster ? imageUrl(reel.poster, 600) : undefined}>
                     <source src={imageUrl(reel.videoUrl)} type={videoType(reel.videoUrl)} />
@@ -66,10 +68,10 @@ export function ReelVideo({ reel, onOpen, label }) {
             ) : (
                 <span className="absolute inset-0 bg-gradient-to-br from-primary-deep to-primary" aria-hidden="true" />
             )}
-            <span className={cn('absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-ink/10 transition-opacity', playing && 'opacity-60')} aria-hidden="true" />
-            <span className={cn('absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-primary shadow-md transition-opacity group-hover:opacity-100', playing ? 'opacity-0' : 'opacity-100')} aria-hidden="true">
+            <span className={cn('absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-ink/10 transition-opacity', playing && 'opacity-60', isPhoto && 'hidden')} aria-hidden="true" />
+            {!isPhoto && <span className={cn('absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-primary shadow-md transition-opacity group-hover:opacity-100', playing ? 'opacity-0' : 'opacity-100')} aria-hidden="true">
                 <Play size={20} className="ml-0.5" fill="currentColor" />
-            </span>
+            </span>}
         </button>
     );
 }
@@ -110,11 +112,11 @@ export function ReelViewer({ reels, index, productFor, onIndex, onClose }) {
                     ) : (
                         <img src={imageUrl(reel.poster, 900)} alt={reel.title} className="mx-auto max-h-[68dvh] w-full object-contain" />
                     )}
-                    <button type="button" onClick={onClose} aria-label="Close video" className="absolute right-2 top-2 grid size-10 place-items-center rounded-full bg-surface/90 text-ink shadow-md"><X size={18} /></button>
+                    <button type="button" onClick={onClose} aria-label="Close" className="absolute right-2 top-2 grid size-10 place-items-center rounded-full bg-surface/90 text-ink shadow-md"><X size={18} /></button>
                     {reels.length > 1 && (
                         <>
-                            <button type="button" onClick={() => onIndex((index - 1 + reels.length) % reels.length)} aria-label="Previous video" className="absolute left-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-ink shadow-md"><ChevronLeft size={20} /></button>
-                            <button type="button" onClick={() => onIndex((index + 1) % reels.length)} aria-label="Next video" className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-ink shadow-md"><ChevronRight size={20} /></button>
+                            <button type="button" onClick={() => onIndex((index - 1 + reels.length) % reels.length)} aria-label="Previous" className="absolute left-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-ink shadow-md"><ChevronLeft size={20} /></button>
+                            <button type="button" onClick={() => onIndex((index + 1) % reels.length)} aria-label="Next" className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-ink shadow-md"><ChevronRight size={20} /></button>
                         </>
                     )}
                 </div>

@@ -10,7 +10,7 @@ const CHILD_TABLES = {
 };
 
 /** Product extras kept together in products.extras_json (see lib/migrations.js). */
-const EXTRAS_KEYS = ['concerns', 'videos', 'infoBanners', 'clubEligible', 'clubPrice', 'series'];
+const EXTRAS_KEYS = ['concerns', 'videos', 'infoBanners', 'highlights', 'clubEligible', 'clubPrice', 'series'];
 const cleanText = (v, max) => String(v ?? '').trim().slice(0, max);
 /** An address saved by the admin: one of our own files or a link. Script-style addresses (javascript:, data:) are dropped. */
 const cleanUrl = (v, max) => { const u = cleanText(v, max); return /^(javascript|data|vbscript):/i.test(u) ? '' : u; };
@@ -21,11 +21,17 @@ function parseExtras(raw) {
     return {
         concerns: (Array.isArray(parsed.concerns) ? parsed.concerns : []).map((c) => cleanText(c, 60)).filter(Boolean),
         videos: (Array.isArray(parsed.videos) ? parsed.videos : [])
+            .slice(0, 24)
             .map((v) => ({ url: cleanUrl(v?.url, 500), poster: cleanUrl(v?.poster, 500), title: cleanText(v?.title, 90) }))
             .filter((v) => v.url || v.poster),
         infoBanners: (Array.isArray(parsed.infoBanners) ? parsed.infoBanners : [])
             .map((b) => ({ image: cleanText(b?.image, 500), alt: cleanText(b?.alt, 140) }))
             .filter((b) => b.image),
+        // The product's own running ribbon: short promises such as "100% natural" with an icon name from the storefront's ribbon icons.
+        highlights: (Array.isArray(parsed.highlights) ? parsed.highlights : [])
+            .map((h) => ({ icon: cleanText(h?.icon, 20).toLowerCase(), title: cleanText(h?.title, 60), sub: cleanText(h?.sub, 90) }))
+            .filter((h) => h.title)
+            .slice(0, 12),
         clubEligible: parsed.clubEligible !== false,
         clubPrice: Number(parsed.clubPrice) > 0 ? Number(parsed.clubPrice) : null,
         // The Chikit "Well" series the product belongs to (himwell, herwell, gutwell …; see src/utils/wellRange.js), or ''.
