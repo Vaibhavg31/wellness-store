@@ -32,17 +32,21 @@ export function ConcernTile({ concern, onClick }) {
     const brandIcon = concern.image?.startsWith('/brand/icons/');
     const series = seriesForConcern(concern.slug);
     return (
-        <Link to={`/concern/${concern.slug}`} onClick={onClick} className="group flex flex-col items-center gap-2 text-center">
+        // Phones and tablets: a small round icon above its name. Laptops and desktops: a compact row (icon beside the name), so
+        // 18 concerns fit in three short rows instead of three tall rows of oversized pictures.
+        <Link to={`/concern/${concern.slug}`} onClick={onClick} className="group flex flex-col items-center gap-2 text-center lg:flex-row lg:gap-2.5 lg:rounded-xl lg:p-2 lg:text-left lg:transition-colors lg:hover:bg-primary-soft">
             <span className={cn(
-                'relative grid aspect-square w-full place-items-center overflow-hidden transition-[box-shadow,transform] duration-300 group-hover:-translate-y-0.5 group-hover:shadow-md',
-                brandIcon ? 'rounded-full ring-1 ring-line group-hover:ring-primary/40' : 'rounded-2xl bg-accent-tint ring-1 ring-line',
+                'relative grid aspect-square w-full max-w-[4.5rem] shrink-0 place-items-center overflow-hidden transition-[box-shadow,transform] duration-300 group-hover:shadow-md lg:size-11 lg:max-w-none',
+                brandIcon ? 'rounded-full ring-1 ring-line group-hover:ring-primary/40' : 'rounded-xl bg-accent-tint ring-1 ring-line',
             )}>
                 {concern.image
-                    ? <img src={imageUrl(concern.image, 240)} alt="" width="120" height="120" loading="lazy" className="size-full object-cover" />
-                    : <Icon size={34} strokeWidth={1.6} className="text-primary" aria-hidden="true" />}
+                    ? <img src={imageUrl(concern.image, 160)} alt="" width="96" height="96" decoding="async" className="size-full object-cover" />
+                    : <Icon size={26} strokeWidth={1.6} className="text-primary" aria-hidden="true" />}
             </span>
-            <span className="text-caption font-medium leading-tight text-ink group-hover:text-primary sm:text-small">{concern.label}</span>
-            {series.length > 0 && <span className="-mt-1.5 text-[11px] font-semibold uppercase tracking-wider text-accent-ink">{series.join(' · ')}</span>}
+            <span className="flex min-w-0 flex-col items-center gap-0.5 lg:items-start">
+                <span className="text-caption font-medium leading-tight text-ink group-hover:text-primary sm:text-small">{concern.label}</span>
+                {series.length > 0 && <span className="text-[11px] font-semibold uppercase tracking-wider text-accent-ink">{series.join(' · ')}</span>}
+            </span>
         </Link>
     );
 }
@@ -157,12 +161,12 @@ export function RibbonPanels({ openMenu, onClose }) {
             className="pointer-events-auto absolute inset-x-0 top-full z-40 max-h-[calc(100dvh-7.5rem)] animate-fade-in overflow-y-auto overscroll-contain border-t border-line bg-surface shadow-lg"
         >
             {openMenu === 'concern' && (
-                <div className="container-page py-6 lg:py-8">
-                    <div className="mb-4 flex items-end justify-between gap-4">
+                <div className="container-page py-6 lg:py-5">
+                    <div className="mb-4 flex items-end justify-between gap-4 lg:mb-2">
                         <p className="eyebrow">Shop by health need</p>
                         <Link to="/shop" onClick={onClose} className="text-small font-medium text-primary hover:underline">All products</Link>
                     </div>
-                    <ul className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 lg:gap-x-4">
+                    <ul className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 lg:gap-x-2 lg:gap-y-0.5 xl:grid-cols-6">
                         {concerns.map((concern) => <li key={concern.slug}><ConcernTile concern={concern} onClick={onClose} /></li>)}
                     </ul>
                     {plan.length > 0 && (
