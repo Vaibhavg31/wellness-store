@@ -62,7 +62,7 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
     const { getWhatsAppUrl } = useWhatsApp();
     const { offers } = useOffers();
     const mode = content.extras?.nav?.mode;
-    const items = useMemo(() => ribbonItems(content.extras), [content.extras]);
+    const items = useMemo(() => ribbonItems(content.extras, { always: variant === 'desktop' ? ['new'] : [] }), [content.extras, variant]);
     const concerns = useMemo(() => activeConcerns(content.extras), [content.extras]);
     const clubOn = content.extras?.club?.enabled !== false;
     const member = Boolean(isAuthenticated && user?.club?.member);
@@ -97,7 +97,12 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
             {visible.map((item) => {
                 switch (item.key) {
                     case 'new':
-                        return (
+                        // On desktop the first spot is the Shop link (New Launches stays in the phone menu and at /new-launches).
+                        return variant === 'desktop' ? (
+                            <NavLink key="new" to="/shop" className={({ isActive }) => cn(pillBase, size, isActive ? pillOpen : pillIdle)}>
+                                Shop
+                            </NavLink>
+                        ) : (
                             <NavLink key="new" to="/new-launches" className={({ isActive }) => cn(pillBase, size, isActive ? pillOpen : pillIdle)}>
                                 {item.label}
                             </NavLink>

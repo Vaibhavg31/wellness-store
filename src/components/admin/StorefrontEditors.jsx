@@ -41,7 +41,7 @@ export function RibbonMenuEditor({ extras, onChange }) {
         <div className="space-y-3">
             {rows.map((row) => (
                 <div key={row.key} className="grid items-end gap-3 sm:grid-cols-[1fr_auto]">
-                    <AdminField label={row.fallback} hint="Leave empty to keep the standard name.">
+                    <AdminField label={row.fallback} hint={row.key === 'new' ? 'Phone menu only. On desktop this spot is always the Shop link.' : 'Leave empty to keep the standard name.'}>
                         <Input value={row.label} maxLength={24} placeholder={row.fallback} onChange={(e) => patch(row.key, { label: e.target.value })} />
                     </AdminField>
                     <label className="flex h-11 items-center gap-2 text-sm"><input type="checkbox" className="size-4 accent-primary" checked={row.enabled} onChange={(e) => patch(row.key, { enabled: e.target.checked })} /> Show</label>
