@@ -4,15 +4,17 @@ import Reveal from '@/components/ui/Reveal';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useCategories } from '@/hooks/useApi';
 import { imageUrl } from '@/services/api';
+import { activeConcerns } from '@/utils/concerns';
 import { cn } from '@/utils/formatPrice';
 
 /** Goal-led entry points: the admin's "concerns" when set, otherwise the store's categories. */
 function useNeeds() {
     const { content } = useSiteContent();
     const { categories } = useCategories();
-    const concerns = content.extras.concerns ?? [];
-    if (concerns.length > 0) {
-        return concerns.map((c) => ({ key: c.label, label: c.label, image: c.image, to: c.search ? `/shop?search=${encodeURIComponent(c.search)}` : '/shop' }));
+    // The admin's own list when there is one. A concern switched off there must not appear here either, so even if
+    // every concern is switched off this section shows nothing for concerns rather than falling back to categories.
+    if ((content.extras.concerns ?? []).length > 0) {
+        return activeConcerns(content.extras).map((c) => ({ key: c.slug, label: c.label, image: c.image, to: `/concern/${c.slug}` }));
     }
     return categories.map((c) => ({ key: c.slug, label: c.label, image: c.image, to: `/category/${c.slug}` }));
 }
