@@ -240,7 +240,7 @@ export function AdminIconButton({ onClick, icon: Icon, variant = 'default', titl
             title={title}
             aria-label={title}
             disabled={disabled}
-            className={cn('inline-grid size-9 place-items-center rounded-lg transition-colors disabled:opacity-30 disabled:pointer-events-none', ICON_BTN_VARIANTS[variant], className)}
+            className={cn('inline-grid size-9 max-sm:size-11 place-items-center rounded-lg transition-colors disabled:opacity-30 disabled:pointer-events-none', ICON_BTN_VARIANTS[variant], className)}
         >
             <Icon size={size} />
         </button>

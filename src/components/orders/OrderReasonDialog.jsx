@@ -4,6 +4,7 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { api } from '@/services/api';
 import { cn } from '@/utils/formatPrice';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 let cachedReasons = null;
 
@@ -54,7 +55,7 @@ export default function OrderReasonDialog({ mode, order, token, isOpen, onClose,
     useEffect(() => { if (isOpen) { setReason(''); setNote(''); setError(''); setBusy(false); } }, [isOpen, mode]);
 
     const needsNote = reason === 'other';
-    const submit = async () => {
+    const submit = useSingleFlight(async () => {
         if (!reason) { setError('Please choose a reason.'); return; }
         if (needsNote && note.trim().length < 3) { setError('Please tell us a little more.'); return; }
         setBusy(true);
@@ -69,7 +70,7 @@ export default function OrderReasonDialog({ mode, order, token, isOpen, onClose,
         } finally {
             setBusy(false);
         }
-    };
+    });
 
     return (
         <Modal isOpen={isOpen} onClose={busy ? () => {} : onClose} title={copy.title} size="sm">

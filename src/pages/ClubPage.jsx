@@ -18,6 +18,7 @@ import { api } from '@/services/api';
 import { loginUrl } from '@/utils/authRedirect';
 import { lookupPincode, isValidPincode } from '@/utils/pincodeLookup';
 import { cn } from '@/utils/formatPrice';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const GENDERS = [
     { value: 'female', label: 'Female' },
@@ -59,7 +60,7 @@ function Steps({ step }) {
                 const done = i < step;
                 const current = i === step;
                 return (
-                    <li key={label} className="flex flex-1 items-center gap-2">
+                    <li key={label} className="flex min-w-0 flex-1 items-center gap-2">
                         <span className={cn('grid size-8 shrink-0 place-items-center rounded-full text-caption font-bold', done ? 'bg-success text-white' : current ? 'bg-primary text-white' : 'bg-canvas-alt text-muted')} aria-current={current ? 'step' : undefined}>
                             {done ? <Check size={15} aria-hidden="true" /> : i + 1}
                         </span>
@@ -161,9 +162,9 @@ function EmailStep({ user, token, status, onDone }) {
         <div>
             <div className="mb-4 flex items-center gap-3">
                 <span className="grid size-10 place-items-center rounded-full bg-primary-tint text-primary"><MailCheck size={20} aria-hidden="true" /></span>
-                <div>
+                <div className="min-w-0">
                     <h3 className="font-sans text-h4">Confirm your email</h3>
-                    <p className="text-small text-muted">{user.email}</p>
+                    <p className="text-small text-muted [overflow-wrap:anywhere]">{user.email}</p>
                 </div>
             </div>
             {alreadyVerified && <><p className="mb-4 flex items-center gap-2 text-small font-medium text-success"><Check size={16} aria-hidden="true" /> This email is already confirmed.</p><Button className="w-full" size="lg" onClick={onDone}>Continue</Button></>}
@@ -212,7 +213,7 @@ function DetailsStep({ user, token, onJoined }) {
 
     const today = new Date().toISOString().slice(0, 10);
 
-    const submit = async (e) => {
+    const submit = useSingleFlight(async (e) => {
         e.preventDefault();
         const next = {};
         if (!form.name.trim()) next.name = 'Enter your name';
@@ -239,7 +240,7 @@ function DetailsStep({ user, token, onJoined }) {
         } catch (err) {
             setFormError(err instanceof Error ? err.message : 'Could not complete your sign-up');
         } finally { setBusy(false); }
-    };
+    });
 
     return (
         <form onSubmit={submit} noValidate className="space-y-4">

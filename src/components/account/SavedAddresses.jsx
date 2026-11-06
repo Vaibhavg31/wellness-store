@@ -7,6 +7,7 @@ import Input from '@/components/ui/Input';
 import DeliveryAddressForm from '@/components/checkout/DeliveryAddressForm';
 import { formatIndianAddress } from '@/utils/formatAddress';
 import { validateDeliveryAddress } from '@/utils/validateAddress';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const MAX_ADDRESSES = 3;
 
@@ -64,7 +65,7 @@ export default function SavedAddresses() {
         setError('');
     };
 
-    const save = async () => {
+    const save = useSingleFlight(async () => {
         const addressErrors = validateDeliveryAddress(form);
         if (!form.name?.trim()) addressErrors.name = 'Full name is required';
         setErrors(addressErrors);
@@ -93,7 +94,7 @@ export default function SavedAddresses() {
         } finally {
             setLoading(false);
         }
-    };
+    });
 
     const remove = async (id) => {
         if (!window.confirm('Delete this address?')) return;

@@ -13,7 +13,7 @@ const variants = {
 variants.turmeric = variants.accent;
 
 const sizes = {
-    sm: 'h-9 px-4 text-small',
+    sm: 'h-9 px-4 text-small max-sm:h-11',
     md: 'h-11 px-6 text-small',
     lg: 'h-12 px-8 text-body',
 };

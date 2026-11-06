@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError } from '../lib/response.js';
 import { generateId } from '../lib/db.js';
+import { isValidEmail, assertText } from '../lib/validate.js';
 import { NewsletterRepository } from '../repositories/newsletterRepository.js';
 
 const router = Router();
@@ -13,7 +14,8 @@ function escapeHtml(s) {
 
 router.post('/newsletter/subscribe', asyncRoute(async (req, res) => {
     const email = String(req.body?.email || '').toLowerCase().trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendError(res, 'A valid email address is required', 400);
+    if (!isValidEmail(email)) return sendError(res, 'A valid email address is required', 400);
+    assertText(req.body?.source, 'Source', 60);
 
     if (await repo.findByEmail(email)) {
         return sendJson(res, { success: true, message: 'Already subscribed' });

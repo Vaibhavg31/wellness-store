@@ -14,6 +14,7 @@ import {
     AdminIconButton,
     AdminStatusPill,
 } from '@/components/admin/AdminUi';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const TARGET_LABELS = { slider: 'Full-width slider only', stacked: 'Stacked only', both: 'Both', product: 'This product page' };
 
@@ -108,7 +109,7 @@ export default function BannerManager({ filterTarget, productId }) {
         setModalOpen(true);
     };
 
-    const handleSave = async () => {
+    const handleSave = useSingleFlight(async () => {
         if (!adminToken || !form.image) return;
         setSaving(true);
         try {
@@ -122,7 +123,7 @@ export default function BannerManager({ filterTarget, productId }) {
         } finally {
             setSaving(false);
         }
-    };
+    });
 
     const handleImageUpload = async (e) => {
         if (!adminToken || !e.target.files?.length) return;

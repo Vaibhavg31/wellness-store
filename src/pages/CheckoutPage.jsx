@@ -43,7 +43,7 @@ function normalizePhone(value) {
 function readSavedPincode() {
     try {
         const saved = localStorage.getItem('chikit-pincode') || '';
-        return /^d{6}$/.test(saved) ? saved : '';
+        return /^\d{6}$/.test(saved) ? saved : '';
     } catch {
         return '';
     }
@@ -118,6 +118,7 @@ export default function CheckoutPage() {
     const otpSectionRef = useRef(null);
     const addressSectionRef = useRef(null);
     const skipVerifyRequestRef = useRef('');
+    const submittingRef = useRef(false);
 
     const [form, setForm] = useState({
         name: user?.name || '',
@@ -498,6 +499,10 @@ export default function CheckoutPage() {
             return;
         }
 
+        // A ref, not just the `loading` state: state only updates after the next render, so a fast double tap (or a slow
+        // phone) could start two orders before the button had been disabled.
+        if (submittingRef.current) return;
+        submittingRef.current = true;
         setLoading(true);
         try {
             await submitOrder();
@@ -509,6 +514,7 @@ export default function CheckoutPage() {
             }
             setError(err instanceof Error ? err.message : 'Failed to place order');
         } finally {
+            submittingRef.current = false;
             setLoading(false);
         }
     };

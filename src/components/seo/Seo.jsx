@@ -49,7 +49,7 @@ export default function Seo({ title, description, path = '/', image, type = 'web
             <meta name="twitter:image" content={img} />
 
             {schemas.map((schema, i) => (
-                <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+                <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} />
             ))}
         </>
     );

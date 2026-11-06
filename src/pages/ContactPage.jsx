@@ -11,6 +11,7 @@ import { useWhatsApp } from '@/hooks/useWhatsApp';
 import { api } from '@/services/api';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { hasInstagramUrl } from '@/utils/socialLinks';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const EMPTY_FORM = { name: '', email: '', phone: '', message: '' };
 
@@ -42,7 +43,7 @@ export default function ContactPage() {
 
     const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = useSingleFlight(async (e) => {
         e.preventDefault();
         setSubmitting(true);
         setError('');
@@ -55,7 +56,7 @@ export default function ContactPage() {
         } finally {
             setSubmitting(false);
         }
-    };
+    });
 
     return (
         <>

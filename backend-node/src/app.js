@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { corsMiddleware } from './lib/cors.js';
 import { sendError } from './lib/response.js';
+import { requireAdmin } from './lib/auth.js';
 import { uploadsDirPath } from './lib/db.js';
 import { healthProfile } from './lib/appConfig.js';
 import { isAuthEmailEnabled } from './services/emailService.js';
@@ -34,6 +35,15 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 
 export function createApp() {
     const app = express();
+    // Do not announce the framework, and send the basic browser protections on every response (the page itself is served by this
+    // same process in production): no content-type guessing, no framing by other sites, and no full referrer to other sites.
+    app.disable('x-powered-by');
+    app.use((req, res, next) => {
+        res.set('X-Content-Type-Options', 'nosniff');
+        res.set('X-Frame-Options', 'SAMEORIGIN');
+        res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        next();
+    });
     // The HTTPS proxy sits in front of this process on a private address. Trusting only private addresses means req.ip is
     // the visitor's real address, so per-visitor limits (spins, logins, offers) count each person on their own instead of
     // lumping everyone behind the proxy together, and a visitor on the open internet cannot fake it with a header.
@@ -64,6 +74,10 @@ export function createApp() {
 
     // ── Health check ──────────────────────────────────────────────────────
     app.get('/api/health', async (req, res) => {
+        // Outside development the detail (server address, OTP provider set-up) is for signed-in admins only; anyone else gets "ok".
+        let detailed = (process.env.APP_ENV || '') === 'development';
+        if (!detailed) { try { requireAdmin(req); detailed = true; } catch { /* anonymous caller */ } }
+        if (!detailed) return res.json({ status: 'ok', timestamp: new Date().toISOString() });
         const outboundIp = await serverOutboundIp();
         res.json({
             status: 'ok',
@@ -156,6 +170,8 @@ export function createApp() {
     app.use((err, req, res, next) => {
         if (res.headersSent) return next(err);
         console.error(err);
+        // A body over the limit is a 413 (it was reported as a plain 400); anything else the parser rejects stays a 400.
+        if (err.status === 413 || err.type === 'entity.too.large') return sendError(res, 'The request is too large', 413);
         sendError(res, 'Invalid request', 400);
     });
 

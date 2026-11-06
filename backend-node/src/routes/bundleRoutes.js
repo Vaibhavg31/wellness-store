@@ -2,10 +2,47 @@ import { Router } from 'express';
 import { requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError, HttpError } from '../lib/response.js';
 import { generateId } from '../lib/db.js';
+import { assertText, assertWhole, assertAmount, assertImageUrl } from '../lib/validate.js';
 import { BundleRepository } from '../repositories/bundleRepository.js';
+import { ProductRepository } from '../repositories/productRepository.js';
 
 const router = Router();
 const repo = new BundleRepository();
+const productRepo = new ProductRepository();
+
+/**
+ * Input rules for a bundle. `current` is the saved bundle when editing, so a change to only the discount is still
+ * checked against the products already in it. A discount may never make the bundle free (or negative).
+ */
+async function assertValidBundle(fields, current = null) {
+    if ('title' in fields) assertText(fields.title, 'Title', 255, { required: true });
+    if ('subtitle' in fields) assertText(fields.subtitle, 'Subtitle', 255);
+    if ('description' in fields) assertText(fields.description, 'Description', 5000);
+    if ('image' in fields) assertImageUrl(fields.image, 'Bundle image');
+    if ('sortOrder' in fields) assertWhole(fields.sortOrder, 'Order', { min: 0, max: 9999 });
+
+    const type = fields.discountType ?? current?.discountType ?? 'percent';
+    const discount = 'discountValue' in fields ? fields.discountValue : (current?.discountValue ?? 0);
+    const value = assertAmount(discount, 'Discount', { min: 0, max: type === 'percent' ? 100 : 1000000 });
+    if (type === 'percent' && value >= 100) throw new HttpError('A percentage discount must be below 100% (a bundle cannot be free)', 400);
+
+    let lines = null;
+    if (Array.isArray(fields.items)) {
+        lines = [];
+        for (const item of fields.items) {
+            const quantity = item.quantity === undefined || item.quantity === null || item.quantity === '' ? 1 : assertWhole(item.quantity, 'Quantity', { min: 1, max: 99 });
+            const product = await productRepo.getById(String(item.productId || '').trim());
+            if (!product) throw new HttpError(`Product not found: ${String(item.productId).slice(0, 60)}`, 400);
+            lines.push({ price: Number(product.price) || 0, quantity });
+        }
+    } else if (current?.items) {
+        lines = current.items.map((i) => ({ price: Number(i.product?.price) || 0, quantity: Number(i.quantity) || 1 }));
+    }
+    if (type === 'flat' && lines) {
+        const subtotal = lines.reduce((sum, l) => sum + l.price * l.quantity, 0);
+        if (value >= subtotal) throw new HttpError(`A flat discount must be smaller than the products' total (₹${Math.round(subtotal)})`, 400);
+    }
+}
 
 function validateItems(items) {
     if (items.length < 2) throw new HttpError('A bundle needs at least 2 products', 400);
@@ -45,6 +82,7 @@ router.post('/bundles', asyncRoute(async (req, res) => {
 
     const items = Array.isArray(body.items) ? body.items : [];
     validateItems(items);
+    await assertValidBundle({ ...body, items });
 
     const now = new Date().toISOString();
     const bundle = {
@@ -88,6 +126,7 @@ router.put('/bundles/:id', asyncRoute(async (req, res) => {
         changes.items = Array.isArray(changes.items) ? changes.items : [];
         validateItems(changes.items);
     }
+    await assertValidBundle(changes, existing);
 
     changes.updatedAt = new Date().toISOString();
     const updated = await repo.update(req.params.id, changes);

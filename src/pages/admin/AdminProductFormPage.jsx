@@ -36,6 +36,7 @@ import {
     OptionalSection,
     SectionHeader,
 } from '@/components/admin/AdminFormUi';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const TAG_OPTIONS = ['New', 'Sale', 'Limited', 'Best Seller', 'Combo Deal'];
 
@@ -404,7 +405,7 @@ export default function AdminProductFormPage() {
         }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = useSingleFlight(async (e) => {
         e.preventDefault();
         if (!adminToken) return;
 
@@ -519,7 +520,7 @@ export default function AdminProductFormPage() {
         } finally {
             setSaving(false);
         }
-    };
+    });
 
     return (
         <div className="max-w-5xl mx-auto">

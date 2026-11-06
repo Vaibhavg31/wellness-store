@@ -18,6 +18,7 @@ import {
     AdminLoadingState,
     AdminEmptyState,
 } from '@/components/admin/AdminUi';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const EMPTY_FORM = {
     title: '',
@@ -125,7 +126,7 @@ export default function AdminBundlesPage() {
         : Math.round(preview.subtotal * Math.max(0, Math.min(100, Number(form.discountValue) || 0)) / 100 * 100) / 100;
     const bundlePrice = Math.max(0, Math.round((preview.subtotal - discountAmount) * 100) / 100);
 
-    const handleSave = async () => {
+    const handleSave = useSingleFlight(async () => {
         if (!adminToken || !form.title.trim()) {
             setError('Bundle title is required.');
             return;
@@ -165,7 +166,7 @@ export default function AdminBundlesPage() {
         } finally {
             setSaving(false);
         }
-    };
+    });
 
     const handleToggle = async (bundle) => {
         if (!adminToken) return;

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAdmin, optionalCustomer } from '../lib/auth.js';
-import { asyncRoute, sendJson, sendError } from '../lib/response.js';
+import { asyncRoute, sendJson, sendError, HttpError } from '../lib/response.js';
 import { generateId } from '../lib/db.js';
 import { CouponRepository } from '../repositories/couponRepository.js';
 import { CouponService } from '../services/couponService.js';
@@ -8,6 +8,28 @@ import { CouponService } from '../services/couponService.js';
 const router = Router();
 const repo = new CouponRepository();
 const service = new CouponService();
+
+/**
+ * Admin input rules for a coupon, checked on the whole coupon (existing values + changes) so a half-valid edit cannot slip through.
+ * Throws a 400 with a sentence the admin form can show as it is.
+ */
+function assertValidCoupon(c) {
+    if (!/^[A-Z0-9_-]{2,40}$/.test(c.code)) throw new HttpError('Coupon code must be 2-40 letters, numbers, dashes or underscores (no spaces)', 400);
+    const money = (v, label) => { if (!Number.isFinite(v) || v < 0 || v > 10000000) throw new HttpError(`${label} must be a number from 0 to 10,000,000`, 400); };
+    money(c.value, 'Discount value'); money(c.minOrderAmount, 'Minimum order'); money(c.maxDiscount, 'Maximum discount');
+    if (c.type === 'percent' && (c.value <= 0 || c.value > 100)) throw new HttpError('A percentage coupon must be between 1% and 100%', 400);
+    if (c.type === 'flat' && c.value <= 0) throw new HttpError('A flat coupon needs an amount above 0', 400);
+    for (const [v, label] of [[c.maxUses, 'Total uses'], [c.maxUsesPerUser, 'Uses per customer']]) {
+        if (!Number.isInteger(v) || v < 0 || v > 1000000) throw new HttpError(`${label} must be a whole number (0 means unlimited)`, 400);
+    }
+    const when = (v, label) => { if (!v) return null; const t = Date.parse(v); if (Number.isNaN(t)) throw new HttpError(`${label} is not a valid date`, 400); return t; };
+    const start = when(c.startsAt, 'Start date'), end = when(c.expiresAt, 'Expiry date');
+    if (start !== null && end !== null && end <= start) throw new HttpError('The expiry date must be after the start date', 400);
+}
+
+/** Coerces the numeric fields the same way the repository stores them, so validation sees what will be saved. */
+const numberOf = (v, fallback = 0) => (v === undefined || v === null || v === '' ? fallback : Number(v));
+const intOf = (v, fallback = 0) => (v === undefined || v === null || v === '' ? fallback : (Number.isInteger(Number(v)) ? Number(v) : NaN));
 
 router.get('/coupons/public', asyncRoute(async (req, res) => {
     const payload = optionalCustomer(req);
@@ -66,11 +88,11 @@ router.post('/coupons', asyncRoute(async (req, res) => {
         title: String(body.title ?? code).trim(),
         description: String(body.description ?? '').trim(),
         type,
-        value: Number(body.value ?? 0),
-        minOrderAmount: Number(body.minOrderAmount ?? 0),
-        maxDiscount: Number(body.maxDiscount ?? 0),
-        maxUses: Number.parseInt(body.maxUses ?? 0, 10),
-        maxUsesPerUser: Number.parseInt(body.maxUsesPerUser ?? 0, 10),
+        value: numberOf(body.value),
+        minOrderAmount: numberOf(body.minOrderAmount),
+        maxDiscount: numberOf(body.maxDiscount),
+        maxUses: intOf(body.maxUses),
+        maxUsesPerUser: intOf(body.maxUsesPerUser),
         usageCount: 0,
         isEnabled: Boolean(body.isEnabled ?? true),
         showOnWebsite: Boolean(body.showOnWebsite ?? true),
@@ -82,6 +104,9 @@ router.post('/coupons', asyncRoute(async (req, res) => {
         createdAt: now,
         updatedAt: now,
     };
+
+    if (type === 'free_delivery') coupon.value = 0;
+    assertValidCoupon(coupon);
 
     sendJson(res, await repo.create(coupon), 201);
 }, 'Failed to create coupon'));
@@ -115,6 +140,12 @@ router.put('/coupons/:id', asyncRoute(async (req, res) => {
     if ('type' in changes && !CouponService.TYPES.includes(changes.type)) return sendError(res, 'Invalid coupon type', 400);
     if ('audience' in changes && !CouponService.AUDIENCES.includes(changes.audience)) return sendError(res, 'Invalid coupon audience', 400);
     if ('minPreviousOrders' in changes) changes.minPreviousOrders = Math.max(1, Number.parseInt(changes.minPreviousOrders, 10));
+
+    for (const key of ['value', 'minOrderAmount', 'maxDiscount']) if (key in changes) changes[key] = numberOf(changes[key]);
+    for (const key of ['maxUses', 'maxUsesPerUser']) if (key in changes) changes[key] = intOf(changes[key]);
+    const merged = { ...existing, ...changes };
+    if (merged.type === 'free_delivery') changes.value = merged.value = 0;
+    assertValidCoupon(merged);
 
     changes.updatedAt = new Date().toISOString();
     const updated = await repo.update(req.params.id, changes);

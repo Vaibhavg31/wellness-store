@@ -95,7 +95,7 @@ export default function AdminLayout() {
                     <button
                         type="button"
                         onClick={() => setMobileNavOpen(true)}
-                        className="-ml-1 grid size-10 shrink-0 place-items-center rounded-lg text-ink hover:bg-primary-soft"
+                        className="-ml-1 grid size-11 shrink-0 place-items-center rounded-lg text-ink hover:bg-primary-soft"
                         aria-label="Open menu"
                         aria-expanded={mobileNavOpen}
                     >

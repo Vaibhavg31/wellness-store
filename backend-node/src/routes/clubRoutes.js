@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import { requireCustomer, requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError } from '../lib/response.js';
 import { getPool } from '../lib/db.js';
+import { isValidEmail } from '../lib/validate.js';
 import { checkRateLimit } from '../lib/rateLimiter.js';
 import { clubConfig } from '../lib/club.js';
 import * as otpConfig from '../lib/otpConfig.js';
@@ -76,7 +77,7 @@ router.post('/club/email-otp/send', asyncRoute(async (req, res) => {
     if (!user) return sendError(res, 'User not found', 404);
 
     const email = String(req.body?.email || user.email || '').toLowerCase().trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendError(res, 'Enter a valid email address', 400);
+    if (!isValidEmail(email)) return sendError(res, 'Enter a valid email address', 400);
     if (email !== String(user.email).toLowerCase()) return sendError(res, 'Use the email address of your account.', 400);
 
     if (!(await checkRateLimit(`club-email-otp-${user.id}`, 5, 900))) return sendError(res, 'Too many codes requested. Please wait a few minutes and try again.', 429);

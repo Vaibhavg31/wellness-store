@@ -15,7 +15,7 @@ import { cn } from '@/utils/formatPrice';
 const SearchOverlay = lazy(() => import('@/components/layout/SearchOverlay'));
 
 const iconButton =
-    'relative grid size-10 min-[340px]:size-11 place-items-center rounded-full text-ink transition-colors hover:bg-primary-soft hover:text-primary active:bg-primary-tint';
+    'relative grid size-10 shrink-0 min-[340px]:size-11 place-items-center rounded-full text-ink transition-colors hover:bg-primary-soft hover:text-primary active:bg-primary-tint';
 
 function CountBadge({ count }) {
     if (!count) return null;

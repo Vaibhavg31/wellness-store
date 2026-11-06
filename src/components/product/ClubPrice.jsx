@@ -25,7 +25,8 @@ export default function ClubPrice({ memberPrice, className, compact = false }) {
         <Link
             to="/club"
             className={cn('inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-accent-tint px-2.5 py-1 text-caption font-semibold text-primary transition-colors hover:bg-accent', // compact: a small chip on a card; its tap area still grows to a thumb's size.
-                compact && "relative px-2 py-0.5 text-[11px] before:absolute before:-inset-x-1 before:-inset-y-3 before:content-['']", className)}
+                // On a two-column phone grid the card is narrower than "₹404 Chikit Club price", so the chip may wrap onto a second line instead of being cut off.
+                compact && "relative max-w-full whitespace-normal rounded-xl px-2 py-0.5 text-[11px] leading-tight before:absolute before:-inset-x-1 before:-inset-y-3 before:content-['']", className)}
         >
             <Crown size={compact ? 11 : 13} aria-hidden="true" />
             {formatPrice(memberPrice)} <span className="font-medium">{compact ? 'Chikit Club price' : 'for Chikit Club members'}</span>

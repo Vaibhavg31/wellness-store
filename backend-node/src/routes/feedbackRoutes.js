@@ -2,27 +2,29 @@ import { Router } from 'express';
 import { requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError } from '../lib/response.js';
 import { generateId } from '../lib/db.js';
+import { assertText, isValidEmail } from '../lib/validate.js';
 import { FeedbackRepository } from '../repositories/feedbackRepository.js';
 
 const router = Router();
 const repo = new FeedbackRepository();
 
-function escapeHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-}
 
 router.post('/feedback', asyncRoute(async (req, res) => {
     const body = req.body || {};
     if (!body.name || !body.email || !body.message) return sendError(res, 'name, email and message are required', 400);
+    assertText(body.name, 'Name', 120);
+    assertText(body.message, 'Message', 5000);
+    assertText(body.email, 'Email', 254);
 
     const email = String(body.email).toLowerCase().trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendError(res, 'Enter a valid email address', 400);
+    if (!isValidEmail(email)) return sendError(res, 'Enter a valid email address', 400);
 
     const item = {
         id: generateId('fb'),
-        name: escapeHtml(body.name),
-        email: escapeHtml(email),
-        message: escapeHtml(body.message),
+        // Stored as typed: the admin page (React) escapes it when it is displayed. Escaping here as well showed "O&#039;Brien".
+        name: String(body.name).trim(),
+        email,
+        message: String(body.message).trim(),
         isRead: false,
         createdAt: new Date().toISOString(),
     };

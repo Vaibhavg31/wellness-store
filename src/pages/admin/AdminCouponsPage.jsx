@@ -22,6 +22,7 @@ import {
     AdminLoadingState,
     AdminEmptyState,
 } from '@/components/admin/AdminUi';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const EMPTY_FORM = {
     code: '',
@@ -141,7 +142,7 @@ export default function AdminCouponsPage() {
         setModalOpen(true);
     };
 
-    const handleSave = async () => {
+    const handleSave = useSingleFlight(async () => {
         if (!adminToken || !form.code.trim()) return;
         setSaving(true);
         try {
@@ -169,7 +170,7 @@ export default function AdminCouponsPage() {
         } finally {
             setSaving(false);
         }
-    };
+    });
 
     const handleToggle = async (coupon) => {
         if (!adminToken) return;

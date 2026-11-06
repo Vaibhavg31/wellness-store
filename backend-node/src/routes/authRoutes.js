@@ -13,6 +13,7 @@ import * as msg91 from '../services/msg91Service.js';
 import * as emailService from '../services/emailService.js';
 import { UserRepository } from '../repositories/userRepository.js';
 import { accountTokenPayload, activeAccountByEmail, findAccountByEmail, recordAdminLogin, superLogins, verifyAccountLogin } from '../lib/adminAccounts.js';
+import { isValidEmail } from '../lib/validate.js';
 
 const router = Router();
 const repo = new UserRepository();
@@ -127,8 +128,12 @@ router.post('/auth/register', asyncRoute(async (req, res) => {
     const confirmPassword = String(body.confirmPassword || '');
     const name = String(body.name || '').trim();
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendError(res, 'Enter a valid email address', 400);
+    // Only text is accepted: an object or array used to be turned into "[object Object]" and saved as a customer name.
+    if (['email', 'password', 'confirmPassword', 'name'].some((k) => body[k] !== undefined && typeof body[k] !== 'string')) return sendError(res, 'Invalid sign-up details', 400);
+    if (!isValidEmail(email)) return sendError(res, 'Enter a valid email address', 400);
     if (!name) return sendError(res, 'Full name is required', 400);
+    if (name.length > 100) return sendError(res, 'Name must be 100 characters or fewer', 400);
+    if (password.length > 200) return sendError(res, 'Password must be 200 characters or fewer', 400);
     if (password.length < 8) return sendError(res, 'Password must be at least 8 characters', 400);
     if (!confirmPassword || password !== confirmPassword) return sendError(res, 'Passwords do not match', 400);
 
@@ -242,7 +247,7 @@ router.post('/auth/login', asyncRoute(async (req, res) => {
 
 router.post('/auth/forgot-password', asyncRoute(async (req, res) => {
     const email = String(req.body?.email || '').toLowerCase().trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendError(res, 'Enter a valid email address', 400);
+    if (!isValidEmail(email)) return sendError(res, 'Enter a valid email address', 400);
     if (!(await checkRateLimit(`forgot-${clientIp(req)}`, 5, 3600))) return sendError(res, 'Too many reset requests. Try again later.', 429);
 
     const user = await repo.findByEmail(email);

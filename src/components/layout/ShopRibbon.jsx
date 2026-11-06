@@ -115,7 +115,8 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
                         return (
                             <a key="help" href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className={cn(pillBase, size, pillIdle)}>
                                 <WhatsAppIcon size={16} className="text-[#1FA855]" />
-                                {item.label}
+                                {/* On a 1024px screen the full row (with the sign-in avatar) is wider than the header, which pushed the bag icon off the edge; the label returns from 1280px. */}
+                                <span className={variant === 'desktop' ? 'lg:sr-only xl:not-sr-only' : undefined}>{item.label}</span>
                             </a>
                         );
                     default:
@@ -132,7 +133,7 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
             </nav>
         );
     }
-    return <nav aria-label="Main navigation" className="ml-6 hidden flex-1 items-center gap-0.5 lg:flex">{nav}</nav>;
+    return <nav aria-label="Main navigation" className="ml-3 hidden min-w-0 flex-1 items-center gap-0.5 lg:flex xl:ml-6">{nav}</nav>;
 }
 
 /** The drop-down panels under the header: every concern as a tile, and the live offer pages as a list. */

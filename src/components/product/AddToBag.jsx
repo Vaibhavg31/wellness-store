@@ -69,8 +69,8 @@ export default function AddToBag({ product, size = 'card', tone = 'light', soldO
             className={cn(
                 'relative z-10 inline-flex w-full items-center justify-center gap-2 rounded-full border font-semibold transition-colors',
                 dark
-                    ? cn('border-accent bg-accent text-primary-deep hover:bg-accent-hover', tall ? 'h-12 text-body' : 'h-10 text-small')
-                    : cn('border-primary bg-primary text-white hover:bg-primary-hover', tall ? 'h-12 text-body' : 'h-10 text-small'),
+                    ? cn('border-accent bg-accent text-primary-deep hover:bg-accent-hover', tall ? 'h-12 text-body' : 'h-11 text-small')
+                    : cn('border-primary bg-primary text-white hover:bg-primary-hover', tall ? 'h-12 text-body' : 'h-11 text-small'),
                 'disabled:cursor-not-allowed disabled:border-line-strong disabled:bg-transparent disabled:text-subtle disabled:hover:bg-transparent disabled:hover:text-subtle',
                 className,
             )}

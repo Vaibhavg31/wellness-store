@@ -36,6 +36,7 @@ import {
     paymentLabel,
     shortOrderId,
 } from '@/constants/orders';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const EMPTY_ITEM = { productId: '', title: '', price: '', quantity: 1, image: '' };
 
@@ -348,7 +349,7 @@ export default function AdminDirectOrdersPage() {
         setOptional(DEFAULT_OPTIONAL);
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = useSingleFlight(async (e) => {
         e.preventDefault();
         if (!adminToken) return;
 
@@ -410,7 +411,7 @@ export default function AdminDirectOrdersPage() {
         } finally {
             setSaving(false);
         }
-    };
+    });
 
     return (
         <div className="max-w-5xl mx-auto">

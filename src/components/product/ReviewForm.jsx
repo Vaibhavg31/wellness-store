@@ -7,6 +7,7 @@ import { api } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { loginUrl } from '@/utils/authRedirect';
 import { cn } from '@/utils/formatPrice';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const MAX_IMAGES = 4;
 
@@ -50,7 +51,7 @@ export default function ReviewForm({ product, onSubmitted }) {
         setImages((prev) => prev.filter((p) => p.previewUrl !== previewUrl));
     };
 
-    const submit = async (event) => {
+    const submit = useSingleFlight(async (event) => {
         event.preventDefault();
         setError('');
         setSubmitting(true);
@@ -67,7 +68,7 @@ export default function ReviewForm({ product, onSubmitted }) {
         } finally {
             setSubmitting(false);
         }
-    };
+    });
 
     let body;
     if (done) {

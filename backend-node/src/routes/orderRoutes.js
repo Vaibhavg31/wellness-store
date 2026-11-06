@@ -7,6 +7,7 @@ import { checkRateLimit } from '../lib/rateLimiter.js';
 import { exportTablePdf } from '../lib/exportHelper.js';
 import { revenueForOrder } from '../lib/orderRevenue.js';
 import * as addressBookHelper from '../lib/addressBookHelper.js';
+import { validateAddress } from '../lib/addressHelper.js';
 import * as otpConfig from '../lib/otpConfig.js';
 import { isOtpEnabled } from '../lib/servicesConfig.js';
 import { isEmailVerified } from './authRoutes.js';
@@ -131,6 +132,22 @@ async function releaseCouponForOrder(order) {
     await couponService.releaseUsage(couponId);
 }
 
+/**
+ * Moving a cancelled website order back to an active status takes its stock (and coupon use) again; otherwise the
+ * stock that cancelling returned to the shelf would be sold twice. Refused when the shelf no longer has enough.
+ */
+async function reserveStockForReopenedOrder(order) {
+    if (order.orderSource === 'direct' || !Array.isArray(order.items)) return;
+    try {
+        await decrementStock(order.items);
+    } catch (err) {
+        if (err instanceof HttpError) throw new HttpError('Not enough stock to reopen this cancelled order. Restock the items first.', 400);
+        throw err;
+    }
+    const couponId = String(order.couponId || '').trim();
+    if (couponId) await couponService.recordUsage(couponId);
+}
+
 async function restoreStockForOrder(order) {
     const items = order.items;
     if (!Array.isArray(items)) return;
@@ -214,9 +231,10 @@ async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
         const variantId = String(line.variantId || '').trim();
         const bundleId = String(line.bundleId || '').trim();
         const offerId = String(line.offerId || '').trim();
-        const qty = Number.parseInt(line.quantity ?? 0, 10);
+        // Only a whole number counts: "abc", true, {}, Infinity and "1.5" used to slip through parseInt as NaN / a silent 1.
+        const qty = ['number', 'string'].includes(typeof line.quantity) ? Number(line.quantity) : NaN;
 
-        if (!productId || qty < 1) throw new HttpError('Each item needs a productId and quantity ≥ 1', 400);
+        if (!productId || !Number.isInteger(qty) || qty < 1) throw new HttpError('Each item needs a productId and a whole-number quantity ≥ 1', 400);
         // Nobody needs more than 9 of one item (a Buy 1 Get 1 line holds the free ones too, so 18). Bundles have their own fixed quantity.
         if (!bundleId && qty > (offerId ? 18 : 9)) throw new HttpError(`You can order up to 9 of one item. Please lower the quantity.`, 400);
 
@@ -318,12 +336,12 @@ async function buildDirectOrderItems(rawItems) {
         if (!line || typeof line !== 'object') throw new HttpError('Invalid line item', 400);
 
         const title = String(line.title || '').trim();
-        const qty = Number.parseInt(line.quantity ?? 0, 10);
+        const qty = ['number', 'string'].includes(typeof line.quantity) ? Number(line.quantity) : NaN;
         const price = Number(line.price || 0);
         let productId = String(line.productId || '').trim();
 
-        if (!title || qty < 1) throw new HttpError('Each item needs a title and quantity ≥ 1', 400);
-        if (price < 0) throw new HttpError('Item price cannot be negative', 400);
+        if (!title || !Number.isInteger(qty) || qty < 1) throw new HttpError('Each item needs a title and a whole-number quantity ≥ 1', 400);
+        if (!Number.isFinite(price) || price < 0) throw new HttpError('Item price must be a number that is not negative', 400);
 
         let image = String(line.image || '').trim();
         let isCustom = !productId || productId.startsWith('custom-');
@@ -432,6 +450,7 @@ router.post('/orders/admin/create-direct', asyncRoute(async (req, res) => {
 
     const discountAmount = Math.max(0, Number(body.discountAmount || 0));
     const deliveryFee = Math.max(0, Number(body.deliveryFee || 0));
+    if (!Number.isFinite(discountAmount) || !Number.isFinite(deliveryFee)) return sendError(res, 'Discount and delivery fee must be numbers', 400);
     const total = Math.round(Math.max(0, subtotal - discountAmount + deliveryFee) * 100) / 100;
 
     const payment = String(body.payment || 'cod').toLowerCase();
@@ -508,6 +527,8 @@ router.put('/orders/:id/status', asyncRoute(async (req, res) => {
     if (status === 'cancelled' && prev !== 'cancelled') {
         await restoreStockForOrder(existing);
         await releaseCouponForOrder(existing);
+    } else if (prev === 'cancelled' && status !== 'cancelled') {
+        await reserveStockForReopenedOrder(existing);
     }
 
     const changes = buildStatusChange(existing, status, note || null, 'admin');
@@ -552,6 +573,7 @@ router.post('/orders/admin/bulk-status', asyncRoute(async (req, res) => {
     if (!ALLOWED_STATUSES.includes(status)) return sendError(res, 'Invalid status', 400);
 
     const updated = [];
+    const skipped = [];
     for (const rawId of ids) {
         const id = String(rawId);
         const existing = await repo.getById(id);
@@ -561,6 +583,13 @@ router.post('/orders/admin/bulk-status', asyncRoute(async (req, res) => {
         if (status === 'cancelled' && prev !== 'cancelled') {
             await restoreStockForOrder(existing);
             await releaseCouponForOrder(existing);
+        } else if (prev === 'cancelled' && status !== 'cancelled') {
+            try {
+                await reserveStockForReopenedOrder(existing);
+            } catch (err) {
+                if (err instanceof HttpError) { skipped.push({ id, error: err.message }); continue; }
+                throw err;
+            }
         }
 
         const changes = buildStatusChange(existing, status, note || 'Bulk update', 'admin');
@@ -571,7 +600,7 @@ router.post('/orders/admin/bulk-status', asyncRoute(async (req, res) => {
         }
     }
 
-    sendJson(res, { updated: updated.length, orders: updated });
+    sendJson(res, { updated: updated.length, orders: updated, skipped });
 }, 'Failed to bulk update orders'));
 
 router.post('/orders/admin/bulk-refund', asyncRoute(async (req, res) => {
@@ -823,6 +852,14 @@ router.post('/orders', asyncRoute(async (req, res) => {
 
     const payment = String(body.payment || 'cod').toLowerCase();
     if (!['cod', 'razorpay'].includes(payment)) return sendError(res, 'Invalid payment method', 400);
+
+    // A delivery address is mandatory: the storefront form enforces it, but the server must too (an order with no
+    // address, phone or PIN code can never be delivered).
+    const shippingInput = body.shipping && typeof body.shipping === 'object' && !Array.isArray(body.shipping) ? body.shipping : {};
+    const addressErrors = validateAddress(shippingInput);
+    if (String(shippingInput.phone || '').replace(/\D/g, '').length < 10) addressErrors.phone = 'Enter a valid 10-digit mobile number';
+    const firstAddressError = Object.values(addressErrors)[0];
+    if (firstAddressError) return sendError(res, firstAddressError, 400);
 
     const buyer = await users.getById(payload.userId || '');
     const validated = await validateAndBuildItems(body.items, { isMember: Boolean(buyer?.clubMember) });

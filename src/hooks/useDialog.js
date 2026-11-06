@@ -9,6 +9,11 @@ const FOCUSABLE = 'a[href],button:not([disabled]),textarea,input,select,[tabinde
  */
 export function useDialog(isOpen, onClose) {
     const panelRef = useRef(null);
+    // Callers usually pass an inline onClose, a new function on every render. Keeping it in a ref means the effect below runs
+    // only when the dialog opens or closes; depending on it directly re-ran the effect on every keystroke inside a form, which
+    // sent focus back to the opener and then to the first control, so only the first letter of anything typed was kept.
+    const onCloseRef = useRef(onClose);
+    useEffect(() => { onCloseRef.current = onClose; });
 
     useEffect(() => {
         if (!isOpen) return undefined;
@@ -22,7 +27,7 @@ export function useDialog(isOpen, onClose) {
 
         const onKeyDown = (event) => {
             if (event.key === 'Escape') {
-                onClose();
+                onCloseRef.current?.();
                 return;
             }
             if (event.key !== 'Tab') return;
@@ -45,7 +50,7 @@ export function useDialog(isOpen, onClose) {
             document.body.style.overflow = previousOverflow;
             opener?.focus?.();
         };
-    }, [isOpen, onClose]);
+    }, [isOpen]);
 
     return panelRef;
 }

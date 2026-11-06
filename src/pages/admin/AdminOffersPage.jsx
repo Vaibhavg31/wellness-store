@@ -10,6 +10,7 @@ import Drawer from '@/components/ui/Drawer';
 import ProductSearchSelect from '@/components/admin/ProductSearchSelect';
 import { ImageUploadField } from '@/components/admin/ContentEditor';
 import { AdminEmptyState, AdminLoadingState, AdminMenu, AdminPageHeader, AdminSwitch, AdminTableShell } from '@/components/admin/AdminUi';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const KINDS = [
     { value: 'mix_match', label: 'Pick & Mix', icon: Layers, help: 'The shopper picks any N different products for one fixed price (for example any 3 for ₹1499).' },
@@ -82,7 +83,7 @@ export default function AdminOffersPage() {
 
     const setProductAt = (index, id) => set({ productIds: form.productIds.map((p, i) => (i === index ? id : p)) });
 
-    const save = async () => {
+    const save = useSingleFlight(async () => {
         if (!form.title.trim()) return setError('Give the offer page a title.');
         const ids = [...new Set(form.productIds.filter(Boolean))];
         if (form.kind === 'mix_match' && !(Number(form.price) > 0)) return setError('Enter the price for the whole box.');
@@ -108,7 +109,7 @@ export default function AdminOffersPage() {
             setError(err instanceof Error ? err.message : 'Could not save the offer');
         } finally { setSaving(false); }
         return undefined;
-    };
+    });
 
     const toggle = async (offer) => {
         try { await api.put(`/api/offers/${offer.id}`, { isEnabled: !offer.isEnabled }, adminToken); load(); } catch (err) { showToast(err instanceof Error ? err.message : 'Could not update the offer', 'error'); }

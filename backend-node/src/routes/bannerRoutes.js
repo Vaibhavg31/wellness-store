@@ -1,11 +1,23 @@
 import { Router } from 'express';
 import { requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError } from '../lib/response.js';
+import { assertText, assertWhole, assertImageUrl, assertLink } from '../lib/validate.js';
 import { BannerRepository } from '../repositories/bannerRepository.js';
 
 const router = Router();
 const repo = new BannerRepository();
 const TARGETS = ['slider', 'stacked', 'both', 'product'];
+
+/** Only the fields present are checked, so the same rules serve create and partial update. */
+function assertValidBanner(fields) {
+    if ('image' in fields) assertImageUrl(fields.image, 'Banner image', { required: true });
+    if ('mobileImage' in fields) assertImageUrl(fields.mobileImage, 'Phone image');
+    if ('title' in fields) assertText(fields.title, 'Title', 200);
+    if ('subtitle' in fields) assertText(fields.subtitle, 'Subtitle', 500);
+    if ('ctaLabel' in fields) assertText(fields.ctaLabel, 'Button label', 60);
+    if ('ctaHref' in fields) assertLink(fields.ctaHref, 'Button link');
+    if ('order' in fields) assertWhole(fields.order, 'Order', { min: 0, max: 9999 });
+}
 
 router.get('/banners', asyncRoute(async (req, res) => {
     const target = req.query.target ? String(req.query.target) : null;
@@ -28,6 +40,7 @@ router.post('/banners', asyncRoute(async (req, res) => {
     requireAdmin(req);
     const body = req.body || {};
     if (!body.image) return sendError(res, 'Banner image is required', 400);
+    assertValidBanner(body);
 
     let displayTarget = String(body.displayTarget || 'both');
     if (!TARGETS.includes(displayTarget)) displayTarget = 'both';
@@ -57,6 +70,7 @@ router.put('/banners/:id', asyncRoute(async (req, res) => {
     const body = req.body || {};
     const changes = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
 
+    assertValidBanner(changes);
     if ('displayTarget' in changes && !TARGETS.includes(changes.displayTarget)) delete changes.displayTarget;
 
     if (changes.displayTarget === 'product') {

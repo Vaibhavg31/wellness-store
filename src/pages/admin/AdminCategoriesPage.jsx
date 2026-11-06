@@ -16,6 +16,7 @@ import {
     AdminLoadingState,
     AdminEmptyState,
 } from '@/components/admin/AdminUi';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const slugify = (text) => String(text ?? '').toLowerCase().trim().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
@@ -69,14 +70,14 @@ export default function AdminCategoriesPage() {
         setModalOpen(true);
     };
 
-    const handleSave = async () => {
+    const handleSave = useSingleFlight(async () => {
         if (!adminToken) return;
         if (!form.label.trim()) {
             showToast('Please enter a name for the category', 'error');
             return;
         }
         // The page address is made from the name, so nobody has to think about it; an existing one is never changed.
-        const payload = { ...form, slug: editing ? form.slug : (form.slug.trim() || slugify(form.label)) };
+        const payload = { ...form, slug: editing ? form.slug : slugify(form.slug.trim() || form.label) };
         try {
             if (editing) {
                 await api.put(`/api/categories/${editing.id}`, payload, adminToken);
@@ -88,7 +89,7 @@ export default function AdminCategoriesPage() {
         } catch (err) {
             showToast(err instanceof Error ? err.message : 'Could not save the category', 'error');
         }
-    };
+    });
 
     const handleImageUpload = async (e) => {
         if (!adminToken || !e.target.files?.length) return;

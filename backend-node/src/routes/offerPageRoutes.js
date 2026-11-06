@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError, HttpError } from '../lib/response.js';
+import { assertText, assertDateRange } from '../lib/validate.js';
 import { OfferRepository, OFFER_KINDS } from '../repositories/offerRepository.js';
 
 const router = Router();
@@ -13,6 +14,8 @@ function validate(body, { creating }) {
     if (creating || 'kind' in body) {
         if (!OFFER_KINDS.includes(body.kind)) throw new HttpError('Choose what kind of offer this is', 400);
     }
+    if ('title' in body) assertText(body.title, 'Title', 255, { required: true });
+    if ('startsAt' in body || 'endsAt' in body) assertDateRange(body.startsAt, body.endsAt, { startLabel: 'Start date', endLabel: 'End date' });
     const kind = body.kind;
     if (kind === 'mix_match' && (creating || 'price' in body)) {
         if (!(Number(body.price) > 0)) throw new HttpError('A "pick any" offer needs the price for the whole box', 400);

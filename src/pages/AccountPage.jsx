@@ -61,9 +61,9 @@ export default function AccountPage() {
                 <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-4">
                         <UserAvatar user={user} size="lg" signedIn />
-                        <div>
-                            <h1 className="text-h2">Hello, {user?.name || user?.email?.split('@')[0] || 'there'}</h1>
-                            <p className="text-small text-muted">{user?.email}</p>
+                        <div className="min-w-0">
+                            <h1 className="text-h2 [overflow-wrap:anywhere]">Hello, {user?.name || user?.email?.split('@')[0] || 'there'}</h1>
+                            <p className="text-small text-muted [overflow-wrap:anywhere]">{user?.email}</p>
                         </div>
                     </div>
                     <Button variant="outline" size="sm" onClick={signOut} loading={isSigningOut} className="self-start"><LogOut size={16} aria-hidden="true" /> Sign out</Button>

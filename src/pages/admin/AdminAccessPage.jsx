@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { AdminSection } from '@/components/admin/ContentEditor';
 import { AdminEmptyState, AdminLoadingState, AdminMenu, AdminPageHeader, AdminStatusPill, AdminTableShell } from '@/components/admin/AdminUi';
+import { useSingleFlight } from '@/hooks/useSingleFlight';
 
 const fmtDateTime = (iso) => (iso ? new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '–');
 const VIA = { password: 'Sign-in page', studio: 'Studio login', google: 'Google' };
@@ -22,7 +23,7 @@ function OwnPassword({ session }) {
     if (session.kind !== 'account') {
         return <p className="text-sm text-admin-muted">This login is set on the server, so its password is changed there, not here.</p>;
     }
-    const save = async (e) => {
+    const save = useSingleFlight(async (e) => {
         e.preventDefault();
         if (form.newPassword !== form.confirm) return showToast('The two new passwords do not match', 'error');
         setSaving(true);
@@ -35,7 +36,7 @@ function OwnPassword({ session }) {
             showToast(errorText(err, 'Could not change the password'), 'error');
         } finally { setSaving(false); }
         return undefined;
-    };
+    });
     return (
         <form onSubmit={save} className="grid max-w-xl gap-4">
             <Input label="Current password" type="password" autoComplete="current-password" value={form.currentPassword} onChange={(e) => setForm({ ...form, currentPassword: e.target.value })} required />
@@ -56,7 +57,7 @@ function AccountForm({ account, onDone, onCancel }) {
     const [form, setForm] = useState({ email: account?.email ?? '', name: account?.name ?? '', password: '' });
     const [saving, setSaving] = useState(false);
 
-    const save = async (e) => {
+    const save = useSingleFlight(async (e) => {
         e.preventDefault();
         setSaving(true);
         try {
@@ -68,7 +69,7 @@ function AccountForm({ account, onDone, onCancel }) {
         } catch (err) {
             showToast(errorText(err, 'Could not save'), 'error');
         } finally { setSaving(false); }
-    };
+    });
     return (
         <form onSubmit={save} className="grid gap-4 rounded-xl border border-admin-border bg-admin-surface-alt p-4">
             <div className="grid gap-4 sm:grid-cols-2">

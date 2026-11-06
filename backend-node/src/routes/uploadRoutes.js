@@ -6,6 +6,7 @@ import fs from 'node:fs/promises';
 import { requireAdmin, requireCustomer } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError } from '../lib/response.js';
 import { uploadsDirPath } from '../lib/db.js';
+import sharp from 'sharp';
 import { processImage } from '../lib/imageProcessor.js';
 import { MediaRepository } from '../repositories/mediaRepository.js';
 
@@ -37,6 +38,12 @@ async function saveImageFile(file) {
 
     const ext = extOf(file.originalname);
     if (!ALLOWED_EXT.has(ext)) throw Object.assign(new Error('Only JPG, PNG, and WebP images are allowed'), { statusCode: 400 });
+
+    // The name says "png", but is it one? Read the bytes before anything is written: a text, HTML or PHP file renamed to
+    // .png used to be saved under /uploads and then crash the image step (a 500 that also left the file behind).
+    let detected = '';
+    try { detected = (await sharp(file.buffer).metadata()).format || ''; } catch { /* not an image */ }
+    if (!['jpeg', 'png', 'webp'].includes(detected)) throw Object.assign(new Error('That file is not a valid JPG, PNG or WebP image'), { statusCode: 400 });
 
     let filename = `product-${Date.now()}-${randomSuffix()}.${ext}`;
     let dest = path.join(uploadsDirPath(), filename);
@@ -102,6 +109,10 @@ router.post('/upload/video', videoUpload.single('video'), asyncRoute(async (req,
 
     const ext = extOf(file.originalname);
     if (!ALLOWED_VIDEO_EXT.has(ext)) return sendError(res, 'Only MP4, WebM, and MOV videos are allowed', 400);
+    // Check the file's own signature too: MP4/MOV carry "ftyp" at byte 4, WebM starts with the EBML header 1A 45 DF A3.
+    const head = file.buffer.subarray(0, 12);
+    const looksLikeVideo = head.length >= 12 && (head.subarray(4, 8).toString('latin1') === 'ftyp' || (head[0] === 0x1a && head[1] === 0x45 && head[2] === 0xdf && head[3] === 0xa3));
+    if (!looksLikeVideo) return sendError(res, 'That file is not a valid MP4, WebM or MOV video', 400);
 
     const filename = `video-${Date.now()}-${randomSuffix()}.${ext}`;
     const dest = path.join(uploadsDirPath(), filename);
