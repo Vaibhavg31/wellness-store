@@ -11,7 +11,8 @@ export function QuantityStepper({ qty, max, onChange, title = 'item', size = 'ca
     const tall = size === 'large';
     const atMax = qty >= max;
     // The card stepper is slimmer on a desktop mouse (36px high, 28px buttons); on a phone it keeps the 40px / 32px touch size.
-    const btn = cn('grid shrink-0 place-items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40', tall ? 'size-10' : 'size-8 lg:size-7');
+    // The small card buttons get an invisible ring so a thumb's tap area is 44px (the visible circle stays 32 / 28px).
+    const btn = cn('relative grid shrink-0 place-items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40', tall ? 'size-10 after:absolute after:-inset-0.5 after:content-[\'\']' : "size-8 after:absolute after:-inset-1.5 after:content-[''] lg:size-7 lg:after:-inset-2");
     const icon = cn(!tall && 'lg:size-3.5');
     return (
         <div className={cn('flex w-full items-center justify-between rounded-full border px-1', tone === 'dark' ? 'border-accent bg-accent' : 'border-primary/25 bg-primary-tint', tall ? 'h-12' : 'h-10 lg:h-9')} role="group" aria-label={`${title} quantity in your bag`}>
