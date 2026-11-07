@@ -1,6 +1,6 @@
 import { Children, cloneElement, isValidElement, useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion, Reorder, useDragControls } from 'framer-motion';
-import { Plus, Trash2, Upload, GripVertical, ChevronDown, AlertTriangle, CheckCircle2, Film, X } from 'lucide-react';
+import { Plus, Trash2, Upload, GripVertical, ChevronDown, AlertTriangle, CheckCircle2, Film, X, ArrowUp, ArrowDown } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { api, imageUrl } from '@/services/api';
@@ -446,6 +446,15 @@ export function SectionToggles({ sections, onChange, labels, renderContent, meta
         nextKeys.forEach((k) => { next[k] = sections[k]; });
         onChange(next);
     };
+    // The same as dragging, for a keyboard or a phone: move one section up or down by one place.
+    const moveBy = (key, step) => {
+        const from = keys.indexOf(key);
+        const to = from + step;
+        if (from < 0 || to < 0 || to >= keys.length) return;
+        const next = [...keys];
+        [next[from], next[to]] = [next[to], next[from]];
+        handleReorder(next);
+    };
 
     const toggleExpand = (key) => {
         setExpandedKeys((prev) => {
@@ -467,10 +476,12 @@ export function SectionToggles({ sections, onChange, labels, renderContent, meta
             onReorder={handleReorder}
             className="divide-y divide-line/30 rounded-xl border border-admin-border overflow-hidden"
         >
-            {keys.map((key) => (
+            {keys.map((key, index) => (
                 <SectionAccordionRow
                     key={key}
                     itemKey={key}
+                    onMoveUp={index > 0 ? () => moveBy(key, -1) : null}
+                    onMoveDown={index < keys.length - 1 ? () => moveBy(key, 1) : null}
                     label={meta[key]?.title ?? labels[key] ?? key}
                     description={meta[key]?.desc}
                     tag={meta[key]?.tag}
@@ -487,7 +498,7 @@ export function SectionToggles({ sections, onChange, labels, renderContent, meta
     );
 }
 
-function SectionAccordionRow({ itemKey, label, description, tag, enabled, onToggle, expanded, onToggleExpand, children }) {
+function SectionAccordionRow({ itemKey, label, description, tag, enabled, onToggle, expanded, onToggleExpand, onMoveUp, onMoveDown, children }) {
     const dragControls = useDragControls();
     const hasContent = children != null;
 
@@ -499,7 +510,6 @@ function SectionAccordionRow({ itemKey, label, description, tag, enabled, onTogg
             dragControls={dragControls}
             whileDrag={{ scale: 1.015, boxShadow: '0 10px 28px rgba(35,20,20,0.14)', cursor: 'grabbing' }}
             className="relative bg-canvas"
-            style={{ touchAction: 'none' }}
         >
             <div className="flex items-center justify-between gap-3 p-4 hover:bg-admin-surface-alt">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -535,6 +545,10 @@ function SectionAccordionRow({ itemKey, label, description, tag, enabled, onTogg
                     </button>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
+                    <span className="flex items-center">
+                        <button type="button" onClick={onMoveUp ?? undefined} disabled={!onMoveUp} aria-label={`Move ${label} up`} title="Move up" className="grid size-9 place-items-center rounded-md text-admin-muted hover:bg-admin-surface-alt hover:text-primary disabled:opacity-25 max-sm:size-11"><ArrowUp size={15} aria-hidden="true" /></button>
+                        <button type="button" onClick={onMoveDown ?? undefined} disabled={!onMoveDown} aria-label={`Move ${label} down`} title="Move down" className="grid size-9 place-items-center rounded-md text-admin-muted hover:bg-admin-surface-alt hover:text-primary disabled:opacity-25 max-sm:size-11"><ArrowDown size={15} aria-hidden="true" /></button>
+                    </span>
                     <span className={`hidden text-xs font-medium sm:inline ${enabled ? 'text-primary' : 'text-admin-muted'}`}>{enabled ? 'Showing' : 'Hidden'}</span>
                     <button
                         type="button"
