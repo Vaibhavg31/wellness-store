@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import Button from './Button';
 
 /** `as` sets the heading level: use "h1" when this is the main content of a page. */
@@ -13,9 +12,7 @@ export default function EmptyState({ icon: Icon, title, description, actionLabel
             <Heading className="text-h3">{title}</Heading>
             {description && <p className="mt-2 text-muted">{description}</p>}
             {actionLabel && actionHref && (
-                <Link to={actionHref} className="mt-6">
-                    <Button>{actionLabel}</Button>
-                </Link>
+                <Button to={actionHref} className="mt-6">{actionLabel}</Button>
             )}
         </div>
     );

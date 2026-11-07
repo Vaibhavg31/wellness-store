@@ -171,14 +171,14 @@ function SpinBody({ popup, segments, preview, onDismiss }) {
                         <h2 className="mb-1 text-h3">You won {result.label}!</h2>
                         <p className="mb-5 text-small text-muted">Copy this code and use it at checkout.</p>
                         <div className="mb-5"><CouponRow code={result.code} /></div>
-                        <Link to={popup.ctaHref || '/shop'} onClick={onDismiss} className="block"><Button className="w-full">{popup.ctaLabel || 'Start shopping'}</Button></Link>
+                        <Button to={popup.ctaHref || '/shop'} onClick={onDismiss} className="w-full">{popup.ctaLabel || 'Start shopping'}</Button>
                     </>
                 ) : (
                     <>
                         <span className="mx-auto mb-3 grid size-14 animate-pop place-items-center rounded-full bg-canvas-alt text-muted"><Frown size={26} aria-hidden="true" /></span>
                         <h2 className="mb-1 text-h3">Better luck next time</h2>
                         <p className="mb-5 text-small text-muted">No prize on this spin, but there is plenty to explore. Come back for another try soon.</p>
-                        <Link to="/shop" onClick={onDismiss} className="block"><Button variant="outline" className="w-full">Continue shopping</Button></Link>
+                        <Button to="/shop" onClick={onDismiss} variant="outline" className="w-full">Continue shopping</Button>
                     </>
                 )}
             </div>
@@ -242,9 +242,7 @@ export function PopupDialog({ popup, product = null, category = null, segments =
                             )}
 
                             {popup.ctaLabel && popup.ctaHref && (
-                                <Link to={popup.ctaHref} onClick={onDismiss} className="block">
-                                    <Button className="w-full">{popup.ctaLabel}</Button>
-                                </Link>
+                                <Button to={popup.ctaHref} onClick={onDismiss} className="w-full">{popup.ctaLabel}</Button>
                             )}
                         </div>
                     </>

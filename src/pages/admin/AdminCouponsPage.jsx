@@ -467,7 +467,7 @@ export default function AdminCouponsPage() {
                                     type="button"
                                     size="sm"
                                     variant="outline"
-                                    onClick={async () => { (await copyText(`${window.location.origin}/?coupon=${form.code.trim().toUpperCase()}`)) && showToast('Link copied', 'success'); }}
+                                    onClick={async () => { const ok = await copyText(`${window.location.origin}/?coupon=${form.code.trim().toUpperCase()}`); showToast(ok ? 'Link copied' : 'Could not copy. Select the link and copy it by hand.', ok ? 'success' : 'error'); }}
                                 >
                                     Copy link
                                 </Button>

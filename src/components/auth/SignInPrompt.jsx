@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import Button from '@/components/ui/Button';
 import { loginUrl } from '@/utils/authRedirect';
 
@@ -10,8 +9,8 @@ export default function SignInPrompt({ icon: Icon, title, description, redirect 
             <h1 className="text-h2">{title}</h1>
             <p className="mb-6 mt-3 max-w-sm text-muted">{description}</p>
             <div className="flex flex-col gap-3 sm:flex-row">
-                <Link to={loginUrl(redirect)}><Button>Sign in</Button></Link>
-                <Link to="/shop"><Button variant="outline">Continue shopping</Button></Link>
+                <Button to={loginUrl(redirect)}>Sign in</Button>
+                <Button to="/shop" variant="outline">Continue shopping</Button>
             </div>
         </div>
     );

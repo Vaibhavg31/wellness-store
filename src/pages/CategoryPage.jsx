@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
 import { breadcrumbJsonLd } from '@/utils/seoSchema';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import PageHeader from '@/components/ui/PageHeader';
 import Button from '@/components/ui/Button';
 import SearchField from '@/components/shop/SearchField';
@@ -25,7 +25,7 @@ export default function CategoryPage() {
         return (
             <div className="container-page py-24 text-center">
                 <h1>Category not found</h1>
-                <Link to="/shop" className="mt-6 inline-block"><Button variant="outline">Back to shop</Button></Link>
+                <Button to="/shop" variant="outline" className="mt-6">Back to shop</Button>
             </div>
         );
     }

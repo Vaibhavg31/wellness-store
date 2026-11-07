@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { BadgePercent, Gift, Package, ShoppingBag, ShoppingCart } from 'lucide-react';
 import Seo, { SITE_URL } from '@/components/seo/Seo';
 import Button from '@/components/ui/Button';
@@ -116,7 +116,7 @@ export function OfferPage() {
                 <Gift size={40} className="mx-auto text-primary" aria-hidden="true" />
                 <h1 className="mt-4">This offer has ended</h1>
                 <p className="mt-2 text-muted">See what else is on right now.</p>
-                <Link to="/offers" className="mt-6 inline-block"><Button>View all offers</Button></Link>
+                <Button to="/offers" className="mt-6">View all offers</Button>
             </div>
         );
     }

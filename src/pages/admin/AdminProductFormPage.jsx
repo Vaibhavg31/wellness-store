@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     AlertCircle,
     Boxes,
@@ -539,11 +539,9 @@ export default function AdminProductFormPage() {
                     <Button type="button" variant="outline" size="sm" className="normal-case tracking-normal" onClick={() => setPreviewOpen(true)}>
                         <Eye size={15} aria-hidden="true" /> Preview page
                     </Button>
-                    <Link to={`${ADMIN_PATH}/products`}>
-                        <Button variant="outline" size="sm" className="normal-case tracking-normal">
-                            Back to products
-                        </Button>
-                    </Link>
+                    <Button to={`${ADMIN_PATH}/products`} variant="outline" size="sm" className="normal-case tracking-normal">
+                        Back to products
+                    </Button>
                 </div>
             </div>
 

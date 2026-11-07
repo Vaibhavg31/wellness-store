@@ -30,7 +30,7 @@ function DayArc({ progress, count }) {
 }
 
 /** One moment of the day. All stages are stacked; scroll progress decides which one is in front. */
-function Stage({ stage, index, count, progress, product, active, onAdd, added, last, onAddAll, total, allAdded }) {
+function Stage({ stage, index, count, progress, product, active, onAdd, last, onAddAll, total, allAdded }) {
     const deep = stage.tone === 'deep';
     const distance = useTransform(progress, (p) => index - p);
     const opacity = useTransform(distance, (d) => clamp(1.7 - Math.abs(d) * 3.4, 0, 1));

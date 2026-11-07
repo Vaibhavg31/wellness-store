@@ -346,7 +346,7 @@ export default function ClubPage() {
                     </ul>
                     <div className="mt-8 flex justify-center">
                         {member
-                            ? <Link to="/shop"><Button size="lg" variant="outline">Shop with Chikit Club member prices</Button></Link>
+                            ? <Button to="/shop" size="lg" variant="outline">Shop with Chikit Club member prices</Button>
                             : <a href="#join" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-small font-semibold text-white shadow-md transition-colors hover:bg-primary-hover"><Crown size={16} className="text-accent" aria-hidden="true" /> Become a Chikit Club member</a>}
                     </div>
                 </section>
@@ -362,7 +362,7 @@ export default function ClubPage() {
                             {justJoined && <VerifyAnimation size={72} className="mx-auto mb-3 text-success" />}
                             <h2 className="text-h3">{justJoined ? 'Welcome, Chikit Club member!' : 'You are a Chikit Club member'}</h2>
                             <p className="mt-2 text-muted">Your Chikit Club member prices show on every product while you are signed in. Card number <strong className="font-mono text-ink">{user.club.cardNo}</strong>.</p>
-                            <Link to="/shop" className="mt-6 inline-block"><Button size="lg">Shop with Chikit Club member prices</Button></Link>
+                            <Button to="/shop" size="lg" className="mt-6">Shop with Chikit Club member prices</Button>
                         </div>
                     )}
 
@@ -371,7 +371,7 @@ export default function ClubPage() {
                             <h2 className="text-h3">Join in three quick steps</h2>
                             <p className="mt-2 text-muted">Confirm your mobile and email, tell us your birthday and address, and your card is ready. Sign in first (or create an account); it only takes a minute.</p>
                             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-                                <Link to={loginUrl('/club')}><Button size="lg" className="w-full">Sign in to join</Button></Link>
+                                <Button to={loginUrl('/club')} size="lg" className="w-full">Sign in to join</Button>
                             </div>
                         </div>
                     )}

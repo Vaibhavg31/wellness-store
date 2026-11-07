@@ -74,9 +74,7 @@ export default function CheckoutLoginGate() {
                         <p className="mt-2 max-w-md text-body text-muted">
                             Your total is <strong className="text-ink">{formatPrice(total)}</strong>, delivery included. Sign in with Google and you come straight back to this page with your bag as it is.
                         </p>
-                        <Link to={loginUrl('/checkout')} className="mt-6 block sm:max-w-xs">
-                            <Button size="lg" className="w-full">Sign in &amp; continue</Button>
-                        </Link>
+                        <Button to={loginUrl('/checkout')} size="lg" className="mt-6 w-full sm:max-w-xs">Sign in &amp; continue</Button>
                         <p className="mt-5 text-caption font-semibold uppercase tracking-[0.14em] text-accent-ink">What happens next</p>
                         <ul className="mt-3 space-y-2.5">
                             {NEXT.map(({ icon: Icon, text }) => (

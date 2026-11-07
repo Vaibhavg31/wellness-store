@@ -170,7 +170,7 @@ export default function CartPage() {
                 ) : (
                     <div className="mb-6 flex flex-col justify-between gap-3 rounded-lg border border-line bg-surface p-4 sm:flex-row sm:items-center">
                         <p className="text-small text-ink">Shopping as guest. Sign in only when you&apos;re ready to place your order.</p>
-                        <Link to={loginUrl('/checkout')}><Button variant="outline" size="sm">Sign in</Button></Link>
+                        <Button to={loginUrl('/checkout')} variant="outline" size="sm">Sign in</Button>
                     </div>
                 )}
 
@@ -193,7 +193,7 @@ export default function CartPage() {
                             <h2 className="text-h4">Price details</h2>
                             <CouponInput compact />
                             <PriceBreakdown showUpsell={false} />
-                            <Link to="/checkout" className="block"><Button size="lg" className="w-full">Proceed to checkout</Button></Link>
+                            <Button to="/checkout" size="lg" className="w-full">Proceed to checkout</Button>
                             <PaymentAssurance className="justify-center" />
                             <Link to="/shop" className="flex min-h-11 items-center justify-center text-small text-muted hover:text-primary">Continue shopping</Link>
                         </div>
@@ -208,7 +208,7 @@ export default function CartPage() {
                         <p className="text-caption text-muted">Total</p>
                         <p className="font-display text-h4 leading-tight text-primary">{formatPrice(total)}</p>
                     </div>
-                    <Link to="/checkout" className="min-w-0 flex-1"><Button size="lg" className="w-full">Proceed to checkout</Button></Link>
+                    <Button to="/checkout" size="lg" className="w-full min-w-0 flex-1">Proceed to checkout</Button>
                 </div>
             </div>
         </>

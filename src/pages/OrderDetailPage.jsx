@@ -31,7 +31,7 @@ export default function OrderDetailPage() {
     const { id } = useParams();
     const { token, isAuthenticated } = useAuth();
     const { showToast } = useToast();
-    const { getWhatsAppUrl } = useWhatsApp();
+    const { available: whatsappOn, getWhatsAppUrl } = useWhatsApp();
     const { addToCart } = useCart();
     const { content } = useSiteContent();
     const { products } = useProducts();
@@ -199,10 +199,8 @@ export default function OrderDetailPage() {
                 )}
 
                 <div className="flex flex-col gap-3 sm:flex-row">
-                    <Link to="/shop" className="flex-1"><Button className="w-full">Continue shopping</Button></Link>
-                    <a href={getWhatsAppUrl(`Hi, I have a question about my order ${order.id}`)} target="_blank" rel="noopener noreferrer" className="flex-1">
-                        <Button variant="outline" className="w-full"><MessageCircle size={16} aria-hidden="true" /> Need help?</Button>
-                    </a>
+                    <Button to="/shop" className="w-full flex-1">Continue shopping</Button>
+                    {whatsappOn && <Button href={getWhatsAppUrl(`Hi, I have a question about my order ${order.id}`)} target="_blank" rel="noopener noreferrer" variant="outline" className="flex-1"><MessageCircle size={16} aria-hidden="true" /> Need help?</Button>}
                     <Button variant="outline" className="flex-1" onClick={() => openInvoice(order, content)}><FileText size={16} aria-hidden="true" /> Invoice</Button>
                 </div>
             </div>

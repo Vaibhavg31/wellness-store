@@ -13,7 +13,7 @@ import {
     XCircle,
 } from 'lucide-react';
 import { formatIndianAddress } from '@/utils/formatAddress';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
@@ -571,11 +571,9 @@ export default function AdminOrdersPage() {
                 subtitle="Confirm, pack and ship customer orders"
                 actions={(
                     <>
-                        <Link to={`${ADMIN_PATH}/direct-orders`}>
-                            <Button variant="turmeric" size="sm" className="gap-2 normal-case tracking-normal">
-                                Direct order
-                            </Button>
-                        </Link>
+                        <Button to={`${ADMIN_PATH}/direct-orders`} variant="turmeric" size="sm" className="gap-2 normal-case tracking-normal">
+                            Direct order
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => setExportModalOpen(true)} disabled={exporting || loading} className="gap-2">
                             <Download size={14} className={exporting ? 'animate-pulse' : ''} />
                             Export

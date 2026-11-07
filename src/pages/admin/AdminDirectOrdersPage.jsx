@@ -424,11 +424,9 @@ export default function AdminDirectOrdersPage() {
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    <Link to={`${ADMIN_PATH}/orders`}>
-                        <Button variant="outline" size="sm" className="normal-case tracking-normal">
-                            All orders
-                        </Button>
-                    </Link>
+                    <Button to={`${ADMIN_PATH}/orders`} variant="outline" size="sm" className="normal-case tracking-normal">
+                        All orders
+                    </Button>
                     <Button
                         variant="outline"
                         size="sm"

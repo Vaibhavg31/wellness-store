@@ -151,11 +151,9 @@ export default function AdminProductsPage() {
                 title="Products"
                 subtitle={`${counts.all} ${counts.all === 1 ? 'product' : 'products'} in your store`}
                 actions={(
-                    <Link to={`${ADMIN_PATH}/products/new`}>
-                        <Button variant="turmeric" size="sm" className="gap-2">
-                            <Plus size={16} /> Add product
-                        </Button>
-                    </Link>
+                    <Button to={`${ADMIN_PATH}/products/new`} variant="turmeric" size="sm" className="gap-2">
+                        <Plus size={16} /> Add product
+                    </Button>
                 )}
             />
 
@@ -206,7 +204,7 @@ export default function AdminProductsPage() {
                                     <div className="flex items-center justify-between gap-3">
                                         <AdminSwitch checked={product.isPublished} onChange={() => togglePublish(product)} aria-label={`${product.isPublished ? 'Hide' : 'Show'} ${product.title} on the store`} />
                                         <div className="flex items-center gap-1">
-                                            <Link to={editHref(product)}><Button variant="outline" size="sm">Edit</Button></Link>
+                                            <Button to={editHref(product)} variant="outline" size="sm">Edit</Button>
                                             <AdminMenu items={menuFor(product)} label={`More actions for ${product.title}`} />
                                         </div>
                                     </div>
@@ -250,7 +248,7 @@ export default function AdminProductsPage() {
                                             </td>
                                             <td className="p-4">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Link to={editHref(product)}><Button variant="outline" size="sm">Edit</Button></Link>
+                                                    <Button to={editHref(product)} variant="outline" size="sm">Edit</Button>
                                                     <AdminMenu items={menuFor(product)} label={`More actions for ${product.title}`} />
                                                 </div>
                                             </td>

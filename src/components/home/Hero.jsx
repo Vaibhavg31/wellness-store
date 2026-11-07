@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { LazyMotion, MotionConfig, domAnimation, m } from 'framer-motion';
 import Button from '@/components/ui/Button';
@@ -66,14 +65,12 @@ export default function Hero({ products, loading = false }) {
                             <m.p {...rise(0.45)} className="mt-5 hidden max-w-xl text-lead text-muted sm:block">{hero.subheadline}</m.p>
                             <m.div {...rise(0.55)} className="mt-4 flex flex-wrap gap-3 sm:mt-8">
                                 <Magnetic>
-                                    <Link to={hero.primaryCta?.href || '/shop'}>
-                                        <Button size="lg">
-                                            {hero.primaryCta?.label || 'Shop now'} <ArrowRight size={18} aria-hidden="true" />
-                                        </Button>
-                                    </Link>
+                                    <Button to={hero.primaryCta?.href || '/shop'} size="lg">
+                                        {hero.primaryCta?.label || 'Shop now'} <ArrowRight size={18} aria-hidden="true" />
+                                    </Button>
                                 </Magnetic>
                                 <Magnetic>
-                                    <Link to="/about"><Button size="lg" variant="outline">Our story</Button></Link>
+                                    <Button to="/about" size="lg" variant="outline">Our story</Button>
                                 </Magnetic>
                             </m.div>
                         </div>

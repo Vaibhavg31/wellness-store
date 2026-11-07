@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { trackEvent } from '@/utils/analytics';
 import ProductDetailView from '@/components/product/ProductDetailView';
 import Button from '@/components/ui/Button';
@@ -39,7 +39,7 @@ export default function ProductDetailPage() {
         return (
             <div className="container-page py-24 text-center">
                 <h1>Product not found</h1>
-                <Link to="/shop" className="mt-6 inline-block"><Button variant="outline">Back to shop</Button></Link>
+                <Button to="/shop" variant="outline" className="mt-6">Back to shop</Button>
             </div>
         );
     }

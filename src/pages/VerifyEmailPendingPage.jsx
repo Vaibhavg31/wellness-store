@@ -1,4 +1,4 @@
-import { Link, useSearchParams, Navigate } from 'react-router-dom';
+import { useSearchParams, Navigate } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 import AuthShell from '@/components/auth/AuthShell';
 import Button from '@/components/ui/Button';
@@ -35,7 +35,7 @@ export default function VerifyEmailPendingPage() {
 
             <EmailVerificationBanner email={displayEmail} className="mb-6" />
 
-            <Link to={redirectTo} className="block"><Button size="lg" className="mb-3 w-full">Continue browsing</Button></Link>
+            <Button to={redirectTo} size="lg" className="mb-3 w-full">Continue browsing</Button>
             <p className="text-center text-caption text-muted">Didn&apos;t get it? Check spam, or use resend above.</p>
         </AuthShell>
     );

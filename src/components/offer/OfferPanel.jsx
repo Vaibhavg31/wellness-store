@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Check, Copy, Gift, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -48,7 +47,7 @@ function CodeTicket({ result, onClose }) {
             <p className="mt-3 text-caption text-muted">
                 {result.description}{result.minOrderAmount > 0 ? `${result.description ? ' · ' : ''}Valid on orders above ${formatPrice(result.minOrderAmount)}` : ''}
             </p>
-            <Link to="/shop" onClick={onClose} className="mt-5 block"><Button className="w-full">Start shopping</Button></Link>
+            <Button to="/shop" onClick={onClose} className="w-full mt-5">Start shopping</Button>
         </div>
     );
 }

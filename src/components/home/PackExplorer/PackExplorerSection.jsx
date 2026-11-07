@@ -1,5 +1,4 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Check, Hand, RotateCw, ZoomIn } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -144,9 +143,7 @@ export default function PackExplorerSection({ products = [] }) {
                                 </AnimatePresence>
                                 <div className="mt-6 flex flex-wrap gap-3">
                                     <div className="min-w-0 flex-1 sm:w-56 sm:flex-none"><AddToBag product={active} size="large" /></div>
-                                    <Link to={`/product/${active.id}`} className="flex-1 sm:flex-none">
-                                        <Button size="lg" variant="outline" className="w-full">Details <ArrowRight size={18} aria-hidden="true" /></Button>
-                                    </Link>
+                                    <Button to={`/product/${active.id}`} size="lg" variant="outline" className="flex-1 sm:flex-none">Details <ArrowRight size={18} aria-hidden="true" /></Button>
                                 </div>
                             </div>
                         </Reveal>

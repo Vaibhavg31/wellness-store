@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Camera, ShieldCheck, Star, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Textarea from '@/components/ui/Textarea';
@@ -81,7 +81,7 @@ export default function ReviewForm({ product, onSubmitted }) {
         body = (
             <div className="max-w-lg">
                 <p className="mb-4 text-muted">Sign in and purchase this product to write a review — reviews here are only from verified buyers.</p>
-                <Link to={loginUrl(pathname)}><Button>Sign in</Button></Link>
+                <Button to={loginUrl(pathname)}>Sign in</Button>
             </div>
         );
     } else if (eligibility.reason === 'not_purchased') {

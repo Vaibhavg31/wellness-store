@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Volume2, VolumeX } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useSiteContent } from '@/contexts/SiteContentContext';
@@ -74,7 +73,7 @@ export default function VideoBanner() {
                             {banner.subtitle && <p className="eyebrow">{banner.subtitle}</p>}
                             {banner.title && <p className="mt-1 font-display text-h3 leading-tight text-ink">{banner.title}</p>}
                             {banner.ctaLabel && banner.ctaHref && (
-                                <Link to={banner.ctaHref} className="mt-4 inline-block"><Button size="sm">{banner.ctaLabel}</Button></Link>
+                                <Button to={banner.ctaHref} size="sm" className="mt-4">{banner.ctaLabel}</Button>
                             )}
                         </div>
                     )}

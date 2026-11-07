@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Seo from '@/components/seo/Seo';
-import { Link } from 'react-router-dom';
 import PageHeader from '@/components/ui/PageHeader';
 import Rating from '@/components/ui/Rating';
 import Button from '@/components/ui/Button';
@@ -51,7 +50,7 @@ export default function ReviewsPage() {
                     <div className="mt-12 rounded-xl bg-primary-tint p-8 text-center">
                         <h2 className="text-h3">Bought something from us?</h2>
                         <p className="mx-auto mt-2 max-w-md text-muted">Open the product you purchased and share your experience — reviews are from verified buyers only.</p>
-                        <Link to="/orders" className="mt-5 inline-block"><Button>Go to my orders</Button></Link>
+                        <Button to="/orders" className="mt-5">Go to my orders</Button>
                     </div>
                 </div>
             </div>

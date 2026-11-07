@@ -86,7 +86,7 @@ function Result({ result, products, loading, onRetake }) {
             )}
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
-                <Link to={shopPathFor(result.goal)}><Button>Shop my picks <ArrowRight size={16} aria-hidden="true" /></Button></Link>
+                <Button to={shopPathFor(result.goal)}>Shop my picks <ArrowRight size={16} aria-hidden="true" /></Button>
                 <Button variant="ghost" onClick={onRetake}><RotateCcw size={16} aria-hidden="true" /> Retake quiz</Button>
             </div>
             <p className="mt-5 text-caption text-muted">Traditional Ayurvedic guidance for general wellness. It is not medical advice; speak to your doctor about health conditions.</p>

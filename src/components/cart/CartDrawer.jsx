@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { BadgeCheck, ShoppingBag, Sparkles, Trash2, Truck, X } from 'lucide-react';
 import Drawer from '@/components/ui/Drawer';
 import Button from '@/components/ui/Button';
@@ -158,8 +157,8 @@ export default function CartDrawer() {
                         </p>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <Link to="/cart" onClick={closeCartDrawer}><Button variant="outline" className="w-full">View bag</Button></Link>
-                            <Link to="/checkout" onClick={closeCartDrawer}><Button className="w-full">Checkout</Button></Link>
+                            <Button to="/cart" onClick={closeCartDrawer} variant="outline" className="w-full">View bag</Button>
+                            <Button to="/checkout" onClick={closeCartDrawer} className="w-full">Checkout</Button>
                         </div>
                     </div>
                 </div>

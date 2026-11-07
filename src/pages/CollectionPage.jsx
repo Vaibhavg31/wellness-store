@@ -49,7 +49,7 @@ export default function ConcernPage() {
     const { products, loading } = useProducts();
     const { categories } = useCategories();
     const { content } = useSiteContent();
-    const { getWhatsAppUrl } = useWhatsApp();
+    const { available: whatsappOn, getWhatsAppUrl } = useWhatsApp();
     const concerns = useMemo(() => activeConcerns(content.extras), [content.extras]);
     const concern = concerns.find((c) => c.slug === slug);
     const items = useMemo(() => productsForConcern(products, concern, categories), [products, concern, categories]);
@@ -62,7 +62,7 @@ export default function ConcernPage() {
                 <div className="mt-6 flex flex-wrap justify-center gap-2">
                     {concerns.map((c) => <Link key={c.slug} to={`/concern/${c.slug}`} className="rounded-full border border-line-strong px-4 py-2 text-small font-medium text-ink hover:border-primary hover:text-primary">{c.label}</Link>)}
                 </div>
-                <Link to="/shop" className="mt-6 inline-block"><Button variant="outline">Browse all products</Button></Link>
+                <Button to="/shop" variant="outline" className="mt-6">Browse all products</Button>
             </div>
         );
     }
@@ -104,8 +104,8 @@ export default function ConcernPage() {
                         <h2 className="text-h3">New products are on the way</h2>
                         <p className="mt-2 text-muted">We are still adding formulations for {concern.label.toLowerCase()}. Ask us what suits you, or browse the full range.</p>
                         <div className="mt-5 flex flex-wrap justify-center gap-3">
-                            <a href={getWhatsAppUrl(`Hi! I am looking for something for ${concern.label}.`)} target="_blank" rel="noopener noreferrer"><Button variant="outline">Ask on WhatsApp</Button></a>
-                            <Link to="/shop"><Button>Browse all products</Button></Link>
+                            {whatsappOn && <Button href={getWhatsAppUrl(`Hi! I am looking for something for ${concern.label}.`)} target="_blank" rel="noopener noreferrer" variant="outline">Ask on WhatsApp</Button>}
+                            <Button to="/shop">Browse all products</Button>
                         </div>
                     </div>
                 )}

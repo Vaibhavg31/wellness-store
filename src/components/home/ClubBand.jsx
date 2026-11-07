@@ -48,7 +48,7 @@ export default function ClubBand({ products }) {
                     <div className="lg:col-span-12">
                         <p className="mb-3 text-small font-semibold uppercase tracking-[0.14em] text-accent">Usual price and Chikit Club price, side by side</p>
                         <ul className="-mx-4 flex snap-x scroll-pl-4 gap-3 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 xl:grid-cols-6">
-                            {examples.slice(0, 6).map((p, i) => (
+                            {examples.slice(0, 6).map((p) => (
                                 <li key={p.id} className="w-[10.5rem] shrink-0 snap-start sm:w-auto">
                                     <ClubPriceTile product={p} member={member} />
                                 </li>

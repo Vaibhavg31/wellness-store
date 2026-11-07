@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Mail, PackageCheck, Truck } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import VerifyAnimation from '@/components/ui/VerifyAnimation';
@@ -35,8 +34,8 @@ export default function OrderPlaced({ placed }) {
                 </ol>
 
                 <div className="flex flex-col justify-center gap-3 sm:flex-row">
-                    <Link to={`/orders/${placed.id}`}><Button>Track your order</Button></Link>
-                    <Link to="/shop"><Button variant="outline">Continue shopping</Button></Link>
+                    <Button to={`/orders/${placed.id}`}>Track your order</Button>
+                    <Button to="/shop" variant="outline">Continue shopping</Button>
                 </div>
             </div>
         </div>
