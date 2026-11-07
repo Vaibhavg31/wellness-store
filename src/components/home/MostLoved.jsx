@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
+import Skeleton from '@/components/ui/Skeleton';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useProducts, useTrendingProducts } from '@/hooks/useApi';
 
@@ -14,7 +15,7 @@ const inStock = (p) => !(typeof p.stock === 'number' && p.stock <= 0);
  */
 export default function MostLoved() {
     const { content } = useSiteContent();
-    const { products } = useProducts();
+    const { products, loading } = useProducts();
     const { products: pinned } = useTrendingProducts();
     const cfg = content.extras.bestSellers;
     const count = Math.min(8, Math.max(2, Number(cfg.count) || 4));
@@ -33,6 +34,9 @@ export default function MostLoved() {
         return chosen.filter((p) => !seen.has(p.id) && seen.add(p.id)).sort((a, b) => Number(inStock(b)) - Number(inStock(a))).slice(0, count);
     }, [products, pinned, cfg.mode, cfg.productIds, count]);
 
+    // While the products load, hold the shelf's place with card-shaped placeholders: otherwise the offers and the Club band
+    // below paint first and are then pushed down the screen when the products arrive (a large layout shift on phones).
+    if (loading) return <MostLovedPlaceholder title={cfg.title} subtitle={cfg.subtitle} count={count} />;
     if (picks.length < 2) return null;
 
     return (
@@ -46,6 +50,31 @@ export default function MostLoved() {
             </div>
             <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 lg:grid-cols-4 lg:gap-x-6">
                 {picks.map((product, i) => <ProductCard key={product.id} product={product} priority={i < 2} />)}
+            </div>
+        </section>
+    );
+}
+
+/** The shelf's frame with grey cards of the real cards' shape (picture, two lines of title, price, chip, button). */
+function MostLovedPlaceholder({ title, subtitle, count }) {
+    return (
+        <section aria-busy="true" aria-label={title} className="container-page py-10 lg:py-14">
+            <div className="mb-6 lg:mb-8">
+                <h2 aria-hidden="true">{title}</h2>
+                {subtitle && <p className="mt-2 text-body text-muted lg:text-lead">{subtitle}</p>}
+            </div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 lg:grid-cols-4 lg:gap-x-6">
+                {Array.from({ length: count }, (_, i) => (
+                    <div key={i} className="flex flex-col">
+                        <Skeleton className="aspect-[4/5] rounded-2xl" />
+                        <Skeleton className="mt-3 h-4 w-11/12" />
+                        <Skeleton className="mt-1.5 h-4 w-2/3" />
+                        <Skeleton className="mt-1.5 h-3 w-3/4" />
+                        <Skeleton className="mt-4 h-5 w-1/2" />
+                        <Skeleton className="mt-2 h-5 w-3/4 rounded-full" />
+                        <Skeleton className="mt-3 h-11 rounded-full" />
+                    </div>
+                ))}
             </div>
         </section>
     );

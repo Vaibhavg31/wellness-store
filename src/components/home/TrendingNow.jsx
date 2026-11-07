@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp } from 'lucide-react';
 import { useSiteContent } from '@/contexts/SiteContentContext';
+import Skeleton from '@/components/ui/Skeleton';
 import { useProducts } from '@/hooks/useApi';
 import { normalize, searchProducts } from '@/utils/searchProducts';
 
@@ -38,7 +39,7 @@ function suggestKeywords(products, limit = 10) {
 /** "Trending now": quick searches for what shoppers look for, shown right under the banner. */
 export default function TrendingNow() {
     const { content } = useSiteContent();
-    const { products } = useProducts();
+    const { products, loading } = useProducts();
     const { title, auto, keywords } = content.extras.trending;
 
     const chips = useMemo(() => {
@@ -46,7 +47,9 @@ export default function TrendingNow() {
         return auto ? suggestKeywords(products) : [];
     }, [keywords, auto, products]);
 
-    if (chips.length === 0) return null;
+    // Words built from the products: keep the row's height while they load, so nothing below jumps when they appear.
+    const waiting = loading && keywords.length === 0 && auto;
+    if (chips.length === 0 && !waiting) return null;
 
     return (
         <section aria-labelledby="trending-title" className="container-page py-6 lg:py-8">
@@ -54,8 +57,9 @@ export default function TrendingNow() {
                 <h2 id="trending-title" className="flex shrink-0 items-center gap-2 font-sans text-body font-semibold sm:text-lead">
                     <TrendingUp size={20} className="text-primary" aria-hidden="true" /> {title}
                 </h2>
-                <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-                    {chips.map((chip) => (
+                <ul aria-busy={waiting || undefined} className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                    {waiting && ['w-20', 'w-16', 'w-24', 'w-[4.5rem]', 'w-20', 'w-16'].map((width, i) => <li key={i} className="shrink-0"><Skeleton className={`h-11 rounded-full ${width}`} /></li>)}
+                    {!waiting && chips.map((chip) => (
                         <li key={chip.query} className="shrink-0">
                             <Link
                                 to={`/shop?search=${encodeURIComponent(chip.query)}`}
