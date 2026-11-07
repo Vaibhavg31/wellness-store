@@ -50,7 +50,7 @@ export default function MobileNav({ isOpen, onClose, links }) {
     const { mode, showAll } = content.extras.nav;
     const categoryMode = mode !== 'links';
     const { user, isAuthenticated } = useCustomerSession();
-    const { getWhatsAppUrl } = useWhatsApp();
+    const { available: whatsappOn, getWhatsAppUrl } = useWhatsApp();
     const { offers } = useOffers();
     const concerns = useMemo(() => activeConcerns(content.extras), [content.extras]);
     const ribbon = useMemo(() => Object.fromEntries(ribbonItems(content.extras).map((i) => [i.key, i.label])), [content.extras]);
@@ -70,7 +70,7 @@ export default function MobileNav({ isOpen, onClose, links }) {
                             {ribbon.new && <li><NavLink to="/new-launches" onClick={onClose} className={({ isActive }) => cn(row, 'flex items-center gap-2', isActive ? 'bg-primary-tint text-primary-deep' : 'text-ink hover:bg-primary-soft')}>{ribbon.new}</NavLink></li>}
                             {ribbon.offers && <li><NavLink to="/offers" onClick={onClose} className={({ isActive }) => cn(row, 'flex items-center justify-between', isActive ? 'bg-primary-tint text-primary-deep' : 'text-ink hover:bg-primary-soft')}>{ribbon.offers}{offers.length > 0 && <span className="rounded-full bg-primary-tint px-2.5 py-0.5 font-sans text-caption font-semibold text-primary-deep">{offers.length} live</span>}</NavLink></li>}
                             {ribbon.club && clubOn && <li><NavLink to="/club" onClick={onClose} className={({ isActive }) => cn(row, 'flex items-center gap-2', isActive ? 'bg-primary-tint text-primary-deep' : 'text-ink hover:bg-primary-soft')}><Crown size={20} className="text-accent-ink" aria-hidden="true" />{member ? 'My Chikit Club Card' : ribbon.club}</NavLink></li>}
-                            {ribbon.help && <li><a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" onClick={onClose} className={cn(row, 'flex items-center gap-2 text-ink hover:bg-primary-soft')}><WhatsAppIcon size={20} className="text-[#1FA855]" />{ribbon.help}</a></li>}
+                            {ribbon.help && whatsappOn && <li><a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" onClick={onClose} className={cn(row, 'flex items-center gap-2 text-ink hover:bg-primary-soft')}><WhatsAppIcon size={20} className="text-[#1FA855]" />{ribbon.help}</a></li>}
                         </ul>
                         {ribbon.concern && concerns.length > 0 && (
                             <>

@@ -33,7 +33,7 @@ function ContactRow({ icon: Icon, label, value, href }) {
 export default function ContactPage() {
     const { content } = useSiteContent();
     const { contact, social, contactPage } = content;
-    const { getWhatsAppUrl } = useWhatsApp();
+    const { available: whatsappOn, getWhatsAppUrl } = useWhatsApp();
     const instagramUrl = social.instagramUrl?.trim();
 
     const [form, setForm] = useState(EMPTY_FORM);
@@ -81,13 +81,13 @@ export default function ContactPage() {
 
                 <div className="order-first space-y-8 lg:order-none">
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <a href={getWhatsAppUrl('Hi! I would like to get in touch.')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-lg border border-line bg-surface p-5 transition-shadow hover:shadow-md">
+                        {whatsappOn && <a href={getWhatsAppUrl('Hi! I would like to get in touch.')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-lg border border-line bg-surface p-5 transition-shadow hover:shadow-md">
                             <span className="grid size-12 shrink-0 place-items-center rounded-full bg-[#25D366] text-white"><WhatsAppIcon size={26} /></span>
                             <span>
                                 <span className="block text-caption font-semibold uppercase tracking-wider text-success">WhatsApp · fastest</span>
                                 <span className="font-medium text-ink">{contact.whatsappDisplay}</span>
                             </span>
-                        </a>
+                        </a>}
                         {hasInstagramUrl(instagramUrl) && (
                             <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-lg border border-line bg-surface p-5 transition-shadow hover:shadow-md">
                                 <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-white"><InstagramIcon size={22} /></span>
@@ -100,7 +100,7 @@ export default function ContactPage() {
                     </div>
 
                     <ul className="space-y-6">
-                        <ContactRow icon={Phone} label="Phone / WhatsApp" value={contact.whatsappDisplay} href={getWhatsAppUrl()} />
+                        {whatsappOn && <ContactRow icon={Phone} label="Phone / WhatsApp" value={contact.whatsappDisplay} href={getWhatsAppUrl()} />}
                         <ContactRow icon={Mail} label="Email" value={contact.email} href={`mailto:${contact.email}`} />
                         <ContactRow icon={Clock} label="Hours" value={contact.businessHours} />
                     </ul>

@@ -5,12 +5,12 @@ import { useWhatsApp } from '@/hooks/useWhatsApp';
 /** Prefilled WhatsApp question about this product, plus the (admin-editable) health disclaimer. */
 export default function ExpertChat({ product }) {
     const { content } = useSiteContent();
-    const { getWhatsAppUrl } = useWhatsApp();
+    const { available: whatsappOn, getWhatsAppUrl } = useWhatsApp();
     const { expertChat, disclaimer } = content.extras;
 
     return (
         <>
-            {expertChat && (
+            {expertChat && whatsappOn && (
                 <a
                     href={getWhatsAppUrl(`Hi Chikit, I have a question about ${product.title}.`)}
                     target="_blank"

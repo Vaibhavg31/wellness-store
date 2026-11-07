@@ -70,7 +70,7 @@ export default function Footer() {
     const homeHasSignup = pathname === '/' && content.sections?.newsletter !== false;
     const { social, footer, contact } = content;
     const { categories } = useCategories();
-    const { getWhatsAppUrl } = useWhatsApp();
+    const { available: whatsappOn, getWhatsAppUrl } = useWhatsApp();
     const instagramUrl = social.instagramUrl?.trim();
     const known = new Set(['/', '/shop', ...COMPANY_LINKS.map((l) => l.href), ...HELP_LINKS.map((l) => l.href)]);
     const companyLinks = [...COMPANY_LINKS, ...(content.navLinks ?? []).filter((l) => !known.has(l.href) && !l.href.startsWith('/category'))];
@@ -96,11 +96,11 @@ export default function Footer() {
                                 </a>
                             </li>
                         )}
-                        <li>
+                        {whatsappOn && <li>
                             <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className={iconLink} aria-label="WhatsApp">
                                 <WhatsAppIcon size={18} />
                             </a>
-                        </li>
+                        </li>}
                         {contact?.email && (
                             <li>
                                 <a href={`mailto:${contact.email}`} className={iconLink} aria-label="Email us">

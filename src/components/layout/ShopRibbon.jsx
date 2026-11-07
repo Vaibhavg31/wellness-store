@@ -59,7 +59,7 @@ export function ConcernTile({ concern, onClick }) {
 export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) {
     const { content } = useSiteContent();
     const { user, isAuthenticated } = useCustomerSession();
-    const { getWhatsAppUrl } = useWhatsApp();
+    const { available: whatsappOn, getWhatsAppUrl } = useWhatsApp();
     const { offers } = useOffers();
     const mode = content.extras?.nav?.mode;
     const items = useMemo(() => ribbonItems(content.extras, { always: variant === 'desktop' ? ['new'] : [] }), [content.extras, variant]);
@@ -73,6 +73,7 @@ export default function ShopRibbon({ variant = 'desktop', openMenu, onToggle }) 
     const visible = items.filter((item) => {
         if (item.key === 'concern') return concerns.length > 0;
         if (item.key === 'club') return clubOn;
+        if (item.key === 'help') return whatsappOn;
         return true;
     });
 
