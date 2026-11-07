@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Check, Crown, Plus, ShoppingBag, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
+import { useSiteContent } from '@/contexts/SiteContentContext';
 import Price from '@/components/ui/Price';
 import { imageUrl } from '@/services/api';
 import { mixBoxPricing } from '@/utils/pricing';
@@ -99,11 +100,14 @@ export default function MixBox({ offer, products }) {
     const unlocked = full && !short;
     const saving = unlocked ? Math.max(0, worth - pay) : 0;
     // A guest whose Chikit Club prices would beat the box is told what joining would make this box cost.
+    // (Never while the Club is switched off in the admin: there is nothing to join.)
+    const { content } = useSiteContent();
+    const clubOpen = content.extras?.club?.enabled !== false;
     const clubOffer = useMemo(() => {
-        if (!full || isMember) return null;
+        if (!full || isMember || !clubOpen) return null;
         const member = mixBoxPricing(lists, members, offer.price, true);
         return member.byClub ? member.clubTotal : null;
-    }, [full, isMember, picked, offer.price]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [full, isMember, clubOpen, picked, offer.price]); // eslint-disable-line react-hooks/exhaustive-deps
     const pickedIds = useMemo(() => new Set(picked.map((p) => p.id)), [picked]);
 
     const toggle = (product) => {

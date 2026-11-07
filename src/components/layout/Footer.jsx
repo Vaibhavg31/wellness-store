@@ -73,7 +73,9 @@ export default function Footer() {
     const { available: whatsappOn, getWhatsAppUrl } = useWhatsApp();
     const instagramUrl = social.instagramUrl?.trim();
     const known = new Set(['/', '/shop', ...COMPANY_LINKS.map((l) => l.href), ...HELP_LINKS.map((l) => l.href)]);
-    const companyLinks = [...COMPANY_LINKS, ...(content.navLinks ?? []).filter((l) => !known.has(l.href) && !l.href.startsWith('/category'))];
+    // The Club link goes with the Club: when the admin switches the Club off, the footer stops pointing to it.
+    const clubOn = content.extras?.club?.enabled !== false;
+    const companyLinks = [...COMPANY_LINKS.filter((l) => clubOn || l.href !== '/club'), ...(content.navLinks ?? []).filter((l) => !known.has(l.href) && !l.href.startsWith('/category'))];
 
     const collections = (categories.length > 0
         ? categories.map((c) => ({ id: c.slug || c.id, label: c.label }))

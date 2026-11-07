@@ -5,6 +5,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useCustomerSession } from '@/hooks/useCustomerSession';
 import { loginUrl } from '@/utils/authRedirect';
 import { cn } from '@/utils/formatPrice';
+import { useSiteContent } from '@/contexts/SiteContentContext';
 
 const tab = 'relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors';
 
@@ -19,7 +20,10 @@ export default function MobileTabBar() {
     const { itemCount, openCartDrawer } = useCart();
     const { user, isAuthenticated } = useCustomerSession();
     const ref = useRef(null);
+    const { content } = useSiteContent();
     const member = Boolean(isAuthenticated && user?.club?.member);
+    // The raised Club crown is only there while the Club is open (Admin → Club); otherwise the bar has four tabs.
+    const clubOn = content.extras?.club?.enabled !== false;
     const hidden = pathname.startsWith('/checkout');
     const stacked = pathname.startsWith('/product/') || pathname.startsWith('/offers/');
 
@@ -42,10 +46,10 @@ export default function MobileTabBar() {
             <div className="flex items-end px-2">
                 <NavLink to="/" end className={active}><Home size={21} aria-hidden="true" />Home</NavLink>
                 <NavLink to="/shop" className={active}><LayoutGrid size={21} aria-hidden="true" />Shop</NavLink>
-                <Link to="/club" className={cn('relative flex flex-1 flex-col items-center gap-0.5 text-[11px] font-semibold text-primary-deep', stacked ? 'min-h-14 justify-center' : 'justify-end pb-1.5')} aria-label={member ? 'My Chikit Club card' : 'Join the Chikit Club'}>
+                {clubOn && <Link to="/club" className={cn('relative flex flex-1 flex-col items-center gap-0.5 text-[11px] font-semibold text-primary-deep', stacked ? 'min-h-14 justify-center' : 'justify-end pb-1.5')} aria-label={member ? 'My Chikit Club card' : 'Join the Chikit Club'}>
                     <span className={cn('grid place-items-center rounded-full bg-primary text-accent', stacked ? 'size-[21px]' : '-mt-6 size-12 shadow-lg ring-4 ring-surface')}><Crown size={stacked ? 13 : 22} aria-hidden="true" /></span>
                     Chikit Club
-                </Link>
+                </Link>}
                 <button type="button" onClick={openCartDrawer} className={cn(tab, 'text-muted')}>
                     <span className="relative"><ShoppingBag size={21} aria-hidden="true" />{itemCount > 0 && <span className="absolute -right-2.5 -top-1.5 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-4 text-white">{itemCount}</span>}</span>
                     Bag
