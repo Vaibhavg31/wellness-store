@@ -50,6 +50,8 @@ export function publicUser(user) {
         phone: user.phone ?? null,
         phoneVerified: Boolean(user.phoneVerified),
         emailVerified: isEmailVerified(user),
+        // Whether the account can sign in with a password (a Google-only account cannot until it sets one).
+        hasPassword: Boolean(user.passwordHash),
         addresses: user.addresses || [],
         lastUsedAddressId: user.lastUsedAddressId ?? null,
         dob: user.dob ?? null,
@@ -372,6 +374,40 @@ router.get('/auth/me', asyncRoute(async (req, res) => {
     if (!user) return sendError(res, 'User not found', 404);
     sendJson(res, publicUser(user));
 }, 'Failed to fetch account'));
+
+// ── My account: name and password ───────────────────────────────────────
+
+router.put('/auth/profile', asyncRoute(async (req, res) => {
+    const payload = await requireCustomer(req);
+    const body = req.body || {};
+    if (typeof body.name !== 'string') return sendError(res, 'Please enter your name', 400);
+    const name = body.name.trim().replace(/\s+/g, ' ');
+    if (!name) return sendError(res, 'Please enter your name', 400);
+    if (name.length > 100) return sendError(res, 'Your name must be 100 characters or fewer', 400);
+    const user = await repo.getById(String(payload.userId || ''));
+    if (!user) return sendError(res, 'User not found', 404);
+    const updated = (await repo.update(user.id, { name })) || { ...user, name };
+    sendJson(res, publicUser(updated));
+}, 'Failed to update your details'));
+
+router.post('/auth/change-password', asyncRoute(async (req, res) => {
+    const payload = await requireCustomer(req);
+    const body = req.body || {};
+    const current = typeof body.currentPassword === 'string' ? body.currentPassword : '';
+    const next = typeof body.newPassword === 'string' ? body.newPassword : '';
+    const confirm = typeof body.confirmPassword === 'string' ? body.confirmPassword : '';
+    const user = await repo.getById(String(payload.userId || ''));
+    if (!user) return sendError(res, 'User not found', 404);
+    if (!(await checkRateLimit(`pwchange-${user.id}`, 10, 900))) return sendError(res, 'Too many attempts. Try again in a few minutes.', 429);
+    // An account made with Google has no password yet: it may set one without a current password.
+    if (user.passwordHash && !bcrypt.compareSync(current, user.passwordHash)) return sendError(res, 'Your current password is not right', 400);
+    if (next.length < 8) return sendError(res, 'The new password must be at least 8 characters', 400);
+    if (next.length > 200) return sendError(res, 'The new password must be 200 characters or fewer', 400);
+    if (next !== confirm) return sendError(res, 'The new passwords do not match', 400);
+    if (user.passwordHash && bcrypt.compareSync(next, user.passwordHash)) return sendError(res, 'Choose a password different from your current one', 400);
+    await repo.update(user.id, { passwordHash: bcrypt.hashSync(next, 10) });
+    sendJson(res, { message: user.passwordHash ? 'Your password has been changed.' : 'Your password has been set. You can now also sign in with email.' });
+}, 'Failed to change your password'));
 
 // ── Google OAuth ─────────────────────────────────────────────────────────
 

@@ -15,6 +15,7 @@ import SignInPrompt from '@/components/auth/SignInPrompt';
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import OrderJourney from '@/components/orders/OrderJourney';
 import SavedAddresses from '@/components/account/SavedAddresses';
+import AccountDetails from '@/components/account/AccountDetails';
 import RestockReminders from '@/components/account/RestockReminders';
 import EmailVerificationBanner from '@/components/auth/EmailVerificationBanner';
 import { formatOrderDate, isTerminalStatus, shortOrderId } from '@/constants/orders';
@@ -110,6 +111,8 @@ export default function AccountPage() {
                         </ul>
                     )}
                 </section>
+
+                <AccountDetails />
 
                 <SavedAddresses />
             </div>
