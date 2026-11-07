@@ -36,6 +36,12 @@ router.get('/categories/admin/all', asyncRoute(async (req, res) => {
 router.get('/categories/:slug', asyncRoute(async (req, res) => {
     const cat = await repo.findBySlug(req.params.slug);
     if (!cat) return sendError(res, 'Category not found', 404);
+    // A category switched off in the admin is not shown to shoppers (its page says "not found"); an admin still sees it.
+    if (!cat.isPublished) {
+        let admin = false;
+        try { requireAdmin(req); admin = true; } catch { /* a shopper */ }
+        if (!admin) return sendError(res, 'Category not found', 404);
+    }
     sendJson(res, cat);
 }, 'Failed to fetch category'));
 
