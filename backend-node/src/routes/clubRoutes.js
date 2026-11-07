@@ -158,7 +158,7 @@ router.post('/club/join', asyncRoute(async (req, res) => {
     if (!GENDERS.includes(gender)) return sendError(res, 'Choose a gender (or "prefer not to say").', 400);
 
     const name = String(body.name || user.name || '').trim().slice(0, 120);
-    const address = normalizeAddress({ ...(body.address || {}), name: body.address?.name || name, phone: body.address?.phone || user.phone, label: 'Home' });
+    const address = normalizeAddress({ ...body.address, name: body.address?.name || name, phone: body.address?.phone || user.phone, label: 'Home' });
     const problems = validateAddress(address);
     if (Object.keys(problems).length > 0) return sendError(res, Object.values(problems).join(' '), 400);
 

@@ -16,6 +16,8 @@ const SiteContentContext = createContext({
 function retireCircle(value) {
     if (typeof value === 'string') {
         if (/^(join )?the chikit circle[.!]?$/i.test(value.trim())) return 'Stay in the loop';
+        // The offer tab's old line: "Join the Chikit circle and we will send your code right away."
+        if (/^join (the )?chikit circle and /i.test(value.trim())) return value.trim().replace(/^join (the )?chikit circle and /i, 'Leave your email and ');
         return value.replace(/(join )?(the )?chikit circle/gi, (_, join) => (join ? 'Join Chikit updates' : 'Chikit updates'));
     }
     if (Array.isArray(value)) return value.map(retireCircle);
