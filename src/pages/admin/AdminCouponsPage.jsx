@@ -337,7 +337,7 @@ export default function AdminCouponsPage() {
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                             rows={2}
                             className="w-full px-4 py-3 border border-line rounded-lg text-sm"
-                            placeholder="Shown to customers on cart page"
+                            placeholder="Shown to customers in the bag"
                         />
                     </div>
 
@@ -419,7 +419,7 @@ export default function AdminCouponsPage() {
                         )}
                         {form.audience === 'returning_customers' && form.autoApply && (
                             <p className="text-xs text-accent-ink mt-2 bg-accent/10 border border-accent/20 rounded-lg px-3 py-2">
-                                With auto-apply on, this appears by itself in the cart the moment a qualifying repeat customer signs in — no code to remember or share.
+                                With auto-apply on, this appears by itself in the bag the moment a qualifying repeat customer signs in — no code to remember or share.
                             </p>
                         )}
                     </div>

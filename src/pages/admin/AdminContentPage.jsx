@@ -1194,7 +1194,7 @@ export default function AdminContentPage() {
 
                             <AdminSection
                                 title="Delivery time promise"
-                                description="Shown on product pages, the cart and order pages as “Delivery by 12 Oct – 15 Oct”. Leave both at 0 to show no date promise."
+                                description="Shown on product pages, the bag and order pages as “Delivery by 12 Oct – 15 Oct”. Leave both at 0 to show no date promise."
                             >
                                 <div className="grid sm:grid-cols-2 gap-4">
                                     <AdminField label="Fastest (days)" hint="Days from order date.">
