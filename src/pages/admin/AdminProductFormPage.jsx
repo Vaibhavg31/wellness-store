@@ -206,7 +206,7 @@ export default function AdminProductFormPage() {
                     onlinePaymentEnabled: p.onlinePaymentEnabled !== false,
                 });
                 setOptional({
-                    tags: (p.tags?.length > 0) || p.isNew || p.isBestSeller,
+                    tags: (p.tags?.length > 0) || p.isNew || p.isBestSeller || p.isTrendingPinned,
                     badges: p.showTrustBadges !== false,
                     features: p.features?.some((f) => f.trim()),
                     ingredients: (p.ingredients?.length ?? 0) > 0,
@@ -487,13 +487,23 @@ export default function AdminProductFormPage() {
                 price,
                 originalPrice,
                 stock,
-                tags: form.tags.map((t) => normalizeTag(t)).filter(Boolean),
+                // A section switched off is saved as off: its content is cleared, so the storefront stops showing it and the
+                // section does not switch itself back on when the product is opened again.
+                tags: optional.tags ? form.tags.map((t) => normalizeTag(t)).filter(Boolean) : [],
+                isNew: optional.tags ? form.isNew : false,
+                isBestSeller: optional.tags ? form.isBestSeller : false,
+                isTrendingPinned: optional.tags ? form.isTrendingPinned : false,
                 badges: form.badges.map((b) => normalizeTag(b)).filter(Boolean),
-                features: form.features.filter((f) => f.trim()),
-                ingredients: form.ingredients.filter((i) => i.name.trim()),
-                howToUse: form.howToUse.filter((s) => s.trim()),
-                nutrition: { servingSize: form.nutrition.servingSize.trim(), rows: form.nutrition.rows.filter((r) => r.name.trim() && r.value.trim()) },
-                faqs: form.faqs.filter((f) => f.question.trim() && f.answer.trim()),
+                features: optional.features ? form.features.filter((f) => f.trim()) : [],
+                ingredients: optional.ingredients ? form.ingredients.filter((i) => i.name.trim()) : [],
+                howToUse: optional.howToUse ? form.howToUse.filter((s) => s.trim()) : [],
+                nutrition: optional.nutrition
+                    ? { servingSize: form.nutrition.servingSize.trim(), rows: form.nutrition.rows.filter((r) => r.name.trim() && r.value.trim()) }
+                    : { servingSize: '', rows: [] },
+                faqs: optional.faqs ? form.faqs.filter((f) => f.question.trim() && f.answer.trim()) : [],
+                // Payment section off = no product-specific restriction: both ways to pay follow the store settings.
+                codEnabled: optional.payment ? form.codEnabled : true,
+                onlinePaymentEnabled: optional.payment ? form.onlinePaymentEnabled : true,
                 concerns: form.concerns,
                 series: form.series ?? '',
                 videos: form.videos.filter((v) => v.url),
