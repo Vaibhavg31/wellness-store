@@ -3,6 +3,16 @@
      is what makes a phone zoom out and shifts fixed panels such as the bag drawer. touch-action stops double-tap zoom
      (pinch zoom still works). */
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: clip; touch-action: manipulation; }
+  /* #section links and keyboard focus stop below the sticky header (the header publishes its height), not under it. */
+  html { scroll-padding-top: calc(var(--header-offset, 4.5rem) + 0.75rem); }
+  /* A thin scrollbar in the brand's quiet tones on desktop; phones keep their own overlay scrollbar. */
+  @media (hover: hover) and (pointer: fine) {
+    html { scrollbar-width: thin; scrollbar-color: rgb(96 36 96 / 0.35) transparent; }
+    html::-webkit-scrollbar { width: 10px; height: 10px; }
+    html::-webkit-scrollbar-track { background: transparent; }
+    html::-webkit-scrollbar-thumb { background: rgb(96 36 96 / 0.3); border-radius: 999px; border: 2px solid var(--color-canvas); }
+    html::-webkit-scrollbar-thumb:hover { background: rgb(96 36 96 / 0.5); }
+  }
   body {
     overflow-x: clip;
     background: var(--color-canvas);

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { lockScroll, unlockScroll } from '@/utils/scrollLock';
 
 const FOCUSABLE = 'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])';
 
@@ -18,8 +19,7 @@ export function useDialog(isOpen, onClose) {
     useEffect(() => {
         if (!isOpen) return undefined;
         const opener = document.activeElement;
-        const previousOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
+        lockScroll();
 
         const panel = panelRef.current;
         const focusables = () => (panel ? [...panel.querySelectorAll(FOCUSABLE)] : []);
@@ -47,7 +47,7 @@ export function useDialog(isOpen, onClose) {
 
         return () => {
             document.removeEventListener('keydown', onKeyDown);
-            document.body.style.overflow = previousOverflow;
+            unlockScroll();
             opener?.focus?.();
         };
     }, [isOpen]);
