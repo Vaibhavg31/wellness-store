@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 
 function cloneData(data) {
     return JSON.parse(JSON.stringify(data));
@@ -16,6 +17,8 @@ export function useAdminDirtySave(data) {
 
     const hasChanges = data != null && baseline != null
         && JSON.stringify(data) !== JSON.stringify(baseline);
+    // Leaving with unsaved edits (a menu link, Back, refresh, closing the tab) asks first.
+    useUnsavedChangesWarning(hasChanges && !saving);
 
     const resetBaseline = useCallback((newData) => {
         if (newData != null) setBaseline(cloneData(newData));

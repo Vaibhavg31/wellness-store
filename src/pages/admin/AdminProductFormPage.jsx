@@ -37,6 +37,7 @@ import {
     SectionHeader,
 } from '@/components/admin/AdminFormUi';
 import { useSingleFlight } from '@/hooks/useSingleFlight';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 
 const TAG_OPTIONS = ['New', 'Sale', 'Limited', 'Best Seller', 'Combo Deal'];
 
@@ -140,6 +141,11 @@ export default function AdminProductFormPage() {
     const { adminToken } = useAdminAuth();
     const { content: siteContent } = useSiteContent();
     const [form, setForm] = useState(emptyProduct);
+    // What the form held when it opened (or was last saved), to know whether leaving would lose edits.
+    const [baseline, setBaseline] = useState(() => JSON.stringify(emptyProduct));
+    const [justSaved, setJustSaved] = useState(false);
+    const dirty = !justSaved && JSON.stringify(form) !== baseline;
+    useUnsavedChangesWarning(dirty);
     const [categories, setCategories] = useState([]);
     const [customTag, setCustomTag] = useState('');
     const [customBadge, setCustomBadge] = useState('');
@@ -158,7 +164,7 @@ export default function AdminProductFormPage() {
         api.get('/api/categories/admin/all', adminToken).then(setCategories).catch(() => setCategories([]));
         if (!isNew && id) {
             api.get(`/api/products/admin/${id}`, adminToken).then((p) => {
-                setForm({
+                const loaded = {
                     title: p.title,
                     price: p.price,
                     originalPrice: p.originalPrice,
@@ -204,7 +210,9 @@ export default function AdminProductFormPage() {
                     isPublished: p.isPublished,
                     codEnabled: p.codEnabled !== false,
                     onlinePaymentEnabled: p.onlinePaymentEnabled !== false,
-                });
+                };
+                setForm(loaded);
+                setBaseline(JSON.stringify(loaded));
                 setOptional({
                     tags: (p.tags?.length > 0) || p.isNew || p.isBestSeller || p.isTrendingPinned,
                     badges: p.showTrustBadges !== false,
@@ -524,6 +532,7 @@ export default function AdminProductFormPage() {
                 await api.put(`/api/products/${id}`, payload, adminToken);
             }
 
+            setJustSaved(true);
             navigate(`${ADMIN_PATH}/products`);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Save failed');
@@ -1250,7 +1259,7 @@ export default function AdminProductFormPage() {
                         type="button"
                         variant="outline"
                         className="normal-case tracking-normal"
-                        onClick={() => navigate(`${ADMIN_PATH}/products`)}
+                        onClick={() => { if (!dirty || window.confirm('Discard the changes you made to this product?')) navigate(`${ADMIN_PATH}/products`); }}
                     >
                         Cancel
                     </Button>

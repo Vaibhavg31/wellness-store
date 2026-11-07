@@ -7,6 +7,7 @@ import { SignOutTransitionProvider } from '@/contexts/SignOutTransitionContext';
 import { SiteContentProvider } from '@/contexts/SiteContentContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { loginUrl } from '@/utils/authRedirect';
+import '@/utils/leaveGuard'; // installs the Back-button guard for unsaved admin edits before the router starts listening
 import ScrollToTop from '@/components/layout/ScrollToTop';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import AnnouncementPopup from '@/components/layout/AnnouncementPopup';
