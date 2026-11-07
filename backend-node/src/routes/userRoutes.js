@@ -96,7 +96,7 @@ router.put('/users/addresses/:id/default', asyncRoute(async (req, res) => {
 // ── Admin ────────────────────────────────────────────────────────────────
 
 function sanitizeUser(user) {
-    const { passwordHash, ...rest } = user;
+    const { passwordHash: _passwordHash, ...rest } = user;
     return rest;
 }
 

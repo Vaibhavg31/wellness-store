@@ -20,7 +20,8 @@ const decodeLegacy = (text) => String(text ?? '').replace(/&(?:amp|lt|gt|quot|#0
 const withPlainText = (review) => ({ ...review, comment: decodeLegacy(review.comment) });
 
 function toPublic(review) {
-    const { userId, email, ...rest } = withPlainText(review);
+    // Who wrote it (account id and email) is private: shoppers only see the name, rating and words.
+    const { userId: _userId, email: _email, ...rest } = withPlainText(review);
     return rest;
 }
 

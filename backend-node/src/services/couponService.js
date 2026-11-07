@@ -208,7 +208,7 @@ export class CouponService {
      */
     async listableFor(coupon, userId) {
         const reason = await this.eligibilityError(coupon, 1e9, userId, 1e9);
-        return !reason || (!userId && /^Sign in/.test(reason));
+        return !reason || (!userId && reason.startsWith('Sign in'));
     }
 
     async audienceError(coupon, userId) {

@@ -171,7 +171,7 @@ export async function updateAccount(id, changes) {
     sets.push('updated_at = ?'); values.push(now());
     await getPool().query(`UPDATE admin_accounts SET ${sets.join(', ')} WHERE id = ?`, [...values, id]);
     await refreshAdminAccounts();
-    const { passwordHash, ...updated } = await findAccountById(id);
+    const { passwordHash: _passwordHash, ...updated } = await findAccountById(id);
     return updated;
 }
 

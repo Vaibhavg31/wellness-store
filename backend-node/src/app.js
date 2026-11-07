@@ -61,7 +61,7 @@ export function createApp() {
     }));
 
     // Static uploads — mirrors start.php's /uploads/* handling (content-addressed filenames, cache forever).
-    app.use('/uploads', (req, res, next) => {
+    app.use('/uploads', (req, res) => {
         const filePath = path.join(uploadsDirPath(), decodeURIComponent(req.path));
         if (!filePath.startsWith(uploadsDirPath())) return res.status(404).end(); // path traversal guard, not present in the PHP version but free to add
         if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) return res.status(404).end();

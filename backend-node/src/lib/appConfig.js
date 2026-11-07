@@ -1,4 +1,4 @@
-import { shouldSkipOtpVerify, usesProductionRateLimits } from './otpConfig.js';
+import { shouldSkipOtpVerify } from './otpConfig.js';
 // The FULL isEnabled() check (service toggle AND Brevo credentials configured) —
 // matches PHP's AppConfig.php, which calls EmailService::isEnabled(), not the
 // bare ServicesConfig::isEmailEnabled() toggle.

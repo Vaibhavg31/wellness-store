@@ -9,11 +9,11 @@ export class BaseRepository {
         throw new Error('tableName() not implemented');
     }
 
-    rowToArray(row) {
+    rowToArray(_row) {
         throw new Error('rowToArray() not implemented');
     }
 
-    arrayToRow(data) {
+    arrayToRow(_data) {
         throw new Error('arrayToRow() not implemented');
     }
 
