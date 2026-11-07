@@ -219,7 +219,7 @@ export default function BannerManager({ filterTarget, productId }) {
                                             </div>
                                         </td>
                                         <td className="p-3 align-top">
-                                            <button type="button" onClick={() => toggleEnabled(banner)}>
+                                            <button type="button" role="switch" aria-checked={banner.isEnabled} aria-label={banner.isEnabled ? `Hide banner ${banner.title || ""}`.trim() : `Show banner ${banner.title || ""}`.trim()} title={banner.isEnabled ? "Live on the store. Click to hide" : "Hidden. Click to show"} onClick={() => toggleEnabled(banner)}>
                                                 <AdminStatusPill tone={banner.isEnabled ? 'success' : 'muted'}>
                                                     {banner.isEnabled ? (<><Eye size={11} /> Live</>) : (<><EyeOff size={11} /> Hidden</>)}
                                                 </AdminStatusPill>

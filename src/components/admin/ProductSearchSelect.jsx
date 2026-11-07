@@ -119,6 +119,7 @@ export default function ProductSearchSelect({
                         }}
                         onFocus={() => setOpen(true)}
                         placeholder={placeholder}
+                        aria-label={placeholder || 'Search products'}
                         className={`${fieldClass} pl-8 pr-8`}
                     />
                     {query && (

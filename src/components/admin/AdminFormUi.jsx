@@ -1,9 +1,25 @@
+import { useEffect, useId, useRef } from 'react';
 export const fieldClass =
     'admin-control w-full text-sm text-ink px-3 py-2.5';
 
-export function FormLabel({ children, required }) {
+/**
+ * A field's label. It links itself to the field right after it (an input, select or textarea, or the first one inside the
+ * next element), so screen readers announce the field by its name and clicking the label focuses the field.
+ */
+export function FormLabel({ children, required, htmlFor }) {
+    const ref = useRef(null);
+    const autoId = useId();
+    useEffect(() => {
+        const label = ref.current;
+        if (!label || htmlFor) return;
+        const next = label.nextElementSibling;
+        const field = next && (next.matches('input,select,textarea') ? next : next.querySelector('input,select,textarea'));
+        if (!field) return;
+        if (!field.id) field.id = `field-${autoId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+        label.htmlFor = field.id;
+    });
     return (
-        <label className="text-xs font-semibold text-ink block mb-1.5">
+        <label ref={ref} htmlFor={htmlFor} className="text-xs font-semibold text-ink block mb-1.5">
             {children}
             {required && <span className="text-primary ml-0.5">*</span>}
         </label>
