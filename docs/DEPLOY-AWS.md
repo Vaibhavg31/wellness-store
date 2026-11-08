@@ -32,7 +32,7 @@ Runtime settings live in `s3://chikit-config-<account>/prod.env` (and a private 
 aws s3 cp ~/.chikit-aws/prod.env s3://chikit-config-<account>/prod.env
 ```
 
-Browser-visible `VITE_*` values (site URL, Razorpay key id, Google client id, MSG91 widget) are baked in at build time, so set them as GitHub repository variables with the same names.
+The Razorpay key id and Google client id reach the browser from the server at runtime (with the store settings), so `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` and `GOOGLE_CLIENT_ID` in `prod.env` plus a restart are all they need; see [PAYMENTS-AND-GOOGLE-SIGNIN.md](PAYMENTS-AND-GOOGLE-SIGNIN.md). Other browser-visible `VITE_*` values (site URL, MSG91 widget) are baked in at build time, so set them as GitHub repository variables with the same names.
 
 ## Good to know
 
