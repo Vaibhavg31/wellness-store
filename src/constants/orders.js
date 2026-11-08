@@ -151,7 +151,18 @@ export function isDirectOrder(order) {
     return order?.orderSource === 'direct';
 }
 
+/** Placed by a partner's system through the partner API (Admin → API & webhooks). */
+export function isApiOrder(order) {
+    return order?.orderSource === 'api';
+}
+
+/** Orders that did not come from the shop's own checkout get a small badge in the admin. */
+export function hasSourceBadge(order) {
+    return isDirectOrder(order) || isApiOrder(order);
+}
+
 export function orderSourceLabel(order) {
+    if (isApiOrder(order)) return `API · ${order.apiPartnerName || 'Partner'}${order.externalRef ? ` #${order.externalRef}` : ''}`;
     return isDirectOrder(order) ? 'Direct' : 'Website';
 }
 

@@ -75,6 +75,7 @@ const AdminBundlesPage = lazy(pageLoaders.AdminBundlesPage);
 const AdminOffersPage = lazy(pageLoaders.AdminOffersPage);
 const AdminClubPage = lazy(pageLoaders.AdminClubPage);
 const AdminAccessPage = lazy(pageLoaders.AdminAccessPage);
+const AdminIntegrationsPage = lazy(pageLoaders.AdminIntegrationsPage);
 
 const STOREFRONT_ROUTES = [
     { path: 'shop', Page: ShopPage },
@@ -129,6 +130,7 @@ const ADMIN_ROUTES = [
     { path: 'media', Page: AdminMediaPage },
     { path: 'settings', Page: AdminSettingsPage },
     { path: 'access', Page: AdminAccessPage },
+    { path: 'integrations', Page: AdminIntegrationsPage },
 ];
 
 // Private, transactional and admin routes are kept out of search results.

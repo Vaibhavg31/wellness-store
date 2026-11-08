@@ -47,7 +47,8 @@ import {
     getStatusLabel,
     isTerminalStatus,
     normalizeStatus,
-    isDirectOrder,
+    hasSourceBadge,
+    isApiOrder,
     orderSourceLabel,
     paymentLabel,
     shortOrderId,
@@ -161,7 +162,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-2">
                         <OrderStatusBadge status={order.status} />
-                        {isDirectOrder(order) && (
+                        {hasSourceBadge(order) && (
                             <span className="text-xs px-2 py-0.5 rounded-full bg-primary-tint text-primary-deep border border-primary/20">
                                 {orderSourceLabel(order)}
                             </span>
@@ -705,9 +706,9 @@ export default function AdminOrdersPage() {
                                             </td>
                                             <td className="p-4">
                                                 <p className="font-mono text-xs text-ink">{shortOrderId(order.id)}</p>
-                                                {isDirectOrder(order) && (
-                                                    <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-primary-tint text-primary-deep border border-primary/20">
-                                                        Direct
+                                                {hasSourceBadge(order) && (
+                                                    <span className="mt-1 inline-block max-w-[9rem] truncate rounded border border-primary/20 bg-primary-tint px-1.5 py-0.5 text-[10px] text-primary-deep" title={orderSourceLabel(order)}>
+                                                        {isApiOrder(order) ? `API · ${order.apiPartnerName || 'Partner'}` : 'Direct'}
                                                     </span>
                                                 )}
                                                 {order.trackingNumber && (
