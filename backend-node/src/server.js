@@ -31,6 +31,10 @@ try {
 const { startReviewRequests } = await import('./lib/reviewRequests.js');
 startReviewRequests();
 
+// Online orders left unpaid past their payment window are cancelled and their stock released (lib/onlinePayments.js).
+const { startUnpaidOrderSweep } = await import('./routes/orderRoutes.js');
+startUnpaidOrderSweep();
+
 const { createApp } = await import('./app.js');
 const app = createApp();
 

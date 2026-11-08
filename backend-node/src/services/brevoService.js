@@ -299,8 +299,22 @@ async function orderCancelledMail(order) {
     const shortId = shortOrderId(order.id);
     return {
         subject: `Order cancelled ${shortId} | ${await senderName()}`,
-        html: await orderBody(order, 'Your order was cancelled', 'This order has been cancelled. If you were charged online, any refund will be processed as per our policy.'),
+        html: await orderBody(order, 'Your order was cancelled', order.payment === 'razorpay' && order.paymentStatus === 'paid'
+            ? 'This order has been cancelled. Your online payment is refunded automatically to the same card, UPI or bank account; it usually shows up within 5 to 7 working days.'
+            : order.paymentStatus === 'paid'
+                ? 'This order has been cancelled. We will get in touch about returning your payment.'
+                : 'This order has been cancelled. Nothing was charged, and nothing will be sent.'),
         tags: ['order', 'order_cancelled'],
+    };
+}
+
+/** An online order whose payment never came through, cancelled when its payment window ended. */
+async function orderPaymentFailedMail(order) {
+    const shortId = shortOrderId(order.id);
+    return {
+        subject: `Payment not completed ${shortId} | ${await senderName()}`,
+        html: await orderBody(order, 'We did not receive your payment', 'The payment for this order did not go through in time, so the order has been cancelled and nothing will be sent. If any money left your account, it is refunded automatically to the same account within 5 to 7 working days. You can place the order again any time.'),
+        tags: ['order', 'order_payment_failed'],
     };
 }
 
@@ -318,6 +332,7 @@ async function buildOrderMail(order, event) {
         case 'shipped': return orderShippedMail(order);
         case 'delivered': return orderStatusMail(order, 'delivered', 'Delivered', 'Your order has been delivered. We hope you love it!');
         case 'cancelled': return orderCancelledMail(order);
+        case 'payment_failed': return orderPaymentFailedMail(order);
         default: return null;
     }
 }

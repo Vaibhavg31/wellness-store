@@ -25,6 +25,7 @@ import { recordPurchase } from '../lib/analytics.js';
 import { clubConfig, memberPriceFor } from '../lib/club.js';
 import { bogoUnitPrice, mixBoxPricing, round2 } from '../lib/pricing.js';
 import { CANCEL_REASONS, CANCELLABLE_STATUSES, RETURN_REASONS, RETURN_WINDOW_DAYS, reasonLabel } from '../lib/orderReasons.js';
+import { createPaymentFlow, isAwaitingPayment, paymentDeadline, paymentWindowMinutes } from '../lib/onlinePayments.js';
 
 const router = Router();
 const repo = new OrderRepository();
@@ -44,7 +45,7 @@ async function dispatchOrderEmail(order, event, prevStatus = null) {
         if (event === 'confirmed' && prevStatus !== null) {
             if (order.payment === 'razorpay' && order.paymentStatus === 'paid' && prevStatus === 'confirmed') return;
         }
-        const allowed = ['placed', 'confirmed', 'out_for_delivery', 'delivered', 'cancelled', 'packed', 'shipped'];
+        const allowed = ['placed', 'confirmed', 'out_for_delivery', 'delivered', 'cancelled', 'packed', 'shipped', 'payment_failed'];
         if (!allowed.includes(event)) return;
         await emailService.handleOrderEvent(order, event);
     } catch (err) {
@@ -66,7 +67,18 @@ function enrichOrder(order) {
         order.statusHistory = deriveStatusHistory(order);
     }
     if (order.paymentStatus === undefined && order.payment === 'cod') order.paymentStatus = 'cod';
+    if (isAwaitingPayment(order)) order.paymentDeadline = paymentDeadline(order).toISOString();
     return order;
+}
+
+/**
+ * What the customer sees of their own order: the shop's internal notes, the payment signature and the refund error text
+ * stay in the admin. (The admin notes used to be sent to the customer's browser with every order.)
+ */
+function customerView(order) {
+    if (!order) return order;
+    const { adminNotes, razorpaySignature, refundError, createdBy, ...rest } = enrichOrder(order); // eslint-disable-line no-unused-vars
+    return rest;
 }
 
 function buildStatusChange(order, status, note, by) {
@@ -152,6 +164,41 @@ async function restoreStockForOrder(order) {
     const items = order.items;
     if (!Array.isArray(items)) return;
     await restoreStockItems(items);
+}
+
+// Online payment lifecycle (confirm, retry, switch to cash, unpaid timeout, refunds, webhook): see lib/onlinePayments.js.
+const paymentFlow = createPaymentFlow({
+    statusChange: buildStatusChange,
+    restoreStock: restoreStockForOrder,
+    releaseCoupon: releaseCouponForOrder,
+    sendEmail: dispatchOrderEmail,
+    trackPurchase: (order, ids, userId) => trackPurchase(order, ids, userId),
+});
+
+/** Cancels orders left unpaid past their payment window (started once from server.js). */
+export const startUnpaidOrderSweep = () => paymentFlow.startSweep();
+export const sweepUnpaidOrders = () => paymentFlow.sweep();
+
+/** After an order paid online is cancelled or returned: send the money back through Razorpay. Never fails the request. */
+async function refundIfPaidOnline(order, reason, by) {
+    if (!order || order.payment !== 'razorpay' || order.paymentStatus !== 'paid' || order.refundStatus === 'refunded') return order;
+    try {
+        return await paymentFlow.refundOrder(order, { reason, by });
+    } catch (err) {
+        console.error(`[payments] automatic refund failed for ${order.id}: ${err.message}`);
+        return (await repo.getById(order.id)) || order;
+    }
+}
+
+/** The signed-in customer's own order, or a 404 (never tells whether someone else's order id exists). */
+async function ownOrder(req, res) {
+    const payload = await requireCustomer(req);
+    const order = await repo.getById(String(req.params.id || req.body?.orderId || ''));
+    if (!order || order.userId !== payload.userId) {
+        sendError(res, 'Order not found', 404);
+        return null;
+    }
+    return { payload, order };
 }
 
 function normalizePhone10(phone) {
@@ -393,7 +440,7 @@ async function trackPurchase(order, ids, userId) {
 router.get('/orders', asyncRoute(async (req, res) => {
     const payload = await requireCustomer(req);
     const orders = await repo.getByUserId(payload.userId);
-    sendJson(res, orders.map(enrichOrder));
+    sendJson(res, orders.map(customerView));
 }, 'Failed to fetch orders'));
 
 router.get('/orders/admin/all', asyncRoute(async (req, res) => {
@@ -506,10 +553,9 @@ router.get('/orders/admin/:id', asyncRoute(async (req, res) => {
 }, 'Failed to fetch order'));
 
 router.get('/orders/:id', asyncRoute(async (req, res) => {
-    const payload = await requireCustomer(req);
-    const order = await repo.getById(req.params.id);
-    if (!order || order.userId !== payload.userId) return sendError(res, 'Order not found', 404);
-    sendJson(res, enrichOrder(order));
+    const own = await ownOrder(req, res);
+    if (!own) return;
+    sendJson(res, customerView(own.order));
 }, 'Failed to fetch order'));
 
 router.put('/orders/:id/status', asyncRoute(async (req, res) => {
@@ -524,10 +570,24 @@ router.put('/orders/:id/status', asyncRoute(async (req, res) => {
     const prev = existing.status || '';
     const note = body.note !== undefined ? String(body.note).trim() : '';
 
+    // An online order that is still waiting for its payment can only be cancelled: confirming or shipping it would send
+    // goods that were never paid for. (Once paid it is confirmed on its own; or the customer switches it to cash on delivery.)
+    if (isAwaitingPayment(existing) && status !== 'cancelled' && status !== prev) {
+        return sendError(res, 'This order is still waiting for its online payment. It confirms itself once paid; you can only cancel it until then.', 400);
+    }
+    if (isAwaitingPayment(existing) && status === 'cancelled') {
+        const picked = reasonLabel(CANCEL_REASONS, String(body.reason || '')) || 'Cancelled by the shop';
+        const result = await paymentFlow.cancelUnpaid(existing, { by: 'admin', reason: picked, note: note || 'Cancelled by admin before payment' });
+        if (!result.cancelled && result.paid) return sendError(res, 'The customer has just paid for this order, so it was confirmed instead of cancelled. Cancel it again if you still need to (the money is then refunded).', 409);
+        return sendJson(res, enrichOrder(result.order));
+    }
+
     if (status === 'cancelled' && prev !== 'cancelled') {
         await restoreStockForOrder(existing);
         await releaseCouponForOrder(existing);
     } else if (prev === 'cancelled' && status !== 'cancelled') {
+        if (existing.payment === 'razorpay' && existing.paymentStatus !== 'paid') return sendError(res, 'This online order was never paid, so it cannot be reopened. Ask the customer to order again.', 400);
+        if (existing.payment === 'razorpay' && ['refunded', 'pending', 'processing'].includes(existing.refundStatus)) return sendError(res, 'This order\'s payment has been refunded, so it cannot be reopened.', 400);
         await reserveStockForReopenedOrder(existing);
     }
 
@@ -538,8 +598,10 @@ router.put('/orders/:id/status', asyncRoute(async (req, res) => {
         if (picked) changes.cancelReason = picked;
         if (note) changes.cancelNote = note.slice(0, 500);
     }
-    const updated = await repo.update(req.params.id, changes);
+    let updated = await repo.update(req.params.id, changes);
     if (updated && prev !== status) await dispatchOrderEmail(updated, status, prev);
+    // A paid online order that the shop cancels gets its money back straight away (body.refund: false to refund by hand).
+    if (updated && status === 'cancelled' && prev !== 'cancelled' && body.refund !== false) updated = await refundIfPaidOnline(updated, 'Order cancelled by the shop', 'admin');
 
     if (!updated) return sendError(res, 'Order not found', 404);
     sendJson(res, enrichOrder(updated));
@@ -580,10 +642,21 @@ router.post('/orders/admin/bulk-status', asyncRoute(async (req, res) => {
         if (!existing) continue;
 
         const prev = existing.status || '';
+        if (isAwaitingPayment(existing)) {
+            if (status !== 'cancelled') { skipped.push({ id, error: 'Still waiting for its online payment' }); continue; }
+            const result = await paymentFlow.cancelUnpaid(existing, { by: 'admin', reason: 'Cancelled by the shop', note: note || 'Bulk update' });
+            if (result.cancelled) updated.push(enrichOrder(result.order));
+            else skipped.push({ id, error: result.paid ? 'The customer has just paid; it was confirmed instead' : 'Could not cancel' });
+            continue;
+        }
         if (status === 'cancelled' && prev !== 'cancelled') {
             await restoreStockForOrder(existing);
             await releaseCouponForOrder(existing);
         } else if (prev === 'cancelled' && status !== 'cancelled') {
+            if (existing.payment === 'razorpay' && (existing.paymentStatus !== 'paid' || ['refunded', 'pending', 'processing'].includes(existing.refundStatus))) {
+                skipped.push({ id, error: 'An unpaid or refunded online order cannot be reopened' });
+                continue;
+            }
             try {
                 await reserveStockForReopenedOrder(existing);
             } catch (err) {
@@ -593,9 +666,11 @@ router.post('/orders/admin/bulk-status', asyncRoute(async (req, res) => {
         }
 
         const changes = buildStatusChange(existing, status, note || 'Bulk update', 'admin');
-        const result = await repo.update(id, changes);
+        if (status === 'cancelled' && prev !== 'cancelled') changes.cancelledBy = 'admin';
+        let result = await repo.update(id, changes);
         if (result) {
             if (prev !== status) await dispatchOrderEmail(result, status, prev);
+            if (status === 'cancelled' && prev !== 'cancelled') result = await refundIfPaidOnline(result, 'Order cancelled by the shop', 'admin');
             updated.push(enrichOrder(result));
         }
     }
@@ -612,10 +687,26 @@ router.post('/orders/admin/bulk-refund', asyncRoute(async (req, res) => {
     if (ids.length === 0) return sendError(res, 'ids array is required', 400);
 
     const updated = [];
+    const failed = [];
     for (const rawId of ids) {
         const id = String(rawId);
-        const existing = await repo.getById(id);
+        let existing = await repo.getById(id);
         if (!existing) continue;
+        if (existing.refundStatus === 'refunded') { updated.push(enrichOrder(existing)); continue; }
+        if (existing.payment === 'razorpay' && existing.paymentStatus !== 'paid') { failed.push({ id, error: 'This online order was never paid, so there is nothing to refund' }); continue; }
+
+        // Paid online: the money goes back through Razorpay; the order is then marked returned (unless already cancelled/returned).
+        if (existing.payment === 'razorpay') {
+            try {
+                existing = await paymentFlow.refundOrder(existing, { reason: note, by: 'admin' });
+            } catch (err) {
+                failed.push({ id, error: err.message });
+                continue;
+            }
+            if (!['cancelled', 'returned'].includes(existing.status || '')) existing = await repo.update(id, buildStatusChange(existing, 'returned', note, 'admin'));
+            updated.push(enrichOrder(existing));
+            continue;
+        }
 
         let changes = { refundStatus: 'refunded', refundedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
         const current = existing.status || '';
@@ -629,9 +720,37 @@ router.post('/orders/admin/bulk-refund', asyncRoute(async (req, res) => {
         if (result) updated.push(enrichOrder(result));
     }
 
-    sendJson(res, { updated: updated.length, orders: updated });
+    sendJson(res, { updated: updated.length, orders: updated, failed });
 }, 'Failed to process refunds'));
 
+/** Admin: refund one order paid online, through Razorpay (full amount). */
+router.post('/orders/admin/:id/refund', asyncRoute(async (req, res) => {
+    requireAdmin(req);
+    const order = await repo.getById(req.params.id);
+    if (!order) return sendError(res, 'Order not found', 404);
+    const reason = String(req.body?.note || 'Refund by the shop').trim().slice(0, 200) || 'Refund by the shop';
+    try {
+        sendJson(res, enrichOrder(await paymentFlow.refundOrder(order, { reason, by: 'admin' })));
+    } catch (err) {
+        sendError(res, err.message, 400);
+    }
+}, 'Failed to refund order'));
+
+/** Admin: ask Razorpay how an online order's payment stands right now (confirms it if the money did arrive). */
+router.post('/orders/admin/:id/check-payment', asyncRoute(async (req, res) => {
+    requireAdmin(req);
+    const order = await repo.getById(req.params.id);
+    if (!order) return sendError(res, 'Order not found', 404);
+    if (order.payment !== 'razorpay') return sendError(res, 'This order is not paid online', 400);
+    const result = await paymentFlow.reconcile(order);
+    sendJson(res, { state: result.state, error: result.error || null, order: enrichOrder(result.order || order) });
+}, 'Failed to check payment'));
+
+/**
+ * The checkout reports a successful payment. The signature proves it came from Razorpay for this order; the order is then
+ * confirmed once (the webhook may have done it already). If the order had stopped waiting (cancelled, or the hold ran out),
+ * the money is refunded automatically and the customer is told.
+ */
 router.post('/orders/verify-payment', asyncRoute(async (req, res) => {
     const payload = await requireCustomer(req);
     const body = req.body || {};
@@ -644,21 +763,27 @@ router.post('/orders/verify-payment', asyncRoute(async (req, res) => {
 
     const order = await repo.getById(orderId);
     if (!order || order.userId !== payload.userId) return sendError(res, 'Order not found', 404);
-    if (order.payment !== 'razorpay') return sendError(res, 'Order is not a Razorpay payment', 400);
-    if (order.paymentStatus === 'paid') return sendJson(res, enrichOrder(order));
+    if (!order.razorpayOrderId) return sendError(res, 'Order is not a Razorpay payment', 400);
     if (order.razorpayOrderId !== razorpayOrderId) return sendError(res, 'Razorpay order mismatch', 400);
     if (!razorpay.verifyPaymentSignature(razorpayOrderId, razorpayPaymentId, razorpaySignature)) return sendError(res, 'Invalid payment signature', 400);
 
-    const now = new Date().toISOString();
-    const prevStatus = order.status || 'placed';
-    const statusChanges = buildStatusChange(order, 'confirmed', 'Payment received', 'system');
-    const updated = await repo.update(orderId, { ...statusChanges, paymentStatus: 'paid', razorpayPaymentId, razorpaySignature, paidAt: now });
-
-    if (updated) await trackPurchase(updated, body.analytics, payload.userId);
-    if (updated) await dispatchOrderEmail(updated, 'confirmed', prevStatus);
-    sendJson(res, enrichOrder(updated));
+    const updated = await paymentFlow.markPaid(order, { paymentId: razorpayPaymentId, signature: razorpaySignature, analytics: body.analytics, userId: payload.userId, via: 'checkout' });
+    if (updated && (updated.status === 'cancelled' || updated.payment !== 'razorpay')) {
+        return sendJson(res, {
+            error: updated.payment !== 'razorpay'
+                ? 'This order was already switched to Cash on Delivery, so your online payment is being refunded. It reaches your account in 5 to 7 working days.'
+                : 'This order had already been cancelled, so your payment is being refunded. It reaches your account in 5 to 7 working days.',
+            code: 'PAYMENT_REFUNDED', order: customerView(updated),
+        }, 409);
+    }
+    sendJson(res, customerView(updated));
 }, 'Failed to verify payment'));
 
+/**
+ * Razorpay's server-to-server notice (Dashboard → Settings → Webhooks → https://<site>/api/webhooks/razorpay). Handles
+ * payment.authorized / payment.captured / order.paid (confirm), payment.failed (remember why), and refund.* (refund state).
+ * A 500 makes Razorpay send it again later, which is what we want when the database is briefly unavailable.
+ */
 router.post('/webhooks/razorpay', asyncRoute(async (req, res) => {
     const rawBody = req.rawBody ? req.rawBody.toString('utf8') : '';
     const signature = req.headers['x-razorpay-signature'] || '';
@@ -674,31 +799,84 @@ router.post('/webhooks/razorpay', asyncRoute(async (req, res) => {
     }
     if (!payload || typeof payload !== 'object') return sendError(res, 'Invalid payload', 400);
 
-    const event = payload.event || '';
-    if (!['payment.captured', 'order.paid'].includes(event)) return sendJson(res, { ok: true, ignored: event });
-
     try {
-        const paymentEntity = payload.payload?.payment?.entity || {};
-        const razorpayOrderId = String(paymentEntity.order_id || '');
-        const razorpayPaymentId = String(paymentEntity.id || '');
-
-        const order = await repo.findByRazorpayOrderId(razorpayOrderId);
-        if (!order) return sendJson(res, { ok: true, note: 'order not found' });
-        if (order.paymentStatus === 'paid') return sendJson(res, { ok: true, note: 'already reconciled' });
-
-        const now = new Date().toISOString();
-        const prevStatus = order.status || 'placed';
-        const statusChanges = buildStatusChange(order, 'confirmed', 'Payment confirmed via webhook', 'system');
-        const updated = await repo.update(String(order.id), {
-            ...statusChanges, paymentStatus: 'paid', razorpayPaymentId: razorpayPaymentId || order.razorpayPaymentId || '', paidAt: now,
-        });
-
-        if (updated) await dispatchOrderEmail(updated, 'confirmed', prevStatus);
-        sendJson(res, { ok: true });
-    } catch {
+        const note = await paymentFlow.handleWebhook(String(payload.event || ''), payload);
+        sendJson(res, { ok: true, note });
+    } catch (err) {
+        console.error('[payments] webhook failed:', err.message);
         sendError(res, 'Failed to process webhook', 500);
     }
 }, 'Failed to process webhook'));
+
+// ── Paying for an order that is waiting for its online payment ─────────
+
+/** Try again: reopens Razorpay for the same order (same amount, same Razorpay order, so it can never be paid twice over). */
+router.post('/orders/:id/pay', asyncRoute(async (req, res) => {
+    const own = await ownOrder(req, res);
+    if (!own) return;
+    let { order } = own;
+    if (!(await checkRateLimit(`pay-${order.id}`, 20, 900))) return sendError(res, 'Too many payment attempts. Please wait a few minutes.', 429);
+    if (order.paymentStatus === 'paid' && order.status !== 'cancelled') return sendJson(res, { paid: true, order: customerView(order) });
+    if (!isAwaitingPayment(order)) return sendError(res, order.status === 'cancelled' ? 'This order was cancelled, so it can no longer be paid. Please place it again from your bag.' : 'This order is not waiting for an online payment.', 400);
+    if (!razorpay.isRazorpayConfigured()) return sendError(res, 'Online payment is temporarily unavailable. You can switch this order to Cash on Delivery.', 503);
+
+    // Money may already be on its way (a UPI app finishing late): check before opening a second payment.
+    const check = await paymentFlow.reconcile(order);
+    if (check.state === 'paid') return sendJson(res, { paid: true, order: customerView(check.order) });
+    order = check.order || order;
+    if (paymentDeadline(order).getTime() <= Date.now()) {
+        const closed = await paymentFlow.cancelUnpaid(order, { by: 'system', reason: 'Payment not completed', email: 'payment_failed', note: `No payment within ${paymentWindowMinutes()} minutes, so the order was cancelled and its items released.` });
+        if (closed.paid) return sendJson(res, { paid: true, order: customerView(closed.order) });
+        return sendError(res, 'The time to pay for this order has run out, so it was cancelled and its items released. Please place it again from your bag.', 410);
+    }
+    order = await repo.update(order.id, { paymentAttempts: (order.paymentAttempts || 1) + 1, updatedAt: new Date().toISOString() });
+    sendJson(res, {
+        paid: false,
+        order: customerView(order),
+        razorpay: { keyId: razorpay.publicKeyId(), orderId: order.razorpayOrderId, amount: order.razorpayAmount ?? Math.round(order.total * 100), currency: 'INR' },
+    });
+}, 'Failed to start the payment'));
+
+/** The Razorpay window reported a failed try. The order keeps waiting; the reason is shown on the order page and in the admin. */
+router.post('/orders/:id/payment-failed', asyncRoute(async (req, res) => {
+    const own = await ownOrder(req, res);
+    if (!own) return;
+    const err = req.body?.error && typeof req.body.error === 'object' ? req.body.error : {};
+    const paymentId = String(err.metadata?.payment_id || req.body?.paymentId || '').slice(0, 100) || null;
+    const updated = await paymentFlow.recordFailure(own.order, { description: String(err.description || '').slice(0, 250), reason: String(err.reason || '').slice(0, 100) }, paymentId);
+    sendJson(res, customerView(updated));
+}, 'Failed to record the payment'));
+
+/** After the Razorpay window closes without a success: ask Razorpay whether the money arrived anyway. */
+router.post('/orders/:id/check-payment', asyncRoute(async (req, res) => {
+    const own = await ownOrder(req, res);
+    if (!own) return;
+    if (!(await checkRateLimit(`paycheck-${own.order.id}`, 30, 600))) return sendError(res, 'Please wait a moment and try again.', 429);
+    const result = await paymentFlow.reconcile(own.order);
+    sendJson(res, { state: result.state, order: customerView(result.order || own.order) });
+}, 'Failed to check the payment'));
+
+/** Pay on delivery instead: an unpaid online order becomes a Cash on Delivery order (when the shop and every item allow it). */
+router.post('/orders/:id/pay-on-delivery', asyncRoute(async (req, res) => {
+    const own = await ownOrder(req, res);
+    if (!own) return;
+    const check = await paymentFlow.reconcile(own.order);
+    if (check.state === 'paid') return sendJson(res, customerView(check.order));
+    const order = check.order || own.order;
+    if (!isAwaitingPayment(order)) return sendError(res, order.status === 'cancelled' ? 'This order was cancelled, so it can no longer be changed.' : 'This order is not waiting for an online payment.', 400);
+    await validatePaymentMethod('cod', order.items || []);
+
+    const now = new Date().toISOString();
+    const won = await repo.updateIf(order.id, { payment: 'razorpay', paymentStatus: 'pending', status: 'placed' }, { payment: 'cod', paymentStatus: 'cod', updatedAt: now });
+    if (!won) return sendJson(res, customerView(await repo.getById(order.id)));
+    const updated = await repo.update(order.id, {
+        paymentError: null,
+        statusHistory: [...(order.statusHistory ?? []), { status: 'payment_changed', at: now, by: 'customer', note: 'Switched to Cash on Delivery' }],
+    });
+    await trackPurchase(updated, req.body?.analytics, own.payload.userId);
+    await dispatchOrderEmail(updated, 'placed');
+    sendJson(res, customerView(updated));
+}, 'Failed to switch to Cash on Delivery'));
 
 // ── Guest order tracking ────────────────────────────────────────────────
 // Public lookup for customers who ordered without signing in (or lost access): they must supply the order id
@@ -770,16 +948,30 @@ router.post('/orders/:id/cancel', asyncRoute(async (req, res) => {
     if (!CANCELLABLE_STATUSES.includes(order.status)) return sendError(res, 'This order has already been shipped, so it can no longer be cancelled. You can ask for a return after it is delivered.', 400);
     const { label, note } = readReason(req.body, CANCEL_REASONS);
 
+    // Not paid yet: Razorpay is asked first (a late payment confirms the order instead), then stock and coupon go back.
+    if (isAwaitingPayment(order)) {
+        const result = await paymentFlow.cancelUnpaid(order, { by: 'customer', reason: label, note: `Cancelled by the customer: ${label}${note ? ` (${note})` : ''}` });
+        if (!result.cancelled && result.paid) return sendError(res, 'Your payment for this order has just come through, so it is confirmed. You can still cancel it from this page; the money is then refunded.', 409);
+        if (result.cancelled && note) await repo.update(order.id, { cancelNote: note });
+        return sendJson(res, customerView(await repo.getById(order.id)));
+    }
+
+    // One cancel only: two taps (or two tabs) at the same moment must not put the stock back twice.
+    const now = new Date().toISOString();
+    if (!(await repo.updateIf(order.id, { status: order.status }, { status: 'cancelled', cancelledAt: now, updatedAt: now }))) {
+        return sendError(res, 'This order was just updated. Please refresh the page.', 409);
+    }
     await restoreStockForOrder(order);
     await releaseCouponForOrder(order);
     const changes = buildStatusChange(order, 'cancelled', `Cancelled by the customer: ${label}${note ? ` (${note})` : ''}`, 'customer');
     changes.cancelReason = label;
     changes.cancelNote = note || null;
     changes.cancelledBy = 'customer';
-    if (order.payment === 'razorpay' && order.paymentStatus === 'paid' && !order.refundStatus) changes.refundStatus = 'pending';
-    const updated = await repo.update(order.id, changes);
+    let updated = await repo.update(order.id, changes);
     if (updated) await dispatchOrderEmail(updated, 'cancelled', order.status);
-    sendJson(res, enrichOrder(updated));
+    // Paid online: the refund goes back to the same card / UPI / bank account, automatically.
+    updated = await refundIfPaidOnline(updated, `Cancelled by the customer: ${label}`, 'customer');
+    sendJson(res, customerView(updated));
 }, 'Failed to cancel order'));
 
 /** A customer asks to return a delivered order (within the return window). The shop then approves or declines it in Admin. */
@@ -800,7 +992,7 @@ router.post('/orders/:id/return', asyncRoute(async (req, res) => {
     const updated = await repo.update(order.id, {
         returnStatus: 'requested', returnReason: label, returnNote: note || null, returnRequestedAt: now, statusHistory: history, updatedAt: now,
     });
-    sendJson(res, enrichOrder(updated));
+    sendJson(res, customerView(updated));
 }, 'Failed to request return'));
 
 /** Admin answers a return request: approve, decline (with a reason for the customer), or mark the parcel received (the order becomes Returned). */
@@ -821,7 +1013,9 @@ router.put('/orders/:id/return', asyncRoute(async (req, res) => {
     if (next === 'received') {
         Object.assign(changes, buildStatusChange({ ...existing, statusHistory: history }, 'returned', note || 'Return received', 'admin'));
     }
-    const updated = await repo.update(existing.id, changes);
+    let updated = await repo.update(existing.id, changes);
+    // The returned parcel is in: an online payment is refunded straight away (cash orders are refunded by the shop as before).
+    if (next === 'received') updated = await refundIfPaidOnline(updated, 'Return received', 'admin');
     sendJson(res, enrichOrder(updated));
 }, 'Failed to update return'));
 
@@ -834,15 +1028,11 @@ router.post('/orders/cancel-pending', asyncRoute(async (req, res) => {
     if (!order || order.userId !== payload.userId) return sendError(res, 'Order not found', 404);
     if (order.payment !== 'razorpay') return sendError(res, 'Only pending online payments can be cancelled this way', 400);
     if (order.paymentStatus === 'paid') return sendError(res, 'Payment already completed', 400);
-    if (order.status === 'cancelled') return sendJson(res, enrichOrder(order));
+    if (order.status === 'cancelled') return sendJson(res, customerView(order));
 
-    await restoreStockForOrder(order);
-    await releaseCouponForOrder(order);
-    const statusChanges = buildStatusChange(order, 'cancelled', 'Payment cancelled', 'customer');
-    const updated = await repo.update(orderId, { ...statusChanges, paymentStatus: 'failed', cancelledAt: new Date().toISOString() });
-
-    if (updated) await dispatchOrderEmail(updated, 'cancelled');
-    sendJson(res, enrichOrder(updated));
+    const result = await paymentFlow.cancelUnpaid(order, { by: 'customer', reason: 'Payment not completed', note: 'Cancelled by the customer before paying' });
+    if (!result.cancelled && result.paid) return sendJson(res, { error: 'Your payment has just come through, so this order is confirmed.', code: 'ALREADY_PAID', order: customerView(result.order) }, 409);
+    sendJson(res, customerView(result.order));
 }, 'Failed to cancel order'));
 
 router.post('/orders', asyncRoute(async (req, res) => {
@@ -936,10 +1126,14 @@ router.post('/orders', asyncRoute(async (req, res) => {
             const rp = await razorpay.createRazorpayOrder(amountPaise, orderId, { order_id: orderId, email: payload.email || '' });
             order.razorpayOrderId = rp.id;
             order.razorpayAmount = rp.amount;
+            // The order (and its stock) is held this long for the payment; after that it is cancelled (lib/onlinePayments.js).
+            order.paymentExpiresAt = new Date(Date.now() + paymentWindowMinutes() * 60000).toISOString();
+            order.paymentAttempts = 1;
         } catch (err) {
             await restoreStockItems(items);
             if (couponRecord) await couponService.releaseUsage(String(couponRecord.id));
-            return sendError(res, err.message, 502);
+            console.error(`[payments] could not start a Razorpay order for ${orderId}: ${err.message}`);
+            return sendError(res, 'We could not start the online payment just now. Please try again, or choose Cash on Delivery.', 502);
         }
     }
 
@@ -965,8 +1159,8 @@ router.post('/orders', asyncRoute(async (req, res) => {
 
     if (payment !== 'razorpay') await dispatchOrderEmail(created, 'placed');
 
-    const response = enrichOrder(created);
-    if (payment === 'razorpay') response.razorpayKeyId = razorpay.isRazorpayConfigured() ? (process.env.RAZORPAY_KEY_ID || '').trim() : '';
+    const response = customerView(created);
+    if (payment === 'razorpay') response.razorpayKeyId = razorpay.publicKeyId();
 
     sendJson(res, response, 201);
 }, 'Failed to create order'));

@@ -41,6 +41,13 @@ export class OrderRepository extends BaseRepository {
             adminNotes: row.admin_notes,
             refundStatus: row.refund_status,
             refundedAt: this.toIso(row.refunded_at),
+            refundAmount: this.floatOrNull(row.refund_amount),
+            razorpayRefundId: row.razorpay_refund_id ?? null,
+            refundError: row.refund_error ?? null,
+            paymentExpiresAt: this.toIso(row.payment_expires_at),
+            paymentAttempts: Number(row.payment_attempts || 0),
+            paymentError: row.payment_error ?? null,
+            paymentMethod: row.payment_method ?? null,
             paidAt: this.toIso(row.paid_at),
             cancelledAt: this.toIso(row.cancelled_at),
             cancelReason: row.cancel_reason ?? null,
@@ -121,6 +128,13 @@ export class OrderRepository extends BaseRepository {
             adminNotes: { col: 'admin_notes', type: 'string' },
             refundStatus: { col: 'refund_status', type: 'string' },
             refundedAt: { col: 'refunded_at', type: 'datetime' },
+            refundAmount: { col: 'refund_amount', type: 'float' },
+            razorpayRefundId: { col: 'razorpay_refund_id', type: 'nullableString' },
+            refundError: { col: 'refund_error', type: 'nullableString' },
+            paymentExpiresAt: { col: 'payment_expires_at', type: 'datetime' },
+            paymentAttempts: { col: 'payment_attempts', type: 'int' },
+            paymentError: { col: 'payment_error', type: 'nullableString' },
+            paymentMethod: { col: 'payment_method', type: 'nullableString' },
             paidAt: { col: 'paid_at', type: 'datetime' },
             cancelledAt: { col: 'cancelled_at', type: 'datetime' },
             cancelReason: { col: 'cancel_reason', type: 'nullableString' },
@@ -283,6 +297,54 @@ export class OrderRepository extends BaseRepository {
         if (!razorpayOrderId) return null;
         const [rows] = await this.pool().query('SELECT * FROM orders WHERE razorpay_order_id = ? LIMIT 1', [razorpayOrderId]);
         return rows[0] ? this.rowToArray(rows[0]) : null;
+    }
+
+    /**
+     * Compare-and-set on the orders row: applies `changes` only while every `where` field still has the given value (an array
+     * means "one of"). Returns true when this call made the change, so when a payment confirmation, a webhook and the unpaid-order
+     * sweep race each other exactly one of them wins.
+     */
+    async updateIf(id, where, changes) {
+        const row = this.arrayToRow(changes);
+        const sets = Object.keys(row);
+        if (sets.length === 0) return false;
+        const conds = [];
+        const condParams = [];
+        for (const [key, value] of Object.entries(where)) {
+            const values = Array.isArray(value) ? value : [value];
+            const [col] = Object.keys(this.arrayToRow({ [key]: 'x' }));
+            if (!col) throw new Error(`updateIf: unknown field ${key}`);
+            const given = values.filter((v) => v !== null);
+            const parts = [];
+            if (given.length) parts.push(`\`${col}\` IN (${given.map(() => '?').join(', ')})`);
+            if (given.length < values.length) parts.push(`\`${col}\` IS NULL`); // null in the list means "not set yet"
+            conds.push(parts.length === 1 ? parts[0] : `(${parts.join(' OR ')})`);
+            condParams.push(...given);
+        }
+        const [result] = await this.pool().query(
+            `UPDATE orders SET ${sets.map((c) => `\`${c}\` = ?`).join(', ')} WHERE id = ?${conds.map((c) => ` AND ${c}`).join('')}`,
+            [...sets.map((c) => row[c]), id, ...condParams],
+        );
+        return result.affectedRows === 1;
+    }
+
+    async findByRazorpayPaymentId(paymentId) {
+        if (!paymentId) return null;
+        const [rows] = await this.pool().query('SELECT * FROM orders WHERE razorpay_payment_id = ? LIMIT 1', [paymentId]);
+        return rows[0] ? this.rowToArray(rows[0]) : null;
+    }
+
+    /** Website orders still waiting for an online payment whose hold has run out (oldest first). */
+    async listExpiredAwaitingPayment(limit = 50) {
+        const now = new Date().toISOString().slice(0, 23).replace('T', ' ');
+        const [rows] = await this.pool().query(
+            `SELECT * FROM orders
+              WHERE payment = 'razorpay' AND payment_status = 'pending' AND status = 'placed'
+                AND COALESCE(payment_expires_at, created_at + INTERVAL 30 MINUTE) <= ?
+              ORDER BY created_at ASC LIMIT ${Number(limit) || 50}`,
+            [now],
+        );
+        return this.mapRowsBatched(rows);
     }
 
     async getByUserId(userId) {

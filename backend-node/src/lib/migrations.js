@@ -122,6 +122,17 @@ const COLUMNS = [
     ['orders', 'return_note', 'VARCHAR(500) NULL'],
     ['orders', 'return_requested_at', 'DATETIME(6) NULL'],
     ['orders', 'return_resolved_at', 'DATETIME(6) NULL'],
+    // Online payments (lib/onlinePayments.js): how long an unpaid order is held, the tries so far and why the last one failed,
+    // how it was paid (UPI, card…), and the Razorpay refund behind refund_status.
+    ['orders', 'payment_expires_at', 'DATETIME(6) NULL'],
+    ['orders', 'payment_attempts', 'INT NOT NULL DEFAULT 0'],
+    ['orders', 'payment_error', 'VARCHAR(255) NULL'],
+    ['orders', 'payment_method', 'VARCHAR(30) NULL'],
+    ['orders', 'razorpay_refund_id', 'VARCHAR(100) NULL'],
+    ['orders', 'refund_amount', 'DECIMAL(10,2) NULL'],
+    ['orders', 'refund_error', 'VARCHAR(255) NULL'],
+    // The Google account behind a "Sign in with Google" (its stable id, which never changes even if the email does).
+    ['users', 'google_id', 'VARCHAR(255) NULL'],
 ];
 
 async function hasTable(pool, table) {
@@ -157,5 +168,12 @@ export async function ensureSchema() {
     for (const [table, column, definition] of COLUMNS) await addColumn(pool, table, column, definition);
     if (!(await hasIndex(pool, 'users', 'uq_users_club_card_no'))) {
         await pool.query('ALTER TABLE users ADD UNIQUE KEY uq_users_club_card_no (club_card_no)');
+    }
+    // The unpaid-order sweep looks orders up by payment state every minute.
+    if (!(await hasIndex(pool, 'orders', 'idx_orders_payment_state'))) {
+        await pool.query('ALTER TABLE orders ADD KEY idx_orders_payment_state (payment, payment_status, status)');
+    }
+    if (!(await hasIndex(pool, 'orders', 'idx_orders_razorpay_order'))) {
+        await pool.query('ALTER TABLE orders ADD KEY idx_orders_razorpay_order (razorpay_order_id)');
     }
 }
