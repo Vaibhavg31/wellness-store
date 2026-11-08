@@ -47,9 +47,13 @@ import {
     getStatusLabel,
     isTerminalStatus,
     normalizeStatus,
+    displayStatus,
     isDirectOrder,
+    isAwaitingPayment,
     orderSourceLabel,
+    paymentDeadline,
     paymentLabel,
+    refundLabel,
     shortOrderId,
 } from '@/constants/orders';
 import { printOrderStickers } from '@/utils/printOrderStickers';
@@ -108,6 +112,74 @@ function CustomerSummary({ order }) {
     );
 }
 
+/** Online payment details of one order, with "Check with Razorpay" and "Refund through Razorpay" where they apply. */
+function OnlinePaymentCard({ order, adminToken, onUpdated }) {
+    const [busy, setBusy] = useState('');
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+    if (order.payment !== 'razorpay' && !order.razorpayOrderId) return null;
+
+    const awaiting = isAwaitingPayment(order);
+    const paid = order.payment === 'razorpay' && order.paymentStatus === 'paid';
+    const refund = refundLabel(order);
+    const canRefund = paid && ['cancelled', 'returned'].includes(normalizeStatus(order.status)) && (!order.refundStatus || order.refundStatus === 'failed' || (order.refundStatus === 'pending' && !order.razorpayRefundId));
+
+    const act = async (what, fn) => {
+        setBusy(what);
+        setError('');
+        setMessage('');
+        try {
+            await fn();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Something went wrong');
+        } finally {
+            setBusy('');
+        }
+    };
+    const check = () => act('check', async () => {
+        const res = await api.post(`/api/orders/admin/${order.id}/check-payment`, {}, adminToken);
+        setMessage({ paid: 'Razorpay has the payment: the order is now paid and confirmed.', pending: 'Razorpay has no successful payment for this order yet.', refunded: 'The payment arrived after the order was closed, so it was refunded.', unknown: `Razorpay could not be asked right now${res.error ? ` (${res.error})` : ''}.` }[res.state] || '');
+        await onUpdated();
+    });
+    const sendRefund = () => act('refund', async () => {
+        if (!window.confirm(`Refund ${formatPrice(order.total)} to the customer through Razorpay?`)) return;
+        await api.post(`/api/orders/admin/${order.id}/refund`, { note: 'Refund by the shop' }, adminToken);
+        setMessage('Refund sent to Razorpay.');
+        await onUpdated();
+    });
+
+    const row = (label, value) => value ? (
+        <div className="flex justify-between gap-3"><dt className="text-admin-muted">{label}</dt><dd className="min-w-0 break-all text-right text-ink">{value}</dd></div>
+    ) : null;
+
+    return (
+        <SectionCard title="Online payment">
+            {awaiting && (
+                <p className="mb-3 rounded-md bg-warning-tint px-2.5 py-1.5 text-xs text-warning">
+                    Waiting for the customer to pay, until {formatOrderDate(paymentDeadline(order).toISOString())}. It confirms itself once paid, and is cancelled (stock released) if not.
+                </p>
+            )}
+            <dl className="space-y-1.5 text-sm">
+                {row('Status', paymentLabel(order))}
+                {row('Paid at', order.paidAt ? formatOrderDate(order.paidAt) : '')}
+                {row('Tries', order.paymentAttempts > 1 ? String(order.paymentAttempts) : '')}
+                {row('Last failed try', order.paymentError || '')}
+                {row('Razorpay order', order.razorpayOrderId || '')}
+                {row('Razorpay payment', order.razorpayPaymentId || '')}
+                {row('Refund', refund ? `${refund}${order.refundAmount ? ` · ${formatPrice(order.refundAmount)}` : ''}` : '')}
+                {row('Refund id', order.razorpayRefundId || '')}
+                {row('Refund problem', order.refundError || '')}
+            </dl>
+            <div className="mt-3 flex flex-wrap gap-2">
+                {!paid && <Button size="sm" variant="outline" disabled={Boolean(busy)} onClick={check} className="normal-case tracking-normal text-xs gap-1.5"><RefreshCw size={13} /> {busy === 'check' ? 'Checking…' : 'Check with Razorpay'}</Button>}
+                {canRefund && <Button size="sm" disabled={Boolean(busy)} onClick={sendRefund} className="normal-case tracking-normal text-xs gap-1.5"><RotateCcw size={13} /> {busy === 'refund' ? 'Refunding…' : `Refund ${formatPrice(order.total)} through Razorpay`}</Button>}
+            </div>
+            {message && <p className="mt-2 text-xs text-admin-muted" role="status">{message}</p>}
+            {error && <p className="mt-2 rounded-md bg-danger-tint px-2.5 py-1.5 text-xs text-danger" role="alert">{error}</p>}
+        </SectionCard>
+    );
+}
+
 function OrderDetailPanel({ order, adminToken, onUpdated }) {
     const [updating, setUpdating] = useState(false);
     const [cancelOpen, setCancelOpen] = useState(false);
@@ -160,7 +232,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
             <div className="rounded-xl border border-admin-border bg-canvas-alt p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-2">
-                        <OrderStatusBadge status={order.status} />
+                        <OrderStatusBadge status={displayStatus(order)} />
                         {isDirectOrder(order) && (
                             <span className="text-xs px-2 py-0.5 rounded-full bg-primary-tint text-primary-deep border border-primary/20">
                                 {orderSourceLabel(order)}
@@ -184,7 +256,7 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
 
             {!isTerminalStatus(order.status) && (
                 <div className="grid grid-cols-2 gap-2.5">
-                    {nextStatus ? (
+                    {nextStatus && !isAwaitingPayment(order) ? (
                         <Button
                             variant="turmeric"
                             size="sm"
@@ -236,10 +308,12 @@ function OrderDetailPanel({ order, adminToken, onUpdated }) {
                     {order.cancelNote && <p className="text-sm text-admin-muted mt-1">“{order.cancelNote}”</p>}
                     <p className="text-xs text-admin-muted mt-2">Cancelled by {order.cancelledBy === 'customer' ? 'the customer' : 'admin'}{order.cancelledAt ? ` · ${formatOrderDate(order.cancelledAt)}` : ''}</p>
                     {order.payment === 'razorpay' && order.paymentStatus === 'paid' && order.refundStatus !== 'refunded' && (
-                        <p className="mt-2 rounded-md bg-warning-tint px-2.5 py-1.5 text-xs text-warning">Paid online: refund pending. Use Refund in the orders list once it is sent.</p>
+                        <p className="mt-2 rounded-md bg-warning-tint px-2.5 py-1.5 text-xs text-warning">Paid online: {refundLabel(order) ? `${refundLabel(order).toLowerCase()}.` : 'not refunded yet. Use the refund button under Online payment.'}</p>
                     )}
                 </SectionCard>
             )}
+
+            <OnlinePaymentCard order={order} adminToken={adminToken} onUpdated={onUpdated} />
 
             {order.returnStatus && (
                 <SectionCard title={`Return · ${RETURN_STATUS_LABELS[order.returnStatus] ?? order.returnStatus}`}>
@@ -476,13 +550,14 @@ export default function AdminOrdersPage() {
         if (!adminToken || selected.size === 0 || !status) return;
         setBulkLoading(true);
         try {
-            await api.post('/api/orders/admin/bulk-status', {
+            const res = await api.post('/api/orders/admin/bulk-status', {
                 ids: [...selected],
                 status,
                 note: `Bulk ${getStatusLabel(status)}`,
             }, adminToken);
             setBulkStatus('');
             await fetchOrders(filters, { silent: true });
+            if (res?.skipped?.length) setError(`${res.skipped.length} order(s) were left as they were: ${res.skipped.slice(0, 3).map((s) => `${shortOrderId(s.id)} (${s.error})`).join('; ')}${res.skipped.length > 3 ? '…' : ''}`);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Bulk update failed');
         } finally {
@@ -495,8 +570,9 @@ export default function AdminOrdersPage() {
         if (!confirm(`Refund ${selected.size} order(s)?`)) return;
         setBulkLoading(true);
         try {
-            await api.post('/api/orders/admin/bulk-refund', { ids: [...selected] }, adminToken);
+            const res = await api.post('/api/orders/admin/bulk-refund', { ids: [...selected] }, adminToken);
             await fetchOrders(filters, { silent: true });
+            if (res?.failed?.length) setError(`${res.failed.length} order(s) could not be refunded: ${res.failed.slice(0, 3).map((f) => `${shortOrderId(f.id)} (${f.error})`).join('; ')}${res.failed.length > 3 ? '…' : ''}`);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Refund failed');
         } finally {
@@ -729,7 +805,7 @@ export default function AdminOrdersPage() {
                                             <td className="p-4 font-medium text-ink whitespace-nowrap">{formatPrice(order.total)}</td>
                                             <td className="p-4 text-xs text-admin-muted whitespace-nowrap">{paymentLabel(order)}</td>
                                             <td className="p-4">
-                                                <OrderStatusBadge status={order.status} />
+                                                <OrderStatusBadge status={displayStatus(order)} />
                                                 {order.returnStatus && <p className="mt-1 text-[11px] font-medium text-warning">{RETURN_STATUS_LABELS[order.returnStatus]}</p>}
                                                 {(order.cancelReason || order.returnReason) && <p className="mt-1 max-w-[11rem] text-[11px] leading-snug text-admin-muted">{order.returnStatus ? order.returnReason : order.cancelReason}</p>}
                                             </td>
@@ -738,7 +814,7 @@ export default function AdminOrdersPage() {
                                             </td>
                                             <td className="p-4" onClick={(e) => e.stopPropagation()}>
                                                 <div className="flex items-center justify-end gap-1.5">
-                                                    {getNextStatus(order.status) && !isTerminalStatus(order.status) ? (
+                                                    {getNextStatus(order.status) && !isTerminalStatus(order.status) && !isAwaitingPayment(order) ? (
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
