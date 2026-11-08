@@ -33,6 +33,9 @@ export const STATUS_COLORS = {
     returned: 'bg-warning-tint text-warning border-warning/30',
     packed: 'bg-primary-tint text-primary-deep border-primary/20',
     shipped: 'bg-primary-tint text-primary-deep border-primary/20',
+    awaiting_payment: 'bg-warning-tint text-warning border-warning/30',
+    payment_failed: 'bg-danger-tint text-danger border-danger/30',
+    refund_started: 'bg-warning-tint text-warning border-warning/30',
 };
 
 export const STATUS_LABELS = Object.fromEntries(
@@ -50,10 +53,18 @@ export function normalizeStatus(status) {
 /** Where a customer's return request stands (orders.return_status). */
 export const RETURN_STATUS_LABELS = { requested: 'Return requested', approved: 'Return approved', rejected: 'Return declined', received: 'Return received' };
 
+/** Payment events written into an order's history (see backend lib/onlinePayments.js). */
+export const PAYMENT_EVENT_LABELS = { payment_failed: 'Payment failed', payment_changed: 'Payment method changed', refund_started: 'Refund started', awaiting_payment: 'Awaiting payment' };
+
+/** The badge status of an order: an online order that is not paid yet shows "Awaiting payment" instead of "Placed". */
+export function displayStatus(order) {
+    return isAwaitingPayment(order) ? 'awaiting_payment' : order?.status;
+}
+
 export function getStatusLabel(status, audience = 'admin') {
     const normalized = normalizeStatus(status);
     const found = ORDER_STATUSES.find((s) => s.value === normalized);
-    if (!found) return RETURN_STATUS_LABELS[String(status).replace(/^return_/, '')] ?? status;
+    if (!found) return PAYMENT_EVENT_LABELS[status] ?? RETURN_STATUS_LABELS[String(status).replace(/^return_/, '')] ?? status;
     return audience === 'user' ? found.userLabel : found.adminLabel;
 }
 
@@ -109,24 +120,46 @@ export function canAdvanceStatus(status) {
     return getNextStatus(status) !== null;
 }
 
+const METHOD_LABELS = { upi: 'UPI', card: 'Card', netbanking: 'Net banking', wallet: 'Wallet', emi: 'EMI', paylater: 'Pay later' };
+
+/** An online order that is placed but not paid yet: the customer can still pay, switch to cash on delivery, or cancel. */
+export function isAwaitingPayment(order) {
+    return order?.payment === 'razorpay' && order?.paymentStatus === 'pending' && order?.status === 'placed';
+}
+
+/** When the payment window of an unpaid online order ends (the server sends paymentDeadline; older orders: 30 minutes). */
+export function paymentDeadline(order) {
+    const at = order?.paymentDeadline || order?.paymentExpiresAt;
+    return at ? new Date(at) : new Date(new Date(order?.createdAt || Date.now()).getTime() + 30 * 60000);
+}
+
+/** Where a refund stands, in words, or '' when there is none. */
+export function refundLabel(order) {
+    switch (order?.refundStatus) {
+        case 'refunded': return 'Refunded';
+        case 'pending': case 'processing': return 'Refund in progress';
+        case 'failed': return 'Refund failed';
+        default: return '';
+    }
+}
+
 export function paymentLabel(order) {
+    const refund = refundLabel(order);
     if (order.payment === 'offline') {
-        if (order.refundStatus === 'refunded') return 'Paid Offline · Refunded';
-        return 'Paid Offline';
+        return refund ? `Paid Offline · ${refund}` : 'Paid Offline';
     }
     if (order.payment === 'pending') {
-        if (order.refundStatus === 'refunded') return 'Payment Pending · Refunded';
-        return 'Payment Pending';
+        return refund ? `Payment Pending · ${refund}` : 'Payment Pending';
     }
     if (order.payment === 'razorpay') {
         const ps = order.paymentStatus || 'pending';
-        if (order.refundStatus === 'refunded') return 'Refunded';
-        if (ps === 'paid') return 'Paid Online';
-        if (ps === 'failed') return 'Payment Failed';
-        return 'Payment Pending';
+        const method = METHOD_LABELS[order.paymentMethod] ? ` · ${METHOD_LABELS[order.paymentMethod]}` : '';
+        if (refund) return `Paid Online · ${refund}`;
+        if (ps === 'paid') return `Paid Online${method}`;
+        if (ps === 'failed') return 'Payment not completed';
+        return 'Waiting for payment';
     }
-    if (order.refundStatus === 'refunded') return 'COD · Refunded';
-    return 'Cash on Delivery';
+    return refund ? `COD · ${refund}` : 'Cash on Delivery';
 }
 
 export function formatOrderDate(iso, options = {}) {

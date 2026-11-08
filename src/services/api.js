@@ -17,8 +17,17 @@ class ApiError extends Error {
         this.status = status;
         this.code = extra.code;
         this.email = extra.email;
+        this.order = extra.order; // e.g. the order as it now stands, sent with a 409 from the payment routes
     }
 }
+
+// Developers get the "start the server" hint; shoppers on the live site get plain words.
+const OFFLINE_MESSAGE = import.meta.env.DEV
+    ? 'Cannot reach the API server. Stop the app and run: npm run dev'
+    : 'We could not connect. Please check your internet connection and try again.';
+const GATEWAY_MESSAGE = import.meta.env.DEV
+    ? 'API server is not running. Stop the app (Ctrl+C) and run: npm run dev'
+    : 'Something went wrong on our side. Please try again in a moment.';
 
 /**
  * In-flight GET requests keyed by `${path}::${token}`, so simultaneous callers
@@ -39,10 +48,7 @@ async function doFetch(path, options, token) {
     try {
         res = await fetch(`${API_BASE}${path}`, { ...options, headers });
     } catch {
-        throw new ApiError(
-            'Cannot reach the API server. Stop the app and run: npm run dev',
-            0,
-        );
+        throw new ApiError(OFFLINE_MESSAGE, 0);
     }
     if (!res.ok) {
         const body = await res.json().catch(() => ({ error: res.statusText }));
@@ -54,10 +60,7 @@ async function doFetch(path, options, token) {
             (res.status === 502 || message === 'Bad Gateway')
             && (!body.error || body.error === 'Bad Gateway' || body.error === res.statusText);
         if (isGenericGatewayError) {
-            throw new ApiError(
-                'API server is not running. Stop the app (Ctrl+C) and run: npm run dev',
-                502,
-            );
+            throw new ApiError(GATEWAY_MESSAGE, 502);
         }
         throw new ApiError(message, res.status, body);
     }
@@ -90,10 +93,7 @@ async function download(path, token, filename) {
     try {
         res = await fetch(`${API_BASE}${path}`, { headers });
     } catch {
-        throw new ApiError(
-            'Cannot reach the API server. Stop the app and run: npm run dev',
-            0,
-        );
+        throw new ApiError(OFFLINE_MESSAGE, 0);
     }
     if (!res.ok) {
         const body = await res.json().catch(() => ({ error: res.statusText }));

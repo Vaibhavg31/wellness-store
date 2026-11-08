@@ -18,7 +18,8 @@ import { useWhatsApp } from '@/hooks/useWhatsApp';
 import { useCart } from '@/contexts/CartContext';
 import { useProducts } from '@/hooks/useApi';
 import { reorderItems, reorderSummaryMessage } from '@/utils/reorder';
-import { RETURN_STATUS_LABELS, formatOrderDate, isTerminalStatus, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
+import { RETURN_STATUS_LABELS, displayStatus, formatOrderDate, isAwaitingPayment, isTerminalStatus, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
+import PaymentDue from '@/components/checkout/PaymentDue';
 import { useToast } from '@/contexts/ToastContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { deliveryWindow } from '@/utils/delivery';
@@ -83,8 +84,18 @@ export default function OrderDetailPage() {
     const shipping = order.shipping || {};
     const eta = !isTerminalStatus(order.status) ? deliveryWindow(content.extras.delivery, new Date(order.createdAt)) : null;
     const status = normalizeStatus(order.status);
-    // Cancel until the parcel ships; ask for a return after delivery, within the return window.
-    const canCancel = ['placed', 'confirmed'].includes(status) || order.status === 'packed';
+    const awaitingPayment = isAwaitingPayment(order);
+    const productById = new Map((products || []).map((p) => [p.id, p]));
+    const codAllowed = content.payments?.codEnabled !== false && (order.items || []).every((i) => productById.get(i.productId)?.codEnabled !== false);
+    // Cancel until the parcel ships (an unpaid order is cancelled from its payment card); a return after delivery, within the window.
+    const canCancel = !awaitingPayment && (['placed', 'confirmed'].includes(status) || order.status === 'packed');
+    const paidOnline = order.payment === 'razorpay' && order.paymentStatus === 'paid';
+    const refundText = {
+        refunded: `Your refund${order.refundAmount ? ` of ${formatPrice(order.refundAmount)}` : ''} has been sent to your original payment method.${order.refundedAt ? ` (${formatOrderDate(order.refundedAt, { time: false })})` : ''} Banks usually show it within 5 to 7 working days.`,
+        pending: 'Your refund is on its way to your original payment method. It usually shows up within 5 to 7 working days.',
+        processing: 'Your refund is on its way to your original payment method. It usually shows up within 5 to 7 working days.',
+        failed: 'We are sorting out your refund and will contact you shortly.',
+    }[order.refundStatus] || (paidOnline && ['cancelled', 'returned'].includes(status) ? 'Your refund is being processed. It reaches your original payment method in 5 to 7 working days.' : '');
     const windowDays = rules?.returnWindowDays ?? 7;
     const deliveredEntry = [...(order.statusHistory || [])].reverse().find((h) => normalizeStatus(h.status) === 'delivered');
     const deliveredOn = new Date(deliveredEntry?.at || order.updatedAt || order.createdAt).getTime();
@@ -114,13 +125,26 @@ export default function OrderDetailPage() {
                         </div>
                         <p className="mt-1 text-small text-muted">{formatOrderDate(order.createdAt)}</p>
                     </div>
-                    <OrderStatusBadge status={order.status} audience="user" className="px-3 py-1 text-small" />
+                    <OrderStatusBadge status={displayStatus(order)} audience="user" className="px-3 py-1 text-small" />
                 </div>
 
-                {eta && (
+                {eta && !awaitingPayment && (
                     <p className="mb-4 flex items-center gap-2 rounded-lg bg-primary-soft px-4 py-3 text-small text-ink">
                         <Truck size={16} className="shrink-0 text-primary" aria-hidden="true" /> Expected delivery: <strong>{eta}</strong>
                     </p>
+                )}
+
+                {awaitingPayment && (
+                    <div className="mb-8">
+                        <PaymentDue
+                            order={order}
+                            token={token}
+                            codAllowed={codAllowed}
+                            onPaid={(o) => { setOrder(o); showToast(o.payment === 'cod' ? 'Your order is confirmed: pay when it arrives' : 'Payment received. Your order is confirmed', 'success'); }}
+                            onChanged={setOrder}
+                            onCancelled={(o) => { setOrder(o); showToast('Order cancelled', 'success'); }}
+                        />
+                    </div>
                 )}
 
                 <div className="mb-8"><OrderJourney order={order} /></div>
@@ -128,12 +152,20 @@ export default function OrderDetailPage() {
                 {status === 'cancelled' && (order.cancelReason || order.cancelledBy) && (
                     <section className={`${card} mb-8`} aria-labelledby="order-cancelled">
                         <h2 id="order-cancelled" className="mb-2 flex items-center gap-2 font-sans text-h4"><XCircle size={18} className="text-danger" aria-hidden="true" /> Cancelled</h2>
-                        <p className="text-small text-muted">{order.cancelledBy === 'customer' ? 'You cancelled this order.' : 'This order was cancelled by Chikit.'}{order.cancelReason ? <> Reason: <strong className="text-ink">{order.cancelReason}</strong>.</> : null}</p>
+                        <p className="text-small text-muted">
+                            {order.payment === 'razorpay' && order.paymentStatus === 'failed'
+                                ? ({ customer: 'You cancelled this order before paying.', admin: 'This order was cancelled by Chikit before it was paid.' }[order.cancelledBy] || 'The payment for this order did not come through in time, so it was cancelled and nothing will be sent.')
+                                : order.cancelledBy === 'customer' ? 'You cancelled this order.' : 'This order was cancelled by Chikit.'}
+                            {order.cancelReason && !(order.paymentStatus === 'failed' && order.cancelReason === 'Payment not completed') ? <> Reason: <strong className="text-ink">{order.cancelReason}</strong>.</> : null}
+                        </p>
                         {order.cancelNote && <p className="mt-1 text-small text-muted">“{order.cancelNote}”</p>}
-                        {order.payment === 'razorpay' && order.paymentStatus === 'paid' && (
-                            <p className="mt-3 rounded-lg bg-primary-soft px-3 py-2 text-small text-ink">{order.refundStatus === 'refunded' ? 'Your refund has been processed.' : 'Your refund is being processed. It reaches your original payment method in 5 to 7 working days.'}</p>
-                        )}
+                        {order.payment === 'razorpay' && order.paymentStatus === 'failed' && <p className="mt-3 text-small text-muted">If any money left your account for this order, it is refunded automatically to the same account within 5 to 7 working days.</p>}
+                        {refundText && <p className="mt-3 rounded-lg bg-primary-soft px-3 py-2 text-small text-ink">{refundText}</p>}
                     </section>
+                )}
+
+                {status !== 'cancelled' && refundText && (
+                    <p className="mb-8 rounded-lg bg-primary-soft px-4 py-3 text-small text-ink" role="status">{refundText}</p>
                 )}
 
                 {order.returnStatus && (

@@ -6,7 +6,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { formatPrice } from '@/utils/formatPrice';
 import { imageUrl, api, ApiError } from '@/services/api';
-import { openRazorpayCheckout } from '@/utils/razorpay';
+import { payForOrder } from '@/utils/razorpay';
+import { useIntegrations } from '@/hooks/useIntegrations';
+import { isAwaitingPayment, paymentDeadline, shortOrderId } from '@/constants/orders';
+import PaymentDue from '@/components/checkout/PaymentDue';
 import { getAnalyticsIds, trackEvent } from '@/utils/analytics';
 import { isValidPincode } from '@/utils/pincodeLookup';
 import { validateDeliveryAddress } from '@/utils/validateAddress';
@@ -31,9 +34,6 @@ import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
 
 const OTP_FLOW_KEY = 'chikit-checkout-otp-flow';
 const MAX_SAVED_ADDRESSES = 3;
-
-const razorpayKey = String(import.meta.env.VITE_RAZORPAY_KEY_ID || '');
-const RAZORPAY_ENABLED = razorpayKey.startsWith('rzp_') && !razorpayKey.includes('xxxx');
 
 function normalizePhone(value) {
     return normalizeCheckoutPhone(value);
@@ -66,12 +66,13 @@ export default function CheckoutPage() {
     const { items, total, couponCode, clearCart } = useCart();
     const { user, token, isAuthenticated, updateUser, logout } = useAuth();
     const { content } = useSiteContent();
+    const { razorpayKeyId, razorpayReady: RAZORPAY_ENABLED } = useIntegrations();
 
     const razorpayAvailable = useMemo(() => {
         const globalOnline = content.payments?.onlinePaymentEnabled !== false;
         const cartAllowsOnline = items.every((i) => i.product.onlinePaymentEnabled !== false);
         return RAZORPAY_ENABLED && globalOnline && cartAllowsOnline;
-    }, [content.payments, items]);
+    }, [content.payments, items, RAZORPAY_ENABLED]);
 
     const codAvailable = useMemo(() => {
         const globalCod = content.payments?.codEnabled !== false;
@@ -86,14 +87,31 @@ export default function CheckoutPage() {
 
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [placed, setPlaced] = useState(null);
+    // An online order whose payment did not complete: { order, message }. The form makes way for "try again / pay on delivery".
+    const [pendingPay, setPendingPay] = useState(null);
+    // An unpaid online order from earlier (another tab, or before a refresh) that can still be paid.
+    const [resumable, setResumable] = useState(null);
 
     // The success view below renders in place (no route change), so the
     // pathname-based ScrollToTop never fires — without this, the customer
     // stays scrolled wherever they were on the form (often the footer) and
     // never sees the confirmation.
     useEffect(() => {
-        if (placed) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    }, [placed]);
+        if (placed || pendingPay) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, [placed, pendingPay]);
+
+    useEffect(() => {
+        if (!token) return undefined;
+        let cancelled = false;
+        api.get('/api/orders', token)
+            .then((list) => {
+                if (cancelled || !Array.isArray(list)) return;
+                const open = list.find((o) => isAwaitingPayment(o) && paymentDeadline(o).getTime() > Date.now());
+                setResumable(open || null);
+            })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, [token]);
     // Funnel: a visitor with items who opens checkout (a guest sees the sign-in step first), then reaches the details form.
     const hasItems = items.length > 0;
     const funnelSent = useRef({ start: false, form: false });
@@ -364,48 +382,47 @@ export default function CheckoutPage() {
         };
 
         if (form.payment === 'razorpay') {
-            const key = order.razorpayKeyId || import.meta.env.VITE_RAZORPAY_KEY_ID;
-            try {
-                const payment = await openRazorpayCheckout({
-                    key,
-                    orderId: order.razorpayOrderId,
-                    amount: order.razorpayAmount ?? Math.round(order.total * 100),
-                    customerName: form.name,
-                    email: form.email,
-                    phone: normalizePhone(form.phone),
-                    description: `Order ${order.id}`,
-                });
-
-                const verified = await api.post('/api/orders/verify-payment', {
-                    orderId: order.id,
-                    razorpayOrderId: payment.razorpay_order_id,
-                    razorpayPaymentId: payment.razorpay_payment_id,
-                    razorpaySignature: payment.razorpay_signature,
-                    analytics: getAnalyticsIds(),
-                }, token);
-
-                setPlaced(verified);
+            // A failed or closed payment does not cancel the order: it is held for a while and the shopper can try again,
+            // pay on delivery instead, or cancel (see PaymentDue). The bag is only emptied once the order is paid or switched.
+            const result = await payForOrder({
+                order,
+                token,
+                start: { keyId: order.razorpayKeyId || razorpayKeyId, orderId: order.razorpayOrderId, amount: order.razorpayAmount ?? Math.round(order.total * 100) },
+                prefill: { name: form.name, email: form.email, phone: normalizePhone(form.phone) },
+            });
+            if (result.status === 'paid') {
+                setPlaced(result.order);
                 clearCart();
                 await refreshUser();
-            } catch (payErr) {
-                try {
-                    await api.post('/api/orders/cancel-pending', { orderId: order.id }, token);
-                } catch {
-                    /* best-effort stock restore */
-                }
-                throw payErr instanceof Error
-                    ? payErr
-                    : new Error('Payment was not completed. Your bag was not charged.');
+                return;
             }
+            setResumable(null);
+            setPendingPay({ order: result.order, message: result.message || '', fromBag: true });
             return;
         }
 
         setPlaced(order);
         clearCart();
         await refreshUser();
-    }, [items, couponCode, form, token, clearCart, selectedAddressId, updateUser]);
+    }, [items, couponCode, form, token, clearCart, selectedAddressId, updateUser, razorpayKeyId]);
 
-    if (items.length === 0 && !placed) {
+    // An earlier unpaid order resumed here may hold different items from the bag; the bag is only emptied when it is that order.
+    const bagMatches = useCallback((order) => {
+        const key = (productId, variantId, qty) => `${productId}|${variantId || ''}|${qty}`;
+        const a = items.map((i) => key(i.product.id, i.product.variantId, i.quantity)).sort().join(',');
+        const b = (order.items || []).map((i) => key(i.productId, i.variantId, i.quantity)).sort().join(',');
+        return a === b;
+    }, [items]);
+
+    const finishPaid = useCallback(async (order, fromBag = true) => {
+        setPendingPay(null);
+        setResumable(null);
+        setPlaced(order);
+        if (fromBag || bagMatches(order)) clearCart();
+        try { updateUser(await api.get('/api/auth/me', token)); } catch { /* ignore */ }
+    }, [clearCart, token, updateUser, bagMatches]);
+
+    if (items.length === 0 && !placed && !pendingPay) {
         return (
             <div className="container-page py-16">
                 <EmptyState as="h1" icon={ShoppingBag} title="Nothing to checkout" description="Add items to your bag and come back when you're ready." actionLabel="Continue shopping" actionHref="/shop" />
@@ -521,6 +538,47 @@ export default function CheckoutPage() {
 
     if (placed) return <OrderPlaced placed={placed} />;
 
+    if (pendingPay) {
+        const pendingOrder = pendingPay.order;
+        const stillWaiting = isAwaitingPayment(pendingOrder);
+        return (
+            <div className="container-page py-8 lg:py-12">
+                <div className="mx-auto max-w-xl space-y-5">
+                    <div>
+                        <p className="eyebrow mb-2">Secure checkout</p>
+                        <h1 className="text-h2">{stillWaiting ? 'Your order is saved' : 'Order update'}</h1>
+                    </div>
+                    {stillWaiting ? (
+                        <PaymentDue
+                            order={pendingOrder}
+                            token={token}
+                            variant="checkout"
+                            codAllowed={codAvailable}
+                            message={pendingPay.message}
+                            prefill={{ name: form.name, email: form.email, phone: normalizePhone(form.phone) }}
+                            onPaid={(o) => finishPaid(o, pendingPay.fromBag)}
+                            onChanged={(o) => setPendingPay((p) => ({ ...p, order: o, message: '' }))}
+                            onCancelled={() => {
+                                setPendingPay(null);
+                                setError('Your unpaid order was cancelled. Your bag is just as you left it.');
+                            }}
+                        />
+                    ) : (
+                        <div className="rounded-lg border border-line bg-surface p-5 text-small text-ink" role="status">
+                            {pendingPay.message || (pendingOrder.status === 'cancelled'
+                                ? 'This order was cancelled because the payment did not come through. Your bag is just as you left it.'
+                                : 'This order has been updated.')}
+                        </div>
+                    )}
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                        <Button variant="outline" className="flex-1" to={`/orders/${pendingOrder.id}`}>View order {shortOrderId(pendingOrder.id)}</Button>
+                        {!stillWaiting && <Button className="flex-1" onClick={() => setPendingPay(null)}>Back to checkout</Button>}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const ctaLabel = loading
         ? (form.payment === 'razorpay' ? 'Opening Razorpay…' : 'Placing order…')
         : phoneReady
@@ -582,6 +640,19 @@ export default function CheckoutPage() {
             </p>
 
             {!emailVerified && <EmailVerificationBanner className="mb-6" />}
+
+            {resumable && (
+                <div className="mb-6 flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary-soft p-4 text-small text-ink sm:flex-row sm:items-center sm:justify-between" role="status">
+                    <p className="min-w-0">
+                        Order <span className="font-mono">{shortOrderId(resumable.id)}</span> ({formatPrice(resumable.total)}) is waiting for its payment until{' '}
+                        <strong>{paymentDeadline(resumable).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}</strong>.
+                    </p>
+                    <div className="flex shrink-0 gap-2">
+                        <Button size="sm" onClick={() => setPendingPay({ order: resumable, message: '', fromBag: false })}>Complete payment</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setResumable(null)}>Dismiss</Button>
+                    </div>
+                </div>
+            )}
 
             <form className="grid gap-8 lg:grid-cols-5 lg:gap-10" noValidate onSubmit={(e) => { e.preventDefault(); handlePlaceOrder(); }}>
                 <div className="order-2 space-y-6 lg:order-1 lg:col-span-3">

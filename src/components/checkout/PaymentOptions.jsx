@@ -24,7 +24,8 @@ export default function PaymentOptions({ value, onChange, razorpayAvailable, cod
                 <p className="rounded-lg bg-danger-tint px-4 py-3 text-small text-danger" role="alert">No payment methods are available for the items in your bag. Please contact support.</p>
             )}
             {!razorpayAvailable && codAvailable && !onlineEnabledInSettings && <p className="px-1 text-caption text-muted">Online payment is turned off in store settings.</p>}
-            {!razorpayAvailable && codAvailable && onlineEnabledInSettings && !razorpayConfigured && <p className="px-1 text-caption text-muted">Online payment will appear here once Razorpay keys are configured.</p>}
+            {import.meta.env.DEV && !razorpayAvailable && codAvailable && onlineEnabledInSettings && !razorpayConfigured && <p className="px-1 text-caption text-muted">Online payment will appear here once Razorpay keys are configured.</p>}
+            {razorpayAvailable && value === 'razorpay' && <p className="px-1 text-caption text-muted">If a payment does not go through, your order is held for 30 minutes so you can try again or pay on delivery instead.</p>}
         </fieldset>
     );
 }

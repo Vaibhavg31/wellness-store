@@ -15,7 +15,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useProducts } from '@/hooks/useApi';
 import { useToast } from '@/contexts/ToastContext';
 import { reorderItems, reorderSummaryMessage } from '@/utils/reorder';
-import { formatOrderDate, isTerminalStatus, normalizeStatus, paymentLabel, shortOrderId } from '@/constants/orders';
+import { displayStatus, formatOrderDate, isAwaitingPayment, isTerminalStatus, normalizeStatus, paymentDeadline, paymentLabel, shortOrderId } from '@/constants/orders';
 
 const FILTERS = [
     { key: 'all', label: 'All' },
@@ -44,7 +44,7 @@ function OrderCard({ order }) {
                     <p className="font-mono text-small text-ink">{shortOrderId(order.id)}</p>
                     <p className="mt-1 text-caption text-muted">{formatOrderDate(order.createdAt)}</p>
                 </div>
-                <OrderStatusBadge status={order.status} audience="user" />
+                <OrderStatusBadge status={displayStatus(order)} audience="user" />
             </div>
 
             <div className="mb-4 flex gap-3">
@@ -61,7 +61,12 @@ function OrderCard({ order }) {
                 </div>
             </div>
 
-            {!isTerminalStatus(order.status) && <div className="mb-4"><OrderJourney order={order} variant="compact" /></div>}
+            {isAwaitingPayment(order) && paymentDeadline(order).getTime() > Date.now() ? (
+                <div className="relative z-10 mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-primary-soft px-3 py-2.5">
+                    <p className="text-small text-ink">Waiting for payment until <strong>{paymentDeadline(order).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}</strong></p>
+                    <Link to={`/orders/${order.id}`} className="inline-flex min-h-11 items-center rounded-full bg-primary px-4 text-small font-semibold text-white hover:bg-primary-hover">Pay now</Link>
+                </div>
+            ) : !isTerminalStatus(order.status) && <div className="mb-4"><OrderJourney order={order} variant="compact" /></div>}
 
             <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
                 <p className="text-caption text-muted">{paymentLabel(order)}</p>
