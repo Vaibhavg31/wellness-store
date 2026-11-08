@@ -22,6 +22,7 @@ import { CouponService } from '../services/couponService.js';
 import * as razorpay from '../services/razorpayService.js';
 import * as emailService from '../services/emailService.js';
 import { recordPurchase } from '../lib/analytics.js';
+import { adjustItemStock, decrementStock, restoreStockItems } from '../lib/orderStock.js';
 import { clubConfig, memberPriceFor } from '../lib/club.js';
 import { bogoUnitPrice, mixBoxPricing, round2 } from '../lib/pricing.js';
 import { CANCEL_REASONS, CANCELLABLE_STATUSES, RETURN_REASONS, RETURN_WINDOW_DAYS, reasonLabel } from '../lib/orderReasons.js';
@@ -87,28 +88,6 @@ function appendAdminNote(order, note) {
     const existing = String(order.adminNotes || '').trim();
     const stamp = `${new Date().toISOString().slice(0, 16).replace('T', ' ')} — ${note}`;
     return existing ? `${existing}\n${stamp}` : stamp;
-}
-
-async function adjustItemStock(item, delta) {
-    const variantId = String(item.variantId || '');
-    if (variantId) return products.adjustVariantStock(variantId, delta);
-    return products.adjustStock(String(item.productId || ''), delta);
-}
-
-async function restoreStockItems(items) {
-    for (const item of items) await adjustItemStock(item, Number(item.quantity));
-}
-
-async function decrementStock(items) {
-    const done = [];
-    for (const item of items) {
-        const ok = await adjustItemStock(item, -Number(item.quantity));
-        if (!ok) {
-            await restoreStockItems(done);
-            throw new HttpError('Stock changed while placing order. Please refresh and try again.', 400);
-        }
-        done.push(item);
-    }
 }
 
 async function decrementStockForDirectItems(items) {

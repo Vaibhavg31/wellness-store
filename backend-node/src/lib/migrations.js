@@ -93,6 +93,64 @@ const TABLES = [
         PRIMARY KEY (id),
         KEY idx_admin_login_log_created (created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    // Partner API (lib/apiKeys.js, routes/partnerApiRoutes.js): a third party that places orders with its own API key.
+    // Only a SHA-256 of the key is kept; the key itself is shown once, when it is made.
+    `CREATE TABLE IF NOT EXISTS api_partners (
+        id VARCHAR(64) NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        contact_email VARCHAR(255) NOT NULL DEFAULT '',
+        key_prefix VARCHAR(24) NOT NULL,
+        key_hash CHAR(64) NOT NULL,
+        scopes VARCHAR(255) NOT NULL DEFAULT '',
+        allowed_payments VARCHAR(64) NOT NULL DEFAULT 'prepaid',
+        ip_allowlist VARCHAR(1000) NOT NULL DEFAULT '',
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        last_used_at DATETIME(3) NULL,
+        created_at DATETIME(3) NOT NULL,
+        updated_at DATETIME(3) NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_api_partners_key_hash (key_hash)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    // Outgoing webhooks (lib/webhooks.js): an address told about order events. partner_id NULL = every order in the shop.
+    `CREATE TABLE IF NOT EXISTS webhook_endpoints (
+        id VARCHAR(64) NOT NULL,
+        partner_id VARCHAR(64) NULL,
+        url VARCHAR(500) NOT NULL,
+        description VARCHAR(160) NOT NULL DEFAULT '',
+        secret VARCHAR(80) NOT NULL,
+        events VARCHAR(500) NOT NULL DEFAULT '*',
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        last_success_at DATETIME(3) NULL,
+        last_failure_at DATETIME(3) NULL,
+        consecutive_failures INT NOT NULL DEFAULT 0,
+        created_at DATETIME(3) NOT NULL,
+        updated_at DATETIME(3) NULL,
+        PRIMARY KEY (id),
+        KEY idx_webhook_endpoints_partner (partner_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+    // One row per event per endpoint: the exact body sent (so a retry sends the same event), and how each try went.
+    `CREATE TABLE IF NOT EXISTS webhook_deliveries (
+        id VARCHAR(64) NOT NULL,
+        endpoint_id VARCHAR(64) NOT NULL,
+        event_id VARCHAR(64) NOT NULL,
+        event_type VARCHAR(60) NOT NULL,
+        order_id VARCHAR(64) NULL,
+        payload LONGTEXT NOT NULL,
+        status VARCHAR(12) NOT NULL DEFAULT 'pending',
+        attempts INT NOT NULL DEFAULT 0,
+        next_attempt_at DATETIME(3) NULL,
+        last_attempt_at DATETIME(3) NULL,
+        response_code INT NULL,
+        response_body VARCHAR(1000) NULL,
+        error VARCHAR(300) NULL,
+        duration_ms INT NULL,
+        created_at DATETIME(3) NOT NULL,
+        delivered_at DATETIME(3) NULL,
+        PRIMARY KEY (id),
+        KEY idx_webhook_deliveries_due (status, next_attempt_at),
+        KEY idx_webhook_deliveries_endpoint (endpoint_id, created_at),
+        KEY idx_webhook_deliveries_order (order_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 ];
 
 const COLUMNS = [
@@ -122,7 +180,23 @@ const COLUMNS = [
     ['orders', 'return_note', 'VARCHAR(500) NULL'],
     ['orders', 'return_requested_at', 'DATETIME(6) NULL'],
     ['orders', 'return_resolved_at', 'DATETIME(6) NULL'],
+    // An order placed through the partner API: which partner, its name at the time (kept if the partner is removed later),
+    // and the partner's own order number (unique per partner, so sending the same order twice never makes two).
+    ['orders', 'api_partner_id', 'VARCHAR(64) NULL'],
+    ['orders', 'api_partner_name', 'VARCHAR(120) NULL'],
+    ['orders', 'external_ref', 'VARCHAR(100) NULL'],
 ];
+
+/** Lets an ENUM column hold one more value (a no-op once it does). */
+async function widenEnum(pool, table, column, value, definition) {
+    const [rows] = await pool.query(
+        'SELECT COLUMN_TYPE AS type FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ? LIMIT 1',
+        [table, column],
+    );
+    const type = String(rows[0]?.type ?? '');
+    if (!type.startsWith('enum(') || type.includes(`'${value}'`)) return;
+    await pool.query(`ALTER TABLE \`${table}\` MODIFY COLUMN \`${column}\` ${definition}`);
+}
 
 async function hasTable(pool, table) {
     const [rows] = await pool.query('SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? LIMIT 1', [table]);
@@ -157,5 +231,12 @@ export async function ensureSchema() {
     for (const [table, column, definition] of COLUMNS) await addColumn(pool, table, column, definition);
     if (!(await hasIndex(pool, 'users', 'uq_users_club_card_no'))) {
         await pool.query('ALTER TABLE users ADD UNIQUE KEY uq_users_club_card_no (club_card_no)');
+    }
+    // Partner API orders: a third source next to the website and admin-made orders, a "partner" entry in the status
+    // history, and one order per partner order number.
+    await widenEnum(pool, 'orders', 'order_source', 'api', "ENUM('website','direct','api') NOT NULL DEFAULT 'website'");
+    await widenEnum(pool, 'order_status_history', 'changed_by', 'partner', "ENUM('system','admin','customer','partner') NOT NULL DEFAULT 'system'");
+    if (!(await hasIndex(pool, 'orders', 'uq_orders_partner_ref'))) {
+        await pool.query('ALTER TABLE orders ADD UNIQUE KEY uq_orders_partner_ref (api_partner_id, external_ref)');
     }
 }

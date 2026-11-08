@@ -56,8 +56,10 @@ export function asyncRoute(handler, fallbackMessage = 'Something went wrong') {
 
 /** Thrown by route/service code to produce a specific status+message via asyncRoute's catch. */
 export class HttpError extends Error {
-    constructor(message, statusCode = 400) {
+    /** `code` is an optional short machine-readable reason (the partner API sends it next to the message). */
+    constructor(message, statusCode = 400, code = undefined) {
         super(message);
         this.statusCode = statusCode;
+        if (code) this.code = code;
     }
 }

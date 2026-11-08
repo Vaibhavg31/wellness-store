@@ -701,7 +701,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Customer and admin accounts';
 
 -- ---------------------------------------------------------------------------------------------------------------
--- Tables and columns added after the first launch (offers, Chikit Club, product extras, pack bottle counts) are created
+-- Tables and columns added after the first launch (offers, Chikit Club, product extras, pack bottle counts, partner API
+-- keys, webhooks and their delivery log, the 'api' order source) are created
 -- by backend-node/src/lib/migrations.js every time the server starts, so this file never needs them and they cannot
 -- be forgotten. The starter offers (Pick any 3 for 1499, Buy 1 Get 1 Free) are created with the offers table.
 -- ---------------------------------------------------------------------------------------------------------------

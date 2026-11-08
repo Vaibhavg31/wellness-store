@@ -1,4 +1,5 @@
 import { BaseRepository } from './base.js';
+import { notifyOrderChange } from '../lib/webhooks.js';
 
 /** Orders — `orders` + order_shipping (1-1), order_items (1-n), order_status_history (1-n). Mirrors OrderRepository.php. */
 export class OrderRepository extends BaseRepository {
@@ -51,6 +52,9 @@ export class OrderRepository extends BaseRepository {
             returnNote: row.return_note ?? null,
             returnRequestedAt: this.toIso(row.return_requested_at),
             returnResolvedAt: this.toIso(row.return_resolved_at),
+            apiPartnerId: row.api_partner_id ?? null,
+            apiPartnerName: row.api_partner_name ?? null,
+            externalRef: row.external_ref ?? null,
             createdBy: row.created_by,
             createdAt: this.toIso(row.created_at),
             updatedAt: this.toIso(row.updated_at),
@@ -131,6 +135,9 @@ export class OrderRepository extends BaseRepository {
             returnNote: { col: 'return_note', type: 'nullableString' },
             returnRequestedAt: { col: 'return_requested_at', type: 'datetime' },
             returnResolvedAt: { col: 'return_resolved_at', type: 'datetime' },
+            apiPartnerId: { col: 'api_partner_id', type: 'nullableString' },
+            apiPartnerName: { col: 'api_partner_name', type: 'nullableString' },
+            externalRef: { col: 'external_ref', type: 'nullableString' },
             createdBy: { col: 'created_by', type: 'string' },
             createdAt: { col: 'created_at', type: 'datetime' },
             updatedAt: { col: 'updated_at', type: 'datetime' },
@@ -244,10 +251,15 @@ export class OrderRepository extends BaseRepository {
             conn.release();
         }
 
-        return (await this.getById(id)) ?? data;
+        const created = await this.getById(id);
+        // Webhooks are told about the new order (this never fails the order; see lib/webhooks.js).
+        if (created) await notifyOrderChange(null, created);
+        return created ?? data;
     }
 
     async update(id, changes) {
+        // Read first so webhooks can be told exactly what changed (status, payment, tracking, return, refund).
+        const before = await this.getById(id);
         const conn = await this.pool().getConnection();
         try {
             await conn.beginTransaction();
@@ -269,7 +281,9 @@ export class OrderRepository extends BaseRepository {
             conn.release();
         }
 
-        return this.getById(id);
+        const after = await this.getById(id);
+        if (before && after) await notifyOrderChange(before, after);
+        return after;
     }
 
     async getById(id) {
@@ -278,6 +292,25 @@ export class OrderRepository extends BaseRepository {
     }
 
     // ── Domain methods ──────────────────────────────────────────────────
+
+    /** A partner's own order, by the partner's order number (the partner API never sees other orders). */
+    async findByPartnerRef(partnerId, externalRef) {
+        if (!partnerId || !externalRef) return null;
+        const [rows] = await this.pool().query('SELECT * FROM orders WHERE api_partner_id = ? AND external_ref = ? LIMIT 1', [partnerId, externalRef]);
+        return rows[0] ? this.rowToArray(rows[0]) : null;
+    }
+
+    /** A page of one partner's orders, newest first. `since` is a UTC 'YYYY-MM-DD HH:MM:SS' (changed at or after). */
+    async listForPartner(partnerId, { status = '', since = '', limit = 50, offset = 0 } = {}) {
+        let sql = 'SELECT * FROM orders WHERE api_partner_id = ?';
+        const params = [partnerId];
+        if (status) { sql += ' AND status = ?'; params.push(status); }
+        if (since) { sql += ' AND COALESCE(updated_at, created_at) >= ?'; params.push(since); }
+        sql += ' ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?';
+        params.push(Number(limit), Number(offset));
+        const [rows] = await this.pool().query(sql, params);
+        return this.mapRowsBatched(rows);
+    }
 
     async findByRazorpayOrderId(razorpayOrderId) {
         if (!razorpayOrderId) return null;
@@ -338,7 +371,7 @@ export class OrderRepository extends BaseRepository {
         if (filters.search) sql += ' LEFT JOIN order_shipping os ON os.order_id = o.id';
         sql += ' WHERE 1=1';
 
-        if (filters.source === 'direct' || filters.source === 'website') {
+        if (['direct', 'website', 'api'].includes(filters.source)) {
             sql += ' AND o.order_source = ?';
             params.push(filters.source);
         }

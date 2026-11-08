@@ -31,6 +31,10 @@ try {
 const { startReviewRequests } = await import('./lib/reviewRequests.js');
 startReviewRequests();
 
+// Outgoing webhooks: sends queued order events every few seconds and retries failed ones (see lib/webhooks.js).
+const { startWebhookWorker } = await import('./lib/webhooks.js');
+startWebhookWorker();
+
 const { createApp } = await import('./app.js');
 const app = createApp();
 
