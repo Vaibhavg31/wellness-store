@@ -6,7 +6,7 @@ import { requireCustomer, requireAdmin, optionalCustomer, signToken } from '../l
 import { asyncRoute, sendJson, sendError } from '../lib/response.js';
 import { checkRateLimit, retryAfterSeconds } from '../lib/rateLimiter.js';
 import { generateId, getPool } from '../lib/db.js';
-import { isGoogleSignInEnabled } from '../lib/servicesConfig.js';
+import { googleClientId, isGoogleSignInEnabled } from '../lib/servicesConfig.js';
 import * as otpConfig from '../lib/otpConfig.js';
 import { logOtp, recentOtpLogs, serverOutboundIp } from '../lib/otpLogger.js';
 import * as msg91 from '../services/msg91Service.js';
@@ -52,6 +52,7 @@ export function publicUser(user) {
         emailVerified: isEmailVerified(user),
         // Whether the account can sign in with a password (a Google-only account cannot until it sets one).
         hasPassword: Boolean(user.passwordHash),
+        googleLinked: Boolean(user.googleId),
         addresses: user.addresses || [],
         lastUsedAddressId: user.lastUsedAddressId ?? null,
         dob: user.dob ?? null,
@@ -416,22 +417,45 @@ function shouldGrantAdminRole(email) {
     return adminEmails().includes(email.toLowerCase());
 }
 
+/** Why a verified Google ID token's profile cannot sign in ('' when it can). Google only vouches for an email it has verified. */
+export function googleProfileProblem(payload) {
+    if (!payload || typeof payload !== 'object') return 'Google did not send your account details. Please try again.';
+    if (!payload.email || !isValidEmail(String(payload.email).toLowerCase())) return 'Your Google account has no email address we can use.';
+    if (payload.email_verified !== true && payload.email_verified !== 'true') return 'Your Google account email is not verified yet. Verify it with Google, or sign in with email and password.';
+    if (!payload.sub) return 'Google did not send your account id. Please try again.';
+    return '';
+}
+
+let googleClient = null;
+function googleVerifier() {
+    if (!googleClient || googleClient._clientId !== googleClientId()) googleClient = new OAuth2Client(googleClientId());
+    return googleClient;
+}
+
 router.post('/auth/google', asyncRoute(async (req, res) => {
     const credential = req.body?.credential;
-    if (!credential) return sendError(res, 'Invalid request', 400);
-    if (!process.env.GOOGLE_CLIENT_ID) return sendError(res, 'Google login is not configured. Set GOOGLE_CLIENT_ID in config.json', 503);
+    if (typeof credential !== 'string' || credential.length < 20 || credential.length > 4096) return sendError(res, 'Invalid request', 400);
+    if (!googleClientId()) return sendError(res, 'Google sign-in is not set up on this server yet.', 503);
     if (!(await isGoogleSignInEnabled())) return sendError(res, 'Google sign-in is currently disabled', 503);
+    if (!(await checkRateLimit(`google-${clientIp(req)}`, 30, 900))) return sendError(res, 'Too many sign-in attempts. Try again later.', 429);
 
     try {
-        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-        const ticket = await client.verifyIdToken({ idToken: credential, audience: process.env.GOOGLE_CLIENT_ID });
-        const payload = ticket.getPayload();
-
-        if (!payload || !payload.email) return sendError(res, 'Google account has no email', 401);
+        let payload;
+        try {
+            // Checks Google's signature, the expiry, the issuer and that the token was made for this site's client id.
+            const ticket = await googleVerifier().verifyIdToken({ idToken: credential, audience: googleClientId() });
+            payload = ticket.getPayload();
+        } catch (err) {
+            console.error('[Google Auth] token rejected:', err?.message || err);
+            return sendError(res, 'Google sign-in failed. Please try again.', 401);
+        }
+        const problem = googleProfileProblem(payload);
+        if (problem) return sendError(res, problem, 401);
 
         const email = payload.email.toLowerCase();
-        const name = payload.name || payload.given_name || null;
+        const name = String(payload.name || payload.given_name || '').trim().slice(0, 100) || null;
         const avatar = payload.picture || null;
+        const googleId = String(payload.sub);
 
         if (shouldGrantAdminRole(email)) {
             await recordAdminLogin(email, true, clientIp(req), 'google');
@@ -452,16 +476,21 @@ router.post('/auth/google', asyncRoute(async (req, res) => {
         let user;
 
         if (!existing) {
-            user = await repo.create({ id: generateId('user'), email, name, avatar, emailVerified: true, emailVerifiedAt: now, createdAt: now, lastLogin: now });
+            user = await repo.create({ id: generateId('user'), email, name, avatar, googleId, emailVerified: true, emailVerifiedAt: now, createdAt: now, lastLogin: now });
+            user = (await repo.getById(user?.id || '')) || user;
         } else {
             if (existing.isBlocked) return sendError(res, 'Your account has been blocked. Please contact support.', 403);
+            // Google has verified this email, so it also confirms an email+password account that was never verified.
             const updates = { lastLogin: now, emailVerified: true, emailVerifiedAt: existing.emailVerifiedAt || now };
-            if (name) updates.name = name;
-            if (avatar) updates.avatar = avatar;
+            if (existing.googleId !== googleId) updates.googleId = googleId;
+            // The name the customer chose in My Account is kept; Google's only fills an empty one. Same for the photo.
+            if (name && !String(existing.name || '').trim()) updates.name = name;
+            if (avatar && (!existing.avatar || /googleusercontent\.com/.test(existing.avatar))) updates.avatar = avatar;
             user = (await repo.update(existing.id, updates)) || existing;
         }
 
-        const token = signToken({ role: 'customer', userId: user.id, email: user.email });
+        // Signing in with Google is a deliberate choice on this device, so it stays signed in like "Remember me".
+        const token = issueCustomerToken(user, true);
         sendJson(res, { role: 'customer', token, redirect: '/', user: publicUser(user) });
     } catch (err) {
         console.error('[Google Auth]', err?.message || err);

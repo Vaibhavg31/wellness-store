@@ -4,6 +4,9 @@ import { asyncRoute, sendJson, HttpError } from '../lib/response.js';
 import { assertText, assertWhole, assertAmount, assertImageUrl, assertLink, isValidEmail } from '../lib/validate.js';
 import { resetClubConfigCache } from '../lib/club.js';
 import { SettingsRepository } from '../repositories/settingsRepository.js';
+import { googleClientId } from '../lib/servicesConfig.js';
+import { paymentWindowMinutes } from '../lib/onlinePayments.js';
+import * as razorpay from '../services/razorpayService.js';
 
 const router = Router();
 const repo = new SettingsRepository();
@@ -108,10 +111,39 @@ function assertValidSettings(c) {
     }
 }
 
+/**
+ * The public halves of the payment and sign-in keys, read from the server config at request time: the browser needs the Razorpay
+ * key id to open Checkout and the Google client id to show the button. Putting new keys in config.json and restarting the server is
+ * all it takes; the storefront does not have to be rebuilt. (The secrets never leave the server.)
+ */
+function publicIntegrations() {
+    return {
+        razorpay: { keyId: razorpay.publicKeyId(), mode: razorpay.keyMode() },
+        google: { clientId: googleClientId() },
+    };
+}
+
 router.get('/settings', asyncRoute(async (req, res) => {
     // Deliberately not browser-cached — see backend/lib/Routes/SettingsRoutes.php for why.
-    sendJson(res, await repo.get());
+    sendJson(res, { ...(await repo.get()), integrations: publicIntegrations() });
 }, 'Failed to fetch settings'));
+
+/** Admin: whether Razorpay and Google sign-in are connected, so the Settings page can say what is missing. No secrets. */
+router.get('/admin/integrations/status', asyncRoute(async (req, res) => {
+    requireAdmin(req);
+    const site = String(process.env.FRONTEND_URL || '').trim().replace(/\/+$/, '');
+    sendJson(res, {
+        razorpay: {
+            connected: razorpay.isRazorpayConfigured(),
+            mode: razorpay.keyMode(),
+            keyId: razorpay.publicKeyId(),
+            webhookConnected: razorpay.isWebhookConfigured(),
+            webhookUrl: site ? `${site}/api/webhooks/razorpay` : '/api/webhooks/razorpay',
+            paymentWindowMinutes: paymentWindowMinutes(),
+        },
+        google: { connected: Boolean(googleClientId()), clientId: googleClientId(), origin: site || null },
+    });
+}, 'Failed to read the integration status'));
 
 router.put('/settings', asyncRoute(async (req, res) => {
     requireAdmin(req);

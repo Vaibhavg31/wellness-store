@@ -21,6 +21,12 @@ async function paymentFlag(key) {
     }
 }
 
+/** The Google OAuth web client id from the server config (GOOGLE_CLIENT_ID; the old VITE_ name still works). Public, not a secret. */
+export function googleClientId() {
+    const id = String(process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '').trim();
+    return id.endsWith('.apps.googleusercontent.com') ? id : '';
+}
+
 export const isEmailEnabled = () => serviceFlag('emailEnabled');
 export const isOtpEnabled = () => serviceFlag('otpEnabled');
 export const isGoogleSignInEnabled = () => serviceFlag('googleSignInEnabled');

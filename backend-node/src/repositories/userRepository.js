@@ -31,6 +31,7 @@ export class UserRepository extends BaseRepository {
             clubMember: this.bool(row.club_member),
             clubJoinedAt: this.toIso(row.club_joined_at),
             clubCardNo: row.club_card_no ?? null,
+            googleId: row.google_id ?? null,
         };
     }
 
@@ -42,6 +43,7 @@ export class UserRepository extends BaseRepository {
             isBlocked: 'is_blocked', blockedAt: 'blocked_at', createdAt: 'created_at',
             lastLogin: 'last_login', lastUsedAddressId: 'last_used_address_id',
             dob: 'dob', gender: 'gender', clubMember: 'club_member', clubJoinedAt: 'club_joined_at', clubCardNo: 'club_card_no',
+            googleId: 'google_id',
         };
         const boolCols = new Set(['phone_verified', 'email_verified', 'is_blocked', 'club_member']);
         const dateCols = new Set(['phone_verified_at', 'email_verified_at', 'blocked_at', 'created_at', 'last_login', 'club_joined_at']);
