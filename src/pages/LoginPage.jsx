@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { ShoppingBag, Shield, Truck, Leaf } from 'lucide-react';
+import GoogleSignInButton, { useGoogleSignIn } from '@/components/auth/GoogleSignInButton';
 import AuthShell from '@/components/auth/AuthShell';
 import AuthSlider from '@/components/auth/AuthSlider';
 import AuthPhone from '@/components/auth/AuthPhone';
@@ -12,12 +12,8 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth, ADMIN_PATH } from '@/contexts/AuthContext';
 import { useCustomerSession } from '@/hooks/useCustomerSession';
-import { useSiteContent } from '@/contexts/SiteContentContext';
 import { BRAND_NAME, BRAND_DESCRIPTION } from '@/constants';
 import { ApiError } from '@/services/api';
-
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
-const GOOGLE_ENABLED = !!GOOGLE_CLIENT_ID;
 
 function getSafeRedirect(path) {
     if (!path || !path.startsWith('/') || path.startsWith('//') || path.startsWith('/login')) {
@@ -26,20 +22,16 @@ function getSafeRedirect(path) {
     return path;
 }
 
-function LoginScreen() {
+export default function LoginPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const redirectTo = getSafeRedirect(searchParams.get('redirect'));
     const isCheckoutLogin = redirectTo === '/checkout';
     const isAdminAccess = redirectTo === ADMIN_PATH;
-    const googleBtnRef = useRef(null);
-    const [googleWidth, setGoogleWidth] = useState(320);
 
-    const { loginWithGoogle, loginWithEmail, registerWithEmail, isAuthenticated, isAdmin, adminLogin } = useAuth();
+    const { loginWithEmail, registerWithEmail, isAuthenticated, isAdmin, adminLogin } = useAuth();
     const { welcomeUser } = useCustomerSession();
-    const { content } = useSiteContent();
-
-    const googleSignInEnabled = GOOGLE_ENABLED && content.services?.googleSignInEnabled !== false;
+    const { configured: GOOGLE_ENABLED, enabled: googleSignInEnabled } = useGoogleSignIn();
 
     const [mode, setMode] = useState('signin');
     const [error, setError] = useState('');
@@ -54,16 +46,6 @@ function LoginScreen() {
     const [showStudioLogin, setShowStudioLogin] = useState(false);
 
     const wide = useMediaQuery('(min-width: 1024px)') && !isAdminAccess;
-
-    useEffect(() => {
-        const el = googleBtnRef.current;
-        if (!el) return undefined;
-        const update = () => setGoogleWidth(Math.min(el.offsetWidth, 400));
-        update();
-        const ro = new ResizeObserver(update);
-        ro.observe(el);
-        return () => ro.disconnect();
-    }, [wide, mode]);
 
     useEffect(() => {
         if (isAdmin) navigate(ADMIN_PATH, { replace: true });
@@ -147,21 +129,10 @@ function LoginScreen() {
         }
     };
 
-    const handleGoogleSuccess = async (response) => {
-        if (!response.credential) {
-            setError('Google did not return a credential. Please try again.');
-            return;
-        }
-        setError('');
-        setLoading(true);
-        try {
-            const res = await loginWithGoogle(response.credential);
-            goAfterLogin(res.role, res.redirect, res.user?.name);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Google sign-in failed');
-        } finally {
-            setLoading(false);
-        }
+    const googleProps = {
+        onSignedIn: (res) => { setError(''); goAfterLogin(res.role, res.redirect, res.user?.name); },
+        onError: setError,
+        onBusy: setLoading,
     };
 
     const panelCopy = isAdminAccess
@@ -234,19 +205,7 @@ function LoginScreen() {
             </form>
         </div>
     );
-    const googleBlock = googleSignInEnabled ? (
-        <div ref={googleBtnRef} className="flex w-full justify-center">
-            <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => setError('Google sign-in was cancelled or blocked')}
-                theme="outline"
-                size="large"
-                text="continue_with"
-                shape="pill"
-                width={googleWidth}
-            />
-        </div>
-    ) : null;
+    const googleBlock = googleSignInEnabled ? <GoogleSignInButton {...googleProps} text={mode === 'signup' ? 'signup_with' : 'continue_with'} /> : null;
     const orDivider = googleSignInEnabled && (
         <div className="flex items-center gap-3" aria-hidden="true">
             <span className="h-px flex-1 bg-line" />
@@ -362,21 +321,11 @@ function LoginScreen() {
                 )}
 
                 {googleSignInEnabled ? (
-                    <div ref={googleBtnRef} className="flex w-full justify-center">
-                        <GoogleLogin
-                            onSuccess={handleGoogleSuccess}
-                            onError={() => setError('Google sign-in was cancelled or blocked')}
-                            theme="outline"
-                            size="large"
-                            text="continue_with"
-                            shape="pill"
-                            width={googleWidth}
-                        />
-                    </div>
+                    <GoogleSignInButton {...googleProps} />
                 ) : GOOGLE_ENABLED ? (
                     <p className={notice}>Google sign-in is turned off in store settings.</p>
                 ) : !isAdminAccess && import.meta.env.DEV ? (
-                    <p className={notice}>Add <code className="rounded bg-surface px-1 text-caption">VITE_GOOGLE_CLIENT_ID</code> to enable Google sign-in.</p>
+                    <p className={notice}>Add <code className="rounded bg-surface px-1 text-caption">GOOGLE_CLIENT_ID</code> to config.json (and restart) to enable Google sign-in.</p>
                 ) : null}
 
                 <AutoHeight>{error && <p className="rounded-lg bg-danger-tint p-3 text-center text-small text-danger" role="alert">{error}</p>}</AutoHeight>
@@ -401,15 +350,5 @@ function LoginScreen() {
                 )}
             </div>
         </AuthShell>
-    );
-}
-
-/** Google's sign-in script is only loaded here, not on every storefront page. */
-export default function LoginPage() {
-    if (!GOOGLE_CLIENT_ID) return <LoginScreen />;
-    return (
-        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-            <LoginScreen />
-        </GoogleOAuthProvider>
     );
 }

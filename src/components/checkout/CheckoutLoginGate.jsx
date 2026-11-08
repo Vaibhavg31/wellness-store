@@ -1,4 +1,7 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import GoogleSignInButton, { useGoogleSignIn } from '@/components/auth/GoogleSignInButton';
+import { ADMIN_PATH } from '@/contexts/AuthContext';
 import { ChevronLeft, Lock, MapPin, CreditCard, Smartphone } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { imageUrl } from '@/services/api';
@@ -24,6 +27,9 @@ const NEXT = [
  */
 export default function CheckoutLoginGate() {
     const { items, total } = useCart();
+    const { enabled: googleEnabled } = useGoogleSignIn();
+    const [googleError, setGoogleError] = useState('');
+    const navigate = useNavigate();
     return (
         <div className="container-page py-8 lg:py-12">
             <Link to="/cart" className="group mb-5 inline-flex items-center gap-2 text-small text-muted hover:text-primary">
@@ -72,9 +78,16 @@ export default function CheckoutLoginGate() {
                         <span className="grid size-12 place-items-center rounded-full bg-accent text-primary-deep"><Lock size={22} aria-hidden="true" /></span>
                         <h2 id="signin-title" className="mt-4 text-h3">Sign in to place your order</h2>
                         <p className="mt-2 max-w-md text-body text-muted">
-                            Your total is <strong className="text-ink">{formatPrice(total)}</strong>, delivery included. Sign in with Google and you come straight back to this page with your bag as it is.
+                            Your total is <strong className="text-ink">{formatPrice(total)}</strong>, delivery included. Sign in and you carry on right here, with your bag as it is.
                         </p>
-                        <Button to={loginUrl('/checkout')} size="lg" className="mt-6 w-full sm:max-w-xs">Sign in &amp; continue</Button>
+                        {googleEnabled && (
+                            <div className="mt-6 w-full sm:max-w-xs">
+                                <GoogleSignInButton onSignedIn={(res) => { if (res.role === 'admin') navigate(ADMIN_PATH, { replace: true }); }} onError={setGoogleError} />
+                                {googleError && <p className="mt-2 rounded-lg bg-danger-tint px-3 py-2 text-small text-danger" role="alert">{googleError}</p>}
+                                <p className="mt-4 text-center text-caption uppercase tracking-wider text-muted" aria-hidden="true">or</p>
+                            </div>
+                        )}
+                        <Button to={loginUrl('/checkout')} size="lg" variant={googleEnabled ? 'outline' : undefined} className={`${googleEnabled ? 'mt-3' : 'mt-6'} w-full sm:max-w-xs`}>{googleEnabled ? 'Sign in with email' : 'Sign in & continue'}</Button>
                         <p className="mt-5 text-caption font-semibold uppercase tracking-[0.14em] text-accent-ink">What happens next</p>
                         <ul className="mt-3 space-y-2.5">
                             {NEXT.map(({ icon: Icon, text }) => (
