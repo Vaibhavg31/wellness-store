@@ -33,6 +33,8 @@ import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import seoRoutes from './routes/seoRoutes.js';
+import { SettingsRepository } from './repositories/settingsRepository.js';
+import { BannerRepository } from './repositories/bannerRepository.js';
 
 export function createApp() {
     const app = express();
@@ -132,17 +134,44 @@ export function createApp() {
     const distDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../dist');
     if (fs.existsSync(path.join(distDir, 'index.html'))) {
         const shell = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8');
+        // The home page's biggest picture (the first slide of the banner slider when that section comes first) was only
+        // requested after all the scripts had run and the banner list had arrived. A preload hint in the HTML starts it at
+        // once (the phone artwork on phones). Rebuilt at most once a minute.
+        let homeHints = { at: 0, html: '' };
+        const homeLcpHints = async () => {
+            if (Date.now() - homeHints.at < 60_000) return homeHints.html;
+            let html = '';
+            try {
+                const settings = await new SettingsRepository().get();
+                const first = Object.entries(settings.sections || {}).find(([, on]) => on !== false)?.[0];
+                if (first === 'bannerSlider') {
+                    const [slide] = await new BannerRepository().getPublished('slider');
+                    const own = (p) => typeof p === 'string' && /^\/[\w./-]+$/.test(p);
+                    if (slide && own(slide.image)) {
+                        html = own(slide.mobileImage)
+                            ? `<link rel="preload" as="image" href="${slide.mobileImage}" media="(max-width: 639px)" fetchpriority="high" />\n    <link rel="preload" as="image" href="${slide.image}" media="(min-width: 640px)" fetchpriority="high" />\n    `
+                            : `<link rel="preload" as="image" href="${slide.image}" fetchpriority="high" />\n    `;
+                    }
+                }
+            } catch {
+                html = '';
+            }
+            homeHints = { at: Date.now(), html };
+            return html;
+        };
         // Link previews (WhatsApp, Facebook, Google) read this HTML without running any script, and they need full web
         // addresses: a relative og:image shows no picture. So the page is sent with the full address filled in, plus a
         // canonical link to the main address (FRONTEND_URL, else the address the visitor used).
-        const pageFor = (req) => {
+        const pageFor = async (req) => {
+            const hints = req.path === '/' ? await homeLcpHints() : '';
+            const page = hints ? shell.replace('<title data-seo-default>', `${hints}<title data-seo-default>`) : shell;
             const proto = String(req.headers['x-forwarded-proto'] || req.protocol || 'https').split(',')[0].trim();
             const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
             const visited = /^[a-z0-9.-]+(:\d+)?$/i.test(host) && /^https?$/.test(proto) ? `${proto}://${host}` : '';
             const site = (process.env.FRONTEND_URL || '').trim().replace(/\/$/, '') || visited;
-            if (!site) return shell;
+            if (!site) return page;
             const url = `${site}${req.path === '/' ? '/' : req.path.replace(/\/$/, '')}`;
-            return shell
+            return page
                 .replaceAll('content="/og-image.png"', `content="${site}/og-image.png"`)
                 .replace('<title data-seo-default>', `<link data-seo-default rel="canonical" href="${url}" />\n    <meta data-seo-default property="og:url" content="${url}" />\n    <title data-seo-default>`);
         };
@@ -159,9 +188,9 @@ export function createApp() {
             },
         }));
         // Page routes only: a missing file (anything with an extension, or under /assets) must 404, not return HTML.
-        app.get(/^\/(?!api\/|uploads\/|assets\/)[^.]*$/, (req, res) => {
+        app.get(/^\/(?!api\/|uploads\/|assets\/)[^.]*$/, async (req, res) => {
             res.set('Cache-Control', 'no-cache');
-            res.type('html').send(pageFor(req));
+            res.type('html').send(await pageFor(req));
         });
     }
 
