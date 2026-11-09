@@ -18,6 +18,7 @@ class ApiError extends Error {
         this.code = extra.code;
         this.email = extra.email;
         this.order = extra.order; // e.g. the order as it now stands, sent with a 409 from the payment routes
+        this.usedIn = extra.usedIn; // where a media file is still shown (409 from DELETE /media/:id)
     }
 }
 
@@ -128,10 +129,7 @@ export const api = {
                 body: formData,
             });
         } catch {
-            throw new ApiError(
-                'Cannot reach the API server. Stop the app and run: npm run dev',
-                0,
-            );
+            throw new ApiError(OFFLINE_MESSAGE, 0);
         }
         if (!res.ok) {
             const body = await res.json().catch(() => ({ error: res.statusText }));
@@ -158,10 +156,7 @@ export const api = {
                 body: formData,
             });
         } catch {
-            throw new ApiError(
-                'Cannot reach the API server. Stop the app and run: npm run dev',
-                0,
-            );
+            throw new ApiError(OFFLINE_MESSAGE, 0);
         }
         if (!res.ok) {
             const body = await res.json().catch(() => ({ error: res.statusText }));
@@ -184,10 +179,7 @@ export const api = {
                 body: formData,
             });
         } catch {
-            throw new ApiError(
-                'Cannot reach the API server. Stop the app and run: npm run dev',
-                0,
-            );
+            throw new ApiError(OFFLINE_MESSAGE, 0);
         }
         if (!res.ok) {
             const body = await res.json().catch(() => ({ error: res.statusText }));

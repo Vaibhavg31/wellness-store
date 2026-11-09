@@ -61,8 +61,9 @@ export default function AdminMediaPage() {
             await api.upload(Array.from(e.target.files), adminToken);
             showToast('Uploaded successfully', 'success');
             fetchMedia();
-        } catch {
-            showToast('Upload failed', 'error');
+        } catch (err) {
+            // The server says why (not a real picture, too large…), so pass that on.
+            showToast(err instanceof Error && err.message ? err.message : 'Upload failed', 'error');
         } finally {
             setUploading(false);
             e.target.value = '';
@@ -71,11 +72,26 @@ export default function AdminMediaPage() {
 
     const remove = async (item) => {
         if (!adminToken || !confirm(`Delete "${item.filename}"? This cannot be undone.`)) return;
-        try {
-            await api.delete(`/api/media/${item.id}`, adminToken);
+        const done = () => {
             setMedia((prev) => prev.filter((m) => m.id !== item.id));
             showToast('Deleted', 'success');
-        } catch {
+        };
+        try {
+            await api.delete(`/api/media/${item.id}`, adminToken);
+            done();
+        } catch (err) {
+            // Still on the store: say where, and only delete when the admin confirms a second time.
+            if (err?.status === 409 && Array.isArray(err.usedIn) && err.usedIn.length) {
+                const where = err.usedIn.map((u) => `• ${u}`).join('\n');
+                if (!confirm(`"${item.filename}" is still used here:\n\n${where}\n\nDelete it anyway? Those places will show no picture until you choose a new one.`)) return;
+                try {
+                    await api.delete(`/api/media/${item.id}?force=1`, adminToken);
+                    done();
+                } catch {
+                    showToast('Failed to delete', 'error');
+                }
+                return;
+            }
             showToast('Failed to delete', 'error');
         }
     };
@@ -141,27 +157,27 @@ export default function AdminMediaPage() {
                                         alt={item.altText || item.filename}
                                         className="w-full h-full object-cover"
                                         loading="lazy"
+                                        decoding="async"
                                     />
                                 )}
-                                <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                                    <AdminIconButton
-                                        onClick={() => copyUrl(item)}
-                                        icon={copiedId === item.id ? Check : Copy}
-                                        title="Copy URL"
-                                        className="bg-canvas"
-                                    />
-                                    <AdminIconButton
-                                        onClick={() => remove(item)}
-                                        icon={Trash2}
-                                        variant="danger"
-                                        title="Delete"
-                                        className="bg-canvas"
-                                    />
-                                </div>
                             </div>
-                            <div className="p-2.5">
-                                <p className="text-xs text-ink truncate" title={item.filename}>{item.filename}</p>
-                                <p className="text-[11px] text-admin-muted mt-0.5">{formatSize(item.sizeBytes)}</p>
+                            {/* The actions sit under the picture, always visible: a hover-only overlay could not be reached on a phone. */}
+                            <div className="flex items-center gap-1 p-2">
+                                <div className="min-w-0 flex-1 pl-0.5">
+                                    <p className="text-xs text-ink truncate" title={item.filename}>{item.filename}</p>
+                                    <p className="text-[11px] text-admin-muted mt-0.5">{formatSize(item.sizeBytes)}</p>
+                                </div>
+                                <AdminIconButton
+                                    onClick={() => copyUrl(item)}
+                                    icon={copiedId === item.id ? Check : Copy}
+                                    title={copiedId === item.id ? 'Link copied' : `Copy link to ${item.filename}`}
+                                />
+                                <AdminIconButton
+                                    onClick={() => remove(item)}
+                                    icon={Trash2}
+                                    variant="danger"
+                                    title={`Delete ${item.filename}`}
+                                />
                             </div>
                         </div>
                     ))}

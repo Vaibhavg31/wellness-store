@@ -20,6 +20,16 @@ router.delete('/media/:id', asyncRoute(async (req, res) => {
     const item = await repo.findById(mediaId);
     if (!item) return sendError(res, 'Media not found', 404);
 
+    // A picture that is still on the store is not deleted silently: the admin is told where it is used and has to
+    // confirm (?force=1). Otherwise those pages would show an empty frame.
+    const force = req.query.force === '1' || req.query.force === 'true';
+    if (!force) {
+        const usedIn = await repo.findUsage(item.url);
+        if (usedIn.length) {
+            return sendJson(res, { error: 'This file is still used on the store', code: 'MEDIA_IN_USE', usedIn }, 409);
+        }
+    }
+
     await repo.delete(mediaId);
 
     if (item.url.startsWith('/uploads/')) {
