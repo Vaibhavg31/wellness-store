@@ -20,9 +20,7 @@ function OwnPassword({ session }) {
     const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
     const [saving, setSaving] = useState(false);
 
-    if (session.kind !== 'account') {
-        return <p className="text-sm text-admin-muted">This login is set on the server, so its password is changed there, not here.</p>;
-    }
+    // Hooks first: an early return above a hook breaks React's rule that hooks run in the same order every render.
     const save = useSingleFlight(async (e) => {
         e.preventDefault();
         if (form.newPassword !== form.confirm) return showToast('The two new passwords do not match', 'error');
@@ -37,6 +35,9 @@ function OwnPassword({ session }) {
         } finally { setSaving(false); }
         return undefined;
     });
+    if (session.kind !== 'account') {
+        return <p className="text-sm text-admin-muted">This login is set on the server, so its password is changed there, not here.</p>;
+    }
     return (
         <form onSubmit={save} className="grid max-w-xl gap-4">
             <Input label="Current password" type="password" autoComplete="current-password" value={form.currentPassword} onChange={(e) => setForm({ ...form, currentPassword: e.target.value })} required />

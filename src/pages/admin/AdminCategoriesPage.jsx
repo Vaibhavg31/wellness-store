@@ -17,6 +17,7 @@ import {
     AdminEmptyState,
 } from '@/components/admin/AdminUi';
 import { useSingleFlight } from '@/hooks/useSingleFlight';
+import { useDirtyOnOpen } from '@/hooks/useDirtyOnOpen';
 
 const slugify = (text) => String(text ?? '').toLowerCase().trim().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
@@ -28,6 +29,8 @@ export default function AdminCategoriesPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ slug: '', label: '', description: '', image: '', order: 0, isPublished: true });
+    // Unsaved typing in the side panel: a tap outside, Esc or the × asks before closing.
+    const formDirty = useDirtyOnOpen(modalOpen, form);
     const [uploading, setUploading] = useState(false);
     const [search, setSearch] = useState('');
 
@@ -206,6 +209,7 @@ export default function AdminCategoriesPage() {
             <Drawer
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
+                confirmClose={formDirty}
                 title={editing ? 'Edit category' : 'Add category'}
                 side="right"
                 admin

@@ -19,6 +19,7 @@ import {
     AdminEmptyState,
 } from '@/components/admin/AdminUi';
 import { useSingleFlight } from '@/hooks/useSingleFlight';
+import { useDirtyOnOpen } from '@/hooks/useDirtyOnOpen';
 
 const EMPTY_FORM = {
     title: '',
@@ -51,6 +52,8 @@ export default function AdminBundlesPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
+    // Unsaved typing in the side panel: a tap outside, Esc or the × asks before closing.
+    const formDirty = useDirtyOnOpen(modalOpen, form);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [search, setSearch] = useState('');
@@ -272,6 +275,7 @@ export default function AdminBundlesPage() {
             <Drawer
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
+                confirmClose={formDirty}
                 title={editing ? 'Edit bundle' : 'Create bundle'}
                 side="right"
                 wide

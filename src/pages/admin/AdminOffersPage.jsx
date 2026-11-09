@@ -11,6 +11,7 @@ import ProductSearchSelect from '@/components/admin/ProductSearchSelect';
 import { ImageUploadField } from '@/components/admin/ContentEditor';
 import { AdminEmptyState, AdminLoadingState, AdminMenu, AdminPageHeader, AdminSwitch, AdminTableShell } from '@/components/admin/AdminUi';
 import { useSingleFlight } from '@/hooks/useSingleFlight';
+import { useDirtyOnOpen } from '@/hooks/useDirtyOnOpen';
 
 const KINDS = [
     { value: 'mix_match', label: 'Pick & Mix', icon: Layers, help: 'The shopper picks any N different products for one fixed price (for example any 3 for ₹1499).' },
@@ -51,6 +52,8 @@ export default function AdminOffersPage() {
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState(EMPTY);
+    // Unsaved typing in the side panel: a tap outside, Esc or the × asks before closing.
+    const formDirty = useDirtyOnOpen(open, form);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
@@ -177,7 +180,7 @@ export default function AdminOffersPage() {
                 )}
             </AdminTableShell>
 
-            <Drawer isOpen={open} onClose={() => setOpen(false)} title={editing ? 'Edit offer page' : 'New offer page'} side="right" wide admin>
+            <Drawer isOpen={open} confirmClose={formDirty} onClose={() => setOpen(false)} title={editing ? 'Edit offer page' : 'New offer page'} side="right" wide admin>
                 <div className="space-y-5">
                     {error && <div className="rounded-lg border border-danger/30 bg-danger-tint p-3 text-sm text-danger" role="alert">{error}</div>}
 

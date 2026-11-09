@@ -15,6 +15,7 @@ import {
     AdminStatusPill,
 } from '@/components/admin/AdminUi';
 import { useSingleFlight } from '@/hooks/useSingleFlight';
+import { useDirtyOnOpen } from '@/hooks/useDirtyOnOpen';
 
 const TARGET_LABELS = { slider: 'Full-width slider only', stacked: 'Stacked only', both: 'Both', product: 'This product page' };
 
@@ -47,6 +48,8 @@ export default function BannerManager({ filterTarget, productId }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState(() => emptyForm(productId ? 'product' : (filterTarget ?? 'both'), productId));
+    // Unsaved typing in the side panel: a tap outside, Esc or the × asks before closing.
+    const formDirty = useDirtyOnOpen(modalOpen, form);
     const [uploading, setUploading] = useState(false);
     const [saving, setSaving] = useState(false);
 
@@ -239,7 +242,7 @@ export default function BannerManager({ filterTarget, productId }) {
                 )}
             </AdminTableShell>
 
-            <Drawer isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Banner' : 'Add Banner'} side="right" admin>
+            <Drawer isOpen={modalOpen} confirmClose={formDirty} onClose={() => setModalOpen(false)} title={editing ? 'Edit Banner' : 'Add Banner'} side="right" admin>
                 <div className="space-y-4">
                     <div>
                         <label className="block text-xs tracking-[0.15em] uppercase text-admin-muted mb-2">Banner Image</label>

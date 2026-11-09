@@ -34,7 +34,30 @@ const Input = forwardRef(function Input({ className, label, error, hint, id, typ
     const autoId = useId();
     const inputId = id || autoId;
     const [show, setShow] = useState(false);
+    // Number boxes: many forms store Number(e.target.value), so a cleared box became "0" and the next key gave "05"
+    // (and a typed "-" was lost). While the box is being edited it shows exactly what was typed; on blur it shows
+    // the stored value again.
+    const [draft, setDraft] = useState(null);
     const isPassword = type === 'password';
+    const numberProps =
+        type === 'number' && 'value' in props
+            ? {
+                  value: draft ?? props.value ?? '',
+                  onChange: (e) => {
+                      setDraft(e.target.value);
+                      props.onChange?.(e);
+                  },
+                  onBlur: (e) => {
+                      setDraft(null);
+                      props.onBlur?.(e);
+                  },
+                  // A mouse wheel over a focused number box would silently change the value while scrolling the page.
+                  onWheel: (e) => {
+                      if (document.activeElement === e.currentTarget) e.currentTarget.blur();
+                      props.onWheel?.(e);
+                  },
+              }
+            : null;
 
     return (
         <Field id={inputId} label={label} error={error} hint={hint}>
@@ -47,6 +70,7 @@ const Input = forwardRef(function Input({ className, label, error, hint, id, typ
                     aria-describedby={error ? `${inputId}-error` : undefined}
                     className={cn(fieldClass(error), 'h-11', isPassword && 'pr-12', className)}
                     {...props}
+                    {...numberProps}
                 />
                 {isPassword && (
                     <button

@@ -4,14 +4,22 @@ import { useDialog } from '@/hooks/useDialog';
 import { usePresence } from '@/hooks/usePresence';
 import { cn } from '@/utils/formatPrice';
 
-export default function Drawer({ isOpen, onClose, children, title, subtitle, side = 'right', wide = false, size, flush = false, admin = false }) {
-    const panelRef = useDialog(isOpen, onClose);
+/**
+ * A side panel. `confirmClose` (true or a message): while the form inside has unsaved changes, closing the panel by a tap
+ * outside, Esc or the × asks first, so a stray tap does not throw the typing away. Saving closes it without asking.
+ */
+export default function Drawer({ isOpen, onClose, children, title, subtitle, side = 'right', wide = false, size, flush = false, admin = false, confirmClose = false }) {
+    const requestClose = () => {
+        if (confirmClose && !window.confirm(typeof confirmClose === 'string' ? confirmClose : 'Close without saving? The changes you made here will be lost.')) return;
+        onClose();
+    };
+    const panelRef = useDialog(isOpen, requestClose);
     const { mounted, closing } = usePresence(isOpen);
     if (!mounted) return null;
 
     return createPortal(
         <div className={cn('fixed inset-0 z-[100]', admin && 'admin-panel', closing && 'pointer-events-none')}>
-            <div className={cn('absolute inset-0 bg-ink/50', closing ? 'animate-fade-out' : 'animate-fade-in')} onClick={onClose} aria-hidden="true" />
+            <div className={cn('absolute inset-0 bg-ink/50', closing ? 'animate-fade-out' : 'animate-fade-in')} onClick={requestClose} aria-hidden="true" />
             <div
                 ref={panelRef}
                 role="dialog"
@@ -31,7 +39,7 @@ export default function Drawer({ isOpen, onClose, children, title, subtitle, sid
                         {title && <h3 className={cn('truncate', admin ? 'font-sans text-h4' : 'text-h4')}>{title}</h3>}
                         {subtitle && <p className="mt-1 text-small text-muted">{subtitle}</p>}
                     </div>
-                    <button type="button" onClick={onClose} className="-mr-2 grid size-9 shrink-0 place-items-center rounded-full text-ink hover:bg-canvas-alt" aria-label="Close panel">
+                    <button type="button" onClick={requestClose} className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-ink hover:bg-canvas-alt sm:size-9" aria-label="Close panel">
                         <X size={18} />
                     </button>
                 </div>

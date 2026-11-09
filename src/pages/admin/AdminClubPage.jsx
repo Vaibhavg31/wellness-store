@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import { useAdminAuth } from '@/contexts/AuthContext';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 import { useToast } from '@/contexts/ToastContext';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { formatPrice } from '@/utils/formatPrice';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -15,9 +16,14 @@ const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString('en-IN', { day:
 
 function downloadCsv(members) {
     const head = ['Card', 'Name', 'Email', 'Phone', 'Date of birth', 'Gender', 'Joined', 'Orders', 'Spent'];
-    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    // A name typed by a member that starts like a formula ("=…") must open in Excel as text, not run.
+    const esc = (v) => {
+        const s = String(v ?? '');
+        return `"${(typeof v === 'string' && /^[=+\-@\t\r]/.test(s) ? `'${s}` : s).replace(/"/g, '""')}"`;
+    };
     const rows = members.map((m) => [m.cardNo, m.name, m.email, m.phone, m.dob, GENDER_LABEL[m.gender] ?? m.gender, fmtDate(m.joinedAt), m.orders, m.spent]);
-    const blob = new Blob([[head, ...rows].map((r) => r.map(esc).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' });
+    // The BOM makes Excel read the file as UTF-8 (names in Hindi or with accents stay readable), like the other exports.
+    const blob = new Blob(['﻿' + [head, ...rows].map((r) => r.map(esc).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
     const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'chikit-club-members.csv' });
     a.click();
     URL.revokeObjectURL(a.href);
@@ -32,9 +38,12 @@ export default function AdminClubPage() {
     const [saving, setSaving] = useState(false);
     const [members, setMembers] = useState(null);
     const [search, setSearch] = useState('');
+    // The settings as last loaded or saved, so leaving with unsaved edits asks first (like the other admin forms).
+    const [savedClub, setSavedClub] = useState('');
+    useUnsavedChangesWarning(Boolean(club) && JSON.stringify(club) !== savedClub && !saving);
 
     useEffect(() => {
-        api.get('/api/settings').then((s) => setClub(s.extras.club)).catch(() => {});
+        api.get('/api/settings').then((s) => { setClub(s.extras.club); setSavedClub(JSON.stringify(s.extras.club)); }).catch(() => {});
     }, []);
 
     const loadMembers = () => api.get('/api/club/admin/members', adminToken).then(setMembers).catch(() => setMembers([]));
@@ -45,6 +54,7 @@ export default function AdminClubPage() {
         try {
             const current = await api.get('/api/settings');
             await api.put('/api/settings', { extras: { ...current.extras, club } }, adminToken);
+            setSavedClub(JSON.stringify(club));
             refetch();
             showToast('Club settings saved', 'success');
         } catch (err) {
@@ -90,12 +100,12 @@ export default function AdminClubPage() {
                     <label className="flex items-center gap-2 self-end pb-2 text-sm"><input type="checkbox" checked={club.showPrices !== false} onChange={(e) => setClub({ ...club, showPrices: e.target.checked })} /> Show products with their usual and Club price (home page band and the Club page)</label>
                     {club.showPrices !== false && <Input label="How many products to show" type="number" min="3" max="12" value={club.priceCount ?? 8} onChange={(e) => setClub({ ...club, priceCount: e.target.value })} />}
                 </div>
+                {club.showPrices !== false && <p className="text-xs text-admin-muted">These are your best sellers that have a Club price, with the rupees the Club saves. No percentage is shown to shoppers.</p>}
                 <div className="grid gap-4 sm:grid-cols-2">
                     <Input label="Birthday greeting" value={club.birthdayMessage ?? ''} maxLength={200} onChange={(e) => setClub({ ...club, birthdayMessage: e.target.value })} />
                     <Input label="Birthday gift code (optional)" value={club.birthdayCode ?? ''} maxLength={40} placeholder="A hidden coupon, e.g. BDAY20" onChange={(e) => setClub({ ...club, birthdayCode: e.target.value.toUpperCase() })} />
                 </div>
                 <p className="text-xs text-admin-muted">On a member&apos;s birthday the site greets them with confetti and this message. If you add a code, it is shown as their gift: create it in Coupons as a hidden code first.</p>
-                <p className="text-xs text-admin-muted">These are your best sellers that have a Club price, with the rupees the Club saves. No percentage is shown to shoppers.</p>
                 <div><Button variant="turmeric" onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save club settings'}</Button></div>
             </AdminSection>
 
