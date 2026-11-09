@@ -2,11 +2,17 @@ import { useCallback, useRef, useState } from 'react';
 import { Maximize2 } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import ImageLightbox from '@/components/product/ImageLightbox';
+import { IMAGE_FALLBACK } from '@/components/ui/FadeImage';
 import { imageUrl } from '@/services/api';
 import { cn } from '@/utils/formatPrice';
 
 const TAG_VARIANT = { Sale: 'sale', New: 'new' };
 const SWIPE_PX = 40;
+// A photo that cannot be loaded shows the neutral placeholder instead of a broken-image icon (once, so it cannot loop).
+const showFallback = (e) => {
+    const img = e.currentTarget;
+    if (!img.src.endsWith(IMAGE_FALLBACK)) { img.removeAttribute('srcset'); img.src = IMAGE_FALLBACK; }
+};
 
 /**
  * Main image + thumbnails. On phones the photo is square (so the name and price stay near the first screen), swipes
@@ -55,13 +61,14 @@ export default function ProductGallery({ images, title, tags = [] }) {
                     fetchPriority="high"
                     decoding="async"
                     draggable={false}
+                    onError={showFallback}
                     className="size-full animate-fade-in object-contain mix-blend-multiply"
                 />
                 <button
                     type="button"
                     onClick={() => setViewing(true)}
                     aria-label="Open photo full screen and zoom"
-                    className="absolute bottom-3 right-3 grid size-10 place-items-center rounded-full bg-surface/90 text-ink shadow-xs ring-1 ring-line transition-colors hover:bg-surface"
+                    className="absolute bottom-3 right-3 grid size-11 place-items-center rounded-full sm:size-10 bg-surface/90 text-ink shadow-xs ring-1 ring-line transition-colors hover:bg-surface"
                 >
                     <Maximize2 size={18} aria-hidden="true" />
                 </button>
@@ -89,7 +96,7 @@ export default function ProductGallery({ images, title, tags = [] }) {
                                 aria-current={selected === i}
                                 className={cn('size-14 overflow-hidden rounded-md border-2 bg-canvas-alt transition-[border-color,opacity] sm:size-20 lg:size-[4.5rem]', selected === i ? 'border-primary' : 'border-line opacity-70 hover:opacity-100')}
                             >
-                                <img src={imageUrl(img, 160)} alt="" width="80" height="80" loading="lazy" className="size-full bg-canvas-alt object-contain mix-blend-multiply" />
+                                <img src={imageUrl(img, 160)} alt="" width="80" height="80" loading="lazy" onError={showFallback} className="size-full bg-canvas-alt object-contain mix-blend-multiply" />
                             </button>
                         </li>
                     ))}

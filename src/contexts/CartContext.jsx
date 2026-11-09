@@ -95,6 +95,9 @@ export function CartProvider({ children }) {
     const [couponLoading, setCouponLoading] = useState(false);
     // Why the coupon in the bag stopped applying (shown once, so it never just disappears without a word).
     const [couponNotice, setCouponNotice] = useState('');
+    // "X is no longer available…": set when a refresh finds a product the shop removed (see syncPrices).
+    const [bagNotice, setBagNotice] = useState('');
+    const dismissBagNotice = useCallback(() => setBagNotice(''), []);
     const [cartPulse, setCartPulse] = useState(0);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [autoApplied, setAutoApplied] = useState(false);
@@ -310,11 +313,20 @@ export function CartProvider({ children }) {
             syncable.map((item) => api.get(`/api/products/${item.product.id}`))
         );
         const resultByLine = new Map(syncable.map((item, i) => [item, results[i]]));
+        // A product the shop has deleted or hidden answers 404. It is taken out of the bag with a note (it used to stay at its
+        // old price until "Place order" failed). Any other failure (offline, a hiccup) leaves the line alone.
+        const gone = syncable.filter((item, i) => results[i].status === 'rejected' && results[i].reason?.status === 404);
+        if (gone.length) {
+            setBagNotice(gone.length === 1
+                ? `${gone[0].product.title} is no longer available, so it was taken out of your bag.`
+                : `${gone.length} items are no longer available, so they were taken out of your bag.`);
+        }
 
         setItems((prev) => prev
             .map((item) => {
                 if (item.product.bundleId || item.product.offerId) return item;
                 const result = resultByLine.get(item);
+                if (result?.status === 'rejected' && result.reason?.status === 404) return { ...item, quantity: 0 };
                 if (!result || result.status !== 'fulfilled' || !result.value) return item;
                 const fresh = result.value;
                 // A variant line must re-price off that specific variant, not
@@ -567,6 +579,8 @@ export function CartProvider({ children }) {
         couponCode: couponState?.valid ? couponCode : '',
         couponBreakdown: couponState?.valid ? couponState.breakdown : null,
         couponNotice,
+        bagNotice,
+        dismissBagNotice,
         couponDetails: couponState?.valid ? couponState.coupon : null,
         couponMessage: couponState?.message || '',
         couponLoading,
@@ -607,6 +621,8 @@ export function CartProvider({ children }) {
         couponState,
         couponCode,
         couponNotice,
+        bagNotice,
+        dismissBagNotice,
         eligibleSubtotal,
         couponLoading,
         autoApplied,

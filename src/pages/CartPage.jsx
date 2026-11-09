@@ -22,6 +22,7 @@ import { imageUrl } from '@/services/api';
 import { loginUrl } from '@/utils/authRedirect';
 import { humanizeSlug } from '@/utils/products';
 import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
+import BagNotice from '@/components/cart/BagNotice';
 
 const removeButton = 'grid size-9 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-danger-tint hover:text-danger';
 
@@ -150,6 +151,7 @@ export default function CartPage() {
     if (items.length === 0) {
         return (
             <div className="container-page py-16">
+                <BagNotice className="mx-auto mb-8 max-w-xl" />
                 <EmptyState as="h1" icon={ShoppingBag} title="Your bag is empty" description="Browse freely and add items. No sign-in needed until checkout." actionLabel="Explore the shop" actionHref="/shop" />
                 <PopularPicks />
             </div>
@@ -161,6 +163,7 @@ export default function CartPage() {
             <PageHeader title="Shopping bag" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} · saved on this device`} />
             <div className="container-page py-8 lg:py-12">
                 <CheckoutSteps activeIndex={0} />
+                <BagNotice className="mb-6" />
 
                 {isAuthenticated ? (
                     <p className="mb-6 flex items-center gap-3 rounded-lg bg-primary-tint px-4 py-3 text-small text-ink">

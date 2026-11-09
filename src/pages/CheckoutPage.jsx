@@ -31,6 +31,7 @@ import CouponInput from '@/components/checkout/CouponInput';
 import ActiveCoupons from '@/components/checkout/ActiveCoupons';
 import PriceBreakdown from '@/components/checkout/PriceBreakdown';
 import CartLinePrice, { isClubLine } from '@/components/cart/CartLinePrice';
+import BagNotice from '@/components/cart/BagNotice';
 
 const OTP_FLOW_KEY = 'chikit-checkout-otp-flow';
 const MAX_SAVED_ADDRESSES = 3;
@@ -63,8 +64,15 @@ function isAccountPhoneVerified(user, phoneDigits) {
 }
 
 export default function CheckoutPage() {
-    const { items, total, couponCode, clearCart } = useCart();
+    const { items, total, couponCode, clearCart, syncPrices } = useCart();
     const { user, token, isAuthenticated, updateUser, logout } = useAuth();
+
+    // Fresh prices and stock before paying, and a product the shop removed meanwhile is taken out with a note (BagNotice),
+    // instead of the order failing at "Place order".
+    useEffect(() => {
+        syncPrices();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const { content } = useSiteContent();
     const { razorpayKeyId, razorpayReady: RAZORPAY_ENABLED } = useIntegrations();
 
@@ -618,6 +626,7 @@ export default function CheckoutPage() {
             </div>
 
             <CheckoutSteps activeIndex={currentStep} />
+            <BagNotice className="mb-6" />
 
             {/* Mobile / tablet — single sticky CTA */}
             <div className="sticky top-16 z-30 -mx-4 mb-6 space-y-2 border-b border-line bg-surface px-4 py-3 shadow-sm sm:-mx-6 sm:px-6 lg:hidden">

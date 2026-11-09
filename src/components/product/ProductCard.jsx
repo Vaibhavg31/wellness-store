@@ -68,7 +68,7 @@ function ProductCard({ product, priority = false, action = true, wide = false })
                         className={cn('size-full object-contain mix-blend-multiply transition-[transform,opacity] duration-500 group-hover:scale-[1.04]', secondary && 'group-hover:opacity-0')}
                     />
                     {secondary && (
-                        <img src={imageUrl(secondary, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" className="absolute inset-0 size-full scale-[1.04] object-contain mix-blend-multiply opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-100 group-hover:opacity-100" />
+                        <img src={imageUrl(secondary, 480)} alt="" width="480" height="600" loading="lazy" decoding="async" onError={(e) => { e.currentTarget.hidden = true; }} className="absolute inset-0 size-full scale-[1.04] object-contain mix-blend-multiply opacity-0 transition-[transform,opacity] duration-500 group-hover:scale-100 group-hover:opacity-100" />
                     )}
                 </Link>
 

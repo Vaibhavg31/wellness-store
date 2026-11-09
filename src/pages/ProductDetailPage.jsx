@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { trackEvent } from '@/utils/analytics';
+import { PackageX } from 'lucide-react';
 import ProductDetailView from '@/components/product/ProductDetailView';
-import Button from '@/components/ui/Button';
+import EmptyState from '@/components/ui/EmptyState';
+import PopularPicks from '@/components/shop/PopularPicks';
+import Seo from '@/components/seo/Seo';
 import Skeleton from '@/components/ui/Skeleton';
 import { useBanners, useProduct, useReviews } from '@/hooks/useApi';
 
@@ -36,10 +39,12 @@ export default function ProductDetailPage() {
     if (loading) return <ProductSkeleton />;
 
     if (!product) {
+        // An old link (a removed or hidden product): say so plainly and offer favourites, instead of a bare heading.
         return (
-            <div className="container-page py-24 text-center">
-                <h1>Product not found</h1>
-                <Button to="/shop" variant="outline" className="mt-6">Back to shop</Button>
+            <div className="container-page py-16">
+                <Seo noindex title="Product not available" />
+                <EmptyState as="h1" icon={PackageX} title="This product is not available" description="It may have been removed or is not on sale right now. Here are some customer favourites instead." actionLabel="Browse the shop" actionHref="/shop" />
+                <PopularPicks />
             </div>
         );
     }
