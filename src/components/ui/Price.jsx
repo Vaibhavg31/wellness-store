@@ -26,7 +26,7 @@ export default function Price({ price, originalPrice, memberPrice, isMember = fa
                 </span>
             )}
             {mrp > 0 && (
-                <span className={cn('line-through', member ? 'text-caption text-subtle' : 'text-small text-muted')}>
+                <span className={cn('line-through', member ? 'text-caption text-muted' : 'text-small text-muted')}>
                     <span className="sr-only">Original price </span>
                     {formatPrice(mrp)}
                 </span>

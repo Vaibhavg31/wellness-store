@@ -21,7 +21,7 @@ export default function CartLinePrice({ product, quantity, className, align = 'e
     return (
         <span className={cn('flex flex-wrap items-baseline gap-x-1.5', align === 'start' ? 'justify-start' : 'justify-end', className)}>
             {usual > 0 && <span className="text-caption text-muted line-through"><span className="sr-only">Price without Chikit Club </span>{formatPrice(usual)}</span>}
-            {mrp > 0 && <span className={cn('text-caption line-through', club ? 'text-subtle' : 'text-muted')}><span className="sr-only">Original price </span>{formatPrice(mrp)}</span>}
+            {mrp > 0 && <span className={'text-caption text-muted line-through'}><span className="sr-only">Original price </span>{formatPrice(mrp)}</span>}
             <span className={cn('inline-flex items-baseline gap-1 font-semibold', club ? 'text-primary' : 'text-ink')}>
                 {club && <Crown size={12} className="self-center" aria-label="Chikit Club price" />}
                 {formatPrice(pay)}

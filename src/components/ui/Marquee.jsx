@@ -12,9 +12,13 @@ export default function Marquee({ children, className, trackClassName, secondsPe
 
     // Each copy must be at least as wide as the screen or the loop shows a gap, so a short list is repeated.
     const repeat = items.length < 3 ? 6 : items.length < 6 ? 3 : items.length < 10 ? 2 : 1;
+    // Only the first run of items is real: every repeat exists for the loop, so it is hidden from screen readers and
+    // `inert` keeps its links out of the Tab order (a hidden but focusable link is an accessibility failure).
     const copy = (n) => (
-        <div data-marquee-copy={n} className={cn('flex shrink-0 items-center', trackClassName)} aria-hidden={n === 2 ? 'true' : undefined}>
-            {Array.from({ length: repeat }, (_, r) => items.map((child, i) => <div key={`${r}-${i}`} className="shrink-0">{child}</div>))}
+        <div data-marquee-copy={n} className={cn('flex shrink-0 items-center', trackClassName)} aria-hidden={n === 2 ? 'true' : undefined} inert={n === 2 || undefined}>
+            {Array.from({ length: repeat }, (_, r) => items.map((child, i) => (
+                <div key={`${r}-${i}`} className="shrink-0" aria-hidden={n === 1 && r > 0 ? 'true' : undefined} inert={(n === 1 && r > 0) || undefined}>{child}</div>
+            )))}
         </div>
     );
 

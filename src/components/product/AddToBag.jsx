@@ -70,7 +70,8 @@ export default function AddToBag({ product, size = 'card', tone = 'light', soldO
             type="button"
             onClick={add}
             disabled={outOfStock}
-            aria-label={outOfStock ? `${product.title} is sold out` : `Add ${product.title} to bag`}
+            // The spoken name starts with the words on the button (WCAG "label in name"), so voice control users can say "Add to bag".
+            aria-label={outOfStock ? `${soldOutLabel}: ${product.title}` : `Add to bag: ${product.title}`}
             className={cn(
                 'relative z-10 inline-flex w-full items-center justify-center gap-2 rounded-full border font-semibold transition-colors',
                 dark
