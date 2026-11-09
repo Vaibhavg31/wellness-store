@@ -47,8 +47,11 @@ router.get('/reviews/eligibility', asyncRoute(async (req, res) => {
     if (await repo.findByUserAndProduct(userId, productId)) {
         return sendJson(res, { eligible: false, reason: 'already_reviewed' });
     }
-    if (!(await orders.hasUserPurchasedProduct(userId, productId))) {
-        return sendJson(res, { eligible: false, reason: 'not_purchased' });
+    // Like the big marketplaces: a "verified purchase" review needs the parcel to have arrived (an unpaid or
+    // undelivered order does not count yet).
+    const state = await orders.reviewPurchaseState(userId, productId);
+    if (state !== 'delivered') {
+        return sendJson(res, { eligible: false, reason: state === 'pending' ? 'not_delivered' : 'not_purchased' });
     }
     sendJson(res, { eligible: true });
 }, 'Failed to check review eligibility'));
@@ -60,14 +63,15 @@ router.post('/reviews', asyncRoute(async (req, res) => {
     const body = req.body || {};
     const productId = String(body.productId || '').trim();
     const comment = String(body.comment || '').trim();
-    if (!productId || !comment) return sendError(res, 'productId and comment are required', 400);
+    if (!productId) return sendError(res, 'Choose the product you are reviewing', 400);
+    if (!comment) return sendError(res, 'Please write a few words about the product', 400);
 
     if (await repo.findByUserAndProduct(userId, productId)) {
         throw new HttpError('You have already reviewed this product. Thank you!', 409);
     }
-    if (!(await orders.hasUserPurchasedProduct(userId, productId))) {
-        throw new HttpError('Only customers who have purchased this product can review it', 403);
-    }
+    const state = await orders.reviewPurchaseState(userId, productId);
+    if (state === 'pending') throw new HttpError('You can review this product once your order has been delivered', 403);
+    if (state !== 'delivered') throw new HttpError('Only customers who have purchased this product can review it', 403);
 
     const user = await users.getById(userId);
     if (!user) return sendError(res, 'Account not found', 404);

@@ -84,8 +84,10 @@ export default function ReviewForm({ product, onSubmitted }) {
                 <Button to={loginUrl(pathname)}>Sign in</Button>
             </div>
         );
+    } else if (eligibility.reason === 'not_delivered') {
+        body = <p className="max-w-lg text-muted">Your order for {product.title} is on its way. Once it has been delivered, you can share your experience here.</p>;
     } else if (eligibility.reason === 'not_purchased') {
-        body = <p className="max-w-lg text-muted">Only customers who have purchased this product can write a review. Once your order for {product.title} is placed, you can share your experience here.</p>;
+        body = <p className="max-w-lg text-muted">Only customers who have purchased this product can write a review. Once your order for {product.title} has been delivered, you can share your experience here.</p>;
     } else if (eligibility.eligible) {
         body = (
             <form onSubmit={submit} className="max-w-lg space-y-5">

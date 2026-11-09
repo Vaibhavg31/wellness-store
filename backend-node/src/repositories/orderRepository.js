@@ -353,13 +353,21 @@ export class OrderRepository extends BaseRepository {
     }
 
     /** Gate for "only people who bought this can review it" — true once this user has any non-cancelled order containing this product. */
-    async hasUserPurchasedProduct(userId, productId) {
+    /**
+     * Whether a customer may review a product as a verified buyer: 'delivered' once an order with it has been delivered
+     * (a returned parcel was delivered too), 'pending' while such an order is still on its way or waiting for payment,
+     * 'none' otherwise. Cancelled orders never count.
+     */
+    async reviewPurchaseState(userId, productId) {
         const [rows] = await this.pool().query(
-            `SELECT 1 FROM order_items oi INNER JOIN orders o ON o.id = oi.order_id
-             WHERE o.user_id = ? AND oi.product_id = ? AND o.status != ? LIMIT 1`,
-            [userId, productId, 'cancelled'],
+            `SELECT MAX(o.status IN ('delivered', 'returned')) AS delivered, COUNT(*) AS orders
+               FROM order_items oi INNER JOIN orders o ON o.id = oi.order_id
+              WHERE o.user_id = ? AND oi.product_id = ? AND o.status <> 'cancelled'`,
+            [userId, productId],
         );
-        return rows.length > 0;
+        const row = rows[0] || {};
+        if (Number(row.delivered) === 1) return 'delivered';
+        return Number(row.orders) > 0 ? 'pending' : 'none';
     }
 
     async countNonCancelledOrders(userId) {
