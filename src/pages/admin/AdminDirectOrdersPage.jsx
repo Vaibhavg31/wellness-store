@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     AlertCircle,
-    CheckCircle2,
     ChevronRight,
     ClipboardList,
     History,
@@ -19,6 +18,7 @@ import {
     User,
 } from 'lucide-react';
 import { useAdminAuth, ADMIN_PATH } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/services/api';
 import { formatPrice } from '@/utils/formatPrice';
 import { formatIndianAddress } from '@/utils/formatAddress';
@@ -75,8 +75,8 @@ function LineItemRow({ item, index, products, onChange, onRemove, canRemove }) {
                         <button
                             type="button"
                             onClick={() => onRemove(index)}
-                            className="p-1.5 rounded-lg text-danger hover:bg-danger-tint"
-                            aria-label="Remove item"
+                            className="grid size-9 max-sm:size-11 place-items-center rounded-lg text-danger hover:bg-danger-tint"
+                            aria-label={`Remove line ${index + 1}`}
                         >
                             <Trash2 size={15} />
                         </button>
@@ -224,13 +224,13 @@ const DEFAULT_OPTIONAL = {
 
 export default function AdminDirectOrdersPage() {
     const { adminToken } = useAdminAuth();
+    const { showToast } = useToast();
     const [activeTab, setActiveTab] = useState('create');
     const [products, setProducts] = useState([]);
     const [directOrders, setDirectOrders] = useState([]);
     const [loadingOrders, setLoadingOrders] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
     const [detailOrder, setDetailOrder] = useState(null);
     const [searchInput, setSearchInput] = useState('');
     const [optional, setOptional] = useState(DEFAULT_OPTIONAL);
@@ -354,7 +354,6 @@ export default function AdminDirectOrdersPage() {
         if (!adminToken) return;
 
         setError('');
-        setSuccess('');
 
         const validItems = form.items.filter((item) => item.title.trim() && parseFloat(item.price) >= 0);
         if (validItems.length === 0) {
@@ -401,7 +400,9 @@ export default function AdminDirectOrdersPage() {
             };
 
             const created = await api.post('/api/orders/admin/create-direct', payload, adminToken);
-            setSuccess(`Direct order ${shortOrderId(created.id)} created successfully.`);
+            // The page switches to History and opens the new order, so the confirmation is a notification
+            // (a message on the form tab was never seen).
+            showToast(`Direct order ${shortOrderId(created.id)} created successfully`, 'success');
             resetForm();
             await fetchDirectOrders();
             setDetailOrder(created);
@@ -427,24 +428,26 @@ export default function AdminDirectOrdersPage() {
                     <Button to={`${ADMIN_PATH}/orders`} variant="outline" size="sm" className="normal-case tracking-normal">
                         All orders
                     </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                            if (activeTab === 'history') fetchDirectOrders();
-                        }}
-                        disabled={loadingOrders && activeTab === 'history'}
-                        className="gap-2 normal-case tracking-normal"
-                    >
-                        <RefreshCw size={14} className={loadingOrders && activeTab === 'history' ? 'animate-spin' : ''} />
-                        Refresh
-                    </Button>
+                    {/* Refresh only means something on the History list (on the form it used to do nothing). */}
+                    {activeTab === 'history' && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => fetchDirectOrders()}
+                            disabled={loadingOrders}
+                            className="gap-2 normal-case tracking-normal"
+                        >
+                            <RefreshCw size={14} className={loadingOrders ? 'animate-spin' : ''} />
+                            Refresh
+                        </Button>
+                    )}
                 </div>
             </div>
 
             <div className="flex gap-1 p-1 rounded-xl bg-admin-surface-alt border border-admin-border mb-6 max-w-md">
                 <button
                     type="button"
+                    aria-pressed={activeTab === 'create'}
                     onClick={() => setActiveTab('create')}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         activeTab === 'create'
@@ -457,6 +460,7 @@ export default function AdminDirectOrdersPage() {
                 </button>
                 <button
                     type="button"
+                    aria-pressed={activeTab === 'history'}
                     onClick={() => {
                         setActiveTab('history');
                         fetchDirectOrders();
@@ -483,12 +487,6 @@ export default function AdminDirectOrdersPage() {
                         <div className="p-4 rounded-xl bg-danger-tint border border-danger/30 text-danger text-sm flex gap-3">
                             <AlertCircle size={18} className="flex-shrink-0" />
                             <span>{error}</span>
-                        </div>
-                    )}
-                    {success && (
-                        <div className="p-4 rounded-xl bg-primary/10 border border-primary/30 text-primary text-sm flex gap-3">
-                            <CheckCircle2 size={18} className="flex-shrink-0" />
-                            <span>{success}</span>
                         </div>
                     )}
 

@@ -60,6 +60,9 @@ import { printOrderStickers } from '@/utils/printOrderStickers';
 import { openInvoice } from '@/utils/invoice';
 import { useSiteContent } from '@/contexts/SiteContentContext';
 
+/** Returns the shop still has to act on, in the order they need it. */
+const OPEN_RETURN = ['requested', 'approved'];
+
 const PAYMENT_FILTER_OPTIONS = [
     { value: '', label: 'All payments' },
     { value: 'cod', label: 'Cash on Delivery' },
@@ -484,9 +487,12 @@ export default function AdminOrdersPage() {
     };
 
     const stats = useMemo(() => {
-        const counts = { placed: 0, active: 0, delivered: 0, cancelled: 0, returns: 0 };
+        // The Returns badge counts the same orders the Returns list shows (like every other tab); the ones still
+        // waiting for the shop are listed first and counted separately.
+        const counts = { placed: 0, active: 0, delivered: 0, cancelled: 0, returns: 0, openReturns: 0 };
         orders.forEach((o) => {
-            if (o.returnStatus && ['requested', 'approved'].includes(o.returnStatus)) counts.returns++;
+            if (o.returnStatus) counts.returns++;
+            if (OPEN_RETURN.includes(o.returnStatus)) counts.openReturns++;
             const s = normalizeStatus(o.status);
             if (s === 'placed') counts.placed++;
             else if (s === 'delivered') counts.delivered++;
@@ -498,7 +504,10 @@ export default function AdminOrdersPage() {
 
     const visibleOrders = useMemo(() => {
         if (view === 'all') return orders;
-        if (view === 'returns') return orders.filter((o) => o.returnStatus);
+        if (view === 'returns') {
+            const rank = (o) => (OPEN_RETURN.includes(o.returnStatus) ? OPEN_RETURN.indexOf(o.returnStatus) : OPEN_RETURN.length);
+            return orders.filter((o) => o.returnStatus).sort((a, b) => rank(a) - rank(b));
+        }
         return orders.filter((o) => groupOf(o) === view);
     }, [orders, view]);
 
@@ -676,6 +685,13 @@ export default function AdminOrdersPage() {
                 ]}
             />
 
+            {view === 'returns' && stats.returns > 0 && (
+                <p className="text-sm text-admin-muted">
+                    {stats.openReturns > 0 ? <><strong className="text-warning">{stats.openReturns} waiting for your answer</strong> (shown first) · </> : 'Nothing waiting for you · '}
+                    {stats.returns} {stats.returns === 1 ? 'return' : 'returns'} in total
+                </p>
+            )}
+
             {reasonCounts.length > 0 && (
                 <div className="rounded-xl border border-admin-border bg-admin-surface p-4">
                     <p className="text-[11px] font-medium tracking-[0.15em] uppercase text-admin-muted mb-2.5">{view === 'returns' ? 'Why customers return' : 'Why customers cancel'}</p>
@@ -731,7 +747,71 @@ export default function AdminOrdersPage() {
                 {loading ? (
                     <AdminLoadingState />
                 ) : (
-                    <div className="overflow-x-auto">
+                    <>
+                    {/* Phones and tablets: one card per order (the 9-column table needed sideways scrolling there). */}
+                    {visibleOrders.length > 0 && (
+                        <label className="flex min-h-11 items-center gap-3 border-b border-admin-border bg-admin-surface-alt px-4 text-xs font-medium text-admin-muted lg:hidden">
+                            <input type="checkbox" className="size-5" checked={allSelected} onChange={toggleAll} />
+                            Select all {visibleOrders.length}
+                        </label>
+                    )}
+                    {visibleOrders.length > 0 && (
+                        <ul className="divide-y divide-admin-border-light lg:hidden" aria-label="Orders">
+                            {visibleOrders.map((order) => {
+                                const first = order.items?.[0];
+                                const more = (order.items?.length || 0) - 1;
+                                const next = getNextStatus(order.status) && !isTerminalStatus(order.status) && !isAwaitingPayment(order) ? getNextStatus(order.status) : null;
+                                return (
+                                    <li key={order.id} data-row className={`relative p-4 ${selected.has(order.id) ? 'bg-primary/5' : ''}`}>
+                                        <div className="flex items-start gap-3">
+                                            <input
+                                                type="checkbox"
+                                                className="mt-1 size-5 shrink-0"
+                                                checked={selected.has(order.id)}
+                                                onChange={() => toggleOne(order.id)}
+                                                aria-label={`Select order ${order.id}`}
+                                            />
+                                            <button type="button" onClick={() => setDetailOrder(order)} className="min-w-0 flex-1 text-left" aria-label={`Open order ${shortOrderId(order.id)} from ${order.shipping?.name || 'a customer'}`}>
+                                                <span className="flex flex-wrap items-center gap-2">
+                                                    <span className="font-mono text-xs text-ink">{shortOrderId(order.id)}</span>
+                                                    {isDirectOrder(order) && <span className="rounded border border-primary/20 bg-primary-tint px-1.5 py-0.5 text-[10px] text-primary-deep">Direct</span>}
+                                                    <span className="text-xs text-admin-muted">{formatOrderDate(order.createdAt, { time: false })}</span>
+                                                </span>
+                                                <span className="mt-1 block truncate font-medium text-ink">{order.shipping?.name || '—'}</span>
+                                                <span className="block truncate text-xs text-admin-muted">{first?.title || '—'}{more > 0 ? ` + ${more} more` : ''}</span>
+                                                <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                                                    <span className="font-semibold text-ink">{formatPrice(order.total)}</span>
+                                                    <span className="text-xs text-admin-muted">{paymentLabel(order)}</span>
+                                                </span>
+                                            </button>
+                                            <div className="flex shrink-0 flex-col items-end gap-1.5">
+                                                <OrderStatusBadge status={displayStatus(order)} />
+                                                {order.returnStatus && <span className="text-[11px] font-medium text-warning">{RETURN_STATUS_LABELS[order.returnStatus]}</span>}
+                                            </div>
+                                        </div>
+                                        <div className="mt-3 flex items-center justify-end gap-2 pl-8">
+                                            {next ? (
+                                                <Button variant="outline" size="sm" disabled={advancingId === order.id} onClick={() => advanceOrder(order)}>
+                                                    {advancingId === order.id ? '…' : `Mark ${getStatusLabel(next).toLowerCase()}`}
+                                                </Button>
+                                            ) : (
+                                                <Button variant="outline" size="sm" onClick={() => setDetailOrder(order)}>View</Button>
+                                            )}
+                                            <AdminMenu
+                                                label={`More actions for order ${shortOrderId(order.id)}`}
+                                                items={[
+                                                    { label: 'View details', onClick: () => setDetailOrder(order) },
+                                                    { label: 'Print shipping label', icon: Printer, onClick: () => printStickers([order.id]) },
+                                                    { label: 'Invoice', icon: FileText, onClick: () => openInvoice(order, content) },
+                                                ]}
+                                            />
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                    <div className="overflow-x-auto max-lg:hidden">
                         <table className="w-full text-sm min-w-[900px]">
                             <thead>
                                 <tr className="border-b border-admin-border text-left bg-admin-surface-alt">
@@ -842,15 +922,16 @@ export default function AdminOrdersPage() {
                                 })}
                             </tbody>
                         </table>
-
-                        {visibleOrders.length === 0 && !error && (
-                            <AdminEmptyState
-                                icon={Package}
-                                title="No orders found"
-                                description={hasActiveFilters ? 'Try adjusting your filters.' : 'New orders will appear here after checkout.'}
-                            />
-                        )}
                     </div>
+
+                    {visibleOrders.length === 0 && !error && (
+                        <AdminEmptyState
+                            icon={Package}
+                            title="No orders found"
+                            description={hasActiveFilters ? 'Try adjusting your filters.' : 'New orders will appear here after checkout.'}
+                        />
+                    )}
+                    </>
                 )}
             </AdminTableShell>
 
