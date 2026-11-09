@@ -6,7 +6,9 @@ export async function lookupPincode(pincode) {
     if (digits.length !== 6) return null;
 
     try {
-        const res = await fetch(`${PINCODE_API}/${digits}`);
+        // The public postal service is sometimes very slow; after 6 seconds the shopper just types the city themselves
+        // (without a limit the "Looking up city & state…" spinner could spin forever).
+        const res = await fetch(`${PINCODE_API}/${digits}`, { signal: AbortSignal.timeout(6000) });
         if (!res.ok) return null;
 
         const data = await res.json();

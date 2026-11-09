@@ -64,7 +64,7 @@ export function ToastProvider({ children }) {
                             <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); dismissToast(toast.id); }}
-                                className="grid size-8 shrink-0 place-items-center rounded-full text-muted hover:bg-canvas-alt hover:text-ink"
+                                className="relative grid size-8 shrink-0 place-items-center rounded-full text-muted before:absolute before:-inset-1.5 before:content-[''] hover:bg-canvas-alt hover:text-ink"
                                 aria-label="Dismiss notification"
                             >
                                 <X size={14} />

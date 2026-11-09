@@ -28,7 +28,8 @@ export default function BackToTop() {
             aria-label="Back to top"
             tabIndex={visible ? 0 : -1}
             className={cn(
-                'fixed bottom-24 right-6 z-40 hidden size-11 place-items-center rounded-full border border-line bg-surface text-primary shadow-md sm:grid',
+                // Stacked above the WhatsApp button, which itself sits above the tab bar on tablets (the two used to overlap there).
+                'fixed bottom-[calc(var(--tabbar-h,0px)+5.25rem)] right-[1.875rem] z-40 hidden size-11 place-items-center rounded-full border border-line bg-surface text-primary shadow-md sm:grid lg:bottom-24',
                 'transition-[opacity,transform] duration-300 hover:bg-primary-tint',
                 visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0',
             )}

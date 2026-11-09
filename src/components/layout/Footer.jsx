@@ -36,8 +36,9 @@ function NewsletterForm() {
             await api.post('/api/newsletter/subscribe', { email, source: 'footer' });
             setDone(true);
             setEmail('');
-        } catch {
-            showToast('Could not subscribe. Please try again.', 'error');
+        } catch (err) {
+            // The server's own words when it has them ("Please enter a valid email address", "try again in a little while").
+            showToast(err?.status >= 400 && err.status < 500 && err.message ? err.message : 'Could not subscribe. Please try again.', 'error');
         } finally {
             setLoading(false);
         }
@@ -138,6 +139,8 @@ export default function Footer() {
                                 <li key={item.href}><Link to={item.href} className={linkClass}>{item.label}</Link></li>
                             ))}
                         </ul>
+                        {/* Support hours belong with "Contact us" (they used to sit under the newsletter, and vanished with it on the home page). */}
+                        {contact?.businessHours && <p className="mt-2 text-caption text-ink/70">{contact.businessHours}</p>}
                     </div>
                 </nav>
 
@@ -145,7 +148,6 @@ export default function Footer() {
                     <h2 className={heading.replace('mb-4', 'mb-2')}>{footer.newsletterTitle}</h2>
                     <p className="mb-4 text-small text-ink/75">{footer.newsletterDescription}</p>
                     <NewsletterForm />
-                    {contact?.businessHours && <p className="mt-4 text-caption text-ink/65">{contact.businessHours}</p>}
                 </div>
             </div>
 
