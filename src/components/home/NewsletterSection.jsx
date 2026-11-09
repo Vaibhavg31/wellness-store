@@ -20,8 +20,8 @@ export default function NewsletterSection() {
             await api.post('/api/newsletter/subscribe', { email, source: 'homepage' });
             setSubmitted(true);
             setEmail('');
-        } catch {
-            showToast('Could not subscribe. Please try again.', 'error');
+        } catch (err) {
+            showToast(err?.status >= 400 && err.status < 500 && err.message ? err.message : 'Could not subscribe. Please try again.', 'error');
         } finally {
             setLoading(false);
         }

@@ -2,21 +2,53 @@ import { Router } from 'express';
 import { requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError, HttpError } from '../lib/response.js';
 import { generateId } from '../lib/db.js';
+import { assertAmount, assertImageUrl, assertText, assertWhole } from '../lib/validate.js';
 import { ProductRepository } from '../repositories/productRepository.js';
 
 const router = Router();
 const repo = new ProductRepository();
 
-function validateProduct(body, required) {
-    const fields = ['title', 'price', 'originalPrice', 'category', 'description', 'stock'];
-    for (const field of fields) {
-        const v = body[field];
-        if (required && (v === undefined || v === null || v === '') && v !== 0) {
-            throw new HttpError(`Missing required field: ${field}`, 400);
+const REQUIRED = { title: 'Product name', price: 'Selling price', originalPrice: 'MRP', category: 'Category', description: 'Description', stock: 'Stock' };
+const MAX_RUPEES = 1000000;
+
+/**
+ * Checks a product before it is saved (all fields when creating, only the ones sent when updating). The admin form
+ * checks the same things, but the API must not rely on it: a price of "abc" used to end in a 500, a hidden draft could
+ * be saved with a negative price or stock, and MySQL (not in strict mode) silently cut text that was too long.
+ */
+function validateProduct(body, creating) {
+    if (creating) {
+        for (const [field, label] of Object.entries(REQUIRED)) {
+            const v = body[field];
+            if (v === undefined || v === null || v === '') throw new HttpError(`${label} is required`, 400);
         }
+        if (!Array.isArray(body.images) || body.images.length < 1) throw new HttpError('Add at least one photo', 400);
     }
-    if (required && (!Array.isArray(body.images) || body.images.length < 1)) {
-        throw new HttpError('At least one image is required', 400);
+    if ('title' in body) assertText(body.title, 'Product name', 500, { required: true });
+    if ('description' in body) assertText(body.description, 'Description', 20000);
+    if ('category' in body) assertText(body.category, 'Category', 64, { required: true });
+    if ('series' in body) assertText(body.series ?? '', 'Series', 120);
+    if ('price' in body) assertAmount(body.price, 'Selling price', { max: MAX_RUPEES });
+    if ('originalPrice' in body) assertAmount(body.originalPrice, 'MRP', { max: MAX_RUPEES });
+    if ('stock' in body) assertWhole(body.stock, 'Stock', { min: 0, max: MAX_RUPEES });
+    if ('clubPrice' in body && body.clubPrice !== null && body.clubPrice !== '') assertAmount(body.clubPrice, 'Club price', { max: MAX_RUPEES });
+    if ('images' in body) {
+        if (!Array.isArray(body.images) || body.images.length > 20) throw new HttpError('A product can have 1 to 20 photos', 400);
+        body.images.forEach((url) => assertImageUrl(url, 'Product photo', { required: true }));
+    }
+    if ('variants' in body && Array.isArray(body.variants)) {
+        if (body.variants.length > 20) throw new HttpError('A product can have up to 20 options', 400);
+        for (const v of body.variants) {
+            if (!v || typeof v !== 'object') throw new HttpError('Each option needs a name and a price', 400);
+            assertText(v.label, 'Option name', 150, { required: true });
+            assertAmount(v.price, `Price of "${v.label}"`, { max: MAX_RUPEES });
+            if (v.originalPrice !== undefined && v.originalPrice !== null && v.originalPrice !== '') assertAmount(v.originalPrice, `MRP of "${v.label}"`, { max: MAX_RUPEES });
+            assertWhole(v.stock ?? 0, `Stock of "${v.label}"`, { min: 0, max: MAX_RUPEES });
+            assertText(v.sku ?? '', 'SKU', 100);
+            assertText(v.netQuantity ?? '', 'Net quantity', 100);
+            assertText(v.tag ?? '', 'Option ribbon', 40);
+            assertImageUrl(v.image, 'Option picture');
+        }
     }
 }
 
@@ -118,6 +150,7 @@ router.put('/products/:id', asyncRoute(async (req, res) => {
 
     const changes = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
     if ('variants' in changes && !Array.isArray(changes.variants)) delete changes.variants;
+    validateProduct(changes, false);
 
     const price = Number(changes.price ?? product.price);
     const originalPrice = Number(changes.originalPrice ?? product.originalPrice);

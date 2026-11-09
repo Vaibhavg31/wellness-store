@@ -257,7 +257,7 @@ async function validatePaymentMethod(payment, items) {
  * box is priced the better of the box price and the Club prices of the same products (mixBoxPricing).
  */
 async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
-    if (rawItems.length === 0) throw new HttpError('Cart is empty', 400);
+    if (rawItems.length === 0) throw new HttpError('Your bag is empty', 400);
 
     const club = await clubConfig();
     const offerCache = new Map();
@@ -272,7 +272,7 @@ async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
     const mixLines = new Map(); // "offerId|group" → [{ index, listPrice, offer, productId }]
 
     for (const line of rawItems) {
-        if (!line || typeof line !== 'object') throw new HttpError('Invalid cart item', 400);
+        if (!line || typeof line !== 'object') throw new HttpError('One of the items in your bag is not valid. Please update your bag.', 400);
 
         const productId = String(line.productId || '');
         const variantId = String(line.variantId || '').trim();
@@ -281,7 +281,7 @@ async function validateAndBuildItems(rawItems, { isMember = false } = {}) {
         // Only a whole number counts: "abc", true, {}, Infinity and "1.5" used to slip through parseInt as NaN / a silent 1.
         const qty = ['number', 'string'].includes(typeof line.quantity) ? Number(line.quantity) : NaN;
 
-        if (!productId || !Number.isInteger(qty) || qty < 1) throw new HttpError('Each item needs a productId and a whole-number quantity ≥ 1', 400);
+        if (!productId || !Number.isInteger(qty) || qty < 1) throw new HttpError('Each item in your bag needs a quantity of at least 1. Please update your bag.', 400);
         // Nobody needs more than 9 of one item (a Buy 1 Get 1 line holds the free ones too, so 18). Bundles have their own fixed quantity.
         if (!bundleId && qty > (offerId ? 18 : 9)) throw new HttpError(`You can order up to 9 of one item. Please lower the quantity.`, 400);
 
@@ -486,7 +486,7 @@ router.get('/orders/admin/export', asyncRoute(async (req, res) => {
 router.post('/orders/admin/create-direct', asyncRoute(async (req, res) => {
     requireAdmin(req);
     const body = req.body || {};
-    if (!Array.isArray(body.items) || body.items.length === 0) return sendError(res, 'items array is required', 400);
+    if (!Array.isArray(body.items) || body.items.length === 0) return sendError(res, 'Add at least one item to the order', 400);
 
     const { items, subtotal } = await buildDirectOrderItems(body.items);
 
@@ -1038,7 +1038,8 @@ router.post('/orders/cancel-pending', asyncRoute(async (req, res) => {
 router.post('/orders', asyncRoute(async (req, res) => {
     const payload = await requireCustomer(req);
     const body = req.body || {};
-    if (!Array.isArray(body.items) || body.items.length === 0) return sendError(res, 'items array is required', 400);
+    // The shopper can see this (a bag emptied in another tab), so it is said in their words.
+    if (!Array.isArray(body.items) || body.items.length === 0) return sendError(res, 'Your bag is empty', 400);
 
     const payment = String(body.payment || 'cod').toLowerCase();
     if (!['cod', 'razorpay'].includes(payment)) return sendError(res, 'Invalid payment method', 400);

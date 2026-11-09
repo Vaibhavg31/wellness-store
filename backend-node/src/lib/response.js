@@ -21,7 +21,10 @@ export function sendCsv(res, filename, headers, rows) {
     res.set('Content-Disposition', `attachment; filename="${filename}"`);
 
     const escape = (val) => {
-        const s = val === null || val === undefined ? '' : String(val);
+        let s = val === null || val === undefined ? '' : String(val);
+        // Text a shopper typed (a name, an address) that starts like a formula would run as one when the file is
+        // opened in Excel or Sheets ("=HYPERLINK(...)"). A leading apostrophe makes the cell plain text (OWASP advice).
+        if (typeof val === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
         if (/[",\n\r]/.test(s)) {
             return `"${s.replace(/"/g, '""')}"`;
         }

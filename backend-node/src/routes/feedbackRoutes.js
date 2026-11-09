@@ -3,15 +3,22 @@ import { requireAdmin } from '../lib/auth.js';
 import { asyncRoute, sendJson, sendError } from '../lib/response.js';
 import { generateId } from '../lib/db.js';
 import { assertText, isValidEmail } from '../lib/validate.js';
+import { checkRateLimit } from '../lib/rateLimiter.js';
 import { FeedbackRepository } from '../repositories/feedbackRepository.js';
 
 const router = Router();
 const repo = new FeedbackRepository();
 
 
+// The contact form is public, so one visitor (IP) may send a handful of messages an hour; a bot cannot flood the inbox.
+const MESSAGES_PER_IP_PER_HOUR = 10;
+
 router.post('/feedback', asyncRoute(async (req, res) => {
     const body = req.body || {};
-    if (!body.name || !body.email || !body.message) return sendError(res, 'name, email and message are required', 400);
+    if (!body.name || !body.email || !body.message) return sendError(res, 'Please fill in your name, email and message', 400);
+    if (!(await checkRateLimit(`feedback-${req.ip || req.socket.remoteAddress || '0.0.0.0'}`, MESSAGES_PER_IP_PER_HOUR, 3600))) {
+        return sendError(res, 'You have sent several messages already. Please try again in a little while.', 429);
+    }
     assertText(body.name, 'Name', 120);
     assertText(body.message, 'Message', 5000);
     assertText(body.email, 'Email', 254);
