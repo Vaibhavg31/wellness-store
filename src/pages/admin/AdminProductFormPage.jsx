@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
     AlertCircle,
     Boxes,
+    ChevronLeft,
+    ChevronRight,
     CreditCard,
     Eye,
     ImageIcon,
@@ -891,40 +893,49 @@ export default function AdminProductFormPage() {
                         </label>
                     ) : (
                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                            {form.images.map((img, i) => (
-                                <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border border-admin-border bg-admin-surface-alt">
-                                    <img src={imageUrl(img)} alt="" className="w-full h-full object-cover" />
-                                    <button
-                                        type="button"
-                                        onClick={() => setForm((prev) => ({
-                                            ...prev,
-                                            images: prev.images.filter((_, j) => j !== i),
-                                        }))}
-                                        className="absolute top-1.5 right-1.5 p-1.5 rounded-lg bg-danger text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-sm"
-                                        aria-label="Remove image"
-                                    >
-                                        <X size={12} />
-                                    </button>
-                                    {i === 0 ? (
-                                        <span className="absolute bottom-1.5 left-1.5 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-ink/70 text-white">
-                                            Cover
-                                        </span>
-                                    ) : (
+                            {form.images.map((img, i) => {
+                                // Photos are shown in this order on the product page; the first one is the cover.
+                                const move = (to) => setForm((prev) => {
+                                    const next = [...prev.images];
+                                    const [picked] = next.splice(i, 1);
+                                    next.splice(to, 0, picked);
+                                    return { ...prev, images: next };
+                                });
+                                // Controls are always visible on touch screens; on desktop they appear on hover and on keyboard focus.
+                                const reveal = 'opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity';
+                                const small = "relative grid size-7 place-items-center rounded-lg bg-ink/70 text-white before:absolute before:-inset-1.5 before:content-[''] hover:bg-ink disabled:opacity-40";
+                                return (
+                                    <div key={`${img}-${i}`} className="relative group aspect-square rounded-xl overflow-hidden border border-admin-border bg-admin-surface-alt">
+                                        <img src={imageUrl(img)} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
                                         <button
                                             type="button"
-                                            onClick={() => setForm((prev) => {
-                                                const next = [...prev.images];
-                                                const [picked] = next.splice(i, 1);
-                                                next.unshift(picked);
-                                                return { ...prev, images: next };
-                                            })}
-                                            className="absolute bottom-1.5 left-1.5 text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-ink/60 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                                            onClick={() => setForm((prev) => ({
+                                                ...prev,
+                                                images: prev.images.filter((_, j) => j !== i),
+                                            }))}
+                                            className={`absolute top-1.5 right-1.5 grid size-7 place-items-center rounded-lg bg-danger text-white shadow-sm before:absolute before:-inset-1.5 before:content-[''] ${reveal}`}
+                                            aria-label={`Remove photo ${i + 1}`}
                                         >
-                                            Set as cover
+                                            <X size={14} />
                                         </button>
-                                    )}
-                                </div>
-                            ))}
+                                        <div className={`absolute inset-x-1.5 bottom-1.5 flex items-center gap-1.5 ${i === 0 ? '' : reveal}`}>
+                                            {i === 0 ? (
+                                                <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-ink/70 text-white">Cover</span>
+                                            ) : (
+                                                <button type="button" onClick={() => move(0)} className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-1 rounded bg-ink/60 text-white hover:bg-ink">
+                                                    Set as cover
+                                                </button>
+                                            )}
+                                            {form.images.length > 1 && (
+                                                <span className={`ml-auto flex gap-1.5 ${i === 0 ? reveal : ''}`}>
+                                                    <button type="button" onClick={() => move(i - 1)} disabled={i === 0} className={small} aria-label={`Move photo ${i + 1} earlier`}><ChevronLeft size={14} /></button>
+                                                    <button type="button" onClick={() => move(i + 1)} disabled={i === form.images.length - 1} className={small} aria-label={`Move photo ${i + 1} later`}><ChevronRight size={14} /></button>
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </FormSection>
