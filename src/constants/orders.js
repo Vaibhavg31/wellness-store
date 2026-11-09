@@ -79,31 +79,6 @@ export function getStatusIndex(status) {
     }
 }
 
-export function isStepDone(status, stepIndex) {
-    const normalized = normalizeStatus(status);
-    if (normalized === 'delivered') return true;
-    if (stepIndex === 0) return ['confirmed', 'out_for_delivery'].includes(normalized);
-    if (stepIndex === 1) return false;
-    return false;
-}
-
-export function isStepActive(status, stepIndex) {
-    const normalized = normalizeStatus(status);
-    if (normalized === 'confirmed' && stepIndex === 0) return true;
-    if (normalized === 'out_for_delivery' && stepIndex === 1) return true;
-    return false;
-}
-
-export function getFulfillmentProgress(status) {
-    const normalized = normalizeStatus(status);
-    const stepCount = FULFILLMENT_PIPELINE.length;
-    if (normalized === 'placed') return Math.round((1 / stepCount) * 50);
-    if (normalized === 'confirmed') return Math.round((1 / stepCount) * 100);
-    if (normalized === 'out_for_delivery') return Math.round((2 / stepCount) * 100);
-    if (normalized === 'delivered') return 100;
-    return 0;
-}
-
 export function getNextStatus(status) {
     const normalized = normalizeStatus(status);
     if (normalized === 'placed') return 'confirmed';

@@ -1,170 +1,139 @@
 import { motion } from 'framer-motion';
-import { Check, Truck, MapPin, XCircle, RotateCcw } from 'lucide-react';
-import {
-    FULFILLMENT_PIPELINE,
-    buildStatusHistory,
-    getFulfillmentProgress,
-    getStatusLabel,
-    isStepActive,
-    isStepDone,
-    normalizeStatus,
-} from '@/constants/orders';
+import { Check, ClipboardCheck, PackageCheck, Truck, MapPin, XCircle, RotateCcw } from 'lucide-react';
+import { buildStatusHistory, getStatusLabel, isAwaitingPayment, normalizeStatus } from '@/constants/orders';
 
-const STEP_META = {
-    confirmed: { icon: Check, message: 'Payment confirmed. We\'re preparing your order' },
-    out_for_delivery: { icon: Truck, message: 'On the way to you' },
-    delivered: { icon: MapPin, message: 'Delivered. Enjoy your order' },
-};
+/**
+ * The order tracker. Four steps, like the big marketplaces: Order placed → Confirmed → Out for delivery → Delivered.
+ * Every step before the current one is done (ticked), the current one is highlighted, the rest are still to come.
+ * (It used to start at "Confirmed", so a just-placed order showed every step greyed out, and a cash-on-delivery order
+ * read "Payment confirmed".)
+ */
+const STEPS = ['placed', 'confirmed', 'out_for_delivery', 'delivered'];
+const ICONS = { placed: ClipboardCheck, confirmed: PackageCheck, out_for_delivery: Truck, delivered: MapPin };
+const PROGRESS = { placed: 10, confirmed: 40, out_for_delivery: 75, delivered: 100 };
+
+function stepMessage(step, order, current) {
+    const paidOnline = order.payment === 'razorpay' && order.paymentStatus === 'paid';
+    switch (step) {
+        case 'placed':
+            if (isAwaitingPayment(order)) return 'Waiting for your payment';
+            return current ? 'We have your order and will confirm it shortly' : 'We received your order';
+        case 'confirmed':
+            return paidOnline ? 'Payment received. We are packing your order' : 'We are packing your order';
+        case 'out_for_delivery':
+            return 'On the way to you';
+        default:
+            return 'Delivered. Enjoy your order';
+    }
+}
 
 const TERMINAL_META = {
     cancelled: { icon: XCircle, message: 'This order was cancelled' },
     returned: { icon: RotateCcw, message: 'Return processed' },
 };
 
-function StepIcon({ step, active, done, terminal }) {
-    const meta = TERMINAL_META[step] || STEP_META[step];
-    const Icon = meta?.icon || Check;
+const fmtWhen = (at) => new Date(at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-    if (terminal) {
-        return (
-            <div className="w-11 h-11 rounded-full bg-danger-tint border-2 border-danger/30 flex items-center justify-center">
-                <Icon size={18} className="text-danger" />
-            </div>
-        );
-    }
-
+function StepIcon({ step, active, done }) {
+    const Icon = ICONS[step] || Check;
     if (done) {
         return (
-            <motion.div
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                className="w-11 h-11 rounded-full bg-primary text-canvas flex items-center justify-center shadow-md shadow-primary/20"
-            >
-                <Check size={18} strokeWidth={2.5} />
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex size-11 items-center justify-center rounded-full bg-primary text-canvas shadow-md shadow-primary/20">
+                <Check size={18} strokeWidth={2.5} aria-hidden="true" />
             </motion.div>
         );
     }
-
     if (active) {
         return (
             <div className="relative">
                 <motion.div
                     animate={{ scale: [1, 1.08, 1] }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                    className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-primary-hover text-canvas flex items-center justify-center ring-4 ring-primary/15"
+                    className="flex size-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-hover text-canvas ring-4 ring-primary/15 motion-reduce:animate-none"
                 >
-                    <Icon size={18} />
+                    <Icon size={18} aria-hidden="true" />
                 </motion.div>
-                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-accent border-2 border-canvas animate-pulse" />
+                <span className="absolute -right-0.5 -top-0.5 size-3 rounded-full border-2 border-canvas bg-accent motion-safe:animate-pulse" />
             </div>
         );
     }
-
     return (
-        <div className="w-11 h-11 rounded-full bg-canvas-alt border border-line/60 flex items-center justify-center text-muted/50">
-            <Icon size={16} />
+        <div className="flex size-11 items-center justify-center rounded-full border border-line bg-canvas-alt text-muted/60">
+            <Icon size={16} aria-hidden="true" />
         </div>
     );
 }
 
 export default function OrderJourney({ order, variant = 'full' }) {
     const status = normalizeStatus(order.status);
-    const isTerminal = status === 'cancelled' || status === 'returned';
     const history = buildStatusHistory(order);
 
-    if (isTerminal) {
+    if (status === 'cancelled' || status === 'returned') {
         const meta = TERMINAL_META[status];
         const Icon = meta.icon;
-        const entry = history.find((h) => normalizeStatus(h.status) === status);
-
+        const entry = [...history].reverse().find((h) => normalizeStatus(h.status) === status);
         return (
-            <div className="rounded-2xl bg-gradient-to-br from-canvas-alt to-canvas border border-line/40 p-6 sm:p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-danger-tint border border-danger/30 flex items-center justify-center mx-auto mb-4">
-                    <Icon size={28} className="text-danger" />
+            <div className="rounded-2xl border border-line/40 bg-gradient-to-br from-canvas-alt to-canvas p-6 text-center sm:p-8">
+                <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full border border-danger/30 bg-danger-tint">
+                    <Icon size={28} className="text-danger" aria-hidden="true" />
                 </div>
-                <p className="font-display text-2xl text-ink mb-2">{getStatusLabel(status, 'user')}</p>
-                <p className="text-muted text-sm max-w-sm mx-auto">{meta.message}</p>
-                {entry?.at && (
-                    <p className="text-xs text-muted/70 mt-3">
-                        {new Date(entry.at).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                )}
+                <p className="mb-2 font-display text-2xl text-ink">{getStatusLabel(status, 'user')}</p>
+                <p className="mx-auto max-w-sm text-sm text-muted">{meta.message}</p>
+                {entry?.at && <p className="mt-3 text-xs text-muted">{fmtWhen(entry.at)}</p>}
             </div>
         );
     }
 
-    const steps = FULFILLMENT_PIPELINE;
+    const current = Math.max(0, STEPS.indexOf(status));
+    const delivered = status === 'delivered';
 
     if (variant === 'compact') {
-        const activeStep = FULFILLMENT_PIPELINE.find((_, i) => isStepActive(status, i))
-            || (status === 'confirmed' ? 'confirmed' : FULFILLMENT_PIPELINE[0]);
-        const meta = STEP_META[activeStep];
-        const progress = getFulfillmentProgress(status);
-
+        const step = STEPS[current];
         return (
             <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs text-muted">
-                    <span>{getStatusLabel(activeStep, 'user')}</span>
-                    <span>{Math.round(progress)}%</span>
+                    <span className="font-medium text-ink">{isAwaitingPayment(order) ? 'Awaiting payment' : getStatusLabel(step, 'user')}</span>
+                    <span>Step {current + 1} of {STEPS.length}</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-canvas-alt overflow-hidden">
+                <div className="h-1.5 overflow-hidden rounded-full bg-canvas-alt" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={PROGRESS[step]} aria-label="Order progress">
                     <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
+                        animate={{ width: `${PROGRESS[step]}%` }}
                         transition={{ duration: 0.8, ease: 'easeOut' }}
                         className="h-full rounded-full bg-gradient-to-r from-primary via-accent to-accent"
                     />
                 </div>
-                {meta && <p className="text-xs text-muted/80">{meta.message}</p>}
+                <p className="text-xs text-muted">{stepMessage(step, order, true)}</p>
             </div>
         );
     }
 
     return (
-        <div className="rounded-2xl bg-gradient-to-b from-canvas to-canvas-alt border border-line/40 p-6 sm:p-8 overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-
-            <p className="text-xs tracking-[0.25em] uppercase text-muted mb-6">Your Journey</p>
-
-            <div className="relative">
-                {steps.map((step, i) => {
-                    const done = isStepDone(status, i);
-                    const active = isStepActive(status, i);
-                    const meta = STEP_META[step];
-                    const historyEntry = history.find((h) => normalizeStatus(h.status) === step);
-
+        <div className="relative overflow-hidden rounded-2xl border border-line/40 bg-gradient-to-b from-canvas to-canvas-alt p-6 sm:p-8">
+            <h2 className="mb-6 font-sans text-xs uppercase tracking-[0.25em] text-muted">Your journey</h2>
+            <ol className="relative">
+                {STEPS.map((step, i) => {
+                    const done = i < current || delivered;
+                    const active = i === current && !delivered;
+                    const entry = [...history].reverse().find((h) => normalizeStatus(h.status) === step) || (step === 'placed' ? { at: order.createdAt } : null);
                     return (
-                        <div key={step} className="flex gap-4 pb-8 last:pb-0 relative">
-                            {i < steps.length - 1 && (
-                                <div
-                                    className={`absolute left-[22px] top-11 w-0.5 h-[calc(100%-12px)] ${
-                                        done ? 'bg-primary/40' : 'bg-line/60'
-                                    }`}
-                                />
+                        <li key={step} className="relative flex gap-4 pb-8 last:pb-0" aria-current={active ? 'step' : undefined}>
+                            {i < STEPS.length - 1 && (
+                                <div aria-hidden="true" className={`absolute left-[22px] top-11 h-[calc(100%-12px)] w-0.5 ${done ? 'bg-primary/40' : 'bg-line'}`} />
                             )}
-
                             <StepIcon step={step} active={active} done={done} />
-
-                            <div className={`flex-1 pt-1.5 ${!done && !active ? 'opacity-45' : ''}`}>
+                            <div className={`flex-1 pt-1.5 ${!done && !active ? 'opacity-55' : ''}`}>
                                 <p className={`font-medium ${active ? 'text-ink' : 'text-ink/80'}`}>
                                     {getStatusLabel(step, 'user')}
+                                    <span className="sr-only">{done ? ' (done)' : active ? ' (current step)' : ' (to come)'}</span>
                                 </p>
-                                <p className="text-sm text-muted mt-0.5">{meta.message}</p>
-                                {historyEntry?.at && (done || active) && (
-                                    <p className="text-[11px] text-muted/60 mt-1.5">
-                                        {new Date(historyEntry.at).toLocaleString('en-IN', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                        })}
-                                    </p>
-                                )}
+                                <p className="mt-0.5 text-sm text-muted">{stepMessage(step, order, active)}</p>
+                                {entry?.at && (done || active) && <p className="mt-1.5 text-[11px] text-muted">{fmtWhen(entry.at)}</p>}
                             </div>
-                        </div>
+                        </li>
                     );
                 })}
-            </div>
+            </ol>
         </div>
     );
 }
