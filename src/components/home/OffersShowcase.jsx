@@ -44,8 +44,11 @@ export function ClubStrip({ className }) {
  * strip sits underneath. Shows nothing when no offer is running.
  */
 export default function OffersShowcase({ products }) {
-    const { offers } = useOffers();
-    if (offers.length === 0) return null;
+    const { offers, loading } = useOffers();
+    // While the offers load, two placeholder cards of the real size hold the space, so the page below does not jump
+    // down when they arrive (it was the biggest layout shift on the site).
+    const placeholders = loading && offers.length === 0;
+    if (offers.length === 0 && !placeholders) return null;
 
     return (
         <section aria-labelledby="offers-title" className="bg-gradient-to-b from-canvas-alt to-canvas">
@@ -56,7 +59,18 @@ export default function OffersShowcase({ products }) {
                     <p className="mt-3 text-body text-muted sm:text-lead">Pick your own box or double up on a favourite. Live offers appear here the moment they start.</p>
                 </div>
 
-                <ul aria-label="Live offers" className="mt-8 grid gap-4 md:grid-cols-2 lg:gap-6">
+                <ul aria-label="Live offers" aria-busy={placeholders || undefined} className="mt-8 grid gap-4 md:grid-cols-2 lg:gap-6">
+                    {placeholders && [0, 1].map((i) => (
+                        <li key={i} aria-hidden="true" className="flex flex-col overflow-hidden rounded-2xl bg-surface ring-1 ring-line">
+                            <span className="skeleton h-44 rounded-none sm:h-52" />
+                            <span className="flex flex-col gap-3 p-5 sm:p-6">
+                                <span className="skeleton h-3 w-24 rounded" />
+                                <span className="skeleton h-7 w-3/4 rounded" />
+                                <span className="skeleton h-4 w-2/3 rounded" />
+                                <span className="skeleton mt-3 h-4 w-32 rounded" />
+                            </span>
+                        </li>
+                    ))}
                     {offers.map((offer) => (
                         <li key={offer.id}>
                             <Link

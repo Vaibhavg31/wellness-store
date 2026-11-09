@@ -31,7 +31,7 @@ export function OffersHubPage() {
     return (
         <>
             <Seo title="Offers" description="Pick & Mix boxes, Buy 1 Get 1 Free and more offers on Chikit Ayurvedic wellness." path="/offers" />
-            {offers.length > 0 ? <OffersShowcase products={products} /> : (
+            {offers.length > 0 || loading ? <OffersShowcase products={products} /> : (
                 <section className="bg-gradient-to-b from-canvas-alt to-canvas py-16 text-center">
                     <div className="container-page">
                         <h1>Offers</h1>
@@ -54,7 +54,7 @@ export function OffersHubPage() {
                             </li>
                         ))}
                     </ol>
-                    {offers.length === 0 && <ClubStrip className="mt-10" />}
+                    {!loading && offers.length === 0 && <ClubStrip className="mt-10" />}
                 </div>
             </section>
         </>

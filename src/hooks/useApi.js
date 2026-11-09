@@ -178,18 +178,22 @@ export function useReviews(productId) {
 // The header, the phone menu and the offer pages all ask for the offers; share one request for a minute.
 let offersRequest = null;
 let offersFetchedAt = 0;
+// The last answer, so a page opened later starts with the offers already drawn (no empty first frame, no jump).
+let offersCache = null;
 const fetchOffers = () => {
     if (!offersRequest || Date.now() - offersFetchedAt > 60_000) {
         offersFetchedAt = Date.now();
-        offersRequest = api.get('/api/offers').then((data) => (Array.isArray(data) ? data : [])).catch(() => { offersRequest = null; return []; });
+        offersRequest = api.get('/api/offers')
+            .then((data) => { offersCache = Array.isArray(data) ? data : []; return offersCache; })
+            .catch(() => { offersRequest = null; return offersCache ?? []; });
     }
     return offersRequest;
 };
 
 /** The offer pages that are live right now ("Pick any 3", "Buy 1 Get 1 Free" …). */
 export function useOffers() {
-    const [offers, setOffers] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [offers, setOffers] = useState(() => offersCache ?? []);
+    const [loading, setLoading] = useState(() => offersCache === null);
     useEffect(() => {
         let cancelled = false;
         fetchOffers().then((data) => { if (!cancelled) { setOffers(data); setLoading(false); } });

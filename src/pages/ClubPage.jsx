@@ -282,7 +282,7 @@ export default function ClubPage() {
     const [step, setStep] = useState(0);
     const [justJoined, setJustJoined] = useState(false);
     const member = Boolean(isAuthenticated && user?.club?.member);
-    const { products } = useProducts();
+    const { products, loading: productsLoading } = useProducts();
     const priceCount = Math.min(12, Math.max(3, Number(club.priceCount) || 8));
     const examples = useMemo(() => clubExamples(products, priceCount), [products, priceCount]);
 
@@ -334,15 +334,25 @@ export default function ClubPage() {
                 </div>
             </section>
 
-            {club.showPrices !== false && examples.length > 0 && (
+            {club.showPrices !== false && (examples.length > 0 || productsLoading) && (
                 <section aria-labelledby="club-prices-title" className="container-page py-10 lg:py-14">
                     <div className="mx-auto mb-8 max-w-2xl text-center">
                         <p className="eyebrow mb-3">{member ? 'Chikit Club member prices' : 'See the difference'}</p>
                         <h2 id="club-prices-title">{member ? 'What you pay as a Chikit Club member' : 'Same products. Lower prices.'}</h2>
                         <p className="mt-3 text-body text-muted lg:text-lead">{member ? 'Your Chikit Club price shows on every product while you are signed in. Here is what it saves you on some favourites.' : 'The usual price and the Chikit Club member price of some of our best-loved products, side by side. Joining is free.'}</p>
                     </div>
-                    <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+                    <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4" aria-busy={examples.length === 0 || undefined}>
                         {examples.map((p) => <li key={p.id}><ClubPriceTile product={p} member={member} joinHref="#join" /></li>)}
+                        {/* Placeholders of the real tile size while products load, so the sign-up form below does not jump. */}
+                        {examples.length === 0 && Array.from({ length: priceCount }, (_, i) => (
+                            <li key={i} aria-hidden="true" className="flex flex-col gap-2 rounded-2xl bg-surface p-3 ring-1 ring-line">
+                                <span className="skeleton block aspect-square rounded-xl" />
+                                <span className="skeleton mt-1 block h-4 w-4/5 rounded" />
+                                <span className="skeleton block h-4 w-1/2 rounded" />
+                                <span className="skeleton block h-7 w-2/3 rounded" />
+                                <span className="skeleton mt-1 block h-11 rounded-full" />
+                            </li>
+                        ))}
                     </ul>
                     <div className="mt-8 flex justify-center">
                         {member
