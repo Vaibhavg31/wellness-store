@@ -21,6 +21,7 @@ export function couponConditions(coupon) {
             ? `On orders of ${formatPrice(coupon.minOrderAmount)} or more`
             : `On regular-priced products worth ${formatPrice(coupon.minOrderAmount)} or more`);
     }
+    if (coupon.firstOrderOnly) parts.push('For your first order only');
     if (coupon.type !== 'free_delivery') parts.push('Not on offer boxes, pairs or bundles');
     return parts;
 }

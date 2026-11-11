@@ -850,7 +850,7 @@ INSERT IGNORE INTO `bundle_items` (`id`, `bundle_id`, `product_id`, `quantity`, 
 
 -- coupons
 INSERT IGNORE INTO `coupons` (`id`, `code`, `title`, `description`, `type`, `value`, `min_order_amount`, `max_discount`, `max_uses`, `max_uses_per_user`, `usage_count`, `is_enabled`, `show_on_website`, `auto_apply`, `audience`, `min_previous_orders`, `starts_at`, `expires_at`, `created_at`, `updated_at`) VALUES ('coupon-1789387945092-6a0151','WELCOMEBACK10','Welcome Back - 10% Off','A thank-you for returning customers','percent',10.00,0.00,0.00,0,0,0,1,1,1,'returning_customers',1,NULL,NULL,'2026-09-14 12:12:25.000000','2026-09-14 12:17:03.000000');
-INSERT IGNORE INTO `coupons` (`id`, `code`, `title`, `description`, `type`, `value`, `min_order_amount`, `max_discount`, `max_uses`, `max_uses_per_user`, `usage_count`, `is_enabled`, `show_on_website`, `auto_apply`, `audience`, `min_previous_orders`, `starts_at`, `expires_at`, `created_at`, `updated_at`) VALUES ('coupon-welcome10','WELCOME10','Welcome Offer','10% off on your first order','percent',10.00,499.00,150.00,0,1,0,1,1,0,'everyone',1,NULL,NULL,'2026-01-01 00:00:00.000000','2026-01-01 00:00:00.000000');
+INSERT IGNORE INTO `coupons` (`id`, `code`, `title`, `description`, `type`, `value`, `min_order_amount`, `max_discount`, `max_uses`, `max_uses_per_user`, `usage_count`, `is_enabled`, `show_on_website`, `auto_apply`, `audience`, `min_previous_orders`, `starts_at`, `expires_at`, `created_at`, `updated_at`) VALUES ('coupon-welcome10','WELCOME10','Welcome Offer','10% off on your first order','percent',10.00,499.00,150.00,0,1,0,1,1,0,'new_customers',1,NULL,NULL,'2026-01-01 00:00:00.000000','2026-01-01 00:00:00.000000');
 
 -- promo_banners
 

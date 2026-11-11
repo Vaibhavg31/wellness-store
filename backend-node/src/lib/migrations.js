@@ -27,6 +27,12 @@ async function addColumn(pool, table, column, definition) {
 }
 
 const TABLES = [
+    // Which one-time data fixes have already run (see runOnce).
+    `CREATE TABLE IF NOT EXISTS app_migrations (
+        name VARCHAR(120) NOT NULL,
+        applied_at DATETIME NOT NULL,
+        PRIMARY KEY (name)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
     // Offer pages: "Pick any 3 for ₹1499", "Buy 1 Get 1 Free" and any collection the admin adds later.
     `CREATE TABLE IF NOT EXISTS offers (
         id VARCHAR(64) NOT NULL,
@@ -160,12 +166,36 @@ async function seedStarterOffers(pool) {
     }
 }
 
+/**
+ * One-time data fixes. A fix is recorded in app_migrations the first time it runs, so it never runs again and cannot undo a
+ * change the admin makes afterwards.
+ */
+async function runOnce(pool, name, fix) {
+    // A failed data fix must never stop the shop from starting; it is logged and tried again at the next start.
+    try {
+        const [res] = await pool.query('INSERT IGNORE INTO app_migrations (name, applied_at) VALUES (?, NOW())', [name]);
+        if (res.affectedRows !== 1) return;
+        try {
+            await fix();
+        } catch (err) {
+            await pool.query('DELETE FROM app_migrations WHERE name = ?', [name]);
+            throw err;
+        }
+    } catch (err) {
+        console.error(`One-time fix ${name} did not run:`, err.message);
+    }
+}
+
 export async function ensureSchema() {
     const pool = getPool();
     const offersExisted = await hasTable(pool, 'offers');
     for (const ddl of TABLES) await pool.query(ddl);
     if (!offersExisted) await seedStarterOffers(pool);
     for (const [table, column, definition] of COLUMNS) await addColumn(pool, table, column, definition);
+    // The welcome coupon is for a first order only, once per customer (it was open to everyone). Only the shop's own WELCOME10 is changed.
+    await runOnce(pool, '2026-11-welcome10-first-order-only', async () => {
+        await pool.query("UPDATE coupons SET audience = 'new_customers', max_uses_per_user = 1 WHERE code = 'WELCOME10' AND audience = 'everyone'");
+    });
     if (!(await hasIndex(pool, 'users', 'uq_users_club_card_no'))) {
         await pool.query('ALTER TABLE users ADD UNIQUE KEY uq_users_club_card_no (club_card_no)');
     }

@@ -43,7 +43,7 @@ router.post('/coupons/validate', asyncRoute(async (req, res) => {
     const body = req.body || {};
     const payload = optionalCustomer(req);
     const userId = payload ? String(payload.userId || '') : null;
-    sendJson(res, await service.validate(String(body.code || ''), Number(body.subtotal || 0), userId, body.eligibleSubtotal));
+    sendJson(res, await service.validate(String(body.code || ''), Number(body.subtotal || 0), userId, body.eligibleSubtotal, { phone: String(body.phone || '') }));
 }, 'Failed to validate coupon'));
 
 router.post('/coupons/auto-apply', asyncRoute(async (req, res) => {

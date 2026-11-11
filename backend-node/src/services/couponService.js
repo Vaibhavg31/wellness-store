@@ -1,6 +1,9 @@
 import { CouponRepository } from '../repositories/couponRepository.js';
 import { OrderRepository } from '../repositories/orderRepository.js';
 import { SettingsRepository } from '../repositories/settingsRepository.js';
+import { UserRepository } from '../repositories/userRepository.js';
+
+export const FIRST_ORDER_ONLY = 'This coupon is for your first order only';
 
 /** Mirrors backend/lib/CouponService.php exactly (discount math, eligibility, audience rules). */
 export class CouponService {
@@ -11,6 +14,7 @@ export class CouponService {
         this.coupons = new CouponRepository();
         this.orders = new OrderRepository();
         this.settings = new SettingsRepository();
+        this.users = new UserRepository();
     }
 
     static normalizeCode(code) {
@@ -71,7 +75,7 @@ export class CouponService {
         return best;
     }
 
-    async validate(code, rawSubtotal, userId = null, rawEligible = undefined) {
+    async validate(code, rawSubtotal, userId = null, rawEligible = undefined, who = {}) {
         const { full: subtotal, eligible } = CouponService.cleanAmounts(rawSubtotal, rawEligible);
         const normalized = CouponService.normalizeCode(code);
         if (!normalized) return { valid: false, message: 'Enter a coupon code' };
@@ -79,7 +83,7 @@ export class CouponService {
         const coupon = await this.coupons.findByCode(normalized);
         if (!coupon) return { valid: false, message: 'That code is not valid. Please check it and try again.' };
 
-        const error = await this.eligibilityError(coupon, subtotal, userId, eligible);
+        const error = await this.eligibilityError(coupon, subtotal, userId, eligible, who);
         if (error !== null) return { valid: false, message: error };
 
         const breakdown = await this.calculateBreakdown(subtotal, coupon, eligible);
@@ -155,7 +159,7 @@ export class CouponService {
     async recordUsage(couponId) { return this.coupons.incrementUsage(couponId); }
     async releaseUsage(couponId) { return this.coupons.decrementUsage(couponId); }
 
-    async eligibilityError(coupon, subtotal, userId, eligibleSubtotal = subtotal) {
+    async eligibilityError(coupon, subtotal, userId, eligibleSubtotal = subtotal, who = {}) {
         if (!coupon.isEnabled) return 'This coupon is no longer active';
 
         const now = Date.now();
@@ -198,7 +202,7 @@ export class CouponService {
             }
         }
 
-        return this.audienceError(coupon, userId);
+        return this.audienceError(coupon, userId, who);
     }
 
     /**
@@ -211,16 +215,26 @@ export class CouponService {
         return !reason || (!userId && reason.startsWith('Sign in'));
     }
 
-    async audienceError(coupon, userId) {
+    /**
+     * Whether this shopper has ordered before. Looks at their account, the email on their account and every mobile number they
+     * are known by (their account's, plus the one on the delivery address at checkout), so a second account does not make
+     * someone "new" again.
+     */
+    async hasOrderedBefore(userId, who = {}) {
+        const user = userId ? await this.users.getById(userId) : null;
+        const count = await this.orders.countEarlierOrders({ userId, email: user?.email || who.email || '', phones: [user?.phone, who.phone] });
+        return count > 0;
+    }
+
+    async audienceError(coupon, userId, who = {}) {
         const audience = coupon.audience || 'everyone';
         if (audience === 'everyone') return null;
 
         const signedIn = Boolean(userId);
 
         if (audience === 'new_customers') {
-            if (signedIn && (await this.orders.countNonCancelledOrders(userId)) > 0) {
-                return 'This offer is for new customers only';
-            }
+            // A guest has no history to check; checkout needs an account, and the check runs again when the order is placed.
+            if (signedIn && (await this.hasOrderedBefore(userId, who))) return FIRST_ORDER_ONLY;
             return null;
         }
 
@@ -266,6 +280,7 @@ export class CouponService {
             minOrderAmount: Number(coupon.minOrderAmount || 0),
             maxDiscount: Number(coupon.maxDiscount || 0),
             label: CouponService.labelFor(coupon),
+            firstOrderOnly: (coupon.audience || 'everyone') === 'new_customers',
         };
     }
 
@@ -290,6 +305,7 @@ export class CouponService {
             label,
             minOrderAmount: Number(coupon.minOrderAmount || 0),
             maxDiscount: Number(coupon.maxDiscount || 0),
+            firstOrderOnly: (coupon.audience || 'everyone') === 'new_customers',
         };
     }
 }

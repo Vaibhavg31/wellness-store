@@ -52,7 +52,7 @@ const DELIVERY_MODES = [
 
 const AUDIENCE_OPTIONS = [
     { value: 'everyone', label: 'Everyone', icon: Users },
-    { value: 'new_customers', label: 'New customers', icon: UserPlus },
+    { value: 'new_customers', label: 'First order only', icon: UserPlus },
     { value: 'returning_customers', label: 'Returning customers', icon: Repeat },
 ];
 
@@ -265,7 +265,7 @@ export default function AdminCouponsPage() {
                                                                         ? (coupon.minPreviousOrders > 1
                                                                             ? `${coupon.minPreviousOrders}+ orders`
                                                                             : 'Returning customers')
-                                                                        : 'New customers'}
+                                                                        : 'First order only'}
                                                                 </Badge>
                                                             )}
                                                         </div>
@@ -394,7 +394,7 @@ export default function AdminCouponsPage() {
                                 <button
                                     key={value}
                                     type="button"
-                                    onClick={() => setForm({ ...form, audience: value })}
+                                    onClick={() => setForm({ ...form, audience: value, ...(value === 'new_customers' && !form.maxUsesPerUser ? { maxUsesPerUser: 1 } : {}) })}
                                     className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-xs text-center transition-colors ${form.audience === value ? 'border-primary bg-primary/10 text-primary' : 'border-line hover:border-primary/40'}`}
                                 >
                                     <AIcon size={16} />
@@ -418,7 +418,7 @@ export default function AdminCouponsPage() {
                         )}
                         {form.audience === 'new_customers' && (
                             <p className="text-xs text-admin-muted mt-2">
-                                Only offered to a signed-in customer with no past orders yet. A shopper who hasn&apos;t made an account at all is still shown this offer — there&apos;s no history to check them against.
+                                For a customer&apos;s very first order. It stops working as soon as they have a past order that is not cancelled, and it is not listed for them any more. We look at their account, their email and the mobile number they deliver to, so a second account does not get it again. A visitor who has not signed in yet can still see it; the check runs when they place the order.
                             </p>
                         )}
                         {form.audience === 'returning_customers' && form.autoApply && (

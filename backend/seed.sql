@@ -218,6 +218,8 @@ INSERT INTO `reviews` (`id`, `product_id`, `name`, `email`, `rating`, `comment`,
 -- ----------------------------------------------------------------------------
 INSERT INTO `coupons` (`id`, `code`, `title`, `description`, `type`, `value`, `min_order_amount`, `max_discount`, `max_uses`, `max_uses_per_user`, `usage_count`, `is_enabled`, `show_on_website`, `auto_apply`, `starts_at`, `expires_at`, `created_at`, `updated_at`) VALUES
 ('coupon-welcome10', 'WELCOME10', 'Welcome Offer', '10% off on your first order', 'percent', 10.00, 499.00, 150.00, 0, 1, 0, 1, 1, 0, NULL, NULL, '2026-01-01 00:00:00.000000', '2026-01-01 00:00:00.000000');
+-- First order only: the welcome coupon is for new customers (no earlier order), once each.
+UPDATE `coupons` SET `audience` = 'new_customers' WHERE `code` = 'WELCOME10';
 
 -- ----------------------------------------------------------------------------
 -- promo_banners

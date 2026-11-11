@@ -1074,7 +1074,8 @@ router.post('/orders', asyncRoute(async (req, res) => {
     const eligibleSubtotal = CouponService.eligibleSubtotalOf(items);
 
     if (couponCode) {
-        const validation = await couponService.validate(couponCode, subtotal, payload.userId || '', eligibleSubtotal);
+        // The delivery number counts too: a first-order coupon is not given again to a new account that delivers to a number which has ordered before.
+        const validation = await couponService.validate(couponCode, subtotal, payload.userId || '', eligibleSubtotal, { phone: String(shipping.phone || ''), email: String(body.customerEmail || shipping.email || '') });
         if (!validation.valid) throw new HttpError(validation.message || 'Invalid coupon', 400);
 
         couponRecord = await coupons.findByCode(couponCode);

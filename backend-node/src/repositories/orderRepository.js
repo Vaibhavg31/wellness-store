@@ -376,6 +376,27 @@ export class OrderRepository extends BaseRepository {
         return Number(rows[0].count);
     }
 
+    /**
+     * How many earlier orders (not cancelled) belong to this customer, whichever way they were placed: on their account, with their
+     * email, or delivered to their mobile number. A "first order" coupon uses this, so opening a second account with the same
+     * email or number does not give a second welcome discount. Phone numbers are compared by their last 10 digits (+91 or not).
+     */
+    async countEarlierOrders({ userId = '', email = '', phones = [] } = {}) {
+        const mail = String(email || '').toLowerCase().trim();
+        const tails = [...new Set((phones || []).map((p) => String(p || '').replace(/\D/g, '').slice(-10)).filter((p) => p.length === 10))];
+        const clauses = [];
+        const params = [];
+        if (userId) { clauses.push('o.user_id = ?'); params.push(userId); }
+        if (mail) { clauses.push('LOWER(o.email) = ?'); params.push(mail); }
+        if (tails.length) {
+            clauses.push(`o.id IN (SELECT s.order_id FROM order_shipping s WHERE RIGHT(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(s.phone, ' ', ''), '+', ''), '-', ''), '(', ''), ')', ''), 10) IN (${tails.map(() => '?').join(',')}))`);
+            params.push(...tails);
+        }
+        if (clauses.length === 0) return 0;
+        const [rows] = await this.pool().query(`SELECT COUNT(*) AS count FROM orders o WHERE o.status <> 'cancelled' AND (${clauses.join(' OR ')})`, params);
+        return Number(rows[0].count);
+    }
+
     async getForUser(userId, email) {
         const normalizedEmail = email.toLowerCase().trim();
         const [rows] = await this.pool().query('SELECT * FROM orders WHERE user_id = ? OR LOWER(email) = ? ORDER BY created_at DESC', [userId || null, normalizedEmail]);
